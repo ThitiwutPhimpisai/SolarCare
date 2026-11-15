@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ข้อสังเกตจากการวิเคราะห์</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@media (max-width: 767px){.in-lab-alt{visibility:hidden !important}
+.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}
+}
+body{margin:0}
+.in-btn{font-family:inherit;cursor:pointer}
+.in-track{display:grid;align-items:end;gap:2px}
+.in-details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:13px;font-weight:600;color:#0F6B5C}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827">
+
+  <sc-if value="{{vKpis}}" hint-placeholder-val="{{ false }}">
+    <div role="group" aria-label="สรุปการวิเคราะห์" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563"><dc-import name="Icon" icon="{{k.icon}}" size="16" bg="{{k.bg}}" hint-size="28px,28px"></dc-import>{{k.label}}</div>
+          <div style="font-size: 22px; font-weight: 700; line-height: 1.3">{{k.value}}<span style="font-size: 13px; font-weight: 500; color: #4B5563"> {{k.unit}}</span></div>
+          <div style="font-size: 12px; color: #4B5563">{{k.note}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{vFindings}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <sc-if value="{{fOrderNote}}" hint-placeholder-val="{{ true }}">
+        <div style="font-size: 13px; color: #4B5563">{{fOrderText}}</div>
+      </sc-if>
+      <sc-if value="{{fEmpty}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display: flex; gap: 12px; align-items: flex-start; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px">
+          <dc-import name="Icon" icon="{{fEmptyIcon}}" size="20" bg="gray" hint-size="36px,36px"></dc-import>
+          <div><div style="font-weight: 600">{{fEmptyTitle}}</div><div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{fEmptyText}}</div></div>
+        </div>
+      </sc-if>
+      <sc-for list="{{findings}}" as="f" hint-placeholder-count="3">
+        <article aria-labelledby="{{f.hid}}" style="{{f.cardStyle}}">
+          <div style="display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center">
+            <span style="{{f.sevStyle}}">{{f.sevLabel}}</span>
+            <span style="{{f.tagStyle}}">{{f.tag}}</span>
+            <span style="font-size: 12px; color: #374151; font-weight: 600">ความเชื่อมั่น {{f.conf}}%</span>
+            <span style="font-size: 12px; color: #4B5563">· ตั้งแต่ {{f.since}}</span>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start">
+            <div style="flex: 1 1 320px; min-width: 0">
+              <h3 id="{{f.hid}}" style="margin: 0; font-size: 16px; line-height: 1.4">{{f.title}}</h3>
+              <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{f.where}}</div>
+              <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6">{{f.text}}</p>
+              <sc-if value="{{f.showEv}}" hint-placeholder-val="{{ true }}">
+                <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #374151; line-height: 1.7">
+                  <sc-for list="{{f.ev}}" as="e" hint-placeholder-count="3"><li>{{e.t}}</li></sc-for>
+                </ul>
+              </sc-if>
+            </div>
+            <div style="flex: 0 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+              <div style="font-size: 12px; color: #4B5563">{{f.sparkLabel}}</div>
+              <svg width="220" height="48" viewBox="0 0 220 48" role="img" aria-label="{{f.sparkAria}}" style="display: block; max-width: 100%; height: auto"><line x1="0" y1="{{f.zeroY}}" x2="220" y2="{{f.zeroY}}" stroke="#E3E6EB" stroke-width="1"></line><polyline points="{{f.spark}}" fill="none" stroke="{{f.sparkColor}}" stroke-width="2" stroke-linejoin="round"></polyline></svg>
+              <div style="font-size: 13px; color: #4B5563"><b style="font-size: 16px; color: #111827">{{f.lossText}}</b> {{f.lossSub}}</div>
+            </div>
+          </div>
+          <sc-if value="{{f.hasActions}}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+              <sc-if value="{{f.hasPrimary}}" hint-placeholder-val="{{ true }}">
+                <dc-import name="Button" variant="primary" icon="{{f.pIcon}}" label="{{f.pLabel}}" href="{{f.pHref}}" save-keys="{{f.pKeys}}" hint-size="180px,44px"></dc-import>
+              </sc-if>
+              <sc-if value="{{f.hasSecondary}}" hint-placeholder-val="{{ true }}">
+                <dc-import name="Button" variant="secondary" icon="{{f.sIcon}}" label="{{f.sLabel}}" href="{{f.sHref}}" save-keys="{{f.sKeys}}" hint-size="160px,44px"></dc-import>
+              </sc-if>
+              <sc-if value="{{f.canDismiss}}" hint-placeholder-val="{{ true }}">
+                <button type="button" class="in-btn" onClick="{{f.dismiss}}" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid transparent; background: transparent; font-size: 14px; font-weight: 600; color: #0F6B5C">{{f.dismissLabel}}</button>
+              </sc-if>
+            </div>
+          </sc-if>
+        </article>
+      </sc-for>
+      <sc-if value="{{hasDismissed}}" hint-placeholder-val="{{ false }}">
+        <button type="button" class="in-btn" onClick="{{toggleDismissed}}" aria-pressed="{{showDismissedAria}}" style="align-self: flex-start; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; font-size: 14px; font-weight: 600; color: #374151">{{dismissedLabel}}</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{vCompare}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <sc-if value="{{cEmpty}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; font-size: 14px; color: #4B5563">{{cEmptyText}}</div>
+      </sc-if>
+      <sc-if value="{{cReady}}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="in-cmp-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+          <div>
+            <h3 id="in-cmp-h" style="margin: 0; font-size: 16px">พลังงานจริงเทียบที่ควรได้ · {{cGroupLabel}}</h3>
+            <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{cCaption}}</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #374151">
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B42318"></span>ต่ำกว่าคาดเกิน 5%</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B54708"></span>ต่ำกว่าคาด 2–5%</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #858D9B"></span>ใกล้เคียงที่คาด</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3730A3"></span>PM2.5</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1D4ED8"></span>ฝน</span>
+          </div>
+          <div role="img" aria-label="{{cAria}}" style="display: flex; flex-direction: column; gap: 6px; overflow-x: auto">
+            <div style="font-size: 12px; color: #4B5563">ส่วนต่าง (%) · ต่ำสุด {{cMinDev}}</div>
+            <div class="in-track" style="{{cGrid}}; height: 96px; align-items: start; border-top: 1px solid #D5D9E0">
+              <sc-for list="{{cCols}}" as="c" hint-placeholder-count="20"><div title="{{c.tip}}" style="{{c.devStyle}}"></div></sc-for>
+            </div>
+            <div style="font-size: 12px; color: #4B5563; margin-top: 4px">PM2.5 (µg/m³) · สูงสุด {{cMaxPm}}</div>
+            <div class="in-track" style="{{cGrid}}; height: 44px">
+              <sc-for list="{{cCols}}" as="c" hint-placeholder-count="20"><div title="{{c.tip}}" style="{{c.pmStyle}}"></div></sc-for>
+            </div>
+            <div style="font-size: 12px; color: #4B5563; margin-top: 4px">ฝน (มม.) · รวม {{cRainSum}}</div>
+            <div class="in-track" style="{{cGrid}}; height: 28px">
+              <sc-for list="{{cCols}}" as="c" hint-placeholder-count="20"><div title="{{c.tip}}" style="{{c.rainStyle}}"></div></sc-for>
+            </div>
+            <div class="in-track" style="{{cGrid}}; align-items: start">
+              <sc-for list="{{cCols}}" as="c" hint-placeholder-count="20"><div class="{{c.labCls}}" style="font-size: 12px; color: #4B5563; text-align: center; white-space: nowrap; overflow: visible">{{c.lab}}</div></sc-for>
+            </div>
+          </div>
+          <details class="in-details">
+            <summary>ดูตัวเลขทุกช่วง</summary>
+            <table class="rt" aria-label="ตัวเลขส่วนต่าง PM2.5 และฝน" style="width: 100%; border-collapse: collapse; font-size: 13px">
+              <thead><tr style="text-align: left; color: #4B5563"><th scope="col" style="padding: 8px">ช่วง</th><th scope="col" style="padding: 8px; text-align: right">ส่วนต่าง</th><th scope="col" style="padding: 8px; text-align: right">PM2.5</th><th scope="col" style="padding: 8px; text-align: right">ฝน</th></tr></thead>
+              <tbody>
+                <sc-for list="{{cCols}}" as="c" hint-placeholder-count="4"><tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 8px">{{c.full}}</td><td data-label="ส่วนต่าง" style="padding: 8px; text-align: right">{{c.devText}}</td><td data-label="PM2.5" style="padding: 8px; text-align: right">{{c.pmText}}</td><td data-label="ฝน" style="padding: 8px; text-align: right">{{c.rainText}}</td></tr></sc-for>
+              </tbody>
+            </table>
+          </details>
+        </section>
+
+        <section aria-labelledby="in-lg-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+          <div style="padding: 16px 20px 8px">
+            <h3 id="in-lg-h" style="margin: 0; font-size: 16px">เปรียบเทียบรายไซต์</h3>
+            <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{lgCaption}}</div>
+          </div>
+          <table class="rt" aria-label="เปรียบเทียบรายไซต์" style="width: 100%; border-collapse: collapse; font-size: 14px">
+            <thead><tr style="text-align: left; color: #4B5563; font-size: 13px"><th scope="col" style="padding: 10px 20px">ไซต์</th><th scope="col" style="padding: 10px; text-align: right">ผลผลิตจำเพาะ</th><th scope="col" style="padding: 10px; text-align: right">PR</th><th scope="col" style="padding: 10px; text-align: right">ต่างจากคาด</th><th scope="col" style="padding: 10px; text-align: right">เทียบช่วงก่อน</th><th scope="col" style="padding: 10px 20px">สถานะ</th></tr></thead>
+            <tbody>
+              <sc-for list="{{league}}" as="r" hint-placeholder-count="4">
+                <tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 10px 20px; font-weight: 600">{{r.name}}</td><td data-label="ผลผลิตจำเพาะ" style="padding: 10px; text-align: right">{{r.sy}}</td><td data-label="PR" style="padding: 10px; text-align: right">{{r.pr}}</td><td data-label="ต่างจากคาด" style="padding: 10px; text-align: right; font-weight: 600; color: {{r.devColor}}">{{r.dev}}</td><td data-label="เทียบช่วงก่อน" style="padding: 10px; text-align: right">{{r.delta}}</td><td data-label="สถานะ" style="padding: 10px 20px"><span style="{{r.stStyle}}">{{r.st}}</span></td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </section>
+
+        <section aria-labelledby="in-peer-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+          <div>
+            <h3 id="in-peer-h" style="margin: 0; font-size: 16px">อินเวอร์เตอร์เทียบกลุ่ม · {{peerSite}}</h3>
+            <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{peerCaption}}</div>
+          </div>
+          <sc-for list="{{peerZones}}" as="z" hint-placeholder-count="2">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <div style="font-size: 13px; font-weight: 600; color: #374151">{{z.label}}</div>
+              <div role="list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px">
+                <sc-for list="{{z.cells}}" as="x" hint-placeholder-count="6">
+                  <div role="listitem" aria-label="{{x.aria}}" style="{{x.style}}"><span style="display: block; font-size: 12px; font-weight: 600">{{x.name}}</span><span style="display: block; font-size: 14px; font-weight: 700">{{x.val}}</span></div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{vForecast}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <sc-if value="{{fcEmpty}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; font-size: 14px; color: #4B5563">{{fcEmptyText}}</div>
+      </sc-if>
+      <sc-if value="{{fcReady}}" hint-placeholder-val="{{ true }}">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px">
+          <sc-for list="{{fcHighlights}}" as="h" hint-placeholder-count="3">
+            <div style="display: flex; gap: 10px; align-items: flex-start; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px">
+              <dc-import name="Icon" icon="{{h.icon}}" size="18" bg="{{h.bg}}" hint-size="32px,32px"></dc-import>
+              <div style="min-width: 0"><div style="font-weight: 600; font-size: 14px">{{h.title}}</div><div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{h.text}}</div></div>
+            </div>
+          </sc-for>
+        </div>
+        <section aria-labelledby="in-fc-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
+          <div>
+            <h3 id="in-fc-h" style="margin: 0; font-size: 16px">พยากรณ์พลังงาน 14 วัน · {{fcSite}}</h3>
+            <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{fcCaption}}</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #374151">
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B9DACF"></span>ช่วงที่น่าจะเป็น</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 3px; background: #0F6B5C"></span>ค่าคาดการณ์</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1D4ED8"></span>ฝน</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3730A3"></span>PM2.5</span>
+          </div>
+          <div role="img" aria-label="{{fcAria}}" style="display: flex; flex-direction: column; gap: 6px">
+            <div class="in-track" style="grid-template-columns: repeat(14, minmax(0, 1fr)); height: 120px; border-bottom: 1px solid #D5D9E0">
+              <sc-for list="{{fcDays}}" as="d" hint-placeholder-count="14"><div title="{{d.tip}}" style="position: relative; height: 100%"><div style="{{d.bandStyle}}"></div><div style="{{d.midStyle}}"></div></div></sc-for>
+            </div>
+            <div class="in-track" style="grid-template-columns: repeat(14, minmax(0, 1fr)); height: 28px">
+              <sc-for list="{{fcDays}}" as="d" hint-placeholder-count="14"><div title="{{d.tip}}" style="{{d.rainStyle}}"></div></sc-for>
+            </div>
+            <div class="in-track" style="grid-template-columns: repeat(14, minmax(0, 1fr)); height: 36px">
+              <sc-for list="{{fcDays}}" as="d" hint-placeholder-count="14"><div title="{{d.tip}}" style="{{d.pmStyle}}"></div></sc-for>
+            </div>
+            <div class="in-track" style="grid-template-columns: repeat(14, minmax(0, 1fr)); align-items: start">
+              <sc-for list="{{fcDays}}" as="d" hint-placeholder-count="14"><div style="font-size: 12px; color: #4B5563; text-align: center; white-space: nowrap; overflow: hidden">{{d.lab}}</div></sc-for>
+            </div>
+          </div>
+          <details class="in-details">
+            <summary>ดูตัวเลขรายวัน</summary>
+            <table class="rt" aria-label="พยากรณ์รายวัน" style="width: 100%; border-collapse: collapse; font-size: 13px">
+              <thead><tr style="text-align: left; color: #4B5563"><th scope="col" style="padding: 8px">วัน</th><th scope="col" style="padding: 8px; text-align: right">พลังงานคาด</th><th scope="col" style="padding: 8px; text-align: right">แสงอาทิตย์</th><th scope="col" style="padding: 8px; text-align: right">ฝน</th><th scope="col" style="padding: 8px; text-align: right">PM2.5</th></tr></thead>
+              <tbody>
+                <sc-for list="{{fcDays}}" as="d" hint-placeholder-count="4"><tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 8px">{{d.full}}</td><td data-label="พลังงานคาด" style="padding: 8px; text-align: right">{{d.eText}}</td><td data-label="แสงอาทิตย์" style="padding: 8px; text-align: right">{{d.ghiText}}</td><td data-label="ฝน" style="padding: 8px; text-align: right">{{d.rainText}}</td><td data-label="PM2.5" style="padding: 8px; text-align: right">{{d.pmText}}</td></tr></sc-for>
+              </tbody>
+            </table>
+          </details>
+        </section>
+        <section aria-labelledby="in-soil-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+          <div style="padding: 16px 20px 8px">
+            <h3 id="in-soil-h" style="margin: 0; font-size: 16px">ฝุ่นสะสมและวันที่ควรล้าง</h3>
+            <div style="font-size: 13px; color: #4B5563; margin-top: 2px">จุดคุ้มทุน = วันที่ไฟที่เสียจากฝุ่นสะสมรวมแล้วเท่ากับค่าล้าง (รวมผลฝน และ PM2.5 ที่พยากรณ์)</div>
+          </div>
+          <table class="rt" aria-label="ฝุ่นสะสมและวันที่ควรล้าง" style="width: 100%; border-collapse: collapse; font-size: 14px">
+            <thead><tr style="text-align: left; color: #4B5563; font-size: 13px"><th scope="col" style="padding: 10px 20px">ไซต์</th><th scope="col" style="padding: 10px; text-align: right">ฝุ่นสะสมตอนนี้</th><th scope="col" style="padding: 10px; text-align: right">ไฟที่เสีย/วัน</th><th scope="col" style="padding: 10px">จุดคุ้มทุนการล้าง</th><th scope="col" style="padding: 10px">ครบรอบตามแผน</th><th scope="col" style="padding: 10px 20px">คำแนะนำ</th></tr></thead>
+            <tbody>
+              <sc-for list="{{soilRows}}" as="r" hint-placeholder-count="4">
+                <tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 10px 20px; font-weight: 600">{{r.name}}</td><td data-label="ฝุ่นสะสมตอนนี้" style="padding: 10px; text-align: right">{{r.pct}}</td><td data-label="ไฟที่เสีย/วัน" style="padding: 10px; text-align: right">{{r.loss}}</td><td data-label="จุดคุ้มทุนการล้าง" style="padding: 10px; font-weight: 600; color: {{r.bestColor}}">{{r.best}}</td><td data-label="ครบรอบตามแผน" style="padding: 10px">{{r.due}}</td><td data-label="คำแนะนำ" style="padding: 10px 20px; font-size: 13px">{{r.tip}}</td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </section>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{vSources}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px">
+        <sc-for list="{{sources}}" as="s" hint-placeholder-count="4">
+          <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; align-items: center; gap: 10px"><dc-import name="Icon" icon="{{s.icon}}" size="18" bg="{{s.bg}}" hint-size="32px,32px"></dc-import><div style="min-width: 0"><div style="font-weight: 600; font-size: 14px">{{s.name}}</div><div style="font-size: 12px; color: #4B5563">{{s.by}}</div></div></div>
+            <div style="font-size: 13px; color: #374151">{{s.what}}</div>
+            <div style="font-size: 13px; color: #4B5563">ใช้สำหรับ: {{s.use}}</div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: {{s.stColor}}"><dc-import name="Icon" icon="{{s.stIcon}}" size="14" hint-size="14px,14px"></dc-import>{{s.status}}</div>
+          </div>
+        </sc-for>
+      </div>
+      <section aria-labelledby="in-src-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+        <div style="padding: 16px 20px 8px">
+          <h3 id="in-src-h" style="margin: 0; font-size: 16px">ข้อมูลภายนอกของแต่ละไซต์ · ล่าสุด</h3>
+          <div style="font-size: 13px; color: #4B5563; margin-top: 2px">สถานี PM2.5 ที่ใกล้ที่สุดและจุดพิกัดพยากรณ์อากาศ</div>
+        </div>
+        <table class="rt" aria-label="ข้อมูลภายนอกของแต่ละไซต์" style="width: 100%; border-collapse: collapse; font-size: 14px">
+          <thead><tr style="text-align: left; color: #4B5563; font-size: 13px"><th scope="col" style="padding: 10px 20px">ไซต์</th><th scope="col" style="padding: 10px">สถานี PM2.5</th><th scope="col" style="padding: 10px; text-align: right">PM2.5</th><th scope="col" style="padding: 10px; text-align: right">อุณหภูมิ</th><th scope="col" style="padding: 10px; text-align: right">ฝน 24 ชม.</th><th scope="col" style="padding: 10px 20px; text-align: right">แสงวันนี้ (คาด)</th></tr></thead>
+          <tbody>
+            <sc-for list="{{srcRows}}" as="r" hint-placeholder-count="4">
+              <tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 10px 20px; font-weight: 600">{{r.name}}<span style="display: block; font-size: 12px; font-weight: 400; color: #4B5563">{{r.grid}}</span></td><td data-label="สถานี PM2.5" style="padding: 10px; font-size: 13px">{{r.station}}</td><td data-label="PM2.5" style="padding: 10px; text-align: right; font-weight: 600; color: {{r.pmColor}}">{{r.pm}}</td><td data-label="อุณหภูมิ" style="padding: 10px; text-align: right">{{r.temp}}</td><td data-label="ฝน 24 ชม." style="padding: 10px; text-align: right">{{r.rain}}</td><td data-label="แสงวันนี้ (คาด)" style="padding: 10px 20px; text-align: right">{{r.ghi}}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </section>
+      <section aria-labelledby="in-mth-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px">
+        <h3 id="in-mth-h" style="margin: 0 0 8px; font-size: 16px">วิธีวิเคราะห์</h3>
+        <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #374151; line-height: 1.8">
+          <sc-for list="{{methods}}" as="m" hint-placeholder-count="4"><li>{{m.t}}</li></sc-for>
+        </ul>
+      </section>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{vSumMain}}" hint-placeholder-val="{{ false }}">
+    <a href="Analytics.dc.html" onPointerDown="{{sumGo}}" onKeyDown="{{sumGo}}" onClick="{{sumGo}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px; text-decoration: none; color: #111827; flex-wrap: wrap; border-top: 1px solid #EEF0F3">
+      <dc-import name="Icon" icon="trend" size="18" bg="info" hint-size="32px,32px"></dc-import>
+      <span style="flex: 1 1 240px; min-width: 0">
+        <span style="display: block; font-size: 12px; font-weight: 700; color: #1E3A8A">{{sumKind}}</span>
+        <span style="display: block; font-weight: 600">{{sumTitle}}</span>
+        <span style="display: block; font-size: 13px; color: #4B5563">{{sumMeta}}</span>
+      </span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #0F6B5C">ดูการวิเคราะห์<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></span>
+    </a>
+  </sc-if>
+
+  <sc-if value="{{vSumSite}}" hint-placeholder-val="{{ false }}">
+    <div role="note" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border-radius: 12px; background: #DCE7FB; border: 1px solid #DCE7FB; font-size: 14px; color: #1E3A8A">
+      <dc-import name="Icon" icon="trend" size="18" tone="info" hint-size="18px,18px"></dc-import>
+      <span style="flex: 1 1 220px; min-width: 0"><b>ข้อสังเกต: {{sumTitle}}</b> · {{sumMeta}}</span>
+      <a href="Analytics.dc.html" onPointerDown="{{sumGo}}" onKeyDown="{{sumGo}}" onClick="{{sumGo}}" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; color: #1E3A8A">ดูการวิเคราะห์ →</a>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{vDevice}}" hint-placeholder-val="{{ false }}">
+    <div role="note" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; padding: 14px 16px; border-radius: 12px; background: #DCE7FB; color: #1E3A8A">
+      <dc-import name="Icon" icon="trend" size="20" tone="info" hint-size="20px,20px"></dc-import>
+      <div style="flex: 1 1 260px; min-width: 0">
+        <div style="font-weight: 600">จากการวิเคราะห์ · {{devTitle}}</div>
+        <div style="font-size: 13px; margin-top: 2px; color: #1E3A8A">{{devText}}</div>
+      </div>
+      <a href="Analytics.dc.html" onPointerDown="{{devGo}}" onKeyDown="{{devGo}}" onClick="{{devGo}}" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; color: #1E3A8A">ดูการวิเคราะห์ →</a>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"view":{"editor":"enum","options":["findings","kpis","compare","forecast","sources","summary","device"],"default":"findings"},"site":{"editor":"text","default":"all"},"limit":{"editor":"int","default":0},"compact":{"editor":"boolean","default":false},"place":{"editor":"enum","options":["main","site"],"default":"main"},"device":{"editor":"text","default":""},"focus":{"editor":"text","default":""},"$preview":{"width":1100,"height":900}}'>
+// ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
+var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
+var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+var SCR_PRESETS = [['d7', '7 วัน'], ['d30', '30 วัน'], ['m3', '3 เดือน'], ['m6', '6 เดือน'], ['m12', '12 เดือน'], ['ytd', 'ปีนี้'], ['ly', 'ปีที่แล้ว'], ['custom', 'กำหนดเอง']];
+function scrDay(iso) { var p = String(iso || '').split('-'); if (p.length < 3) return NaN; var d = Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5); return isNaN(d) ? NaN : d; }
+function scrIso(d) { var x = new Date(d * 864e5); return x.getUTCFullYear() + '-' + ('0' + (x.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + x.getUTCDate()).slice(-2); }
+function scrTh(d, short) { var x = new Date(d * 864e5), y = x.getUTCFullYear() + 543; return x.getUTCDate() + ' ' + SCR_MN[x.getUTCMonth()] + ' ' + (short ? String(y).slice(-2) : y); }
+function scrPresetRange(p) {
+  var T = SCR_TODAY, ms = function (n) { return Math.round(Date.UTC(2026, 10 - n + 1, 1) / 864e5); };
+  if (p === 'd7') return [T - 6, T]; if (p === 'd30') return [T - 29, T]; if (p === 'm3') return [ms(3), T]; if (p === 'm6') return [ms(6), T];
+  if (p === 'ytd') return [Math.round(Date.UTC(2026, 0, 1) / 864e5), T]; if (p === 'ly') return [Math.round(Date.UTC(2025, 0, 1) / 864e5), Math.round(Date.UTC(2025, 11, 31) / 864e5)];
+  return [ms(12), T];
+}
+function scrGroups(len) { return [['day', 'รายวัน', len <= 62, 'ช่วงยาวเกิน 62 วัน'], ['week', 'รายสัปดาห์', len >= 7 && len <= 366, len < 7 ? 'ช่วงสั้นกว่า 7 วัน' : 'ช่วงยาวเกิน 1 ปี'], ['month', 'รายเดือน', len >= 28, 'ช่วงสั้นกว่า 1 เดือน'], ['quarter', 'รายไตรมาส', len >= 89, 'ช่วงสั้นกว่า 3 เดือน'], ['year', 'รายปี', len >= 300, 'ช่วงสั้นกว่า 1 ปี']]; }
+function scrDefaultGroup(len) { return len <= 31 ? 'day' : len <= 62 ? 'week' : 'month'; }
+function scrResolve(raw) {
+  var r = {}; try { r = typeof raw === 'string' ? (JSON.parse(raw || '{}') || {}) : (raw || {}); } catch (e) { r = {}; }
+  var preset = SCR_PRESETS.some(function (x) { return x[0] === r.preset; }) ? r.preset : 'm12', a, b, clamped = false;
+  if (preset === 'custom') { a = scrDay(r.from); b = scrDay(r.to); if (isNaN(a) || isNaN(b) || a > b) { preset = 'm12'; } }
+  if (preset !== 'custom') { var pr = scrPresetRange(preset); a = pr[0]; b = pr[1]; }
+  if (a < SCR_START) { a = SCR_START; clamped = true; } if (b > SCR_TODAY) { b = SCR_TODAY; clamped = true; } if (a > b) a = b;
+  if (b - a > 1095) { a = b - 1095; clamped = true; }
+  var len = b - a + 1, g = r.group, okG = scrGroups(len).filter(function (x) { return x[0] === g && x[2]; })[0]; if (!okG) g = scrDefaultGroup(len);
+  var pname = SCR_PRESETS.filter(function (x) { return x[0] === preset; })[0][1];
+  var pa = a - len, pb = a - 1, cmpOk = pa >= SCR_START;
+  return { preset: preset, from: a, to: b, fromIso: scrIso(a), toIso: scrIso(b), len: len, group: g, groupLabel: scrGroups(len).filter(function (x) { return x[0] === g; })[0][1],
+    compare: !!r.compare && cmpOk, compareAsked: !!r.compare, compareOk: cmpOk, prevFrom: pa, prevTo: pb, clamped: clamped,
+    label: (preset === 'custom' ? '' : pname + ' · ') + scrTh(a) + ' – ' + scrTh(b), short: preset === 'custom' ? scrTh(a, 1) + ' – ' + scrTh(b, 1) : pname,
+    prevLabel: scrTh(pa) + ' – ' + scrTh(pb) };
+}
+function scrBuckets(a, b, g) {
+  var out = [], d = a, guard = 0;
+  while (d <= b && guard++ < 2000) {
+    var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), e, lab;
+    if (g === 'day') { e = d; lab = x.getUTCDate() + ' ' + SCR_MN[m]; }
+    else if (g === 'week') { var wd = (x.getUTCDay() + 6) % 7; e = Math.min(b, d - wd + 6); var xe = new Date(e * 864e5); lab = x.getUTCDate() + (xe.getUTCMonth() !== m ? ' ' + SCR_MN[m] : '') + '–' + xe.getUTCDate() + ' ' + SCR_MN[xe.getUTCMonth()]; }
+    else if (g === 'month') { e = Math.round(Date.UTC(y, m + 1, 0) / 864e5); lab = SCR_MN[m] + ' ' + String(y + 543).slice(-2); if (x.getUTCDate() !== 1 || e > b) lab = x.getUTCDate() + '–' + new Date(Math.min(e, b) * 864e5).getUTCDate() + ' ' + lab; } // part of a month (e.g. 1–15 พ.ย. 69 month-to-date) says so
+    else if (g === 'quarter') { var q = Math.floor(m / 3); e = Math.round(Date.UTC(y, q * 3 + 3, 0) / 864e5); lab = 'ไตรมาส ' + (q + 1) + '/' + String(y + 543).slice(-2); }
+    else { e = Math.round(Date.UTC(y, 12, 0) / 864e5); lab = String(y + 543); }
+    e = Math.min(e, b); out.push({ s: d, e: e, label: lab }); d = e + 1;
+  }
+  return out;
+}
+function scrRead() { try { return window.sessionStorage.getItem('sc.range') || ''; } catch (e) { return ''; } }
+// ---- end sc.range resolver ----
+// ---------- Insights engine (DATA.md round 11): one source for findings, external data, forecasts and comparisons ----------
+// Today = 15 พ.ย. 2569 10:40. External data: Air4Thai PM2.5, Open-Meteo weather + irradiance, TMD rain; internal: FusionSolar, SmartLogger, work orders.
+var IN_T = SCR_TODAY;
+function inD(y, m, d) { return Math.round(Date.UTC(y, m - 1, d) / 864e5); }
+function inH(n) { var x = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return x - Math.floor(x); }
+function inFmt(n, dp) { var v = Number(n) || 0; return v.toLocaleString('en-US', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 }); }
+function inSign(n, dp) { var v = Number(n) || 0; return (v > 0 ? '+' : v < 0 ? '−' : '') + inFmt(Math.abs(v), dp == null ? 1 : dp); }
+// sites (kWp, panels, tariff, cycle, last cleaning, PR clean and soil/month follow DATA.md + energy-data.json)
+var IN_SITES = {
+  k1: { name: 'ฟาร์มโคราช 1', org: 'a', prov: 'นครราชสีมา', kwp: 8400, panels: 15600, rate: 10, tariff: 2.20, cycle: 90, last: inD(2026, 11, 14), prev: inD(2026, 8, 18), pr: 0.82, soil: 1.6, pm: 32, gf: 1.02, cur: 1.1, due: '16 พ.ย. 69 (WO-1043 รออนุมัติ)', tip: 'ล้างโซน A–C แล้ว 14 พ.ย. · โซน D ล้างรอบถัดไป', station: 'สถานีตรวจวัด อ.เมืองนครราชสีมา · 12 กม.', lat: 14.97, lon: 102.10, temp: 29, zones: [['A', 6], ['B', 6], ['C', 5], ['D', 5]] },
+  k2: { name: 'ฟาร์มโคราช 2', org: 'a', prov: 'นครราชสีมา', kwp: 6200, panels: 11400, rate: 10, tariff: 2.20, cycle: 45, last: inD(2026, 10, 12), pr: 0.81, soil: 1.9, pm: 31, gf: 1.02, cur: 2.9, due: '26 พ.ย. 69 (WO-1041 · 25 พ.ย.)', tip: 'คงรอบเดิม · ฝน 19 พ.ย. ช่วยคืน ~1%', station: 'สถานีตรวจวัด อ.เมืองนครราชสีมา · 18 กม.', lat: 15.05, lon: 102.25, temp: 29, zones: [['A', 5], ['B', 5], ['C', 4], ['D', 4]] },
+  bp: { name: 'หลังคาโรงงานบางปู', org: 'a', prov: 'สมุทรปราการ', kwp: 1150, panels: 2100, rate: 20, tariff: 4.18, cycle: 60, last: inD(2026, 8, 28), pr: 0.79, soil: 2.4, pm: 47, gf: 0.98, cur: 6.2, due: '27 ต.ค. 69 (เลย 19 วัน)', tip: 'ล้างทันที · เร่ง WO-1039', station: 'สถานีตรวจวัด อ.เมืองสมุทรปราการ · 4 กม.', lat: 13.52, lon: 100.65, temp: 32, zones: [['', 7]] },
+  lb: { name: 'ลานจอดรถลพบุรี', org: 'a', prov: 'ลพบุรี', kwp: 960, panels: 1750, rate: 20, tariff: 4.18, cycle: 60, last: inD(2026, 11, 5), pr: 0.80, soil: 1.8, pm: 37, gf: 0.99, cur: 0.5, due: '4 ม.ค. 70', tip: 'ปกติ · ตรวจมิเตอร์ (ค่าต่างจากอินเวอร์เตอร์)', station: 'สถานีตรวจวัด อ.เมืองลพบุรี · 6 กม.', lat: 14.80, lon: 100.65, temp: 31, zones: [['', 6]] },
+  rs: { name: 'สาขารังสิต', org: 'b', prov: 'ปทุมธานี', kwp: 420, panels: 760, rate: 20, tariff: 4.18, cycle: 30, last: inD(2026, 10, 28), pr: 0.80, soil: 1.5, pm: 43, gf: 0.98, cur: 1.2, due: '27 พ.ย. 69', tip: 'ปกติ · รอบ 30 วันถี่กว่าจุดคุ้มทุน', station: 'สถานีตรวจวัด อ.ธัญบุรี · 5 กม.', lat: 14.00, lon: 100.62, temp: 31, zones: [['', 7]] },
+  bn: { name: 'สาขาบางนา', org: 'b', prov: 'กรุงเทพฯ', kwp: 380, panels: 690, rate: 20, tariff: 4.18, cycle: 60, last: inD(2026, 9, 13), pr: 0.78, soil: 2.0, pm: 48, gf: 0.98, cur: 4.0, due: '12 พ.ย. 69 (เลย 3 วัน)', tip: 'ล้างก่อนจุดคุ้มทุน · GM-0209 กำลังดำเนินการ', station: 'สถานีตรวจวัด เขตบางนา · 3 กม.', lat: 13.66, lon: 100.68, temp: 32, zones: [['', 6]] },
+  lp: { name: 'โรงงาน A ลำพูน', org: 'c', prov: 'ลำพูน', kwp: 2300, panels: 4180, rate: 20, tariff: 4.18, cycle: 30, last: inD(2026, 10, 30), pr: 0.81, soil: 1.4, pm: 40, gf: 0.97, cur: 1.4, due: '29 พ.ย. 69', tip: 'คงรอบ 30 วัน · ห้ามขยายช่วง ธ.ค.–มี.ค.', station: 'สถานีตรวจวัด อ.เมืองลำพูน · 7 กม.', lat: 18.58, lon: 99.02, temp: 30, zones: [['', 13]] },
+  e1: { name: 'หลังคาอาคาร A หัวหิน', org: 'e', prov: 'ประจวบคีรีขันธ์', kwp: 210, panels: 380, rate: 20, tariff: 4.18, cycle: 0, last: null, pr: 0.80, soil: 1.7, pm: 24, gf: 1.0, cur: null, due: 'ยังไม่ตั้งรอบ', tip: 'ตั้งรอบล้างที่หน้าไซต์ · ต้องมีข้อมูล 14 วันก่อนวิเคราะห์', station: 'สถานีตรวจวัด อ.หัวหิน · 3 กม.', lat: 12.57, lon: 99.96, temp: 30, zones: [['', 4]] }
+};
+// ---- energy truth (DATA.md Round 12): monthly energy e (kWh) and irradiation h (kWh/kWp) per site, ธ.ค. 68 – พ.ย. 69 (พ.ย. 69 = 1–15 พ.ย.),
+// copied from EnergyStats ES_DATA after its month-to-date step; daily split and the 2568 reuse follow EnergyStats esSlot/esW exactly
+var IN_ES = {"k1":{"kwp":8400,"e":[1030378,1067136,1122744,1220184,1167180,1102080,982926,947083,964320,935474,967092,492030],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"k2":{"kwp":6200,"e":[749208,803520,803427,903960,862575,803520,714705,713124,703080,680202,728190,369675],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"bp":{"kwp":1150,"e":[138092,141864,140962,151731,158988,141864,131732,125904,127190,122358,125396,63221],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"lb":{"kwp":960,"e":[114693,122880,122993,138240,132048,118426,105374,109056,105638,105984,109411,57600],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"rs":{"kwp":420,"e":[51072,53760,54768,60480,58800,53760,48720,47712,47040,46368,48720,24822],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"bn":{"kwp":380,"e":[44129,47424,47322,53352,50806,47424,42096,42089,40645,40903,42096,21346],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"lp":{"kwp":2300,"e":[283176,298080,303669,335340,326025,298080,270135,264546,260820,257094,270135,137828],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"e1":{"kwp":210,"e":[24227,25066,25056,27140,25909,23654,21437,20993,20698,20402,21437,11088],"h":[152,160,163,180,175,160,145,142,140,138,145,75]}};
+// current soiling (%) on 15 พ.ย. 2569 — identical to EnergyStats ES_SOIL_NOW
+var IN_SOIL_NOW = { k1: 1.1, k2: 2.9, bp: 6.2, lb: 0.5, rs: 1.4, bn: 3.6, lp: 0.8, e1: 4.1 };
+function inW(d) { return 1 + 0.18 * Math.sin(d * 2.3) + 0.08 * Math.cos(d * 0.7); }
+var IN_SLOT = {};
+function inEsSlot(d) {
+  var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), key = y + '-' + m;
+  if (IN_SLOT[key] !== undefined) return IN_SLOT[key];
+  var i = null, scale = 1, hs = 1;
+  if (y === 2025 && m <= 10) { i = m + 1; hs = m === 10 ? 2 : 1; scale = 0.985 * hs; } else if (y === 2025 && m === 11) { i = 0; } else if (y === 2026 && m <= 10) { i = m + 1; }
+  if (i === null) { IN_SLOT[key] = null; return null; }
+  var s0 = Math.round(Date.UTC(y, m, 1) / 864e5), e0 = Math.round(Date.UTC(y, m + 1, 0) / 864e5);
+  if (y === 2026 && m === 10) e0 = SCR_TODAY;
+  var tw = 0; for (var k = s0; k <= e0; k++) tw += inW(k);
+  IN_SLOT[key] = { i: i, scale: scale, hs: hs, tw: tw }; return IN_SLOT[key];
+}
+function inEsDay(id, d) { var t = IN_ES[id], sl = inEsSlot(d); if (!t || !sl || d > SCR_TODAY) return { e: 0, kh: 0 }; var f = inW(d) / sl.tw; return { e: t.e[sl.i] * sl.scale * f, kh: t.kwp * t.h[sl.i] * sl.hs * f }; }
+var IN_MODEL = { k1: 'SUN2000-330KTL-H1', k2: 'SUN2000-330KTL-H1', bp: 'SUN2000-150K-MG0', lb: 'SUN2000-150K-MG0', lp: 'SUN2000-150K-MG0', rs: 'SUN2000-50KTL-M3', bn: 'SUN2000-50KTL-M3', e1: 'SUN2000-50KTL-M3' };
+var IN_IDS = ['k1', 'k2', 'bp', 'lb', 'rs', 'bn', 'lp', 'e1'];
+IN_IDS.forEach(function (id) { IN_SITES[id].cur = IN_SOIL_NOW[id]; }); // one current-soiling table for every page
+var IN_BYNAME = {}; IN_IDS.forEach(function (id) { IN_BYNAME[IN_SITES[id].name] = id; });
+var IN_YIELD = 4.2; // kWh/kWp/day in November (GHI ≈ 4.9 × 1.05 POA × PR)
+function inLossKwh(id, pct) { var s = IN_SITES[id]; return s.kwp * IN_YIELD * pct / 100; }
+// ---- weather / PM2.5 history model (deterministic) ----
+var IN_GHI = [5.0, 5.4, 5.6, 5.8, 5.2, 4.7, 4.6, 4.6, 4.5, 4.7, 4.9, 4.8];
+var IN_PMS = { lp: [2.2, 2.8, 3.0, 1.8, 0.6, 0.5, 0.5, 0.5, 0.5, 0.6, 1.0, 1.8], hh: [0.8, 0.8, 0.7, 0.7, 0.6, 0.6, 0.6, 0.6, 0.6, 0.7, 1.0, 0.9], c: [1.5, 1.4, 1.1, 0.9, 0.5, 0.5, 0.5, 0.5, 0.5, 0.6, 1.0, 1.3] };
+var IN_SEED = { k1: 1, k2: 2, bp: 3, lb: 4, rs: 5, bn: 6, lp: 7, e1: 8 };
+var IN_KORAT_RAIN = inD(2026, 11, 19);
+function inMonth(d) { return new Date(d * 864e5).getUTCMonth(); }
+function inRain(id, d) {
+  if (d >= inD(2026, 10, 28) && d <= IN_T) return 0; // dry since 27 ต.ค. (no rain 19 days at บางปู)
+  if (d === inD(2026, 10, 27) && id !== 'lp' && id !== 'e1') return 8;
+  var m = inMonth(d), p = (m >= 4 && m <= 9) ? 0.45 : m === 10 ? 0.08 : m === 3 ? 0.12 : 0.03;
+  var h = inH(d * 7 + IN_SEED[id] * 131);
+  return h < p ? Math.round(5 + 20 * inH(d * 3 + IN_SEED[id])) : 0;
+}
+function inPm(id, d) {
+  var s = IN_SITES[id], m = inMonth(d), prof = id === 'lp' ? IN_PMS.lp : id === 'e1' ? IN_PMS.hh : IN_PMS.c;
+  var v = s.pm * prof[m] * (1 + 0.22 * Math.sin(d * 0.9 + IN_SEED[id]));
+  if (inRain(id, d) >= 5) v *= 0.65;
+  return Math.max(6, Math.round(v));
+}
+function inCloud(id, d) { if (inRain(id, d) >= 5) return 0.8; var m = inMonth(d); return (m >= 4 && m <= 9 ? 0.3 : 0.1) + 0.3 * inH(d * 5 + IN_SEED[id] * 17); }
+function inGhi(id, d) { return IN_GHI[inMonth(d)] * IN_SITES[id].gf * (1 - 0.35 * inCloud(id, d)); }
+// cleaning events (backward by cycle from the last cleaning; k1 also its 18 ส.ค. round)
+function inCleans(id) {
+  var s = IN_SITES[id], out = []; if (!s.last) return out;
+  out.push(s.last); var start = id === 'k1' ? s.prev : s.last;
+  if (id === 'k1') out.push(start);
+  for (var d = start - s.cycle; d >= SCR_START - 200; d -= s.cycle) out.push(d);
+  return out.sort(function (a, b) { return a - b; });
+}
+var IN_SOIL_CACHE = {};
+function inSoilSeries(id) {
+  if (IN_SOIL_CACHE[id]) return IN_SOIL_CACHE[id];
+  var s = IN_SITES[id], cl = inCleans(id), start = SCR_START - 200, map = {}, acc = 0, rate = s.soil / 30, ci = 0;
+  for (var d = start; d <= IN_T; d++) {
+    while (ci < cl.length && cl[ci] <= d) { if (cl[ci] === d) acc = 0; ci++; }
+    var pmF = 0.6 + 0.4 * inPm(id, d) / s.pm;
+    acc += rate * pmF; if (inRain(id, d) >= 5) acc *= 0.6;
+    map[d] = acc;
+  }
+  if (s.cur != null && s.last) { // calibrate the current cleaning cycle so today equals the measured value
+    var k = map[IN_T] > 0 ? s.cur / map[IN_T] : 1;
+    if (id === 'k1') { for (var x = s.last; x <= IN_T; x++) map[x] = map[x] + 0.9 + 0.2 * (x - s.last); } // zone D not cleaned yet
+    else for (var y = s.last; y <= IN_T; y++) map[y] = map[y] * k;
+  }
+  IN_SOIL_CACHE[id] = map; return map;
+}
+function inAnom(id, d) {
+  var a = 0, n6 = inD(2026, 11, 6), n14 = inD(2026, 11, 14);
+  if (id === 'k1') { if (d >= n6) a += 5.8 / 22; if (d >= n14) a += 3.0 / 22; }
+  if (id === 'bn' && d === IN_T) a += 100 / 6;
+  if (id === 'lp' && d >= inD(2026, 10, 20)) a += 0.25;
+  if (id === 'rs' && inCloud(id, d) < 0.25) a += 1.1;
+  return a;
+}
+function inDay(id, d) { // one site-day: expected / actual kWh, PM2.5, rain, deviation %
+  var s = IN_SITES[id], ghi = inGhi(id, d), poa = ghi * 1.05, tf = inMonth(d) >= 2 && inMonth(d) <= 4 ? 0.965 : 0.985;
+  var exp = s.kwp * poa * s.pr * tf;
+  var dev = -(inSoilSeries(id)[d] || 0) - inAnom(id, d) + (inH(d * 11 + IN_SEED[id] * 7) - 0.5) * 1.2;
+  return { exp: exp, act: exp * (1 + dev / 100), poa: s.kwp * poa, pm: inPm(id, d), rain: inRain(id, d), dev: dev };
+}
+function inAgg(ids, a, b) { // actual energy, PR and specific yield come from the EnergyStats data; only the deviation model is Insights' own
+  var r = { exp: 0, act: 0, poa: 0, pm: 0, rain: 0, n: 0, kwp: 0 };
+  ids.forEach(function (id) { r.kwp += IN_SITES[id].kwp; });
+  for (var d = a; d <= b; d++) { var pm = 0, rain = 0; ids.forEach(function (id) { var x = inDay(id, d), es = inEsDay(id, d); r.act += es.e; r.poa += es.kh; r.exp += es.e / (1 + x.dev / 100); pm += x.pm; rain += x.rain; }); r.pm += pm / ids.length; r.rain += rain / ids.length; r.n++; }
+  r.dev = r.exp ? (r.act / r.exp - 1) * 100 : 0; r.pmAvg = r.n ? r.pm / r.n : 0; r.pr = r.poa ? r.act / r.poa * 100 : 0; r.sy = r.kwp ? r.act / r.kwp : 0;
+  return r;
+}
+// ---- forecast (16–29 พ.ย. 2569) ----
+function inFcRain(id, i) { var d = IN_T + i; if ((id === 'k1' || id === 'k2') && d === IN_KORAT_RAIN) return 6; if (id === 'e1' && d === IN_KORAT_RAIN) return 8; if (id === 'e1' && d === IN_KORAT_RAIN + 1) return 5; return 0; }
+function inFcCloud(id, i) { var r = inFcRain(id, i); return r >= 5 ? 0.75 : 0.18 + 0.2 * inH((IN_T + i) * 13 + IN_SEED[id] * 3); }
+function inFcPm(id, i) { var s = IN_SITES[id], base = s.pm + (id === 'lp' ? 1.9 * i : 0.3 * i), v = base * (1 + 0.1 * Math.sin(i * 1.3 + IN_SEED[id])); if (inFcRain(id, i) >= 5 || inFcRain(id, i - 1) >= 5) v *= 0.7; return Math.round(v); }
+function inFcDay(id, i, soilNow) {
+  var s = IN_SITES[id], cloud = inFcCloud(id, i), ghi = 4.9 * s.gf * (1 - 0.35 * cloud);
+  var mid = s.kwp * ghi * 1.05 * s.pr * 0.985 * (1 - soilNow / 100);
+  return { mid: mid, low: mid * (1 - 0.06 - 0.12 * cloud), high: mid * 1.05, ghi: ghi, rain: inFcRain(id, i), pm: inFcPm(id, i) };
+}
+function inSoilRate(id) { var s = IN_SITES[id]; if (id === 'bp') return 0.21; if (id === 'k1') return s.soil / 30; var days = IN_T - s.last; return days > 0 ? s.cur / days : s.soil / 30; }
+// break-even: cumulative ฿ lost since cleaning ≥ cleaning cost (PM2.5 season ×2.3 for ลำพูน from 1 ธ.ค.)
+function inBestDay(id) {
+  var s = IN_SITES[id]; if (!s.last) return null;
+  var cost = s.panels * s.rate, lossNow = inLossKwh(id, id === 'k1' ? 0.05 : s.cur) * s.tariff, days = Math.max(1, IN_T - s.last);
+  var r = id === 'k1' ? s.kwp * IN_YIELD * (s.soil / 30) / 100 * s.tariff : lossNow / days;
+  var cum = 0, loss = 0;
+  for (var t = 1; t < 500; t++) { var d = s.last + t; var f = id === 'lp' && d >= inD(2026, 12, 1) && d < inD(2027, 4, 1) ? 2.3 : 1; loss += r * f; if (d === IN_KORAT_RAIN && (id === 'k1' || id === 'k2')) loss *= 0.6; cum += loss; if (cum >= cost) return d; }
+  return null;
+}
+// ---- findings ----
+var IN_SEV = { high: [0, 'สูง', '#B42318', '#FDECEA'], med: [1, 'กลาง', '#8A3B06', '#FFF4E5'], low: [2, 'ต่ำ', '#374151', '#F3F4F6'], info: [3, 'ข้อมูล', '#1E3A8A', '#DCE7FB'] };
+function inSiteSpark(id) { var out = []; for (var d = IN_T - 13; d <= IN_T; d++) out.push(Math.round(inDay(id, d).dev * 10) / 10); return out; }
+function inFindings(ctx) {
+  var bpKwh = inLossKwh('bp', 6.2), k2Kwh = inLossKwh('k2', 2.9), bnDay = IN_SITES.bn.kwp / 6 * IN_YIELD, lpKwh = IN_SITES.lp.kwp * IN_YIELD * 0.0109; // 3 of 13 inverters lose 3.1% in the afternoon (≈ 1.1% of site output)
+  var b04 = []; for (var i = 0; i < 14; i++) b04.push(i < 5 ? Math.round((inH(i + 40) - 0.5) * 8) / 10 : Math.round((-5.5 - inH(i + 50) * 0.6) * 10) / 10);
+  var mtr = []; for (var j = 0; j < 14; j++) mtr.push(j < 8 ? Math.round((1.1 + inH(j + 60) * 0.3) * 10) / 10 : Math.round((3.3 + inH(j + 70) * 0.2) * 10) / 10);
+  var off = []; for (var k = 0; k < 14; k++) off.push(k < 13 ? Math.round((inH(k + 80) - 0.5) * 20) / 10 : -100);
+  var lpPm = []; for (var q = 1; q <= 14; q++) lpPm.push(inFcPm('lp', q));
+  var der = []; for (var w = 0; w < 14; w++) der.push(Math.round((-2.9 - inH(w + 90) * 0.5) * 10) / 10);
+  var clip = []; for (var z = 0; z < 14; z++) clip.push(inCloud('rs', IN_T - 13 + z) < 0.25 ? Math.round((1.0 + inH(z + 95) * 0.3) * 10) / 10 : 0);
+  var bpBest = inBestDay('bp');
+  return [
+    { id: 'f1', site: 'bp', sev: 'high', notAlarm: true, conf: 92, since: '1 พ.ย. 2569', title: 'ฝุ่นสะสมเร็วขึ้น · ไฟหายจากฝุ่น 6.2%', device: '', lossKwh: bpKwh, lossBaht: bpKwh * 4.18,
+      text: 'PR ต่ำกว่าค่าหลังล้าง 6.2% และลดลงเร็วขึ้นในช่วง 14 วันล่าสุด สอดคล้องกับ PM2.5 สูงและไม่มีฝนมา 19 วัน ใบงานล้าง WO-1039 เลยกำหนดแล้ว 5 วัน',
+      ev: ['อัตราฝุ่นสะสม 0.21%/วัน (เดิม 0.08%/วัน)', 'PM2.5 เฉลี่ย 47 µg/m³ (เกินค่ามาตรฐาน 37.5)', 'ไม่มีฝนตั้งแต่ 27 ต.ค. (19 วัน)', 'ค่าล้าง ฿42,000 · คืนทุนจากไฟที่ได้คืนใน ~34 วัน · คุ้มที่จะล้างตั้งแต่ ' + (bpBest ? scrTh(bpBest) : '—')],
+      spark: inSiteSpark('bp'), sparkLabel: 'ส่วนต่างจากที่ควรได้ 14 วัน (%)',
+      p: ['เปิดใบงาน WO-1039', 'WorkOrderDetail.dc.html', 'sc.wo=WO-1039|sc.woFrom=Analytics', 'workorder'], s: ['ดูไซต์', 'SiteDetail.dc.html', 'sc.siteName=หลังคาโรงงานบางปู|sc.siteFrom=Analytics', 'site'] },
+    { id: 'f6', site: 'bn', sev: 'high', notAlarm: false, conf: 95, since: '14 พ.ย. 2569 22:10', title: 'INV-04 ขาดการเชื่อมต่อ · ประเมินไฟที่ไม่ได้บันทึก', device: 'INV-04', lossKwh: bnDay, lossBaht: bnDay * 4.18,
+      text: 'อินเวอร์เตอร์แจ้งขาดการเชื่อมต่อแล้ว การวิเคราะห์เสริมด้วยการประเมินพลังงานที่หายจากเครื่องอื่นในไซต์ เพื่อให้รายงานและยอดค่าไฟไม่ขาดช่วง',
+      ev: ['ไฟที่ไม่ได้บันทึกถึงตอนนี้ ≈ 96 kWh (ประเมินจาก INV-01–03, 05–06)', 'เครื่องที่เหลือผลิตปกติ (±1.2% จากค่ากลาง)', 'ถ้ายังไม่แก้ ≈ ' + inFmt(bnDay) + ' kWh/วัน'],
+      spark: off, sparkLabel: 'ผลผลิตเทียบเครื่องอื่นในไซต์ 14 วัน (%)',
+      p: ['สร้างใบงานซ่อม', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=สาขาบางนา|sc.woType=repair|sc.device=INV-04', 'wrench'], s: ['ดูอุปกรณ์ INV-04', 'DeviceDetail.dc.html', 'sc.device=INV-04|sc.siteName=สาขาบางนา|sc.deviceFrom=Analytics', 'plug'], repairDevice: 'INV-04' },
+    { id: 'f2', site: 'k1', sev: 'med', notAlarm: true, conf: 78, since: '6 พ.ย. 2569', title: 'INV-B04 ผลิตต่ำกว่ากลุ่ม 5.8% · ไม่มี alarm', device: 'INV-B04', lossKwh: 93, lossBaht: 93 * 2.20,
+      text: 'ผลผลิตจำเพาะต่ำกว่าค่ากลางของอินเวอร์เตอร์โซน B ต่อเนื่อง 9 วัน ต่ำเท่ากันทั้งวันจึงไม่ใช่เงาบัง และยังต่ำหลังล้างโซน B เมื่อ 14 พ.ย. น่าจะเป็นมูลนกจุดที่ล้างไม่ถึงหรือขั้วต่อสตริง 3–4',
+      ev: ['ผลผลิตจำเพาะ −5.8% เทียบค่ากลางโซน B (6 เครื่อง)', 'สตริง 3–4 ต่ำสุด (−9%)', 'ไม่มี alarm จาก inverter ตลอดช่วง'],
+      spark: b04, sparkLabel: 'ส่วนต่างจากค่ากลางกลุ่ม 14 วัน (%)',
+      p: ['สร้างใบงานตรวจ', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=ฟาร์มโคราช 1|sc.woType=inspect|sc.device=INV-B04', 'plus'], s: ['ดูอุปกรณ์ INV-B04', 'DeviceDetail.dc.html', 'sc.device=INV-B04|sc.siteName=ฟาร์มโคราช 1|sc.deviceFrom=Analytics', 'plug'] },
+    { id: 'f3', site: 'lb', sev: 'med', notAlarm: true, conf: 70, since: '9 พ.ย. 2569', title: 'มิเตอร์อ่านต่ำกว่าผลรวมอินเวอร์เตอร์ 3.4%', device: 'Meter', lossKwh: null, lossBaht: null,
+      text: 'ค่าจากมิเตอร์ต่ำกว่าผลรวมของอินเวอร์เตอร์เกินความสูญเสียสายไฟปกติ เริ่มพร้อมกันทุกช่วงเวลา จึงน่าจะมาจากค่า CT ratio หรือสายสัญญาณ เสี่ยงยอดไฟในรายงานและบิลคลาดเคลื่อน',
+      ev: ['ส่วนต่าง 3.4% (ปกติไม่เกิน 1.5%)', 'เริ่ม 9 พ.ย. และคงที่ทุกช่วงเวลา', 'อินเวอร์เตอร์ทั้ง 6 เครื่องผลิตปกติ'],
+      spark: mtr, sparkLabel: 'ส่วนต่างมิเตอร์กับอินเวอร์เตอร์ 14 วัน (%)',
+      p: ['สร้างใบงานตรวจมิเตอร์', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=ลานจอดรถลพบุรี|sc.woType=inspect|sc.device=มิเตอร์ไฟฟ้า', 'plus'], s: ['ดูอุปกรณ์ของไซต์', 'SiteDetail.dc.html', 'sc.siteName=ลานจอดรถลพบุรี|sc.siteFrom=Analytics|sc.siteTab=devices', 'plug'] },
+    { id: 'f5', site: 'lp', sev: 'med', notAlarm: true, conf: 74, since: 'พยากรณ์ ธ.ค. 2569–มี.ค. 2570', title: 'ฤดูหมอกควันจะทำให้ฝุ่นสะสมเร็วขึ้น 2.3 เท่า', device: '', lossKwh: null, lossBaht: null, forecast: true,
+      text: 'PM2.5 ที่ลำพูนคาดว่าจะขึ้นถึง 80–120 µg/m³ ตั้งแต่ ธ.ค. ฝุ่นสะสมต่อรอบ 30 วันจะขึ้นจาก ~2.6% เป็น ~6% แนะนำคงรอบ 30 วันไว้ตลอดช่วงนี้ ไม่ขยายรอบ ส่วนการลดเป็น 21 วันไม่คุ้ม (ค่าล้างเพิ่ม ~฿142,000 แต่ได้ไฟคืน ~฿43,600)',
+      ev: ['PM2.5 ตอนนี้ 40 µg/m³ · พยากรณ์ 14 วันขึ้นต่อเนื่อง', 'จุดคุ้มทุนการล้างเลื่อนเร็วขึ้นจาก ~7 ม.ค. เป็น ~' + scrTh(inBestDay('lp') || IN_T), 'รอบ 30 วันยังเร็วกว่าจุดคุ้มทุน'],
+      spark: lpPm, sparkLabel: 'PM2.5 พยากรณ์ 14 วัน (µg/m³)',
+      p: ['ดูรอบล้างของไซต์', 'SiteDetail.dc.html', 'sc.siteName=โรงงาน A ลำพูน|sc.siteFrom=Analytics', 'calendar'], s: null },
+    { id: 'f7', site: 'lp', sev: 'low', notAlarm: true, conf: 66, since: '20 ต.ค. 2569', title: 'กำลังถูกจำกัดจากความร้อนช่วงบ่าย 3.1%', device: 'INV-07', lossKwh: lpKwh, lossBaht: lpKwh * 4.18,
+      text: 'INV-07, INV-09 และ INV-12 ที่ติดผนังด้านตะวันตกร้อน 61–64 °C ช่วง 12:00–15:00 และลดกำลังเองโดยไม่แจ้ง alarm ควรตรวจการระบายอากาศหรือติดตั้งหลังคากันแดด',
+      ev: ['อุณหภูมิภายใน 61–64 °C ช่วง 12:00–15:00', 'กำลังช่วงบ่ายต่ำกว่าเครื่องอื่น 3.1%', 'เครื่องอื่น 10 เครื่องไม่เกิน 52 °C'],
+      spark: der, sparkLabel: 'ส่วนต่างช่วงบ่ายเทียบกลุ่ม 14 วัน (%)',
+      p: ['สร้างใบงานตรวจ', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=โรงงาน A ลำพูน|sc.woType=inspect|sc.device=INV-07', 'plus'], s: null },
+    { id: 'f4', site: 'k2', sev: 'low', notAlarm: true, conf: 85, since: '12 ต.ค. 2569', title: 'ฝุ่นสะสมตามปกติ · คงรอบเดิม', device: '', lossKwh: k2Kwh, lossBaht: k2Kwh * 2.20,
+      text: 'หลังปรับตามความเข้มแสงแล้ว PR ต่ำลง 2.9% สอดคล้องกับฝุ่นสะสม 34 วันหลังล้าง ฝนที่คาดว่าจะตก 19 พ.ย. จะช่วยคืนได้ราว 1% ใบงาน WO-1041 วันที่ 25 พ.ย. ยังเหมาะสม',
+      ev: ['อัตราฝุ่นสะสม 0.085%/วัน (ปกติของไซต์)', 'ฝนคาด 19 พ.ย. ~6 มม.', 'จุดคุ้มทุนด้านพลังงานล้วน ~' + scrTh(inBestDay('k2') || IN_T)],
+      spark: inSiteSpark('k2'), sparkLabel: 'ส่วนต่างจากที่ควรได้ 14 วัน (%)',
+      p: ['ดูใบงาน WO-1041', 'WorkOrderDetail.dc.html', 'sc.wo=WO-1041|sc.woFrom=Analytics', 'workorder'], s: null },
+    { id: 'f8', site: 'rs', sev: 'info', notAlarm: true, conf: 88, since: 'ต่อเนื่อง', title: 'กำลังถูกตัดยอดช่วงเที่ยงในวันฟ้าใส 1.1%', device: '', lossKwh: inLossKwh('rs', 1.1), lossBaht: inLossKwh('rs', 1.1) * 4.18,
+      text: 'ช่วง 11:30–13:30 ของวันฟ้าใส อินเวอร์เตอร์จ่ายเต็มพิกัด 50 kW ตามสัดส่วน DC/AC 1.2 ที่ออกแบบไว้ เป็นเรื่องปกติ ไม่ต้องแก้',
+      ev: ['เกิดเฉพาะวันที่เมฆน้อยกว่า 25%', 'คิดเป็น ~1.1% ของพลังงาน', 'ทุกเครื่องเหมือนกัน'],
+      spark: clip, sparkLabel: 'สัดส่วนที่ถูกตัด 14 วัน (%)', p: null, s: null }
+  ];
+}
+var IN_ROLE = { a: 'Org Admin', b: 'Site Manager', c: 'Viewer', d: 'Org Owner', e: 'Site Manager' };
+function inCtx() {
+  var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+  var JS = function (k, d) { try { return JSON.parse(SS(k) || '') || d; } catch (e) { return d; } };
+  var org = SS('sc.org') || 'a'; if (!IN_ROLE[org]) org = 'a';
+  var role = IN_ROLE[org]; if (org === 'd' && (JS('sc.owner', {}) || {}).d) role = 'Org Admin';
+  var edits = JS('sc.siteEdits', {});
+  var DN = function (name) { return (edits[name] && edits[name].name) || name; };
+  var sites = IN_IDS.filter(function (id) { return IN_SITES[id].org === org; });
+  var dismissed = SS('sc.insightDismissed').split(',').filter(Boolean);
+  return { SS: SS, JS: JS, org: org, role: role, canAct: role !== 'Viewer', DN: DN, sites: sites, dismissed: dismissed, createdWo: JS('sc.createdWo', []), woStat: JS('sc.woStat', {}) };
+}
+function inSiteId(v, ctx) { if (!v || v === 'all') return 'all'; if (IN_SITES[v]) return ctx.sites.indexOf(v) >= 0 ? v : 'all'; var id = IN_BYNAME[v]; return id && ctx.sites.indexOf(id) >= 0 ? id : 'all'; }
+function inRanked(ctx, site) {
+  var all = inFindings(ctx).filter(function (f) { return ctx.sites.indexOf(f.site) >= 0 && (site === 'all' || f.site === site); });
+  all.sort(function (x, y) { var a = IN_SEV[x.sev][0], b = IN_SEV[y.sev][0]; return a !== b ? a - b : (y.lossBaht || 0) - (x.lossBaht || 0); });
+  return all;
+}
+function inSpark(vals) {
+  var mn = Math.min.apply(null, vals.concat([0])), mx = Math.max.apply(null, vals.concat([0])); if (mx - mn < 1) { mx += 0.5; mn -= 0.5; }
+  var y = function (v) { return Math.round((4 + (mx - v) / (mx - mn) * 40) * 10) / 10; };
+  return { pts: vals.map(function (v, i) { return Math.round(i * 220 / (vals.length - 1)) + ',' + y(v); }).join(' '), zero: y(0) };
+}
+var IN_BLANK = {"vKpis": false, "kpis": [], "vFindings": false, "fOrderNote": false, "fOrderText": "", "fEmpty": false, "fEmptyIcon": "", "fEmptyTitle": "", "fEmptyText": "", "findings": [], "hasDismissed": false, "toggleDismissed": null, "showDismissedAria": "", "dismissedLabel": "", "vCompare": false, "cEmpty": false, "cEmptyText": "", "cReady": false, "cGroupLabel": "", "cCaption": "", "cAria": "", "cMinDev": "", "cGrid": "", "cCols": [], "cMaxPm": "", "cRainSum": "", "lgCaption": "", "league": [], "peerSite": "", "peerCaption": "", "peerZones": [], "vForecast": false, "fcEmpty": false, "fcEmptyText": "", "fcReady": false, "fcHighlights": [], "fcSite": "", "fcCaption": "", "fcAria": "", "fcDays": [], "soilRows": [], "vSources": false, "sources": [], "srcRows": [], "methods": [], "vSumMain": false, "sumGo": null, "sumKind": "", "sumTitle": "", "sumMeta": "", "vSumSite": false, "vDevice": false, "devTitle": "", "devText": "", "devGo": null};
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { showDismissed: false }; }
+  componentDidMount() {
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.insightDismissed', 'sc.range', 'sc.insightSite', 'sc.woStat', 'sc.createdWo', 'sc.siteEdits', 'sc.owner'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), showDismissed: false });
+  }
+  componentWillUnmount() { if (this._sync) window.removeEventListener('storage', this._sync); if (this._iv) clearInterval(this._iv); }
+  renderVals() {
+    var self = this, p = this.props, view = p.view ?? 'findings', ctx = inCtx();
+    var site = inSiteId(p.site ?? 'all', ctx);
+    var out = Object.assign({}, IN_BLANK);
+    var write = function (keys) { return function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { String(keys).split('|').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) window.sessionStorage.setItem(kv.slice(0, i), kv.slice(i + 1)); }); } catch (x) {} }; };
+    var ranked = inRanked(ctx, site);
+    var active = ranked.filter(function (f) { return ctx.dismissed.indexOf(f.id) < 0; });
+    var money = function (f) { return f.lossBaht == null ? (f.forecast ? 'พยากรณ์' : 'ประเมินไม่ได้') : '≈ ฿' + inFmt(f.lossBaht) + '/วัน'; };
+    var whereOf = function (f) { var s = IN_SITES[f.site]; return ctx.DN(s.name) + ' · ' + s.prov + (f.device && f.device !== 'Meter' ? ' · ' + f.device : f.device === 'Meter' ? ' · มิเตอร์ไฟฟ้า' : ''); };
+
+    if (view === 'kpis') {
+      var cnt = { high: 0, med: 0, low: 0, info: 0 }, sumB = 0, sumK = 0;
+      active.forEach(function (f) { cnt[f.sev]++; if (f.lossBaht != null && f.sev !== 'info') { sumB += f.lossBaht; sumK += f.lossKwh; } });
+      var hl = { a: ['ฝน 19 พ.ย. ที่โคราช', '~6 มม. ช่วยลดฝุ่นฟาร์มโคราช ~40%'], b: ['PM2.5 สูงที่บางนา', '48 µg/m³ เกินค่ามาตรฐาน 37.5'], c: ['หมอกควันเริ่ม ธ.ค.', 'PM2.5 ลำพูนคาด 80–120 µg/m³'], e: ['ฝน 19–20 พ.ย. ที่หัวหิน', '~13 มม. ช่วยล้างฝุ่นตามธรรมชาติ'], d: ['ยังไม่มีไซต์', 'เพิ่มไซต์เพื่อเริ่มพยากรณ์'] }[ctx.org];
+      out.vKpis = true;
+      var actB = 0, actK = 0; active.forEach(function (f) { if (f.lossBaht != null && (f.sev === 'high' || f.sev === 'med') && !f.forecast) { actB += f.lossBaht; actK += f.lossKwh; } });
+      out.kpis = [
+        { icon: 'alert', bg: cnt.high ? 'danger' : 'gray', label: 'ข้อสังเกตที่เปิดอยู่', value: String(active.length), unit: 'รายการ', note: 'สูง ' + cnt.high + ' · กลาง ' + cnt.med + ' · ต่ำ ' + cnt.low + ' · ข้อมูล ' + cnt.info },
+        { icon: 'coin', bg: 'warn', label: 'ไฟที่เสียและควรแก้', value: '฿' + inFmt(actB), unit: '/วัน', note: '≈ ' + inFmt(actK) + ' kWh/วัน · เฉพาะความรุนแรงสูงและกลาง' }
+      ];
+      return out;
+    }
+
+    if (view === 'findings') {
+      var focus = p.focus ?? '', showDis = !!self.state.showDismissed, limit = Number(p.limit ?? 0) || 0;
+      var dismissedList = ranked.filter(function (f) { return ctx.dismissed.indexOf(f.id) >= 0; });
+      var list = showDis ? ranked : active; if (limit) list = list.slice(0, limit);
+      var toggleDis = function (id) { return function () { var cur = ctx.SS('sc.insightDismissed').split(',').filter(Boolean); var i = cur.indexOf(id); if (i >= 0) cur.splice(i, 1); else cur.push(id); try { window.sessionStorage.setItem('sc.insightDismissed', cur.join(',')); } catch (e) {} self.setState({ sync: Date.now() }); }; };
+      out.vFindings = true;
+      out.fOrderNote = list.length > 1; out.fOrderText = 'เรียงตามความรุนแรง แล้วตามไฟที่เสียต่อวัน';
+      out.fEmpty = list.length === 0;
+      out.fEmptyIcon = ctx.sites.length ? 'checkCircle' : 'site';
+      out.fEmptyTitle = !ctx.sites.length ? 'ยังไม่มีไซต์ให้วิเคราะห์' : (ctx.org === 'e' ? 'ต้องตั้งรอบล้างก่อน' : 'ไม่มีข้อสังเกตที่ต้องติดตาม');
+      out.fEmptyText = !ctx.sites.length ? 'เพิ่มไซต์และเชื่อม SmartLogger แล้วระบบจะเริ่มวิเคราะห์หลังมีข้อมูล 14 วัน' : (ctx.org === 'e' ? ctx.DN('หลังคาอาคาร A หัวหิน') + ' ยังไม่ได้ตั้งรอบล้าง ระบบจึงยังประเมินฝุ่นสะสมและวันที่ควรล้างไม่ได้ · พลังงานจริงเทียบที่ควรได้ดูได้ที่แท็บเปรียบเทียบ' : 'ทุกไซต์ผลิตใกล้เคียงที่ควรได้');
+      out.hasDismissed = dismissedList.length > 0; out.showDismissedAria = showDis ? 'true' : 'false';
+      out.dismissedLabel = showDis ? 'ซ่อนที่รับทราบแล้ว' : 'แสดงที่รับทราบแล้ว (' + dismissedList.length + ')';
+      out.toggleDismissed = function () { self.setState({ showDismissed: !self.state.showDismissed }); };
+      out.findings = list.map(function (f) {
+        var sv = IN_SEV[f.sev], dis = ctx.dismissed.indexOf(f.id) >= 0, sp = inSpark(f.spark), on = focus === f.id;
+        var prim = f.p, sec = f.s;
+        var dv = prim && /CreateWorkOrder/.test(prim[1]) ? ((/sc\.device=([^|]+)/.exec(prim[2]) || [])[1] || '') : '';
+        if (dv) { var sName = IN_SITES[f.site].name, open = (ctx.createdWo || []).filter(function (w) { return w && w.st !== 'done' && (!w.org || w.org === ctx.org) && (w.site === sName || w.site === ctx.DN(sName)) && (w.device === dv || String(w.title || '').indexOf(dv) >= 0); })[0]; if (open) prim = ['เปิดใบงาน ' + open.no, 'WorkOrderDetail.dc.html', 'sc.wo=' + open.no + '|sc.woFrom=Analytics', 'workorder']; }
+        var can = ctx.canAct;
+        return {
+          hid: 'in-f-' + f.id, title: f.title, where: whereOf(f), text: f.text, ev: f.ev.map(function (t) { return { t: t }; }), showEv: !p.compact,
+          sevLabel: 'ความรุนแรง' + sv[1], sevStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 700; color: ' + sv[2] + '; background: ' + sv[3],
+          tag: f.forecast ? 'พยากรณ์' : (f.notAlarm ? 'ไม่ใช่ alarm จาก inverter' : 'เสริม alarm: ประเมินไฟที่หาย'),
+          tagStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #3730A3; background: #EEF2FF',
+          conf: f.conf, since: f.since,
+          spark: sp.pts, zeroY: sp.zero, sparkColor: f.sev === 'high' ? '#B42318' : f.sev === 'med' ? '#B54708' : '#1D4ED8', sparkLabel: f.sparkLabel,
+          sparkAria: f.sparkLabel + ': ' + f.spark.join(', '),
+          lossText: money(f), lossSub: f.lossKwh != null && f.lossBaht != null ? '≈ ' + inFmt(f.lossKwh) + ' kWh/วัน' : '',
+          cardStyle: 'display: flex; flex-direction: column; gap: 10px; background: #FFFFFF; border-radius: 12px; padding: 16px 20px; border: ' + (on ? '2px solid #0F6B5C' : '1px solid #E3E6EB') + (dis ? '; opacity: 0.75' : ''),
+          hasActions: can, hasPrimary: can && !!prim, hasSecondary: can && !!sec,
+          pLabel: prim ? prim[0] : '', pHref: prim ? prim[1] : '', pKeys: prim ? prim[2] : '', pIcon: prim ? prim[3] : '',
+          sLabel: sec ? sec[0] : '', sHref: sec ? sec[1] : '', sKeys: sec ? sec[2] : '', sIcon: sec ? sec[3] : '',
+          canDismiss: can, dismissLabel: dis ? 'ยกเลิกรับทราบ' : 'รับทราบ', dismiss: toggleDis(f.id)
+        };
+      });
+      return out;
+    }
+
+    if (view === 'compare') {
+      var ids = (site === 'all' ? ctx.sites : [site]).filter(function (id) { return !!IN_ES[id]; });
+      out.vCompare = true; out.cEmpty = ids.length === 0; out.cReady = ids.length > 0;
+      out.cEmptyText = !ctx.sites.length ? 'ยังไม่มีไซต์ให้เปรียบเทียบ' : 'ไซต์นี้ยังไม่มีข้อมูลย้อนหลังพอจะเปรียบเทียบ (ต้องตั้งรอบล้างและมีข้อมูล 14 วัน)';
+      if (!ids.length) return Object.assign(out, { cCols: [], league: [], peerZones: [] });
+      var rr = scrResolve(scrRead()), bk = scrBuckets(rr.from, rr.to, rr.group);
+      var cols = bk.map(function (b) { var g = inAgg(ids, b.s, b.e); return { b: b, g: g }; });
+      var minDev = Math.min.apply(null, cols.map(function (c) { return c.g.dev; }).concat([-1])), maxPm = Math.max.apply(null, cols.map(function (c) { return c.g.pmAvg; }).concat([10])), maxRain = Math.max.apply(null, cols.map(function (c) { return c.g.rain; }).concat([5]));
+      var every = Math.max(1, Math.ceil(cols.length / 12)), rainSum = 0;
+      out.cGrid = 'grid-template-columns: repeat(' + cols.length + ', minmax(' + (cols.length > 40 ? 6 : 14) + 'px, 1fr))';
+      out.cCols = cols.map(function (c, i) {
+        var dv = c.g.dev, col = dv <= -5 ? '#B42318' : dv <= -2 ? '#B54708' : '#858D9B'; rainSum += c.g.rain;
+        var h = Math.max(2, Math.round(Math.min(0, dv) / minDev * 92)), ph = Math.max(2, Math.round(c.g.pmAvg / maxPm * 42)), rh = c.g.rain > 0.4 ? Math.max(3, Math.round(c.g.rain / maxRain * 26)) : 0;
+        var tip = c.b.label + ' · ต่างจากคาด ' + inSign(dv) + '% · PM2.5 ' + inFmt(c.g.pmAvg) + ' · ฝน ' + inFmt(c.g.rain, 1) + ' มม.';
+        var shortLab = rr.group === 'month' ? c.b.label.replace(/ \d\d$/, '') : c.b.label; // month labels drop the year; on phones every other label hides
+        return { tip: tip, lab: i % every === 0 ? shortLab : '', labCls: (i / every) % 2 === 1 ? 'in-lab-alt' : '', full: c.b.label, devText: inSign(dv) + '%', pmText: inFmt(c.g.pmAvg) + ' µg/m³', rainText: inFmt(c.g.rain, 1) + ' มม.',
+          devStyle: 'height: ' + h + 'px; background: ' + col + '; border-radius: 0 0 3px 3px', pmStyle: 'height: ' + ph + 'px; background: #3730A3; border-radius: 3px 3px 0 0', rainStyle: 'height: ' + rh + 'px; background: #1D4ED8; border-radius: 3px 3px 0 0' };
+      });
+      var tot = inAgg(ids, rr.from, rr.to);
+      out.cGroupLabel = rr.groupLabel; out.cMinDev = inSign(minDev) + '%'; out.cMaxPm = inFmt(maxPm) + ' µg/m³'; out.cRainSum = inFmt(rainSum, 1) + ' มม.';
+      out.cCaption = rr.label + ' · ' + (site === 'all' ? 'ทุกไซต์ (ถ่วงตามขนาด)' : ctx.DN(IN_SITES[site].name)) + ' · รวมต่างจากคาด ' + inSign(tot.dev) + '%';
+      out.cAria = 'ส่วนต่างพลังงานจริงเทียบที่ควรได้ ' + rr.label + ': ' + cols.map(function (c) { return c.b.label + ' ' + inSign(c.g.dev) + '%'; }).join(', ');
+      var cmp = !!rr.compare && rr.compareOk;
+      out.lgCaption = rr.label + (cmp ? ' · เทียบกับ ' + rr.prevLabel : rr.compareAsked ? ' · ไม่มีข้อมูลช่วงก่อนหน้าให้เทียบ' : '');
+      out.league = ids.map(function (id) {
+        var g = inAgg([id], rr.from, rr.to), pv = cmp ? inAgg([id], rr.prevFrom, rr.prevTo) : null, dv = g.dev;
+        var st = dv > -2 ? ['ปกติ', '#0F6B5C', '#E7F2EF'] : dv > -5 ? ['ควรติดตาม', '#8A3B06', '#FFF4E5'] : ['ต่ำกว่าคาด', '#B42318', '#FDECEA'];
+        return { name: ctx.DN(IN_SITES[id].name), sy: inFmt(g.sy, 0) + ' kWh/kWp', pr: inFmt(g.pr, 1) + '%', dev: inSign(dv) + '%', devColor: st[1], delta: pv && pv.sy ? inSign((g.sy / pv.sy - 1) * 100) + '%' : '—',
+          st: st[0], stStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; color: ' + st[1] + '; background: ' + st[2] };
+      });
+      var ps = site !== 'all' ? site : ids[0], S = IN_SITES[ps];
+      var special = { 'k1|INV-B04': -5.8, 'k1|INV-C03': -3.0, 'lp|INV-07': -3.1, 'lp|INV-09': -3.1, 'lp|INV-12': -3.1 };
+      out.peerSite = ctx.DN(S.name);
+      out.peerCaption = 'ผลผลิตจำเพาะ 7 วันล่าสุดเทียบค่ากลางของเครื่องรุ่นเดียวกันในโซน · ต่ำกว่า −5% ควรตรวจ';
+      out.peerZones = S.zones.map(function (z, zi) {
+        var cells = [];
+        for (var n = 1; n <= z[1]; n++) {
+          var nm = 'INV-' + z[0] + (z[0] ? ('0' + n).slice(-2) : ('0' + n).slice(-2)), k = ps + '|' + nm;
+          var v = special[k] != null ? special[k] : Math.round((inH(n * 17 + zi * 31 + IN_SEED[ps] * 7) - 0.5) * 24) / 10;
+          var offl = ps === 'bn' && nm === 'INV-04';
+          var c = offl ? ['#F3F4F6', '#374151'] : v <= -5 ? ['#FDECEA', '#B42318'] : v <= -2 ? ['#FFF4E5', '#8A3B06'] : ['#E7F2EF', '#0F6B5C'];
+          cells.push({ name: nm, val: offl ? 'ขาดการเชื่อมต่อ' : inSign(v) + '%', aria: nm + ' ' + (offl ? 'ขาดการเชื่อมต่อ' : 'ต่างจากค่ากลาง ' + inSign(v) + '%'),
+            style: 'min-height: 56px; box-sizing: border-box; padding: 8px 10px; border-radius: 8px; background: ' + c[0] + '; color: ' + c[1] });
+        }
+        return { label: (z[0] ? 'โซน ' + z[0] + ' · ' : '') + z[1] + ' เครื่อง · ' + IN_MODEL[ps], cells: cells };
+      });
+      return out;
+    }
+
+    if (view === 'forecast') {
+      var fids = (site === 'all' ? ctx.sites : [site]);
+      var fUse = fids.filter(function (id) { return IN_SITES[id].kwp; });
+      out.vForecast = true; out.fcEmpty = fUse.length === 0; out.fcReady = fUse.length > 0;
+      out.fcEmptyText = 'ยังไม่มีไซต์ให้พยากรณ์';
+      if (!fUse.length) return Object.assign(out, { fcDays: [], soilRows: [], fcHighlights: [] });
+      var days = []; var maxE = 0;
+      for (var i = 1; i <= 14; i++) {
+        var tot2 = { mid: 0, low: 0, high: 0, ghi: 0, rain: 0, pm: 0 };
+        fUse.forEach(function (id) { var s = IN_SITES[id], soil = s.cur == null ? 1 : s.cur + inSoilRate(id) * i; if ((id === 'k1' || id === 'k2') && IN_T + i >= IN_KORAT_RAIN) soil *= 0.6; var x = inFcDay(id, i, soil); tot2.mid += x.mid; tot2.low += x.low; tot2.high += x.high; tot2.ghi += x.ghi / fUse.length; tot2.rain += x.rain / fUse.length; tot2.pm += x.pm / fUse.length; });
+        maxE = Math.max(maxE, tot2.high); days.push(tot2);
+      }
+      var big = fUse.reduce(function (a, id) { return a + IN_SITES[id].kwp; }, 0) > 1500;
+      var unit = big ? 'MWh' : 'kWh', div = big ? 1000 : 1, dp = big ? 1 : 0;
+      out.fcSite = site === 'all' ? 'ทุกไซต์' : ctx.DN(IN_SITES[site].name);
+      out.fcCaption = '16–29 พ.ย. 2569 · จากพยากรณ์แสงอาทิตย์ เมฆ ฝน (Open-Meteo) และ PM2.5 · รวมคาด ' + inFmt(days.reduce(function (a, d) { return a + d.mid; }, 0) / div, dp) + ' ' + unit;
+      out.fcAria = 'พยากรณ์พลังงานรายวัน: ' + days.map(function (d, i) { return scrTh(IN_T + i + 1, 1) + ' ' + inFmt(d.mid / div, dp) + ' ' + unit; }).join(', ');
+      out.fcDays = days.map(function (d, i) {
+        var day = IN_T + i + 1, x = new Date(day * 864e5);
+        var lo = d.low / maxE * 100, hi = d.high / maxE * 100, md = d.mid / maxE * 100;
+        return { lab: x.getUTCDate() + (i === 0 || x.getUTCDate() === 1 ? ' ' + SCR_MN[x.getUTCMonth()] : ''), full: scrTh(day),
+          tip: scrTh(day) + ' · คาด ' + inFmt(d.mid / div, dp) + ' ' + unit + ' (' + inFmt(d.low / div, dp) + '–' + inFmt(d.high / div, dp) + ') · ฝน ' + inFmt(d.rain, 1) + ' มม. · PM2.5 ' + inFmt(d.pm),
+          bandStyle: 'position: absolute; left: 15%; right: 15%; bottom: ' + lo.toFixed(1) + '%; height: ' + Math.max(2, hi - lo).toFixed(1) + '%; background: #B9DACF; border-radius: 4px',
+          midStyle: 'position: absolute; left: 8%; right: 8%; bottom: ' + md.toFixed(1) + '%; height: 3px; background: #0F6B5C; border-radius: 2px',
+          rainStyle: 'height: ' + (d.rain > 0.4 ? Math.max(4, Math.round(d.rain / 8 * 26)) : 0) + 'px; background: #1D4ED8; border-radius: 3px 3px 0 0',
+          pmStyle: 'height: ' + Math.max(2, Math.round(d.pm / 80 * 34)) + 'px; background: #3730A3; border-radius: 3px 3px 0 0',
+          eText: inFmt(d.mid / div, dp) + ' ' + unit + ' (' + inFmt(d.low / div, dp) + '–' + inFmt(d.high / div, dp) + ')', ghiText: inFmt(d.ghi, 1) + ' kWh/m²', rainText: inFmt(d.rain, 1) + ' มม.', pmText: inFmt(d.pm) + ' µg/m³' };
+      });
+      var hlF = [];
+      if (fUse.indexOf('k1') >= 0 || fUse.indexOf('k2') >= 0) hlF.push({ icon: 'rain', bg: 'info', title: 'ฝน 19 พ.ย. ที่โคราช ~6 มม.', text: 'ช่วยลดฝุ่นฟาร์มโคราชราว 40% และไฟวันนั้นต่ำลงจากเมฆ' });
+      if (fUse.indexOf('bp') >= 0) hlF.push({ icon: 'alert', bg: 'danger', title: 'บางปูไม่มีฝนในพยากรณ์', text: 'ฝุ่นจะสะสมต่อ ~0.21%/วัน · ควรล้างทันที' });
+      if (fUse.indexOf('lp') >= 0) hlF.push({ icon: 'wind', bg: 'warn', title: 'PM2.5 ลำพูนเพิ่มต่อเนื่อง', text: 'จาก ' + inFcPm('lp', 1) + ' เป็น ' + inFcPm('lp', 14) + ' µg/m³ ใน 14 วัน · เข้าสู่ฤดูหมอกควัน' });
+      if (fUse.indexOf('bn') >= 0 || fUse.indexOf('rs') >= 0) hlF.push({ icon: 'cloud', bg: 'gray', title: 'กรุงเทพฯ–ปทุมธานีอากาศแห้ง', text: 'ไม่มีฝนใน 14 วัน · PM2.5 43–50 µg/m³' });
+      if (fUse.indexOf('e1') >= 0) hlF.push({ icon: 'rain', bg: 'info', title: 'ฝน 19–20 พ.ย. ที่หัวหิน', text: '~13 มม. ช่วยล้างฝุ่นตามธรรมชาติ' });
+      out.fcHighlights = hlF;
+      out.soilRows = fUse.map(function (id) {
+        var s = IN_SITES[id], bd = inBestDay(id), now = bd != null && bd <= IN_T;
+        if (s.cur == null) return { name: ctx.DN(s.name), pct: '—', loss: '—', best: '—', bestColor: '#4B5563', due: s.due, tip: s.tip };
+        var lk = inLossKwh(id, s.cur);
+        return { name: ctx.DN(s.name), pct: inFmt(s.cur, 1) + '% · +' + inFmt(inSoilRate(id), 2) + '%/วัน', loss: '฿' + inFmt(lk * s.tariff) + ' (' + inFmt(lk) + ' kWh)',
+          best: bd == null ? '—' : now ? 'ล้างทันที (คุ้มตั้งแต่ ' + scrTh(bd) + ')' : scrTh(bd), bestColor: now ? '#B42318' : '#111827', due: s.due, tip: s.tip };
+      });
+      return out;
+    }
+
+    if (view === 'sources') {
+      var sids = site === 'all' ? ctx.sites : [site];
+      out.vSources = true;
+      out.sources = [
+        { icon: 'wind', bg: 'warn', name: 'PM2.5 · Air4Thai', by: 'กรมควบคุมมลพิษ · API สาธารณะ', what: 'ค่า PM2.5 รายชั่วโมงจากสถานีที่ใกล้แต่ละไซต์', use: 'คำนวณอัตราฝุ่นสะสม และพยากรณ์ฤดูหมอกควัน', status: 'เชื่อมต่อแล้ว · ล่าสุด 10:00', stIcon: 'checkCircle', stColor: '#0F6B5C' },
+        { icon: 'cloud', bg: 'info', name: 'สภาพอากาศ · Open-Meteo', by: 'Open-Meteo API · พยากรณ์ 14 วัน', what: 'อุณหภูมิ เมฆ ฝน ลม รายชั่วโมงตามพิกัดไซต์', use: 'ปรับค่าที่ควรได้ตามอากาศ และพยากรณ์ไฟ', status: 'เชื่อมต่อแล้ว · ล่าสุด 10:15', stIcon: 'checkCircle', stColor: '#0F6B5C' },
+        { icon: 'rain', bg: 'info', name: 'ปริมาณฝน · กรมอุตุนิยมวิทยา', by: 'TMD · ข้อมูลรายวัน', what: 'ฝนสะสมรายวันจากสถานีตรวจอากาศ', use: 'ตรวจสอบไขว้ว่าฝนช่วยล้างแผงได้จริง', status: 'เชื่อมต่อแล้ว · ล่าสุด 07:00', stIcon: 'checkCircle', stColor: '#0F6B5C' },
+        { icon: 'sun', bg: 'warn', name: 'ความเข้มแสง · ดาวเทียม', by: 'Open-Meteo / Solcast · GHI และ POA', what: 'แสงอาทิตย์รายชั่วโมงที่ตกบนแผงจริง', use: 'ตัวตั้งของ "พลังงานที่ควรได้"', status: 'เชื่อมต่อแล้ว · ล่าสุด 10:15', stIcon: 'checkCircle', stColor: '#0F6B5C' },
+        { icon: 'plug', bg: 'brand', name: 'FusionSolar Northbound API', by: 'Huawei · ทุก 5 นาที', what: 'อินเวอร์เตอร์ สตริง และมิเตอร์ของทุกไซต์', use: 'ค่าจริงที่นำมาเทียบ', status: ctx.org === 'b' ? 'เชื่อมต่อแล้ว · INV-04 บางนาขาดข้อมูล' : 'เชื่อมต่อแล้ว · ล่าสุด 10:35', stIcon: ctx.org === 'b' ? 'alert' : 'checkCircle', stColor: ctx.org === 'b' ? '#B54708' : '#0F6B5C' },
+        { icon: 'workorder', bg: 'gray', name: 'ใบงานและประวัติการล้าง', by: 'SolarCare', what: 'วันล้าง ผลตรวจ และการซ่อมของแต่ละไซต์', use: 'แยกผลของการล้างออกจากความผิดปกติอื่น', status: 'ข้อมูลภายในระบบ', stIcon: 'checkCircle', stColor: '#0F6B5C' }
+      ];
+      out.srcRows = sids.map(function (id) {
+        var s = IN_SITES[id], pm = inPm(id, IN_T);
+        return { name: ctx.DN(s.name), grid: 'พิกัด ' + s.lat.toFixed(2) + ', ' + s.lon.toFixed(2), station: s.station, pm: pm + ' µg/m³', pmColor: pm > 37.5 ? '#B42318' : '#111827', temp: s.temp + ' °C', rain: inRain(id, IN_T) + ' มม.', ghi: inFmt(4.9 * s.gf * 0.92, 1) + ' kWh/m²' };
+      });
+      out.methods = [
+        { t: 'พลังงานที่ควรได้ = แสงที่ตกบนแผง (POA) × ขนาดติดตั้ง × PR ตอนสะอาด × ตัวปรับอุณหภูมิ' },
+        { t: 'ส่วนต่าง = พลังงานจริง ÷ ที่ควรได้ − 1 · ถือว่าผิดปกติเมื่อเกิน 3 เท่าของค่าแกว่งปกติติดกัน 3 วัน' },
+        { t: 'อัตราฝุ่นสะสม = ความชันของ PR ระหว่างรอบล้าง ปรับผลฝน (ฝน ≥ 5 มม. ล้างฝุ่นออก ~40%) และ PM2.5' },
+        { t: 'เทียบกลุ่ม = ผลผลิตจำเพาะ (kWh/kWp) เทียบค่ากลางของอินเวอร์เตอร์รุ่นเดียวกันในโซน' },
+        { t: 'จุดคุ้มทุนการล้าง = วันที่ไฟที่เสียจากฝุ่นสะสมรวมเท่ากับค่าล้าง' }
+      ];
+      return out;
+    }
+
+    if (view === 'summary') {
+      var place = p.place ?? 'main';
+      if (place === 'site') {
+        var sid = IN_BYNAME[p.site] || (IN_SITES[p.site] ? p.site : '');
+        var top = active.filter(function (f) { return f.site === sid; })[0];
+        if (!top) return out;
+        out.vSumSite = true; out.sumTitle = top.title; out.sumMeta = money(top) + ' · ความเชื่อมั่น ' + top.conf + '%';
+        out.sumGo = write('sc.finding=' + top.id + '|sc.insightSite=' + sid + '|sc.findingFrom=SiteDetail');
+        return out;
+      }
+      var now = active.filter(function (f) { return !f.forecast; }), top2 = now[0]; if (!top2) return out;
+      out.vSumMain = true; out.sumKind = 'ข้อสังเกตจากการวิเคราะห์ · ' + now.length + ' รายการ';
+      out.sumTitle = ctx.DN(IN_SITES[top2.site].name) + ' · ' + top2.title; out.sumMeta = money(top2) + ' · ' + (top2.notAlarm ? 'ไม่ใช่ alarm จาก inverter · ' : '') + 'ความเชื่อมั่น ' + top2.conf + '%';
+      out.sumGo = write('sc.finding=' + top2.id + '|sc.insightSite=' + (site === 'all' ? 'all' : site) + '|sc.findingFrom=Main');
+      return out;
+    }
+
+    if (view === 'device') {
+      var dsite = IN_BYNAME[p.site] || p.site, dev = p.device ?? '';
+      var NOTES = {
+        'k1|INV-B04': ['f2', 'ผลิตต่ำกว่ากลุ่ม 5.8% · ไม่มี alarm', 'ต่อเนื่อง 9 วัน (ตั้งแต่ 6 พ.ย.) และยังต่ำหลังล้างโซน B เมื่อ 14 พ.ย. น่าจะเป็นมูลนกจุดที่ล้างไม่ถึงหรือขั้วต่อสตริง 3–4 · ความเชื่อมั่น 78%'],
+        'k1|INV-C03': ['', 'สอดคล้องกับ alarm', 'สตริง 4 ต่ำ 18% ตรงกับจุดร้อน 2 แผงที่พบ · ทั้งเครื่องต่ำกว่ากลุ่ม 3.0% · ติดตามผลหลังแก้ใน WO-1042'],
+        'bn|INV-04': ['f6', 'ประเมินไฟที่ไม่ได้บันทึก', 'ขาดข้อมูลตั้งแต่ 14 พ.ย. 22:10 · ประเมินจากเครื่องอื่นในไซต์ ≈ 96 kWh ถึงตอนนี้ (≈ ' + inFmt(IN_SITES.bn.kwp / 6 * IN_YIELD) + ' kWh/วัน)'],
+        'lb|Meter': ['f3', 'มิเตอร์อ่านต่ำกว่าผลรวมอินเวอร์เตอร์ 3.4%', 'ตั้งแต่ 9 พ.ย. (ปกติไม่เกิน 1.5%) · ตรวจ CT ratio หรือสายสัญญาณ · เสี่ยงยอดไฟคลาดเคลื่อน'],
+        'lp|INV-07': ['f7', 'กำลังถูกจำกัดจากความร้อนช่วงบ่าย', '12:00–15:00 อุณหภูมิภายใน 61–64 °C · กำลังลด 3.1% ช่วงบ่าย · ตรวจการระบายอากาศ'],
+        'lp|INV-09': ['f7', 'กำลังถูกจำกัดจากความร้อนช่วงบ่าย', '12:00–15:00 อุณหภูมิภายใน 61–64 °C · กำลังลด 3.1% ช่วงบ่าย · ตรวจการระบายอากาศ'],
+        'lp|INV-12': ['f7', 'กำลังถูกจำกัดจากความร้อนช่วงบ่าย', '12:00–15:00 อุณหภูมิภายใน 61–64 °C · กำลังลด 3.1% ช่วงบ่าย · ตรวจการระบายอากาศ']
+      };
+      var nk = dsite + '|' + (dev.indexOf('Meter-') === 0 ? 'Meter' : dev), n = NOTES[nk];
+      if (!n || ctx.sites.indexOf(dsite) < 0) return out;
+      out.vDevice = true; out.devTitle = n[1]; out.devText = n[2];
+      out.devGo = write('sc.finding=' + (n[0] || 'f2') + '|sc.insightSite=' + dsite);
+      return out;
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

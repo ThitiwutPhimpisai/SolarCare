@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>พลังงานและผลตอบแทน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="energy" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" eyebrow="{{orgName}}" title="พลังงานและผลตอบแทน" icon="energy" subtitle="{{headSub}}" actions="{{headActs}}" hint-size="100%,96px"></dc-import>
+    <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+      <dc-import name="DateRange" label="ช่วงเวลาพลังงาน" on-change="{{onRange}}" hint-size="100%,170px"></dc-import>
+    </sc-if>
+
+    <sc-if value="{{pendingData}}" hint-placeholder-val="{{ false }}">
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding-bottom: 24px">
+        <dc-import name="ListState" state="empty" unit="ข้อมูลพลังงาน" icon="plug" empty-title="{{pendingTitle}}" empty-text="เชื่อม SmartLogger หรือบัญชี FusionSolar ของไซต์ แล้วระบบจะเริ่มคำนวณพลังงานและผลตอบแทนให้อัตโนมัติ" hint-size="100%,200px"></dc-import>
+        <dc-import name="Button" variant="secondary" icon="site" label="ไปที่หน้าไซต์" href="Sites.dc.html" hint-size="140px,44px"></dc-import>
+      </section>
+    </sc-if>
+    <sc-if value="{{noSites}}" hint-placeholder-val="{{ false }}">
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding-bottom: 24px">
+        <dc-import name="ListState" state="empty" unit="ข้อมูลพลังงาน" icon="energy" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="เพิ่มไซต์และเชื่อมต่อ inverter เพื่อเริ่มคำนวณพลังงาน ผลตอบแทน และคาร์บอนเครดิต" hint-size="100%,140px"></dc-import>
+        <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+          <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=EnergyValue" hint-size="150px,44px"></dc-import>
+        </sc-if>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 20px">
+
+        <dc-import name="FilterChips" label="ไซต์" value="{{siteF}}" options="{{siteOpts}}" on-change="{{setSiteF}}" hint-size="100%,44px"></dc-import>
+        <sc-if value="{{hasOnce}}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #374151">
+            <span style="display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 4px 0 12px; border-radius: 999px; background: #E7F2EF; color: #0F6B5C; font-weight: 600">กรองจากหน้าไซต์: {{onceLabel}}
+              <button type="button" onClick="{{clearOnce}}" aria-label="ล้างตัวกรองไซต์" style="width: 32px; height: 32px; border: 0; border-radius: 999px; background: transparent; color: #0F6B5C; cursor: pointer; display: inline-flex; align-items: center; justify-content: center"><dc-import name="Icon" icon="x" size="16" hint-size="16px,16px"></dc-import></button>
+            </span>
+          </div>
+        </sc-if>
+
+        <dc-import name="EnergyStats" view="full" org="{{org}}" site="{{siteF}}" period="{{period}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" compare="{{rCompare}}" range-label="{{rShort}}" hint-size="100%,1400px"></dc-import>
+
+        <details style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 0 16px">
+          <summary style="cursor: pointer; min-height: 52px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #111827"><dc-import name="Icon" icon="info" size="18" tone="muted" hint-size="18px,18px"></dc-import>วิธีคำนวณและสมมติฐาน</summary>
+          <div style="padding-bottom: 16px">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <dc-import name="EnergyStats" view="assumptions" org="{{org}}" site="{{siteF}}" period="{{period}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" range-label="{{rShort}}" hint-size="100%,700px"></dc-import>
+              <sc-if value="{{cantEdit}}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; font-size: 13px; color: #4B5563">{{readOnlyNote}}</p>
+              </sc-if>
+            </div>
+          </div>
+        </details>
+      </div>
+    </sc-if>
+  </div>
+</main>
+  <dc-import name="Flash" page="EnergyValue.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2200}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+// Org/site data per DATA.md; all energy formulas live in EnergyStats (ENERGY.md)
+var EV_ORGS = {
+  a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', inv: 53, sites: ['ฟาร์มโคราช 1', 'ฟาร์มโคราช 2', 'หลังคาโรงงานบางปู', 'ลานจอดรถลพบุรี'] },
+  b: { name: 'กรีนมาร์ท รีเทล', role: 'Site Manager', inv: 13, sites: ['สาขารังสิต', 'สาขาบางนา'] },
+  c: { name: 'นิคมฯ เหนือ', role: 'Viewer', inv: 13, sites: ['โรงงาน A ลำพูน'] },
+  d: { name: 'ไร่ทองโซลาร์', role: 'Org Owner', inv: 0, sites: [] },
+  e: { name: 'ริมทะเล รีสอร์ท', role: 'Site Manager', inv: 4, sites: ['หลังคาอาคาร A หัวหิน'] }
+};
+
+// ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
+var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
+var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+var SCR_PRESETS = [['d7', '7 วัน'], ['d30', '30 วัน'], ['m3', '3 เดือน'], ['m6', '6 เดือน'], ['m12', '12 เดือน'], ['ytd', 'ปีนี้'], ['ly', 'ปีที่แล้ว'], ['custom', 'กำหนดเอง']];
+function scrDay(iso) { var p = String(iso || '').split('-'); if (p.length < 3) return NaN; var d = Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5); return isNaN(d) ? NaN : d; }
+function scrIso(d) { var x = new Date(d * 864e5); return x.getUTCFullYear() + '-' + ('0' + (x.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + x.getUTCDate()).slice(-2); }
+function scrTh(d, short) { var x = new Date(d * 864e5), y = x.getUTCFullYear() + 543; return x.getUTCDate() + ' ' + SCR_MN[x.getUTCMonth()] + ' ' + (short ? String(y).slice(-2) : y); }
+function scrPresetRange(p) {
+  var T = SCR_TODAY, ms = function (n) { return Math.round(Date.UTC(2026, 10 - n + 1, 1) / 864e5); };
+  if (p === 'd7') return [T - 6, T]; if (p === 'd30') return [T - 29, T]; if (p === 'm3') return [ms(3), T]; if (p === 'm6') return [ms(6), T];
+  if (p === 'ytd') return [Math.round(Date.UTC(2026, 0, 1) / 864e5), T]; if (p === 'ly') return [Math.round(Date.UTC(2025, 0, 1) / 864e5), Math.round(Date.UTC(2025, 11, 31) / 864e5)];
+  return [ms(12), T];
+}
+function scrGroups(len) { return [['day', 'รายวัน', len <= 62, 'ช่วงยาวเกิน 62 วัน'], ['week', 'รายสัปดาห์', len >= 7 && len <= 366, len < 7 ? 'ช่วงสั้นกว่า 7 วัน' : 'ช่วงยาวเกิน 1 ปี'], ['month', 'รายเดือน', len >= 28, 'ช่วงสั้นกว่า 1 เดือน'], ['quarter', 'รายไตรมาส', len >= 89, 'ช่วงสั้นกว่า 3 เดือน'], ['year', 'รายปี', len >= 300, 'ช่วงสั้นกว่า 1 ปี']]; }
+function scrDefaultGroup(len) { return len <= 31 ? 'day' : len <= 62 ? 'week' : 'month'; }
+function scrResolve(raw) {
+  var r = {}; try { r = typeof raw === 'string' ? (JSON.parse(raw || '{}') || {}) : (raw || {}); } catch (e) { r = {}; }
+  var preset = SCR_PRESETS.some(function (x) { return x[0] === r.preset; }) ? r.preset : 'm12', a, b, clamped = false;
+  if (preset === 'custom') { a = scrDay(r.from); b = scrDay(r.to); if (isNaN(a) || isNaN(b) || a > b) { preset = 'm12'; } }
+  if (preset !== 'custom') { var pr = scrPresetRange(preset); a = pr[0]; b = pr[1]; }
+  if (a < SCR_START) { a = SCR_START; clamped = true; } if (b > SCR_TODAY) { b = SCR_TODAY; clamped = true; } if (a > b) a = b;
+  if (b - a > 1095) { a = b - 1095; clamped = true; }
+  var len = b - a + 1, g = r.group, okG = scrGroups(len).filter(function (x) { return x[0] === g && x[2]; })[0]; if (!okG) g = scrDefaultGroup(len);
+  var pname = SCR_PRESETS.filter(function (x) { return x[0] === preset; })[0][1];
+  var pa = a - len, pb = a - 1, cmpOk = pa >= SCR_START;
+  return { preset: preset, from: a, to: b, fromIso: scrIso(a), toIso: scrIso(b), len: len, group: g, groupLabel: scrGroups(len).filter(function (x) { return x[0] === g; })[0][1],
+    compare: !!r.compare && cmpOk, compareAsked: !!r.compare, compareOk: cmpOk, prevFrom: pa, prevTo: pb, clamped: clamped,
+    label: (preset === 'custom' ? '' : pname + ' · ') + scrTh(a) + ' – ' + scrTh(b), short: preset === 'custom' ? scrTh(a, 1) + ' – ' + scrTh(b, 1) : pname,
+    prevLabel: scrTh(pa) + ' – ' + scrTh(pb) };
+}
+function scrBuckets(a, b, g) {
+  var out = [], d = a, guard = 0;
+  while (d <= b && guard++ < 2000) {
+    var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), e, lab;
+    if (g === 'day') { e = d; lab = x.getUTCDate() + ' ' + SCR_MN[m]; }
+    else if (g === 'week') { var wd = (x.getUTCDay() + 6) % 7; e = Math.min(b, d - wd + 6); var xe = new Date(e * 864e5); lab = x.getUTCDate() + (xe.getUTCMonth() !== m ? ' ' + SCR_MN[m] : '') + '–' + xe.getUTCDate() + ' ' + SCR_MN[xe.getUTCMonth()]; }
+    else if (g === 'month') { e = Math.round(Date.UTC(y, m + 1, 0) / 864e5); lab = SCR_MN[m] + ' ' + String(y + 543).slice(-2); if (x.getUTCDate() !== 1 || e > b) lab = x.getUTCDate() + '–' + new Date(Math.min(e, b) * 864e5).getUTCDate() + ' ' + lab; } // part of a month (e.g. 1–15 พ.ย. 69 month-to-date) says so
+    else if (g === 'quarter') { var q = Math.floor(m / 3); e = Math.round(Date.UTC(y, q * 3 + 3, 0) / 864e5); lab = 'ไตรมาส ' + (q + 1) + '/' + String(y + 543).slice(-2); }
+    else { e = Math.round(Date.UTC(y, 12, 0) / 864e5); lab = String(y + 543); }
+    e = Math.min(e, b); out.push({ s: d, e: e, label: lab }); d = e + 1;
+  }
+  return out;
+}
+function scrRead() { try { return window.sessionStorage.getItem('sc.range') || ''; } catch (e) { return ''; } }
+// ---- end sc.range resolver ----
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = {}; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.siteOnce', 'sc.site', 'sc.createdSites', 'sc.siteEdits', 'sc.createdName', 'sc.rates', 'sc.range', 'sc.flash', 'sc.flashAt'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), once: '' }); // fresh render; no one-shot filter (the range lives in sc.range, shared with Reports)
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var org = SS('sc.org') || 'a'; if (!EV_ORGS[org]) org = 'a';
+    var O = EV_ORGS[org];
+    var orgName = org === 'd' ? (SS('sc.createdName') || O.name) : O.name;
+    var canEdit = O.role === 'Org Owner' || O.role === 'Org Admin';
+    // one-shot site filter from SiteDetail: kept in component state as a removable chip, never copied into the shared sc.site
+    var onceIn = SS('sc.siteOnce');
+    if (onceIn) { try { window.sessionStorage.removeItem('sc.siteOnce'); } catch (e) {} if (O.sites.indexOf(onceIn) >= 0) setTimeout(function () { self.setState({ once: onceIn }); }, 0); }
+    var once = O.sites.indexOf(self.state.once || '') >= 0 ? self.state.once : (O.sites.indexOf(onceIn) >= 0 ? onceIn : '');
+    var JSN = function (k, d) { try { return JSON.parse(SS(k) || '') || d; } catch (e) { return d; } };
+    var edits = JSN('sc.siteEdits', {});
+    var shown = function (n) { return (edits[n] && edits[n].name) || n; };
+    var created = JSN('sc.createdSites', []).filter(function (c) { return c && c.org === org && c.name; });
+    var stored = SS('sc.site');
+    var siteF = once || (stored && O.sites.indexOf(stored) >= 0 ? stored : 'all');
+    if (stored && stored !== 'all' && siteF === 'all') { try { window.sessionStorage.setItem('sc.site', 'all'); } catch (e) {} } // site from another org
+    var rr = scrResolve(scrRead());
+    var R0 = {
+      org: org, orgName: orgName, inverters: siteF === 'all' ? O.inv : ({ 'ฟาร์มโคราช 1': 22, 'ฟาร์มโคราช 2': 18, 'หลังคาโรงงานบางปู': 7, 'ลานจอดรถลพบุรี': 6, 'สาขารังสิต': 7, 'สาขาบางนา': 6, 'โรงงาน A ลำพูน': 13, 'หลังคาอาคาร A หัวหิน': 4 })[siteF] || 0, // per site when one site is chosen (DATA Round 7)
+      hasSites: O.sites.length > 0, noSites: O.sites.length === 0 && !created.length, pendingData: O.sites.length === 0 && created.length > 0,
+      pendingTitle: created.length ? 'ยังไม่มีข้อมูลพลังงานของ ' + created.map(function (c) { return shown(c.name); }).join(', ') : '',
+      hasOnce: !!once, onceLabel: shown(once),
+      clearOnce: function () { self.setState({ once: '' }); },
+      canEdit: canEdit, cantEdit: !canEdit,
+      readOnlyNote: 'อัตราและค่าคำนวณปรับได้โดย Org Owner / Org Admin ของ ' + orgName + ' (คุณเป็น ' + O.role + ')',
+      period: '12', rFrom: rr.fromIso, rTo: rr.toIso, rGroup: rr.group, rShort: rr.short, rCompare: !!rr.compare,
+      onRange: function () { self.setState({ sync: Date.now() }); },
+      siteF: siteF,
+      siteOpts: [{ id: 'all', label: 'ทุกไซต์' }].concat(O.sites.map(function (n) { return { id: n, label: shown(n) }; })),
+      setSiteF: function (id) { try { window.sessionStorage.setItem('sc.site', id); } catch (e) {} self.setState({ once: '', sync: Date.now() }); }
+    };
+    R0.headSub = R0.hasSites ? 'ข้อมูลจาก FusionSolar · ซิงก์ล่าสุด 15 พ.ย. 2569 10:15 · อินเวอร์เตอร์ ' + R0.inverters + ' เครื่อง' : 'พลังงานที่ผลิต ผลตอบแทน และผลของการล้างแผง';
+    R0.headActs = R0.hasSites && canEdit ? [{ label: 'ปรับอัตรา', icon: 'coin', variant: 'secondary', href: 'OrgProfile.dc.html', saveKeys: 'sc.rateFrom=EnergyValue|sc.from=EnergyValue' }] : [];
+    return R0;
+  }
+}
+</script>
+</body>
+</html>

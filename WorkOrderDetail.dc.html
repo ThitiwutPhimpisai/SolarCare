@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รายละเอียดใบงาน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input,textarea{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="wo" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <sc-if value="{{noWo}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" icon="workorder" title="ยังไม่มีใบงาน" hint-size="100%,96px"></dc-import>
+      <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px">
+        <dc-import name="ListState" state="empty" unit="ใบงาน" icon="workorder" empty-title="ยังไม่มีใบงานในองค์กรนี้" empty-text="สร้างใบงานแรกจากหน้าใบงาน หรือตั้งรอบล้างที่หน้าไซต์" hint-size="100%,140px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasWo}}" hint-placeholder-val="{{ true }}">
+    <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" code="{{w.no}}" status-kind="wo" status-value="{{status}}" alert="{{w.overdue}}" icon="workorder" title="{{w.title}}" subtitle="{{headSub}}" actions="{{headActs}}" hint-size="100%,140px"></dc-import>
+
+    <sc-if value="{{roleNote}}" hint-placeholder-val="{{ false }}">
+      <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{roleNote}}</div>
+    </sc-if>
+
+    <sc-if value="{{msg}}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="{{msgStyle}}">
+        <span style="flex: 1 1 260px">{{msg}}</span>
+        <dc-import name="Button" icon="arrowLeft" label="{{backBtnLabel}}" variant="secondary" href="{{backHref}}" save-keys="{{backStore}}" hint-size="140px,44px"></dc-import>
+      </div>
+    </sc-if>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <section aria-label="สรุปงาน" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; font-size: 13px">
+          <sc-for list="{{facts}}" as="f" hint-placeholder-count="6">
+            <div><div style="color: #4B5563">{{f.k}}</div><div style="font-weight: 600; font-size: 15px">{{f.v}}</div></div>
+          </sc-for>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 6px 20px 12px">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 12px 0 6px"><dc-import name="Icon" icon="checkCircle" size="18" tone="muted" hint-size="18px,18px"></dc-import>เช็กลิสต์ ({{checkDone}}/{{checkTotal}})</h2>
+          <sc-for list="{{checks}}" as="c" hint-placeholder-count="4">
+            <div style="display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid #EEF0F3">
+              <span aria-hidden="true" style="{{c.dot}}">
+                <sc-if value="{{c.done}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="check" size="14" hint-size="14px,14px"></dc-import></sc-if>
+              </span>
+              <div>
+                <div style="font-weight: 600; font-size: 14px">{{c.label}}<span style="position: absolute; left: -9999px">{{c.sr}}</span></div>
+                <div style="font-size: 13px; color: #4B5563">{{c.note}}</div>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="{{photoStyle}}">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="camera" size="18" tone="muted" hint-size="18px,18px"></dc-import>รูปก่อน / หลัง แยกตามโซน</h2>
+          <sc-if value="{{noPhotos}}" hint-placeholder-val="{{ false }}">
+            <div style="min-height: 96px; border-radius: 8px; border: 1px dashed #9CA3AF; background: #FAFBFC; display: flex; align-items: center; justify-content: center; padding: 12px; text-align: center; font-size: 13px; color: #4B5563">{{photoNote}}</div>
+          </sc-if>
+          <sc-for list="{{zones}}" as="z" hint-placeholder-count="3">
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <div style="font-size: 14px; font-weight: 600">{{z.name}} <span style="font-weight: 400; color: #4B5563">· {{z.count}} รูป</span></div>
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+                <figure style="margin: 0; position: relative">
+                  <dc-import name="SiteThumb" site="before" w="100%" h="180px" radius="8" label="{{true}}" hint-size="100%,180px"></dc-import>
+                  <figcaption style="position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px; font-weight: 600">ก่อน · {{z.tBefore}}</figcaption>
+                </figure>
+                <figure style="margin: 0; position: relative">
+                  <dc-import name="SiteThumb" site="after" w="100%" h="180px" radius="8" label="{{true}}" hint-size="100%,180px"></dc-import>
+                  <figcaption style="position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px; font-weight: 600">หลัง · {{z.tAfter}}</figcaption>
+                </figure>
+              </div>
+            </div>
+          </sc-for>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="users" size="18" tone="muted" hint-size="18px,18px"></dc-import>ความคิดเห็น</h2>
+          <sc-if value="{{noComments}}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 13px; color: #4B5563">ยังไม่มีความคิดเห็น</div>
+          </sc-if>
+          <sc-for list="{{comments}}" as="m" hint-placeholder-count="2">
+            <div style="display: flex; gap: 12px">
+              <dc-import name="Avatar" person="{{m.av}}" size="36" hint-size="36px,36px"></dc-import>
+              <div style="flex: 1; min-width: 0; background: #F5F6F8; border-radius: 10px; padding: 10px 12px">
+                <div style="font-size: 13px"><b>{{m.who}}</b> <span style="color: #4B5563">· {{m.when}}</span></div>
+                <div style="font-size: 14px; margin-top: 2px">{{m.text}}</div>
+              </div>
+            </div>
+          </sc-for>
+          <sc-if value="{{canComment}}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; gap: 8px; align-items: flex-end">
+              <label for="wod-c" style="position: absolute; left: -9999px">เขียนความคิดเห็น</label>
+              <textarea id="wod-c" rows="2" value="{{draft}}" onChange="{{setDraft}}" placeholder="เขียนความคิดเห็นถึงช่างหรือทีม" style="flex: 1; min-width: 0; padding: 10px 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; resize: vertical"></textarea>
+              <dc-import name="Button" label="ส่ง" on-press="{{send}}" disabled="{{noDraft}}" hint-size="64px,44px"></dc-import>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+
+      <aside style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="user" size="18" tone="muted" hint-size="18px,18px"></dc-import>ผู้รับผิดชอบ</h2>
+          <div style="display: flex; gap: 12px; align-items: center">
+            <sc-if value="{{w.av}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{w.av}}" size="48" hint-size="48px,48px"></dc-import></sc-if>
+            <sc-if value="{{w.noAv}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="width: 48px; height: 48px; border-radius: 999px; background: #F3F4F6; color: #374151; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex: none">{{w.ini}}</span></sc-if>
+            <div>
+              <div style="font-weight: 600">{{w.whoLabel}}</div>
+              <div style="font-size: 13px; color: #4B5563">{{w.whoNote}}</div>
+            </div>
+          </div>
+          <sc-if value="{{canAssign}}" hint-placeholder-val="{{ false }}">
+            <label for="wod-assign" style="font-size: 13px; font-weight: 600; color: #374151">มอบหมายช่าง</label>
+            <select id="wod-assign" value="{{assignTo}}" onChange="{{setAssign}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF; color: #111827; box-sizing: border-box; width: 100%">
+              <sc-for list="{{assignOpts}}" as="o" hint-placeholder-count="3"><option value="{{o.v}}">{{o.t}}</option></sc-for>
+            </select>
+            <dc-import name="Button" icon="user" label="มอบหมายช่าง" on-press="{{doAssign}}" disabled="{{assignBad}}" full="{{true}}" hint-size="100%,44px"></dc-import>
+          </sc-if>
+        </section>
+
+        <sc-if value="{{w.hasCheckin}}" hint-placeholder-val="{{ true }}">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="map" size="18" tone="muted" hint-size="18px,18px"></dc-import>ตำแหน่งเช็กอิน</h2>
+          <dc-import name="SiteMap" mode="checkin" selected="{{w.siteKey}}" checkin-lon="{{w.ciLon}}" checkin-lat="{{w.ciLat}}" height="220" hint-size="100%,250px"></dc-import>
+          <div style="font-size: 12px; color: #4B5563">GPS ±8 ม. · ขอบเขตไซต์คือเส้นประ</div>
+          <div style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: #4B5563">เช็กอิน {{w.started}}</span><span style="font-weight: 600; color: #0A4F44">อยู่ในเขตไซต์ · 160 ม.</span></div>
+        </section>
+        </sc-if>
+
+        <a href="SiteDetail.dc.html" onPointerDown="{{toSite}}" onKeyDown="{{toSite}}" onClick="{{toSite}}" aria-label="{{siteLinkLabel}}" style="display: block; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden; color: #111827; text-decoration: none">
+          <dc-import name="SiteThumb" site="{{w.thumb}}" w="100%" h="120px" radius="0" hint-size="100%,120px"></dc-import>
+          <div style="padding: 12px 16px">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; font-weight: 600; color: #0F6B5C">{{w.siteShown}}<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></div>
+            <div style="font-size: 13px; color: #4B5563">{{w.siteNote}}</div>
+          </div>
+        </a>
+        <sc-if value="{{hasDevice}}" hint-placeholder-val="{{ false }}">
+        <a href="DeviceDetail.dc.html" onPointerDown="{{toDevice}}" onKeyDown="{{toDevice}}" onClick="{{toDevice}}" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 16px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; text-decoration: none; color: #111827">
+          <dc-import name="Icon" icon="plug" size="18" bg="warn" hint-size="32px,32px"></dc-import>
+          <span style="flex: 1; min-width: 0"><span style="display: block; font-size: 12px; color: #4B5563">อุปกรณ์ที่เกี่ยวข้อง</span><span style="display: block; font-weight: 600">{{deviceLabel}}</span></span>
+          <dc-import name="Icon" icon="arrowRight" size="16" tone="brand" hint-size="16px,16px"></dc-import>
+        </a>
+        </sc-if>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="clock" size="18" tone="muted" hint-size="18px,18px"></dc-import>ประวัติ</h2>
+          <sc-for list="{{history}}" as="h" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 13px">
+              <div style="width: 8px; height: 8px; border-radius: 999px; background: #0F6B5C; margin-top: 7px; flex: none"></div>
+              <div><b>{{h.who}}</b> {{h.what}}<div style="font-size: 12px; color: #4B5563">{{h.when}}</div></div>
+            </div>
+          </sc-for>
+        </section>
+      </aside>
+    </div>
+    </sc-if>
+  </div>
+</main>
+
+<dc-import name="ConfirmDialog" open="{{dlg}}" title="ส่งกลับให้ช่างแก้ไข" body="{{returnBody}}" reason-label="เหตุผล (บังคับ)" reason-placeholder="เช่น รูปหลังล้างโซน C ไม่ชัด ขอถ่ายใหม่" confirm-label="ส่งกลับแก้ไข" tone="danger" on-confirm="{{doReturn}}" on-close="{{closeReturn}}" hint-size="100%,100%"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { stat: {}, dlg: false, reason: {}, draft: '', extra: {}, assignTo: '', assignMsg: {} }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.wo', 'sc.createdWo', 'sc.woStat', 'sc.woAssign', 'sc.issue', 'sc.woFrom', 'sc.siteName', 'sc.createdSites', 'sc.device', 'sc.siteEdits'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    // a new visit starts clean: no leftover success message, open dialog or draft (DATA.md round 3)
+    self.setState({ sync: Date.now(), stat: {}, dlg: false, draft: '', assignTo: '', assignMsg: {} }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() {
+    var self = this, s = self.state;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var orgId = ['a', 'b', 'c', 'd', 'e'].indexOf(SS('sc.org')) >= 0 ? SS('sc.org') : 'a';
+    // canonical data: ../DATA.md
+    var SITE = {
+      'ฟาร์มโคราช 1': { key: 'k1', prov: 'นครราชสีมา', kwp: '8,400', lat: 14.97, lon: 102.10 },
+      'ฟาร์มโคราช 2': { key: 'k2', prov: 'นครราชสีมา', kwp: '6,200', lat: 15.05, lon: 102.25 },
+      'หลังคาโรงงานบางปู': { key: 'bp', prov: 'สมุทรปราการ', kwp: '1,150', lat: 13.52, lon: 100.65 },
+      'ลานจอดรถลพบุรี': { key: 'lb', prov: 'ลพบุรี', kwp: '960', lat: 14.80, lon: 100.65 },
+      'สาขารังสิต': { key: 'rs', prov: 'ปทุมธานี', kwp: '420', lat: 14.00, lon: 100.62 },
+      'สาขาบางนา': { key: 'bn', prov: 'กรุงเทพฯ', kwp: '380', lat: 13.66, lon: 100.68 },
+      'โรงงาน A ลำพูน': { key: 'lp', prov: 'ลำพูน', kwp: '2,300', lat: 18.58, lon: 99.02 },
+      'หลังคาอาคาร A หัวหิน': { key: '', thumb: 'e1', prov: 'ประจวบคีรีขันธ์', kwp: '210' }
+    };
+    var ROLE = { a: 'Org Admin', b: 'Site Manager', c: 'Viewer', d: 'Org Owner', e: 'Site Manager' }[orgId];
+    var WO = {
+      a: [
+        { no: 'WO-1043', title: 'ล้างแผงรอบไตรมาส โซน A–C', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '18 พ.ย. 2569', st: 'review', panels: '12,000', kind: 'ล้างตามรอบ', zones: ['โซน A', 'โซน B', 'โซน C'],
+          started: '13 พ.ย. 07:05 น.', sent: '14 พ.ย. 16:20 น. (เมื่อวาน)', took: '2 วัน (13–14 พ.ย.)', water: '2,400 ลิตร',
+          hist: [['ธนากร ว.', 'ส่งงานพร้อมรูป 24 รูป', '14 พ.ย. 2569 · 16:20 น.'], ['ธนากร ว.', 'เช็กอินที่ไซต์และเริ่มงาน', '13 พ.ย. 2569 · 07:05 น.'], ['สมศรี ป.', 'มอบหมายให้ธนากร ว.', '3 พ.ย. 2569'], ['ระบบ', 'สร้างอัตโนมัติจากรอบ 90 วัน', '2 พ.ย. 2569']],
+          com: [['somsri', 'สมศรี ป.', '3 พ.ย. 09:12 น.', 'โซน C มีจุดร้อน 2 แผงจากรอบก่อน ฝากถ่ายรูปใกล้ ๆ ด้วยนะคะ'], ['thanakorn', 'ธนากร ว.', '14 พ.ย. 16:18 น.', 'ถ่ายแล้วครับ แนบไว้ในโซน C แผง C-14, C-15 ยังมีรอยไหม้ เปิดงานตรวจแยกเป็น WO-1042 แล้ว']] },
+        { no: 'WO-1042', title: 'ตรวจจุดร้อน (hotspot) หลังพายุ', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '16 พ.ย. 2569', st: 'doing', panels: '600', kind: 'ตรวจสภาพ', zones: ['โซน C'],
+          started: '14 พ.ย. 15:50 น.', hist: [['ธนากร ว.', 'เช็กอินที่ไซต์และเริ่มงาน', '14 พ.ย. 2569 · 15:50 น.'], ['ณัฐภัทร ส.', 'สร้างและมอบหมายให้ธนากร ว. (พบ hotspot 2 แผงจาก WO-1043)', '14 พ.ย. 2569 · 15:30 น.']] },
+        { no: 'WO-1041', title: 'ล้างแผงตามรอบ', site: 'ฟาร์มโคราช 2', who: '—', due: '25 พ.ย. 2569', st: 'new', panels: '11,400', kind: 'ล้างตามรอบ', zones: ['โซน A', 'โซน B', 'โซน C', 'โซน D'],
+          hist: [['ระบบ', 'สร้างอัตโนมัติจากรอบ 45 วัน', '12 พ.ย. 2569']] },
+        { no: 'WO-1039', title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', who: 'ธนากร ว.', due: '10 พ.ย. 2569', st: 'doing', panels: '420', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
+          started: '9 พ.ย. 08:10 น.', hist: [['ธนากร ว.', 'เช็กอินที่ไซต์และเริ่มงาน', '9 พ.ย. 2569'], ['วรวุฒิ ก.', 'มอบหมายงาน', '1 พ.ย. 2569']] },
+        { no: 'WO-1035', title: 'ล้างแผงลานจอดรถ', site: 'ลานจอดรถลพบุรี', who: 'ทีมช่าง B', due: '5 พ.ย. 2569', st: 'done', panels: '360', kind: 'ล้างตามรอบ', zones: ['ลานจอด'],
+          started: '5 พ.ย. 07:30 น.', sent: '5 พ.ย. 11:10 น.', took: '3 ชม. 40 นาที', water: '380 ลิตร',
+          hist: [['ณัฐภัทร ส.', 'อนุมัติปิดงาน', '5 พ.ย. 2569'], ['ทีมช่าง B', 'ส่งงานพร้อมรูป 8 รูป', '5 พ.ย. 2569'], ['ณัฐภัทร ส.', 'มอบหมายงาน', '1 พ.ย. 2569']] },
+        { no: 'WO-1031', title: 'เปลี่ยนสายไฟสตริง 12', site: 'ฟาร์มโคราช 1', who: 'ทีมช่าง B', due: '2 พ.ย. 2569', st: 'done', panels: '24', kind: 'ซ่อมบำรุง', zones: ['โซน D'],
+          started: '2 พ.ย. 08:00 น.', sent: '2 พ.ย. 12:30 น.', took: '4 ชม. 30 นาที', water: '—',
+          hist: [['สมศรี ป.', 'อนุมัติปิดงาน', '2 พ.ย. 2569'], ['ทีมช่าง B', 'ส่งงานพร้อมรูป 6 รูป', '2 พ.ย. 2569']] }
+      ],
+      b: [
+        { no: 'GM-0211', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '20 พ.ย. 2569', st: 'todo', panels: '760', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
+          hist: [['ณัฐภัทร ส.', 'มอบหมายให้ธนากร ว.', '12 พ.ย. 2569']] },
+        { no: 'GM-0209', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', st: 'doing', panels: '690', kind: 'ล้างตามรอบ', zones: ['ลานจอด'],
+          started: '11 พ.ย. 08:20 น.', hist: [['ธนากร ว.', 'เช็กอินที่ไซต์และเริ่มงาน', '11 พ.ย. 2569'], ['ณัฐภัทร ส.', 'มอบหมายงาน', '5 พ.ย. 2569']] },
+        { no: 'GM-0204', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '28 ต.ค. 2569', st: 'done', panels: '760', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
+          started: '28 ต.ค. 07:45 น.', sent: '28 ต.ค. 10:30 น.', took: '2 ชม. 45 นาที', water: '420 ลิตร',
+          hist: [['ณัฐภัทร ส.', 'อนุมัติปิดงาน', '28 ต.ค. 2569'], ['ธนากร ว.', 'ส่งงานพร้อมรูป 6 รูป', '28 ต.ค. 2569']] }
+      ],
+      c: [
+        { no: 'NK-0102', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '22 พ.ย. 2569', st: 'doing', panels: '4,180', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
+          started: '14 พ.ย. 08:00 น.', hist: [['ทีมช่าง B', 'เช็กอินที่ไซต์และเริ่มงาน', '14 พ.ย. 2569']] },
+        { no: 'NK-0097', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '30 ต.ค. 2569', st: 'done', panels: '4,180', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
+          started: '30 ต.ค. 07:30 น.', sent: '30 ต.ค. 15:00 น.', took: '7 ชม. 30 นาที', water: '1,500 ลิตร', hist: [['ศิริพร ก.', 'อนุมัติปิดงาน', '30 ต.ค. 2569'], ['ทีมช่าง B', 'ส่งงานพร้อมรูป 8 รูป', '30 ต.ค. 2569']] }
+      ],
+      d: [], e: []
+    }[orgId].slice();
+    var ORG_SITES = { a: ['ฟาร์มโคราช 1', 'ฟาร์มโคราช 2', 'หลังคาโรงงานบางปู', 'ลานจอดรถลพบุรี'], b: ['สาขารังสิต', 'สาขาบางนา'], c: ['โรงงาน A ลำพูน'], d: [], e: ['หลังคาอาคาร A หัวหิน'] }[orgId];
+    var JS = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
+    JS('sc.createdSites', []).forEach(function (x) { if (x && x.org === orgId && x.name && ORG_SITES.indexOf(x.name) < 0) { ORG_SITES = ORG_SITES.concat([x.name]); SITE[x.name] = { key: '', thumb: ({ farm: 'farmType', roof: 'roofType', carport: 'carportType' })[x.type] || 'roofType', prov: x.prov || '', kwp: x.kwp || '—' }; } });
+    // jobs created in the prototype stay listed (sc.createdWo), the same way WorkOrders shows them
+    JS('sc.createdWo', []).forEach(function (c) {
+      if (!c || c.org !== orgId || ORG_SITES.indexOf(c.site) < 0) return;
+      WO.unshift({ no: c.no, title: c.title, site: c.site, who: c.who, due: c.due, st: c.st || 'todo', panels: '—', kind: c.type || 'ล้างตามรอบ', zones: c.zones && c.zones.length ? c.zones : ['ตามที่เลือก'],
+        hist: [['ณัฐภัทร ส.', 'สร้างใบงานและแจ้ง' + c.who, 'เมื่อสักครู่']] });
+    });
+    var woStat = JS('sc.woStat', {}), woAssign = JS('sc.woAssign', {}), issue = JS('sc.issue', null);
+    // back link goes to the page this job was opened from (sc.woFrom)
+    var FROM = { Main: ['ภาพรวม', 'Main.dc.html'], Schedule: ['ตารางล้าง', 'Schedule.dc.html'], SiteDetail: [((JS('sc.siteEdits', {})[SS('sc.siteName')] || {}).name) || SS('sc.siteName') || 'ไซต์', 'SiteDetail.dc.html'], Reports: ['รายงาน', 'Reports.dc.html'], Notifications: ['การแจ้งเตือน', 'Notifications.dc.html'], Analytics: ['วิเคราะห์', 'Analytics.dc.html'], WorkOrders: ['ใบงาน', 'WorkOrders.dc.html'], DeviceDetail: [SS('sc.device') || 'อุปกรณ์', 'DeviceDetail.dc.html'] };
+    var fromK = FROM[SS('sc.woFrom')] ? SS('sc.woFrom') : 'WorkOrders';
+    var backLabel = FROM[fromK][0], backHref = FROM[fromK][1];
+    if (!WO.length) return { noWo: true, hasWo: false, backLabel: 'ใบงาน', backHref: 'WorkOrders.dc.html', w: {}, status: 'new', headSub: '', headActs: [], facts: [], checks: [], zones: [], comments: [], history: [], dlg: false };
+
+    var w0 = WO.filter(function (x) { return x.no === SS('sc.wo'); })[0] || WO[0];
+    var no = w0.no;
+    var assigned = w0.who === '—' && woAssign[no] ? woAssign[no] : '';
+    if (assigned) w0 = Object.assign({}, w0, { who: assigned, st: w0.st === 'new' ? 'todo' : w0.st, hist: [['ณัฐภัทร ส.', 'มอบหมายให้' + assigned, 'เมื่อสักครู่']].concat(w0.hist) });
+    var status = s.stat[no] || woStat[no] || w0.st; // shared approve / send back (sc.woStat)
+    var site = SITE[w0.site] || {};
+    var EDITS = JS('sc.siteEdits', {}); var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    // real calendar dates (Thai month + Buddhist year), today = 15 พ.ย. 2569
+    var TH_M = { 'ม.ค.': 1, 'ก.พ.': 2, 'มี.ค.': 3, 'เม.ย.': 4, 'พ.ค.': 5, 'มิ.ย.': 6, 'ก.ค.': 7, 'ส.ค.': 8, 'ก.ย.': 9, 'ต.ค.': 10, 'พ.ย.': 11, 'ธ.ค.': 12 };
+    var dayOf = function (d) { var p = String(d || '').split(' '), m = TH_M[p[1]]; if (!m) return NaN; var y = parseInt(p[2], 10); if (isNaN(y)) y = 2569; return Math.round(Date.UTC(y - 543, m - 1, parseInt(p[0], 10) || 1) / 86400000); };
+    var TODAY = Math.round(Date.UTC(2026, 10, 15) / 86400000), dueDay = dayOf(w0.due);
+    var late = status !== 'done' && status !== 'review' && !isNaN(dueDay) && dueDay < TODAY ? 'เลยกำหนด ' + (TODAY - dueDay) + ' วัน' : '';
+    var started = (!!w0.started || status === 'doing' || status === 'paused') && status !== 'new' && status !== 'todo';
+    var submitted = status === 'review' || status === 'done' || status === 'returned';
+    var canApprove = ROLE !== 'Viewer';
+    var isTech = w0.who === 'ธนากร ว.';
+    var av = { 'ธนากร ว.': 'thanakorn', 'สมศรี ป.': 'somsri', 'ณัฐภัทร ส.': 'natthaphat' }[w0.who] || '';
+    var facts = [{ k: 'โซน / พื้นที่', v: w0.zones.join(', ') }, { k: 'จำนวนแผง', v: w0.panels === '—' ? '—' : w0.panels + ' แผง' }, { k: 'เริ่มงาน', v: started ? w0.started : 'รอช่างเริ่มงาน' }];
+    if (submitted && w0.sent) facts = facts.concat([{ k: 'ส่งงาน', v: w0.sent }, { k: 'ใช้เวลา', v: w0.took }, { k: 'น้ำที่ใช้', v: w0.water }]);
+    // one checklist per job type (DATA.md round 5)
+    var TYPE = /ตรวจ/.test(w0.kind) ? 'inspect' : (/ซ่อม/.test(w0.kind) ? 'repair' : 'clean');
+    var CL = {
+      clean: [['ถ่ายรูปก่อนล้าง', 'ครบทุกโซนที่กำหนด'], ['ล้างด้วยน้ำ DI', 'ครบทุกโซนที่กำหนด'], ['ถ่ายรูปหลังล้าง', 'ครบทุกโซนที่กำหนด'], ['ตรวจรอยร้าว / ขั้วต่อ', no === 'WO-1043' ? 'พบรอยไหม้ 2 แผงในโซน C (C-14, C-15) → เปิด WO-1042' : 'ไม่พบความผิดปกติ']],
+      inspect: [['ถ่ายภาพความร้อน (thermal)', 'ครบทุกแผงในโซนที่กำหนด'], ['ระบุแผงที่พบปัญหา', no === 'WO-1042' ? 'C-14, C-15' : 'ไม่พบ'], ['วัดค่าแรงดัน / กระแสสตริง', 'บันทึกในใบงาน'], ['สรุปผลและข้อเสนอแนะ', 'ส่งพร้อมใบงาน']],
+      repair: [['ตัดไฟ / ล็อกเอาต์ก่อนเริ่ม', 'ยืนยันด้วยรูปป้ายล็อก'], ['เปลี่ยนชิ้นส่วน', no === 'WO-1031' ? 'เปลี่ยนสายสตริง 12 ใหม่ 24 แผง' : 'ตามที่กำหนด'], ['ทดสอบหลังซ่อม', 'ค่าแรงดันปกติ'], ['ถ่ายรูปหลังซ่อม', 'แนบในใบงาน']]
+    }[TYPE];
+    var nDone = submitted ? 4 : (started ? 2 : 0);
+    var checks = CL.map(function (c, i) { var d = i < nDone; return { label: c[0], note: d ? c[1] : 'ยังไม่ได้ทำ', done: d, sr: d ? ' (ทำแล้ว)' : ' (ยังไม่ได้ทำ)',
+      dot: 'width: 24px; height: 24px; border-radius: 999px; display: flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box; ' + (d ? 'background: #0F6B5C; color: #FFFFFF' : 'background: #FFFFFF; border: 2px solid #9CA3AF') }; });
+    var TP = JS('sc.techProgress', {})[w0.no], tpCount = TP && TP.photos ? (TP.photos.before ? 1 : 0) + (TP.photos.after ? 1 : 0) : 0; // prototype-submitted jobs: real photo count from TechMobile
+    var zones = submitted ? (TP ? [w0.zones.join(', ')] : w0.zones).map(function (z, i) { return { name: z, count: TP ? tpCount : 8, tBefore: ['07:40 น.', '10:10 น.', '12:40 น.'][i % 3], tAfter: ['09:55 น.', '12:05 น.', '14:05 น.'][i % 3] }; }) : [];
+    var history = w0.hist.map(function (h) { return { who: h[0], what: h[1], when: h[2] }; });
+    if (status === 'done' && w0.st !== 'done') history.unshift({ who: 'ณัฐภัทร ส.', what: 'อนุมัติปิดงาน', when: 'เมื่อสักครู่' });
+    if (status === 'returned' && w0.st !== 'returned') history.unshift({ who: 'ณัฐภัทร ส.', what: 'ส่งกลับแก้ไข' + (s.reason[no] ? ': ' + s.reason[no] : ''), when: 'เมื่อสักครู่' });
+    if (status === 'doing' && w0.st !== 'doing') history.unshift({ who: w0.who, what: woStat[no] === 'doing' && !s.stat[no] ? 'เริ่มงาน' : 'ทำงานต่อ (ผู้จัดการแก้ปัญหาแล้ว)', when: 'เมื่อสักครู่' });
+    if (status === 'review' && w0.st !== 'review') history.unshift({ who: w0.who, what: 'ส่งงานให้อนุมัติ', when: 'เมื่อสักครู่' });
+    var myIssue = issue && issue.no === no ? issue : null;
+    if (myIssue) history.unshift({ who: w0.who, what: 'แจ้งปัญหา: ' + (myIssue.kind || 'ปัญหาหน้างาน') + (myIssue.pause ? ' · พักงานจนกว่าจะแก้' : ''), when: myIssue.at || 'เมื่อสักครู่' });
+    var comments = (w0.com || []).map(function (c) { return { av: c[0], who: c[1], when: c[2], text: c[3] }; });
+    if (myIssue) comments.push({ av: w0.who === 'ธนากร ว.' ? 'thanakorn' : '', who: w0.who, when: myIssue.at || 'เมื่อสักครู่',
+      text: 'แจ้งปัญหา: ' + (myIssue.kind || '') + ' · ความรุนแรง' + (myIssue.level || '') + (myIssue.zone ? ' · ' + myIssue.zone : '') + (myIssue.text ? ' — ' + myIssue.text : '') + (myIssue.pause ? ' · ขอพักงานจนกว่าจะแก้' : '') });
+    comments = comments.concat(s.extra[no] || []);
+    var whoLabel = w0.who === '—' ? 'ยังไม่มอบหมาย' : w0.who;
+    var whoNote = { 'ธนากร ว.': 'Technician · ผู้รับเหมา CleanPro', 'ทีมช่าง B': 'ทีมช่างผู้รับเหมา CleanPro', 'สมศรี ป.': 'Site Manager · ทำงานนี้เอง', 'ณัฐภัทร ส.': ROLE + ' · ทำงานนี้เอง (คุณ)', '—': 'ยังไม่มีผู้รับผิดชอบ' }[w0.who] || '';
+    // technicians allowed on this site, and who approves it (DATA.md round 5)
+    var TECHS = { a: ['ธนากร ว.', 'ทีมช่าง B'], b: ['ธนากร ว.'], c: ['ทีมช่าง B'], d: [], e: [] }[orgId];
+    var APPROVER = { 'ฟาร์มโคราช 1': 'สมศรี ป. (Site Manager)', 'ฟาร์มโคราช 2': 'สมศรี ป. (Site Manager)', 'สาขารังสิต': 'ณัฐภัทร ส. (Site Manager)', 'สาขาบางนา': 'ณัฐภัทร ส. (Site Manager)', 'โรงงาน A ลำพูน': 'ศิริพร ก. (Site Manager)', 'หลังคาอาคาร A หัวหิน': 'ณัฐภัทร ส. (Site Manager)' }[w0.site] || 'ณัฐภัทร ส. (Org Admin)';
+    var apvName = APPROVER.replace(/ \(.*\)$/, ''), apvMine = apvName === 'ณัฐภัทร ส.', isAdmin = ROLE === 'Org Admin' || ROLE === 'Org Owner';
+    var apvText = apvMine ? 'รอคุณตรวจและอนุมัติ' : 'รอ ' + APPROVER + ' อนุมัติ' + (isAdmin ? ' · คุณอนุมัติแทนได้' : '');
+    var canAssign = status === 'new' && ROLE !== 'Viewer' && TECHS.length > 0;
+    var assignPick = TECHS.indexOf(s.assignTo) >= 0 ? s.assignTo : '';
+    if (w0.who === '—') whoNote = canAssign ? 'เลือกช่างที่มีสิทธิ์ในไซต์นี้ด้านล่าง' : (ROLE === 'Viewer' ? 'ผู้จัดการไซต์จะมอบหมายช่าง' : 'ยังไม่มีช่างที่มีสิทธิ์ในไซต์นี้ · เชิญได้ที่หน้าสมาชิก');
+    var setStat = function (v, r) {
+      // write the outcome right away so WorkOrders, Schedule, SiteDetail and TechMobile show it too
+      var ws = Object.assign({}, JS('sc.woStat', {})); ws[no] = v;
+      try { window.sessionStorage.setItem('sc.woStat', JSON.stringify(ws)); } catch (e) {}
+      var st = Object.assign({}, s.stat); st[no] = v; var rr = Object.assign({}, s.reason); if (r != null) rr[no] = r; self.setState({ stat: st, reason: rr, dlg: false });
+    };
+    var wsNow = Object.assign({}, woStat); if (s.stat[no]) wsNow[no] = s.stat[no];
+    var canAct = status === 'review' && canApprove;
+    var headActs = [];
+    if (isTech) headActs.push({ label: 'ดูมุมมองช่าง', icon: 'phone', variant: 'ghost', href: 'TechMobile.dc.html', saveKeys: 'sc.wo=' + no + '|sc.from=techView|sc.techView=1' });
+    if (status === 'paused' && canApprove) headActs.push({ label: 'แก้ปัญหาแล้ว · ให้ทำงานต่อ', icon: 'sync', onPress: function () { setStat('doing'); } });
+    if (canAct) headActs.push({ label: 'ส่งกลับแก้ไข', variant: 'secondary', onPress: function () { self.setState({ dlg: true }); } }, { label: 'อนุมัติปิดงาน', icon: 'checkCircle', onPress: function () { setStat('done'); } });
+    return {
+      noWo: false, hasWo: true,
+      backLabel: backLabel, backHref: backHref,
+      canAssign: canAssign, assignTo: assignPick, assignBad: !assignPick,
+      assignOpts: [{ v: '', t: 'เลือกช่าง' }].concat(TECHS.map(function (n) { return { v: n, t: n }; })),
+      setAssign: function (e) { self.setState({ assignTo: e.target.value }); },
+      doAssign: function () {
+        if (!assignPick) return;
+        try { var ss = window.sessionStorage;
+          var wa = JS('sc.woAssign', {}); wa[no] = assignPick; ss.setItem('sc.woAssign', JSON.stringify(wa));
+          var ws = JS('sc.woStat', {}); ws[no] = 'todo'; ss.setItem('sc.woStat', JSON.stringify(ws));
+        } catch (e) {}
+        var am = Object.assign({}, s.assignMsg); am[no] = 'มอบหมาย ' + no + ' ให้ ' + assignPick + ' แล้ว · แจ้งช่างแล้ว';
+        self.setState({ assignTo: '', assignMsg: am, sync: Date.now() });
+      },
+      w: { no: no, title: w0.title, site: w0.site, kind: w0.kind, due: w0.due, overdue: late, isTech: isTech, av: av, noAv: !av, ini: w0.who === 'ทีมช่าง B' ? 'ทB' : '—',
+        whoLabel: whoLabel, whoNote: whoNote, hasCheckin: started && !!site.key, siteKey: site.key || 'k1', started: w0.started || '',
+        ciLat: site.lat ? (site.lat + 0.0012).toFixed(4) : '', ciLon: site.lon ? (site.lon - 0.0009).toFixed(4) : '',
+        siteShown: DN(w0.site), thumb: site.thumb || site.key || 'k1', siteNote: site.prov + ' · ' + site.kwp + ' kWp' },
+      status: status,
+      canAct: canAct, headActs: headActs, headSub: DN(w0.site) + ' · ' + w0.kind + ' · กำหนดเสร็จ ' + w0.due,
+      roleNote: status === 'paused' ? 'ช่างพักงานนี้ไว้เพราะแจ้งปัญหาหน้างาน (ดูในความคิดเห็น)' + (canApprove ? ' · แก้ปัญหาแล้วกด “แก้ปัญหาแล้ว · ให้ทำงานต่อ”' : '')
+        : (status === 'review' && !canApprove ? 'บทบาท Viewer ดูได้อย่างเดียว · ' + 'รอ ' + APPROVER + ' อนุมัติ' : (status === 'review' ? apvText : '')),
+      woKeys: 'sc.wo=' + no, techKeys: 'sc.wo=' + no + '|sc.from=techView|sc.techView=1',
+      siteKeys: 'sc.siteName=' + w0.site + '|sc.siteFrom=WorkOrderDetail', siteLinkLabel: 'ดูรายละเอียดไซต์ ' + DN(w0.site),
+      backBtnLabel: 'กลับไปที่' + backLabel,
+      toSite: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.siteName', w0.site); window.sessionStorage.setItem('sc.siteFrom', 'WorkOrderDetail'); } catch (x) {} },
+      hasDevice: no === 'WO-1042', deviceLabel: 'INV-C03 · กระแสสตริง 4 ต่ำ',
+      toDevice: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.device', 'INV-C03'); window.sessionStorage.setItem('sc.siteName', 'ฟาร์มโคราช 1'); } catch (x) {} },
+      photoStyle: 'background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px' + (status === 'review' ? '; order: -1' : ''),
+      msg: s.stat[no] === 'done' ? 'อนุมัติปิดงานแล้ว · ระบบตั้งรอบล้างถัดไปให้อัตโนมัติ' : (s.stat[no] === 'returned' ? 'ส่งกลับให้ ' + whoLabel + ' แก้ไขแล้ว' : (s.stat[no] === 'doing' ? 'แจ้ง ' + whoLabel + ' ให้ทำงานต่อแล้ว' : (s.assignMsg[no] || ''))),
+      msgStyle: 'display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 8px 8px 16px;border-radius:10px;font-size:14px;font-weight:600;' + (s.stat[no] === 'returned' ? 'background:#FDECEA;color:#B42318' : 'background:#E7F2EF;color:#0A4F44'),
+      backStore: 'sc.flash=' + (s.stat[no] === 'done' ? 'ปิดงาน ' + no + ' แล้ว' : (s.stat[no] === 'doing' ? 'ให้ช่างทำงานต่อใน ' + no + ' แล้ว' : (s.stat[no] === 'returned' ? 'ส่งกลับ ' + no + ' ให้ช่างแก้ไขแล้ว' : (s.assignMsg[no] || 'อัปเดต ' + no + ' แล้ว')))) + '|sc.woStat=' + JSON.stringify(wsNow),
+      approve: function () { setStat('done'); },
+      openReturn: function () { self.setState({ dlg: true }); },
+      dlg: s.dlg,
+      returnBody: whoLabel + ' จะได้รับแจ้งพร้อมเหตุผล และใบงานจะเปลี่ยนเป็น “ส่งกลับแก้ไข”',
+      closeReturn: function () { self.setState({ dlg: false }); },
+      doReturn: function (r) { setStat('returned', r); },
+      facts: facts,
+      checks: checks, checkDone: nDone, checkTotal: 4,
+      zones: zones, noPhotos: !zones.length,
+      photoNote: started ? 'ช่างกำลังทำงาน · รูปก่อน/หลังจะขึ้นเมื่อส่งงาน' : 'ยังไม่มีรูป · ช่างจะถ่ายก่อน/หลังระหว่างทำงาน',
+      comments: comments, noComments: !comments.length, draft: s.draft, noDraft: !s.draft.trim(),
+      canComment: ROLE !== 'Viewer',
+      setDraft: function (e) { self.setState({ draft: e.target.value }); },
+      send: function () { var t = s.draft.trim(); if (!t) return; var ex = Object.assign({}, s.extra); ex[no] = (ex[no] || []).concat([{ av: 'natthaphat', who: 'ณัฐภัทร ส.', when: 'เมื่อสักครู่', text: t }]); self.setState({ draft: '', extra: ex }); },
+      history: history
+    };
+  }
+}
+</script>
+</body>
+</html>

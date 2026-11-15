@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แจ้งปัญหาหน้างาน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,select,textarea{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="width: 100%; max-width: 390px; height: 100dvh; max-height: 844px; margin: 0 auto; box-sizing: border-box; background: #F5F6F8; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; overflow: hidden">
+  <div style="background: #FFFFFF; border-bottom: 1px solid #E3E6EB; padding: 48px 8px 10px; display: flex; align-items: center; gap: 4px; flex: none">
+    <a href="TechMobile.dc.html" aria-label="กลับไปที่งาน" onPointerDown="{{goBack}}" onKeyDown="{{goBack}}" onClick="{{goBack}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+      <dc-import name="Icon" icon="arrowLeft" size="22" hint-size="22px,22px"></dc-import>
+    </a>
+    <div style="min-width: 0">
+      <div style="font-size: 12px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="OrgBadge" org="{{job.badge}}" size="16" with-name="{{false}}" hint-size="16px,16px"></dc-import>{{job.no}} · {{job.site}}</div>
+      <h1 style="font-size: 16px; font-weight: 700; margin: 0">แจ้งปัญหาหน้างาน</h1>
+    </div>
+  </div>
+
+  <sc-if value="{{form}}" hint-placeholder-val="{{ true }}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend style="font-size: 14px; font-weight: 700; margin-bottom: 8px">ประเภทปัญหา</legend>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{types}}" as="t" hint-placeholder-count="4">
+              <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="{{t.style}}">
+                <dc-import name="Icon" icon="{{t.icon}}" size="20" hint-size="20px,20px"></dc-import>
+                <span>{{t.label}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </fieldset>
+
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend style="font-size: 14px; font-weight: 700; margin-bottom: 8px">ความรุนแรง</legend>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #D5D9E0; border-radius: 10px; overflow: hidden; background: #FFFFFF">
+            <sc-for list="{{levels}}" as="l" hint-placeholder-count="3">
+              <button onClick="{{l.pick}}" aria-pressed="{{l.on}}" style="{{l.style}}">{{l.label}}</button>
+            </sc-for>
+          </div>
+        </fieldset>
+
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="ti-zone" style="font-size: 14px; font-weight: 700">โซน</label>
+          <select id="ti-zone" value="{{zone}}" onChange="{{setZone}}" style="min-height: 48px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 10px; font-size: 15px; background: #FFFFFF">
+            <sc-for list="{{zones}}" as="z" hint-placeholder-count="4"><option value="{{z}}">{{z}}</option></sc-for>
+          </select>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="ti-desc" style="font-size: 14px; font-weight: 700">รายละเอียด<span style="font-weight: 400; color: #4B5563">{{descHint}}</span></label>
+          <textarea id="ti-desc" rows="3" value="{{desc}}" onChange="{{setDesc}}" aria-invalid="{{descBad}}" aria-describedby="ti-desc-msg" placeholder="เช่น แผง C-14 กระจกแตกมุมขวา มีรอยไหม้" style="{{descStyle}}"></textarea>
+          <sc-if value="{{descBad}}" hint-placeholder-val="{{ false }}"><span id="ti-desc-msg" style="font-size: 12px; color: #B42318">ความรุนแรงสูงต้องอธิบายปัญหา</span></sc-if>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <div style="font-size: 14px; font-weight: 700">รูปภาพ <span style="font-weight: 400; color: #4B5563">(อย่างน้อย 1 รูป)</span></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{photos}}" as="p" hint-placeholder-count="3">
+              <button onClick="{{p.toggle}}" aria-label="{{p.label}}" style="{{p.style}}">
+                <sc-if value="{{p.has}}" hint-placeholder-val="{{ false }}">
+                  <span style="position: absolute; inset: 0; display: block"><dc-import name="SiteThumb" site="before" w="100%" h="120px" radius="0" hint-size="100%,120px"></dc-import></span>
+                </sc-if>
+                <sc-if value="{{p.none}}" hint-placeholder-val="{{ true }}">
+                  <dc-import name="Icon" icon="camera" size="22" hint-size="22px,22px"></dc-import>
+                </sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{photoBad}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #B42318">ถ่ายรูปปัญหาอย่างน้อย 1 รูป</span></sc-if>
+        </div>
+
+        <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; font-size: 14px; cursor: pointer">
+          <input type="checkbox" checked="{{stop}}" onChange="{{toggleStop}}" style="width: 22px; height: 22px; accent-color: #B42318">
+          <span style="flex: 1"><span style="display: block; font-weight: 600">หยุดงานจนกว่าจะแก้</span><span style="display: block; font-size: 12px; color: #4B5563">แจ้ง Site Manager ทันที และพักใบงานนี้</span></span>
+        </label>
+      </div>
+      <div style="background: #FFFFFF; border-top: 1px solid #E3E6EB; padding: 12px 16px 28px; flex: none">
+        <dc-import name="Button" label="ส่งรายงานปัญหา" on-press="{{submit}}" disabled="{{blocked}}" full="{{true}}" hint-size="100%,44px"></dc-import>
+        <div style="font-size: 12px; color: #4B5563; text-align: center; margin-top: 6px">ส่งได้แม้ออฟไลน์ ระบบจะส่งให้อัตโนมัติเมื่อมีสัญญาณ</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 32px; text-align: center">
+      <div style="width: 72px; height: 72px; border-radius: 999px; background: #E7F2EF; color: #0F6B5C; display: flex; align-items: center; justify-content: center">
+        <dc-import name="Icon" icon="check" size="36" hint-size="36px,36px"></dc-import>
+      </div>
+      <h2 style="margin: 0; font-size: 20px">บันทึกรายงานปัญหาแล้ว</h2>
+      <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6">{{doneNote}}</p>
+      <div style="margin-top: 8px"><dc-import name="Button" label="กลับไปที่งาน" href="TechMobile.dc.html" save-keys="{{woKeys}}" hint-size="140px,44px"></dc-import></div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { type: 'panel', level: 'mid', photos: {}, stop: false, doneFor: '', desc: '', zone: '' }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var ss = window.sessionStorage; return (ss.getItem('sc.wo') || '') + '|' + (ss.getItem('sc.issueDone') || '') + '|' + (ss.getItem('sc.createdWo') || '') + '|' + (ss.getItem('sc.woAssign') || '') + '|' + (ss.getItem('sc.siteEdits') || ''); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    // each visit starts with an empty form (Play restores the last state otherwise)
+    self.setState({ sync: Date.now(), photos: {}, desc: '', stop: false, level: 'mid', type: 'panel', zone: '' }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() {
+    var self = this, s = self.state;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    // ธนากร ว.'s jobs (canonical data: ../DATA.md)
+    var JOBS = {
+      'WO-1039': { badge: 'sf', site: 'หลังคาโรงงานบางปู', zones: ['หลังคา'], mgr: 'ณัฐภัทร ส. (Org Admin)' },
+      'GM-0209': { badge: 'gm', site: 'สาขาบางนา', zones: ['ลานจอด'], mgr: 'ณัฐภัทร ส. (Site Manager)' },
+      'WO-1042': { badge: 'sf', site: 'ฟาร์มโคราช 1', zones: ['โซน C'], mgr: 'สมศรี ป. (Site Manager)' },
+      'GM-0211': { badge: 'gm', site: 'สาขารังสิต', zones: ['หลังคา'], mgr: 'ณัฐภัทร ส. (Site Manager)' },
+      'WO-1043': { badge: 'sf', site: 'ฟาร์มโคราช 1', zones: ['โซน A', 'โซน B', 'โซน C'], mgr: 'สมศรี ป. (Site Manager)' }
+    };
+    // jobs created in the prototype and assigned to ธนากร (sc.createdWo) can be reported on too
+    try { (JSON.parse(SS('sc.createdWo') || 'null') || []).forEach(function (c) {
+      if (c && c.who === 'ธนากร ว.' && (c.org === 'a' || c.org === 'b')) JOBS[c.no] = { badge: c.org === 'a' ? 'sf' : 'gm', site: c.site, zones: c.zones && c.zones.length ? c.zones : ['ทั้งไซต์'],
+        mgr: c.org === 'b' ? 'ณัฐภัทร ส. (Site Manager)' : (c.site === 'ฟาร์มโคราช 1' || c.site === 'ฟาร์มโคราช 2' ? 'สมศรี ป. (Site Manager)' : 'ณัฐภัทร ส. (Org Admin)') };
+    }); } catch (e) {}
+    // jobs assigned in the prototype (sc.woAssign) — same source TechMobile uses
+    try { var asg = JSON.parse(SS('sc.woAssign') || '{}') || {}; if (asg['WO-1041'] === 'ธนากร ว.') JOBS['WO-1041'] = { badge: 'sf', site: 'ฟาร์มโคราช 2', zones: ['โซน A', 'โซน B', 'โซน C', 'โซน D'], mgr: 'สมศรี ป. (Site Manager)' }; } catch (e) {}
+    var EDITS = {}; try { EDITS = JSON.parse(SS('sc.siteEdits') || '{}') || {}; } catch (e) { EDITS = {}; }
+    var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    var no = JOBS[SS('sc.wo')] ? SS('sc.wo') : 'WO-1042';
+    var job = Object.assign({ no: no }, JOBS[no]); job.site = DN(job.site);
+    // the done screen lives in sc.issueDone ("<job>|<time>"): another job, or leaving the page, starts a fresh form
+    var doneVal = SS('sc.issueDone'), mine = !!doneVal && doneVal.split('|')[0] === no;
+    if (no !== self._lastNo) { var first = self._lastNo == null; self._lastNo = no; if (!first) setTimeout(function () { self.setState({ photos: {}, desc: '', stop: false, zone: '' }); }, 0); }
+    var zone = job.zones.indexOf(s.zone) >= 0 ? s.zone : job.zones[job.zones.indexOf('โซน C') >= 0 ? job.zones.indexOf('โซน C') : 0];
+    var nPhotos = [0, 1, 2].filter(function (i) { return !!s.photos[no + i]; }).length;
+    var photoBad = nPhotos === 0, descBad = s.level === 'high' && !s.desc.trim();
+    var types = [
+      ['panel', 'แผงแตก / จุดร้อน (hotspot)', 'thermo'],
+      ['wire', 'สายไฟ / ขั้วต่อ', 'plug'],
+      ['inv', 'อินเวอร์เตอร์', 'energy'],
+      ['other', 'อื่น ๆ', 'alert']
+    ];
+    var levels = [['low', 'ต่ำ', '#0A4F44'], ['mid', 'กลาง', '#8A3B06'], ['high', 'สูง', '#B42318']];
+    return {
+      job: job, woKeys: 'sc.wo=' + no + '|sc.issueDone=|sc.from=techView',
+      goBack: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.issueDone', ''); window.sessionStorage.setItem('sc.from', 'techView'); } catch (x) {} },
+      form: !mine, done: mine,
+      zones: job.zones, zone: zone, setZone: function (e) { self.setState({ zone: e.target.value }); },
+      desc: s.desc, setDesc: function (e) { self.setState({ desc: e.target.value }); },
+      descHint: s.level === 'high' ? ' (บังคับเมื่อความรุนแรงสูง)' : ' (ไม่บังคับ)',
+      descBad: descBad,
+      descStyle: 'padding: 10px 12px; border: 1px solid ' + (descBad ? '#B42318' : '#858D9B') + '; border-radius: 10px; font-size: 15px; resize: vertical',
+      photoBad: photoBad, blocked: photoBad || descBad,
+      doneNote: s.stop ? 'พักใบงาน ' + no + ' แล้ว (สถานะ “พักงาน”) และแจ้ง ' + job.mgr + ' แล้ว · รายงานนี้แสดงในหน้าใบงานของผู้จัดการ' : 'แจ้ง ' + job.mgr + ' แล้ว · รายงานนี้แสดงในหน้าใบงาน คุณทำงานต่อได้ตามปกติ',
+      types: types.map(function (t) { var on = t[0] === s.type; return { label: t[1], icon: t[2], on: on, pick: function () { self.setState({ type: t[0] }); },
+        style: 'min-height:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:10px 12px;border-radius:10px;text-align:left;font-size:13px;font-weight:600;border:' + (on ? '2px solid #0F6B5C;background:#F0F7F5;color:#0A4F44' : '1px solid #D5D9E0;background:#FFFFFF;color:#374151') }; }),
+      levels: levels.map(function (l) { var on = l[0] === s.level; return { label: l[1], on: on, pick: function () { self.setState({ level: l[0] }); },
+        style: 'min-height:48px;border:0;font-size:14px;font-weight:700;' + (on ? 'background:' + l[2] + ';color:#FFFFFF' : 'background:#FFFFFF;color:#374151') }; }),
+      photos: [0, 1, 2].map(function (i) { var k = no + i, has = !!s.photos[k]; return { has: has, none: !has, label: has ? 'ลบรูปที่ ' + (i + 1) : 'ถ่ายรูปที่ ' + (i + 1),
+        style: 'position:relative;overflow:hidden;padding:0;aspect-ratio:1/1;min-height:96px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#374151;border:' + (has ? '1px solid #0F6B5C;background:#E7F2EF' : '1px dashed #4B5563;background:#FAFBFC'),
+        toggle: function () { var o = Object.assign({}, s.photos); o[k] = !o[k]; self.setState({ photos: o }); } }; }),
+      stop: s.stop,
+      toggleStop: function () { self.setState({ stop: !s.stop }); },
+      // the report reaches the console: WorkOrderDetail history + comments read sc.issue; "หยุดงาน" sets the job to พักงาน (sc.woStat)
+      submit: function () { if (photoBad || descBad) return;
+        var typeLabel = (types.filter(function (t) { return t[0] === s.type; })[0] || types[3])[1];
+        var levelLabel = (levels.filter(function (l) { return l[0] === s.level; })[0] || levels[1])[1];
+        try { var ss = window.sessionStorage;
+          ss.setItem('sc.issueDone', no + '|' + Date.now());
+          ss.setItem('sc.issue', JSON.stringify({ no: no, kind: typeLabel, level: levelLabel, zone: zone, text: s.desc.trim(), at: 'เมื่อสักครู่', pause: !!s.stop }));
+          if (s.stop) { var ws = JSON.parse(ss.getItem('sc.woStat') || 'null') || {}; ws[no] = 'paused'; ss.setItem('sc.woStat', JSON.stringify(ws)); }
+        } catch (e) {}
+        self.setState({ doneFor: no, desc: '', photos: {}, sync: Date.now() }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

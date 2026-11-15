@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ผู้ดูแลแพลตฟอร์ม</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@media (max-width: 767px){.pf-name{display:none !important}.pf-note{display:none !important}.po-x{display:none !important}.po-m{display:block !important}.po-tbl thead{display:none}.po-tbl tr{display:flex;flex-direction:column;border-top:1px solid #EEF0F3}.po-org{padding:12px 16px 4px !important;border:0 !important}.po-act{padding:4px 16px 12px !important;text-align:left !important;border:0 !important}}
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; position: relative">
+  <div style="background: #111827; color: #FFFFFF; padding: 10px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <dc-import name="Icon" icon="support" size="18" bg="brand" hint-size="32px,32px"></dc-import>
+      <span style="font-weight: 700">SolarCare · คอนโซลทีม Qleen</span>
+      <span style="white-space: nowrap; padding: 2px 10px; border-radius: 999px; background: #F5B301; color: #111827; font-size: 12px; font-weight: 700">โหมดผู้ดูแลแพลตฟอร์ม</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span class="pf-note" style="font-size: 13px; color: #D5D9E0">ทุกการเข้าถึงข้อมูลองค์กรถูกบันทึก</span>
+      <div id="pf-menu" style="position: relative" onKeyDown="{{menuKey}}">
+        <button type="button" onClick="{{toggleMenu}}" aria-controls="pf-menu-panel" aria-expanded="{{menuExp}}" aria-label="เมนูบัญชี ทีม Qleen" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 6px; border-radius: 10px; border: 1px solid #374151; background: transparent; color: #FFFFFF; font-size: 14px; font-weight: 600">
+          <dc-import name="Avatar" person="qleen" size="30" hint-size="30px,30px"></dc-import>
+          <span class="pf-name">ทีม Qleen</span>
+          <dc-import name="Icon" icon="chevronDown" size="14" hint-size="14px,14px"></dc-import>
+        </button>
+        <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+          <div id="pf-menu-panel" style="position: absolute; right: 0; top: calc(100% + 6px); z-index: 40; min-width: 200px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; box-shadow: 0 12px 32px rgba(17,24,39,0.18); padding: 6px; display: flex; flex-direction: column">
+            <div style="padding: 8px 10px; font-size: 12px; color: #4B5563; display: flex; flex-direction: column; gap: 2px"><b style="font-size: 13px; color: #111827">ทีม Qleen Support</b>support@qleen.example · ผู้ดูแลแพลตฟอร์ม<span>บัญชีทีมงานจัดการโดย Qleen IT</span></div>
+            <a href="Login.dc.html" onPointerDown="{{pfLogout}}" onKeyDown="{{pfLogout}}" onClick="{{pfLogout}}" style="min-height: 44px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; color: #B42318; text-decoration: none; font-size: 14px; font-weight: 600; gap: 8px"><dc-import name="Icon" icon="logout" size="18" hint-size="18px,18px"></dc-import>ออกจากระบบ</a>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width: 1376px; margin: 0 auto; padding: 24px clamp(16px, 3vw, 32px) 48px; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" icon="building" title="องค์กรทั้งหมด" subtitle="ทุกองค์กรลูกค้าบนแพลตฟอร์ม Qleen" primary-label="สร้างองค์กรให้ลูกค้า" primary-icon="plus" primary-href="CreateOrg.dc.html" primary-keys="sc.from=platform" hint-size="100%,96px"></dc-import>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; justify-content: space-between">
+      <div style="flex: 0 1 280px; min-width: 0">
+        <label for="po-q" style="position: absolute; left: -9999px">ค้นหาองค์กร</label>
+        <input id="po-q" type="search" value="{{q}}" onChange="{{setQ}}" placeholder="ค้นหาชื่อองค์กรหรือ slug" style="min-height: 44px; width: 100%; box-sizing: border-box; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+      </div>
+      <div style="min-width: 0; flex: 1 1 360px">
+        <dc-import name="FilterChips" label="สถานะองค์กร" value="{{fSt}}" options="{{stOpts}}" on-change="{{setSt}}" hint-size="100%,44px"></dc-import>
+      </div>
+      <dc-import name="ResultBar" count="{{shownN}}" total="{{totalN}}" unit="องค์กร" active="{{filtered}}" on-clear="{{clearAll}}" hint-size="260px,44px"></dc-import>
+    </div>
+
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
+      <table class="po-tbl" aria-label="องค์กรทั้งหมดบนแพลตฟอร์ม" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 0">
+        <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 12px 20px; font-weight: 600">องค์กร</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600">ประเภท</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600; text-align: right">ไซต์</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600; text-align: right">สมาชิก</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600">สถานะ</th><th scope="col" style="padding: 12px 20px; font-weight: 600"><span style="position: absolute; left: -9999px">การทำงาน</span></th></tr></thead>
+        <tbody>
+          <sc-for list="{{orgs}}" as="o" hint-placeholder-count="5">
+            <tr style="border-top: 1px solid #EEF0F3">
+              <td class="po-org" style="padding: 12px 20px">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <sc-if value="{{o.known}}" hint-placeholder-val="{{ true }}"><dc-import name="OrgBadge" org="{{o.id}}" size="36" with-name="{{false}}" hint-size="36px,36px"></dc-import></sc-if>
+                  <sc-if value="{{o.isNew}}" hint-placeholder-val="{{ false }}"><span role="img" aria-label="{{o.name}}" style="width: 36px; height: 36px; border-radius: 10px; flex: none; background: #F3F4F6; color: #374151; font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; justify-content: center">ใหม่</span></sc-if>
+                  <div><a href="PlatformOrgDetail.dc.html" onPointerDown="{{o.pick}}" onKeyDown="{{o.pick}}" onClick="{{o.pick}}" style="font-weight: 600; color: #111827">{{o.name}}</a><div style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">/o/{{o.slug}}</div><div class="po-m" style="display: none; margin-top: 4px"><dc-import name="StatusPill" kind="org" value="{{o.s}}" hint-size="110px,26px"></dc-import></div></div>
+                </div>
+              </td>
+              <td class="po-x" style="padding: 12px; color: #374151">{{o.type}}</td>
+              <td class="po-x" style="padding: 12px; text-align: right; font-variant-numeric: tabular-nums">{{o.sites}}</td>
+              <td class="po-x" style="padding: 12px; text-align: right; font-variant-numeric: tabular-nums">{{o.members}}</td>
+              <td class="po-x" style="padding: 12px"><dc-import name="StatusPill" kind="org" value="{{o.s}}" hint-size="110px,26px"></dc-import></td>
+              <td class="po-act" style="padding: 12px 20px; text-align: right"><dc-import name="Button" variant="secondary" full="{{true}}" label="เข้าดูเพื่อช่วยเหลือ" icon="support" on-press="{{o.open}}" hint-size="160px,44px"></dc-import></td>
+            </tr>
+          </sc-for>
+          <sc-if value="{{noMatch}}" hint-placeholder-val="{{ false }}">
+            <tr><td colspan="6" style="padding: 32px 20px; text-align: center; color: #4B5563; font-size: 14px">
+              <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 12px">
+                <span>{{emptyText}}</span>
+                <dc-import name="Button" variant="secondary" label="ล้างตัวกรอง" on-press="{{clearAll}}" hint-size="140px,44px"></dc-import>
+              </div>
+            </td></tr>
+          </sc-if>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <a id="po-go" href="SupportSession.dc.html" tabIndex="-1" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">เริ่มเซสชัน</a>
+  <dc-import name="ConfirmDialog" open="{{modal}}" title="{{dlgTitle}}" body="คุณจะเห็นข้อมูลขององค์กรนี้แบบอ่านอย่างเดียว 60 นาที การเข้าถึงจะถูกบันทึกใน Audit log ของทั้งแพลตฟอร์มและขององค์กร และ Org Owner จะได้รับแจ้ง" reason-label="เหตุผล / เลขเรื่อง (ticket) (บังคับ)" reason-placeholder="เช่น เลขเรื่อง #4821 · ลูกค้าแจ้งรายงานไม่ตรง" confirm-label="เริ่มเซสชันอ่านอย่างเดียว" tone="dark" on-confirm="{{confirm}}" on-close="{{close}}" hint-size="100%,0px"></dc-import>
+  <dc-import name="Flash" page="PlatformOrgs.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+// member count per DATA.md Round 9: base + invites created here − cancelled invites − removed members
+function scMemberCount(org, base) {
+  var J = function (k, d) { try { var v = JSON.parse(window.sessionStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+  var seeded = ({ a: ['ops@lopburi-parking.example'] })[org] || [];
+  var created = J('sc.createdInvites', []).filter(function (v) { return v && v.org === org && seeded.indexOf(v.email) < 0; }).map(function (v) { return v.email; });
+  var invites = seeded.concat(created), cancelled = J('sc.inviteCancel', []);
+  var gone = invites.filter(function (m) { return cancelled.indexOf(m) >= 0; });
+  var removed = J('sc.removed', []).filter(function (k) { k = String(k); return k.indexOf(org + '|') === 0 && gone.indexOf(k.slice(org.length + 1)) < 0; });
+  return Math.max(0, base + created.length - gone.length - removed.length);
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { menu: false, target: null, targetId: '', q: '', fSt: 'all' };
+  }
+  componentDidMount() {
+    // the account menu closes on a click/tap anywhere outside it
+    var self = this;
+    self._outside = function (e) { if (!self.state.menu) return; var m = document.getElementById('pf-menu'); if (m && !m.contains(e.target)) self.setState({ menu: false }); };
+    document.addEventListener('pointerdown', self._outside);
+    // a new visit starts without the open dialog that Play restores
+    // Play may pre-render this page: re-render when the created-org key changes
+    var snap = function () { try { var ss = window.sessionStorage; return ['sc.pnew', 'sc.inviteCancel', 'sc.removed', 'sc.flashAt', 'sc.created', 'sc.createdName', 'sc.createdInvites'].map(function (k) { return ss.getItem(k) || ''; }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ target: null, targetId: '', menu: false, sync: Date.now() });
+  }
+  componentWillUnmount() { if (this._outside) document.removeEventListener('pointerdown', this._outside); if (this._sync) window.removeEventListener('storage', this._sync); if (this._iv) clearInterval(this._iv); }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var orgs = [
+      { name: 'สยามโซลาร์ฟาร์ม จำกัด', slug: 'siamsolar', id: 'sf', type: 'เจ้าของไซต์', sites: 4, members: scMemberCount('a', 6), s: 'active' },
+      { name: 'กรีนมาร์ท รีเทล', slug: 'greenmart', id: 'gm', type: 'เจ้าของไซต์', sites: 2, members: scMemberCount('b', 4), s: 'active' },
+      { name: 'นิคมฯ เหนือ', slug: 'nikom-north', id: 'nk', type: 'เจ้าของไซต์', sites: 1, members: scMemberCount('c', 3), s: 'active' },
+      { name: 'CleanPro Services', slug: 'cleanpro', id: 'cp', type: 'ผู้ให้บริการล้าง', sites: 0, members: 12, s: 'active' },
+      { name: 'ริมทะเล รีสอร์ท', slug: 'rimtalay', id: 'rr', type: 'เจ้าของไซต์', sites: 1, members: scMemberCount('e', 2), s: 'trial' },
+      { name: 'บ้านสวนแพ็คกิ้ง', slug: 'bansuan', id: 'bs', type: 'เจ้าของไซต์', sites: 1, members: 2, s: 'suspended' }
+    ];
+    // badge id → sc.porg id (DATA.md: a,b,c,d,e; others keep their badge id)
+    var P = { sf: 'a', gm: 'b', nk: 'c', rt: 'd', rr: 'e' };
+    // an org the Qleen team just created for a customer (CreateOrg platform mode → sc.pnew)
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var pnew = SS('sc.pnew');
+    // ไร่ทองโซลาร์ exists only after the user created it (sc.created = d), under the name they typed
+    if (SS('sc.created') === 'd') {
+      var rl = function (k) { try { var v = JSON.parse(SS(k) || '[]'); return Array.isArray(v) ? v.filter(function (x) { return x && x.org === 'd'; }) : []; } catch (e) { return []; } };
+      orgs.splice(4, 0, { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', slug: 'raithong', id: 'rt', type: 'เจ้าของไซต์', sites: rl('sc.createdSites').length, members: scMemberCount('d', 1), s: 'trial' });
+    }
+    if (pnew) orgs.unshift({ name: pnew, slug: 'new-org', id: 'new', type: 'เจ้าของไซต์', sites: 0, members: 1, s: 'trial' });
+    orgs.forEach(function (o) { o.isNew = o.id === 'new'; o.known = !o.isNew; });
+    var q = self.state.q.trim().toLowerCase();
+    var all = orgs, fSt = self.state.fSt;
+    var byQ = all.filter(function (o) { return !q || (o.name + ' ' + o.slug).toLowerCase().indexOf(q) >= 0; });
+    orgs = byQ.filter(function (o) { return fSt === 'all' || o.s === fSt; });
+    var stDefs = [['all', 'ทั้งหมด'], ['active', 'ใช้งาน'], ['trial', 'เริ่มต้นใช้งาน'], ['suspended', 'ระงับการใช้งาน']];
+    return {
+      // logging out clears every shared prototype key so the next sign-in starts fresh (DATA.md)
+      pfLogout: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage, ks = []; for (var i = 0; i < ss.length; i++) { var k = ss.key(i); if (k && k.indexOf('sc.') === 0) ks.push(k); } ks.forEach(function (k) { ss.removeItem(k); }); } catch (x) {} },
+      fSt: fSt, setSt: function (id) { self.setState({ fSt: id }); },
+      stOpts: stDefs.map(function (d) { return { id: d[0], label: d[1], count: byQ.filter(function (o) { return d[0] === 'all' || o.s === d[0]; }).length }; }),
+      shownN: orgs.length, totalN: all.length, filtered: !!q || fSt !== 'all',
+      emptyText: q ? 'ไม่พบองค์กร “' + self.state.q + '”' : 'ไม่มีองค์กรในสถานะนี้',
+      clearAll: function () { self.setState({ q: '', fSt: 'all' }); },
+      menuOpen: self.state.menu, menuExp: self.state.menu ? 'true' : 'false',
+      toggleMenu: function () { self.setState({ menu: !self.state.menu }); },
+      menuKey: function (e) { if (e.key === 'Escape') self.setState({ menu: false }); },
+
+      q: self.state.q, noMatch: orgs.length === 0,
+      setQ: function (e) { self.setState({ q: e.target.value }); },
+      clearQ: function () { self.setState({ q: '' }); },
+      modal: !!self.state.target, dlgTitle: 'เข้าดู ' + (self.state.target || ''),
+      close: function () { self.setState({ target: null }); },
+      // one confirm: the typed reason is the record, the session starts straight away (no separate approval step)
+      confirm: function (reason) {
+        try { var ss = window.sessionStorage; ss.setItem('sc.supportReason', reason || ''); ss.setItem('sc.porg', P[self.state.targetId] || self.state.targetId || 'a'); ss.setItem('sc.from', 'platformOrgs'); var d0 = new Date(); ss.setItem('sc.supportStart', 'วันนี้ ' + (function (ms) { var t0 = Number(ss.getItem('sc.protoT0')) || 0; if (!t0) { t0 = ms; ss.setItem('sc.protoT0', String(t0)); } var m = 640 + Math.floor((ms - t0) / 60000); m = Math.min(m, 1439); return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); })(d0.getTime())); ss.setItem('sc.supportStartMs', String(d0.getTime())); } catch (e) {}
+        self.setState({ target: null });
+        var a = document.getElementById('po-go'); if (a) ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function (t) { var E = t.indexOf('pointer') === 0 && window.PointerEvent ? window.PointerEvent : window.MouseEvent; a.dispatchEvent(new E(t, { bubbles: true, cancelable: true, view: window, button: 0 })); });
+      },
+      orgs: orgs.map(function (o) { return Object.assign({}, o, {
+        open: function () { self.setState({ target: o.name, targetId: o.id }); },
+        pick: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.porg', P[o.id] || o.id); } catch (x) {} }
+      }); })
+    };
+  }
+}
+</script>
+</body>
+</html>

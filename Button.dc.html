@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ปุ่ม</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<sc-if value="{{isLink}}" hint-placeholder-val="{{ true }}">
+  <a href="{{href}}" onPointerDown="{{save}}" onPointerUp="{{save}}" onKeyDown="{{save}}" onClick="{{save}}" style="{{style}}"><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" icon="{{icon}}" size="18" hint-size="18px,18px"></dc-import></sc-if>{{label}}</a>
+</sc-if>
+<sc-if value="{{isButton}}" hint-placeholder-val="{{ false }}">
+  <button type="button" onClick="{{press}}" disabled="{{disabled}}" aria-pressed="{{pressed}}" style="{{style}}"><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" icon="{{icon}}" size="18" hint-size="18px,18px"></dc-import></sc-if>{{label}}</button>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"เพิ่มไซต์"},"icon":{"editor":"text","default":""},"href":{"editor":"text","default":""},"variant":{"editor":"enum","options":["primary","secondary","danger","dark","ghost"],"default":"primary"},"full":{"editor":"boolean","default":false},"disabled":{"editor":"boolean","default":false},"saveKeys":{"editor":"text","default":""},"onPress":{"editor":null},"pressed":{"editor":null},"$preview":{"width":220,"height":60}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props;
+    var v = p.variant ?? 'primary';
+    var dis = !!(p.disabled ?? false);
+    var V = {
+      primary: 'background: #0F6B5C; color: #FFFFFF; border: 1px solid #0F6B5C;',
+      secondary: 'background: #FFFFFF; color: #374151; border: 1px solid #D5D9E0;',
+      danger: 'background: #FFFFFF; color: #B42318; border: 1px solid #F3C4BF;',
+      dark: 'background: #111827; color: #FFFFFF; border: 1px solid #111827;',
+      ghost: 'background: transparent; color: #0F6B5C; border: 1px solid transparent;'
+    };
+    var style = "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; box-sizing: border-box; min-height: 44px; padding: 0 16px; border-radius: 8px; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; text-decoration: none; cursor: pointer; " + (V[v] || V.primary) + ((p.full ?? false) ? ' width: 100%;' : '') + (dis ? ' opacity: 0.45; cursor: not-allowed;' : '');
+    var href = p.href ?? '';
+    var self = this;
+    return {
+      hasIcon: !!(p.icon ?? ''), icon: p.icon ?? '',
+      label: p.label ?? 'เพิ่มไซต์', href: href, isLink: !!href && !dis, isButton: !href || dis, style: style, disabled: dis, // a disabled link renders as a disabled button: no navigation
+      pressed: p.pressed ?? undefined,
+      save: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; if (e && e.type === 'pointerdown') { if (e.button !== 0) return; if (e.pointerType === 'touch') { self._td = { x: e.clientX, y: e.clientY }; return; } } if (e && e.type === 'pointerup') { var td = self._td; self._td = null; if (!td || Math.abs(e.clientX - td.x) + Math.abs(e.clientY - td.y) > 10) return; } var st = self.props.saveKeys; if (st) { try { String(st).split('|').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) { var k = kv.slice(0, i).trim(); window.sessionStorage.setItem(k, kv.slice(i + 1)); if (k === 'sc.flash') { window.sessionStorage.setItem('sc.flashAt', String(Date.now())); window.sessionStorage.setItem('sc.flashTo', String(self.props.href || '')); } } }); } catch (x) {} } if (self.props.onPress) { var now = Date.now(); if (self._pressAt && now - self._pressAt < 900) return; self._pressAt = now; self.props.onPress(e); } }, // one press per interaction (pointerdown, Enter and click all arrive)
+      press: function (e) { if (!dis && self.props.onPress) self.props.onPress(e); }
+    };
+  }
+}
+</script>
+</body>
+</html>

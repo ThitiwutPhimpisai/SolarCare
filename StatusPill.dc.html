@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ป้ายสถานะ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<span style="{{style}}">{{text}}</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["wo","site","member","org","scope","role"],"default":"wo"},"value":{"editor":"text","default":"review"},"label":{"editor":null},"$preview":{"width":200,"height":40}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var T = {
+      gray: ['#F3F4F6', '#374151'], green: ['#E7F2EF', '#0A4F44'], greenSolid: ['#0F6B5C', '#FFFFFF'], teal: ['#B9DACF', '#0A4F44'],
+      amber: ['#FFF4E5', '#8A3B06'], red: ['#FDECEA', '#B42318'], indigo: ['#EEF2FF', '#3730A3'], blue: ['#DCE7FB', '#1E3A8A']
+    };
+    var M = {
+      wo: { new: ['รอมอบหมาย', 'gray'], todo: ['มอบหมายแล้ว', 'blue'], doing: ['กำลังดำเนินการ', 'indigo'], queued: ['รอส่ง (ออฟไลน์)', 'amber'], review: ['รออนุมัติ', 'amber'], returned: ['ส่งกลับแก้ไข', 'red'], paused: ['พักงาน', 'amber'], done: ['เสร็จสิ้น', 'green'], late: ['เลยกำหนด', 'red'] },
+      site: { ok: ['ปกติ', 'green'], due: ['ใกล้ครบรอบ', 'amber'], late: ['เลยกำหนด', 'red'], unset: ['ยังไม่ตั้งรอบล้าง', 'gray'], none: ['มองไม่เห็นไซต์นี้', 'gray'] },
+      member: { active: ['ใช้งาน', 'green'], invited: ['รอยืนยัน', 'amber'], suspended: ['ระงับ', 'red'], contractor: ['ผู้รับเหมา', 'gray'], customer: ['ลูกค้า', 'gray'] },
+      org: { active: ['ใช้งาน', 'green'], trial: ['เริ่มต้นใช้งาน', 'amber'], suspended: ['ระงับการใช้งาน', 'red'] },
+      scope: { platform: ['ทุก Org', 'greenSolid'], org: ['องค์กร', 'teal'], site: ['ไซต์', 'outlineTeal'], own: ['ของตน', 'gray'], none: ['—', 'none'] },
+      role: { 'Org Owner': ['Org Owner', 'teal'], 'Org Admin': ['Org Admin', 'teal'], 'Site Manager': ['Site Manager', 'outlineTeal'], 'Technician': ['Technician', 'gray'], 'Viewer': ['Viewer', 'outline'], 'สิทธิ์รายไซต์': ['สิทธิ์รายไซต์', 'gray'] }
+    };
+    var kind = this.props.kind ?? 'wo';
+    var value = this.props.value ?? 'review';
+    var hit = (M[kind] || {})[value] || [String(value), 'gray'];
+    var tone = hit[1];
+    var text = this.props.label ?? hit[0];
+    var base = "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: inline-block; white-space: nowrap; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; line-height: 1.5;";
+    if (kind === 'scope') base = base.replace('border-radius: 999px', 'border-radius: 6px').replace('padding: 3px 10px', 'padding: 2px 8px');
+    // role/scope pills use neutral tones only; amber/red/indigo stay reserved for statuses
+    var style = tone === 'none' ? base + ' color: #4B5563; background: transparent'
+      : tone === 'outline' ? base + ' background: #FFFFFF; color: #374151; box-shadow: inset 0 0 0 1px #D5D9E0'
+      : tone === 'outlineTeal' ? base + ' background: #FFFFFF; color: #0A4F44; box-shadow: inset 0 0 0 1px #B9DACF' // blue fill stays reserved for the work-order status มอบหมายแล้ว
+      : base + ' background: ' + T[tone][0] + '; color: ' + T[tone][1];
+    return { text: text, style: style };
+  }
+}
+</script>
+</body>
+</html>

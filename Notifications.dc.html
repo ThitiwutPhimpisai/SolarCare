@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>การแจ้งเตือน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="notifications" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" title="การแจ้งเตือน" icon="bell" subtitle="{{headSub}}" actions="{{phActions}}" hint-size="100%,96px"></dc-import>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+        <dc-import name="FilterChips" label="กรองการแจ้งเตือน" value="{{tab}}" options="{{tabOpts}}" on-change="{{setTab}}" hint-size="100%,44px"></dc-import>
+        <dc-import name="ResultBar" unit="การแจ้งเตือน" count="{{shownCount}}" total="{{totalCount}}" active="{{filtered}}" on-clear="{{clearTab}}" hint-size="100%,44px"></dc-import>
+
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <h2 style="margin: 6px 0 0; font-size: 13px; color: #4B5563; font-weight: 600">{{g.label}}</h2>
+            <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
+              <sc-for list="{{g.items}}" as="n" hint-placeholder-count="3">
+                <a href="{{n.href}}" onPointerDown="{{n.go}}" onKeyDown="{{n.go}}" onClick="{{n.go}}" style="{{n.rowStyle}}">
+                  <span style="position: relative; flex: none">
+                    <sc-if value="{{n.person}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{n.av}}" size="40" hint-size="40px,40px"></dc-import></sc-if>
+                    <sc-if value="{{n.sys}}" hint-placeholder-val="{{ false }}"><dc-import name="OrgBadge" org="{{n.logo}}" size="40" with-name="{{false}}" hint-size="40px,40px"></dc-import></sc-if>
+                    <span style="position: absolute; right: -6px; bottom: -6px; display: inline-flex; border: 2px solid #FFFFFF; border-radius: 7px; background: #FFFFFF"><dc-import name="OrgBadge" org="{{n.logo}}" size="20" with-name="{{false}}" hint-size="20px,20px"></dc-import></span>
+                  </span>
+                  <span style="flex: 1; min-width: 0">
+                    <span style="display: block; font-size: 14px; color: #111827; line-height: 1.5">{{n.text}}</span>
+                    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4B5563; margin-top: 2px"><dc-import name="Icon" icon="{{n.ic}}" size="16" tone="{{n.icTone}}" hint-size="16px,16px"></dc-import>{{n.org}} · {{n.when}}</span>
+                  </span>
+                  <sc-if value="{{n.action}}" hint-placeholder-val="{{ false }}">
+                    <span style="flex: none"><dc-import name="StatusPill" kind="wo" value="review" label="ต้องดำเนินการ" hint-size="110px,26px"></dc-import></span>
+                  </sc-if>
+                  <sc-if value="{{n.unread}}" hint-placeholder-val="{{ true }}">
+                    <span style="flex: none; width: 10px; height: 10px; border-radius: 999px; background: #0F6B5C"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">ยังไม่อ่าน</span></span>
+                  </sc-if>
+                </a>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+          <div style="background: #FFFFFF; border: 1px dashed #9CA3AF; border-radius: 12px; padding: 40px 20px; text-align: center; font-size: 14px; color: #4B5563">ไม่มีการแจ้งเตือนในหมวดนี้</div>
+        </sc-if>
+      </section>
+
+      <aside aria-labelledby="nf-set" style="flex: 1 1 340px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+        <h2 id="nf-set" style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="edit" size="18" tone="brand" hint-size="18px,18px"></dc-import>การตั้งค่าแจ้งเตือน</h2>
+        <p style="margin: 0; font-size: 13px; color: #4B5563">เลือกช่องทางที่อยากได้รับในแต่ละเรื่อง</p>
+        <table aria-label="ช่องทางการแจ้งเตือนแต่ละเรื่อง" style="width: 100%; border-collapse: collapse; font-size: 13px">
+          <thead>
+            <tr style="color: #4B5563; text-align: center">
+              <th scope="col" style="text-align: left; padding: 8px 0; font-weight: 600">เรื่อง</th>
+              <th scope="col" style="padding: 8px 4px; font-weight: 600">อีเมล</th>
+              <th scope="col" style="padding: 8px 4px; font-weight: 600">LINE</th>
+              <th scope="col" style="padding: 8px 4px; font-weight: 600">ในแอป</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{prefs}}" as="p" hint-placeholder-count="4">
+              <tr style="border-top: 1px solid #EEF0F3">
+                <th scope="row" style="text-align: left; padding: 6px 0; font-weight: 500; color: #111827">{{p.label}}</th>
+                <sc-for list="{{p.cells}}" as="c" hint-placeholder-count="3">
+                  <td style="text-align: center; padding: 0">
+                    <label style="display: inline-flex; flex-direction: column; width: 44px; min-height: 44px; align-items: center; justify-content: center; cursor: pointer">
+                      <input type="checkbox" checked="{{c.on}}" disabled="{{c.forced}}" onChange="{{c.toggle}}" aria-label="{{c.aria}}" style="width: 18px; height: 18px; accent-color: #0F6B5C">
+                      <sc-if value="{{c.forced}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="font-size: 12px; color: #4B5563">บังคับ</span></sc-if>
+                    </label>
+                  </td>
+                </sc-for>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <p style="margin: 0; font-size: 12px; color: #4B5563">การเข้าถึงข้ามองค์กรโดยทีม Qleen จะแจ้ง Org Owner ทางอีเมลเสมอ ปิดไม่ได้</p>
+      </aside>
+    </div>
+  </div>
+</main>
+  <dc-import name="Flash" page="Notifications.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { tab: 'all', prefs: { wo: [1, 1, 1], late: [1, 0, 1], member: [1, 0, 1], cross: [1, 0, 1] } };
+  }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.woStat', 'sc.orgNames', 'sc.site', 'sc.siteName', 'sc.wo', 'sc.member', 'sc.porg', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.joined', 'sc.created', 'sc.inviteDone', 'sc.read'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), tab: 'all' }); // fresh render + a new visit starts on ทั้งหมด
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this, s = self.state;
+    var A = { n: 'natthaphat', w: 'worawut', t: 'thanakorn', s: 'somsri' };
+    var SF = 'sf';
+    var all = [
+      { id: 'n3', day: 'today', when: '10:34 น.', av: 'qleen', logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'Qleen Support เข้าดูองค์กรแบบอ่านอย่างเดียว · เหตุผล: เลขเรื่อง (ticket) #4821', href: 'AuditLog.dc.html', action: false, ic: 'support', icTone: 'info' },
+      { id: 'n2', day: 'today', when: '10:05 น.', av: A.t, logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'ธนากร ว. กลับมาออนไลน์ · ส่งรูปที่ค้างไว้ 6 รูปของ WO-1042 ขึ้นระบบแล้ว', href: 'WorkOrderDetail.dc.html', wo: 'WO-1042', action: false, ic: 'upload', icTone: 'brand' },
+      { id: 'n6', day: 'today', when: '08:30 น.', av: '', sys: true, logo: 'nk', org: 'นิคมฯ เหนือ', so: 'c', text: 'บทบาทของคุณใน นิคมฯ เหนือ เปลี่ยนเป็น Viewer · ลิงก์หน้าสมาชิกเดิมใช้ไม่ได้แล้ว', href: 'AccessDenied.dc.html', denied: 'หน้าสมาชิก', action: false, ic: 'shield', icTone: 'muted' },
+      { id: 'n4', day: 'yesterday', when: '16:40 น.', av: '', sys: true, logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'หลังคาโรงงานบางปู เลยกำหนดล้าง 18 วัน', href: 'SiteDetail.dc.html', siteName: 'หลังคาโรงงานบางปู', action: true, ic: 'alert', icTone: 'danger' },
+      { id: 'n1', day: 'yesterday', when: '16:20 น.', av: A.t, logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'ธนากร ว. ส่ง WO-1043 ล้างแผงรอบไตรมาส โซน A–C · รออนุมัติ', href: 'WorkOrderDetail.dc.html', wo: 'WO-1043', action: true, ic: 'workorder', icTone: 'warn' },
+      { id: 'n5', day: 'yesterday', when: '10:30 น.', av: 'arunee', logo: 'rr', org: 'ริมทะเล รีสอร์ท', keepOrg: true, text: 'อรุณี ท. (Org Owner) เชิญคุณเข้าร่วม ริมทะเล รีสอร์ท ในฐานะ Site Manager', href: 'AcceptInvite.dc.html', action: true, ic: 'mail', icTone: 'brand' }
+    ];
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    // WO-1043 reflects its status after approve / send back in the prototype (sc.woStat)
+    var woSt = {}; try { woSt = JSON.parse(SS('sc.woStat') || '{}') || {}; } catch (e) { woSt = {}; }
+    all = all.map(function (n) {
+      var st = n.wo ? woSt[n.wo] : '';
+      if (n.id !== 'n1' || !st || st === 'review') return n;
+      if (st === 'done') return Object.assign({}, n, { text: 'ธนากร ว. ส่ง WO-1043 ล้างแผงรอบไตรมาส โซน A–C · อนุมัติปิดงานแล้ว', action: false, ic: 'checkCircle', icTone: 'brand' });
+      if (st === 'returned') return Object.assign({}, n, { text: 'ธนากร ว. ส่ง WO-1043 ล้างแผงรอบไตรมาส โซน A–C · ส่งกลับให้แก้ไขแล้ว', action: false, ic: 'sync', icTone: 'info' });
+      return n;
+    });
+    // the RR invite notification reflects what you did with the invite
+    var inv = SS('sc.inviteDone');
+    all = all.map(function (n) {
+      if (n.id !== 'n5' || !inv) return n;
+      return Object.assign({}, n, inv === 'accepted'
+        ? { text: 'คุณเข้าร่วม ริมทะเล รีสอร์ท แล้วในฐานะ Site Manager (คำเชิญจาก อรุณี ท.)', href: 'Main.dc.html', so: 'e', keepOrg: false, action: false, ic: 'checkCircle' }
+        : { text: 'คุณปฏิเสธคำเชิญเข้าร่วม ริมทะเล รีสอร์ท แล้ว', href: 'SelectOrg.dc.html', action: false, ic: 'x', icTone: 'muted' });
+    });
+    // a new account (sc.newAccount=1) only gets notifications for the orgs it created / joined this session
+    if (SS('sc.newAccount') === '1') {
+      var mine = [];
+      if (SS('sc.created') === 'd') mine.push({ id: 'n0', day: 'today', when: '10:40 น.', av: '', sys: true, logo: 'rt', org: SS('sc.createdName') || 'ไร่ทองโซลาร์', so: 'd', text: 'สร้างองค์กร ' + (SS('sc.createdName') || 'ไร่ทองโซลาร์') + ' แล้ว · ทำเช็กลิสต์เริ่มต้นต่อที่หน้าภาพรวม', href: 'Main.dc.html', action: true, ic: 'checkCircle', icTone: 'brand' });
+      all = mine.concat(all.filter(function (n) { return n.id === 'n5' && SS('sc.joined') === 'e'; }));
+    }
+    var readIds = SS('sc.read').split(',');
+    var isUnread = function (n) { return readIds.indexOf(n.id) < 0 && readIds.indexOf('all') < 0; };
+    var filtered = all.filter(function (n) { return s.tab === 'all' || (s.tab === 'unread' && isUnread(n)) || (s.tab === 'action' && n.action); });
+    var deco = function (n) { var u = isUnread(n); var so = n.so || (n.logo === SF ? 'a' : ''); return Object.assign({}, n, { unread: u, sys: !!n.sys, person: !n.sys,
+      // save the context the target page needs before Play navigates, and mark the item read
+      go: function (e) {
+        if (e && e.type === 'keydown' && e.key !== 'Enter') return;
+        try {
+          var ss = window.sessionStorage;
+          if (so && !n.keepOrg) { ss.setItem('sc.org', so); ss.setItem('sc.site', 'all'); }
+          if (n.wo) { ss.setItem('sc.wo', n.wo); ss.setItem('sc.woFrom', 'Notifications'); }
+          if (n.siteName) { ss.setItem('sc.siteName', n.siteName); ss.setItem('sc.siteFrom', 'Notifications'); }
+          if (n.denied) { ss.setItem('sc.denied', n.denied); ss.setItem('sc.deniedFrom', 'Notifications.dc.html'); }
+          var r = (ss.getItem('sc.read') || '').split(',').filter(Boolean); if (r.indexOf(n.id) < 0) r.push(n.id); ss.setItem('sc.read', r.join(','));
+        } catch (x) {}
+        self.setState({ sync: Date.now() });
+      },
+      rowStyle: 'display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;border-top:1px solid #EEF0F3;text-decoration:none;background:' + (u ? '#F0F7F5' : '#FFFFFF') }); };
+    var groups = [['today', 'วันนี้'], ['yesterday', 'เมื่อวาน']].map(function (d) { return { label: d[1], items: filtered.filter(function (n) { return n.day === d[0]; }).map(deco) }; }).filter(function (g) { return g.items.length; });
+    var unreadCount = all.filter(isUnread).length;
+    var events = [['wo', 'ใบงานรออนุมัติ'], ['late', 'เลยกำหนดล้าง'], ['member', 'สมาชิกใหม่ / คำเชิญ'], ['cross', 'การเข้าถึงข้ามองค์กร']];
+    var channels = ['อีเมล', 'LINE', 'ในแอป'];
+    return (function (R) { R.phActions = [{ label: 'ทำเครื่องหมายว่าอ่านแล้วทั้งหมด', icon: 'checkCircle', variant: 'secondary', onPress: R.markAll, disabled: R.allRead }]; return R; })({
+      headSub: 'รวมจากทุกองค์กรที่คุณเป็นสมาชิก · ' + (unreadCount ? 'ยังไม่อ่าน ' + unreadCount + ' รายการ' : 'อ่านครบแล้ว'),
+      unreadCount: unreadCount, allRead: unreadCount === 0, empty: groups.length === 0, groups: groups,
+      markAll: function () { try { window.sessionStorage.setItem('sc.read', 'all'); } catch (x) {} self.setState({ sync: Date.now() }); },
+      tab: s.tab, setTab: function (id) { self.setState({ tab: id }); }, clearTab: function () { self.setState({ tab: 'all' }); },
+      tabOpts: [['all', 'ทั้งหมด'], ['unread', 'ยังไม่อ่าน'], ['action', 'ต้องดำเนินการ']].map(function (t) { return { id: t[0], label: t[1], count: all.filter(function (n) { return t[0] === 'all' || (t[0] === 'unread' && isUnread(n)) || (t[0] === 'action' && n.action); }).length }; }),
+      shownCount: filtered.length, totalCount: all.length, filtered: s.tab !== 'all',
+      prefs: events.map(function (ev) { return { label: ev[1], cells: channels.map(function (ch, i) { var forced = ev[0] === 'cross' && i === 0; return { on: forced || !!s.prefs[ev[0]][i], forced: forced, notForced: !forced, aria: ev[1] + ' ทาง' + ch + (forced ? ' (บังคับ ปิดไม่ได้)' : ''),
+        toggle: function () { if (forced) return; var p = Object.assign({}, s.prefs); var row = p[ev[0]].slice(); row[i] = row[i] ? 0 : 1; p[ev[0]] = row; self.setState({ prefs: p }); } }; }) }; })
+    });
+  }
+}
+</script>
+</body>
+</html>

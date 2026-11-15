@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>การ์ดตัวเลข</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; box-sizing: border-box; height: 100%">
+  <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563"><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{icon}}" size="16" bg="{{iconBg}}" hint-size="29px,29px"></dc-import></sc-if><span>{{label}}</span></div>
+  <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+    <div style="height: 28px; width: 60%; margin-top: 10px; border-radius: 6px; background: #E3E6EB"></div>
+  </sc-if>
+  <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+    <div style="{{valueStyle}}">{{value}} <span style="font-size: 14px; font-weight: 500; color: #4B5563">{{unit}}</span></div>
+    <sc-if value="{{note}}" hint-placeholder-val="{{ false }}">
+      <div style="font-size: 12px; color: #4B5563; margin-top: 4px">{{note}}</div>
+    </sc-if>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ใบงานเปิดอยู่"},"icon":{"editor":"text","default":"workorder"},"value":{"editor":"text","default":"9"},"unit":{"editor":"text","default":""},"note":{"editor":null},"tone":{"editor":"enum","options":["default","danger"],"default":"default"},"loading":{"editor":"boolean","default":false},"$preview":{"width":280,"height":130}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props;
+    var loading = !!(p.loading ?? false);
+    return {
+      hasIcon: !!(this.props.icon ?? ''), icon: this.props.icon ?? '', iconBg: (this.props.tone ?? 'default') === 'danger' ? 'danger' : 'brand',
+      label: p.label ?? 'ใบงานเปิดอยู่', value: p.value ?? '9', unit: p.unit ?? '', note: p.note ?? '',
+      loading: loading, ready: !loading,
+      valueStyle: 'font-size: clamp(22px, 5vw, 28px); font-weight: 700; margin-top: 6px; white-space: nowrap; color: ' + ((p.tone ?? 'default') === 'danger' ? '#B42318' : '#111827')
+    };
+  }
+}
+</script>
+</body>
+</html>

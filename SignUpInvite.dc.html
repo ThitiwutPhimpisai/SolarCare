@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>สร้างบัญชีจากคำเชิญ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; box-sizing: border-box; padding: clamp(24px, 6vw, 56px) 16px; display: flex; justify-content: center">
+  <div style="width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: #111827"><dc-import name="Icon" icon="sun" size="20" bg="brand" hint-size="36px,36px"></dc-import>SolarCare</div>
+    <a href="AcceptInvite.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; text-decoration: none"><dc-import name="Icon" icon="arrowLeft" size="16" hint-size="16px,16px"></dc-import>กลับไปที่คำเชิญ</a>
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; gap: 14px; align-items: center">
+      <dc-import name="OrgBadge" org="rr" size="56" with-name="{{false}}" hint-size="56px,56px"></dc-import>
+      <div style="flex: 1; min-width: 0">
+        <div style="font-size: 13px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="Avatar" person="arunee" size="20" hint-size="20px,20px"></dc-import>คุณอรุณี ท. (Org Owner) เชิญคุณเข้าร่วม</div>
+        <div style="font-size: 17px; font-weight: 700; margin-top: 2px">ริมทะเล รีสอร์ท</div>
+        <div style="font-size: 13px; color: #374151">Site Manager · 1 ไซต์ (หลังคาอาคาร A หัวหิน)</div>
+      </div>
+    </section>
+
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 28px; display: flex; flex-direction: column; gap: 18px">
+      <div>
+        <h1 style="margin: 0; font-size: 24px">สร้างบัญชีเพื่อเข้าร่วม</h1>
+        <p style="margin: 6px 0 0; font-size: 14px; color: #4B5563">สำหรับคนที่ยังไม่มีบัญชี SolarCare · ใช้อีเมลเดียวกับที่ได้รับคำเชิญ บัญชีนี้ใช้ได้กับทุกองค์กรที่คุณจะได้รับเชิญในอนาคต</p>
+      </div>
+      <form aria-label="สร้างบัญชี" data-submit="submit" onSubmit="{{submit}}" onKeyDown="{{formEnter}}" noValidate="{{true}}" style="display: flex; flex-direction: column; gap: 16px">
+        <a id="su-go" href="Main.dc.html" onPointerDown="{{saveJoin}}" onClick="{{saveJoin}}" tabIndex="-1" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">ไปต่อ</a>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="su-name" style="font-size: 13px; font-weight: 600">ชื่อ-นามสกุล <span style="color: #B42318">*</span></label>
+          <input id="su-name" autocomplete="name" placeholder="เช่น สมชาย ใจดี" required="{{true}}" value="{{name}}" onChange="{{setName}}" aria-invalid="{{nameBad}}" aria-describedby="su-name-err" style="{{nameStyle}}">
+          <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><span id="su-name-err" style="font-size: 12px; color: #B42318">กรอกชื่อ-นามสกุล</span></sc-if>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="su-email" style="font-size: 13px; font-weight: 600">อีเมลที่ได้รับคำเชิญ <span style="color: #B42318">*</span></label>
+          <input id="su-email" type="email" autocomplete="email" inputmode="email" value="{{email}}" readOnly="{{true}}" aria-readonly="true" aria-describedby="su-email-note" style="{{emailStyle}}">
+          <span id="su-email-note" style="font-size: 12px; color: #4B5563">คำเชิญส่งถึงอีเมลนี้ จึงแก้ไม่ได้ · ถ้าไม่ใช่คุณ ให้ขอคำเชิญใหม่จากผู้เชิญ</span>
+          <sc-if value="{{emailBad}}" hint-placeholder-val="{{ false }}"><span id="su-email-err" style="font-size: 12px; color: #B42318">กรอกอีเมลที่ได้รับคำเชิญ</span></sc-if>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="su-pw" style="font-size: 13px; font-weight: 600">รหัสผ่าน</label>
+          <input id="su-pw" type="password" autocomplete="new-password" value="{{pw}}" onChange="{{setPw}}" aria-describedby="su-rules" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="su-pw2" style="font-size: 13px; font-weight: 600">ยืนยันรหัสผ่าน</label>
+          <input id="su-pw2" type="password" autocomplete="new-password" value="{{pw2}}" onChange="{{setPw2}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+        </div>
+        <ul id="su-rules" aria-live="polite" style="list-style: none; margin: 0; padding: 12px 14px; border-radius: 10px; background: #FAFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+          <sc-for list="{{rules}}" as="r" hint-placeholder-count="4">
+            <li style="{{r.style}}"><span aria-hidden="true" style="width: 18px; text-align: center; font-weight: 700">{{r.mark}}</span>{{r.label}}</li>
+          </sc-for>
+        </ul>
+        <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #374151; cursor: pointer; min-height: 44px">
+          <input type="checkbox" checked="{{agree}}" onChange="{{toggleAgree}}" style="width: 20px; height: 20px; margin-top: 2px; accent-color: #0F6B5C; flex: none">
+          <span>ยอมรับ <button type="button" onClick="{{openTerms}}" style="font-family: inherit; font-size: inherit; padding: 0; border: 0; background: transparent; color: #0F6B5C; text-decoration: underline; cursor: pointer">ข้อกำหนดการใช้งาน</button> และ <button type="button" onClick="{{openPrivacy}}" style="font-family: inherit; font-size: inherit; padding: 0; border: 0; background: transparent; color: #0F6B5C; text-decoration: underline; cursor: pointer">นโยบายความเป็นส่วนตัว</button></span>
+        </label>
+        <sc-if value="{{ready}}" hint-placeholder-val="{{ false }}">
+          <span id="su-primary" style="display: contents"><dc-import name="Button" variant="primary" full="{{true}}" label="สร้างบัญชีและเข้าร่วม" href="Main.dc.html" save-keys="{{joinKeys}}" hint-size="100%,44px"></dc-import></span>
+        </sc-if>
+        <sc-if value="{{notReady}}" hint-placeholder-val="{{ true }}">
+          <dc-import name="Button" variant="primary" full="{{true}}" disabled="{{true}}" label="สร้างบัญชีและเข้าร่วม" hint-size="100%,44px"></dc-import>
+        </sc-if>
+      </form>
+      <p style="margin: 0; font-size: 13px; color: #4B5563; text-align: center">มีบัญชีอยู่แล้ว? <a href="Login.dc.html" onPointerDown="{{toLogin}}" onKeyDown="{{toLogin}}" onClick="{{toLogin}}">เข้าสู่ระบบเพื่อตอบรับ</a></p>
+    </section>
+  </div>
+  <dc-import name="ConfirmDialog" open="{{docOpen}}" title="{{docTitle}}" body="{{docBody}}" reason-label="" confirm-label="อ่านแล้ว" cancel-label="ปิด" tone="primary" on-confirm="{{closeDoc}}" on-close="{{closeDoc}}" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { name: '', email: '', pw: '', pw2: '', agree: false, tried: false, doc: '' };
+  }
+  componentDidMount() { this.setState({ name: '', email: '', pw: '', pw2: '', agree: false, tried: false, doc: '' }); }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this, s = self.state;
+    var checks = [
+      ['อย่างน้อย 8 ตัวอักษร', s.pw.length >= 8],
+      ['มีตัวเลขอย่างน้อย 1 ตัว', /[0-9]/.test(s.pw)],
+      ['มีตัวพิมพ์ใหญ่และตัวพิมพ์เล็ก', /[a-z]/.test(s.pw) && /[A-Z]/.test(s.pw)],
+      ['รหัสผ่านทั้งสองช่องตรงกัน', s.pw.length > 0 && s.pw === s.pw2]
+    ];
+    var allOk = checks.every(function (c) { return c[1]; });
+    var INVITED = 'newstaff@rimtalay.example'; // the second RR invite (DATA round 12): an address with no SolarCare account yet
+    var nameOk = !!s.name.trim(), emailOk = true;
+    var ready = allOk && s.agree && nameOk && emailOk;
+    var saveJoin = function () { try { joinKeys.split('|').forEach(function (kv) { var i = kv.indexOf('='); window.sessionStorage.setItem(kv.slice(0, i), kv.slice(i + 1)); }); window.sessionStorage.setItem('sc.flashAt', String(Date.now())); window.sessionStorage.setItem('sc.flashTo', 'Main.dc.html'); } catch (x) {} };
+    var joinKeys = 'sc.authed=new|sc.newAccount=1|sc.myName=' + s.name.trim().replace(/[|=]/g, ' ') + '|sc.myEmail=' + INVITED + '|sc.org=e|sc.site=all|sc.joined=e|sc.inviteDone=accepted|sc.from=|sc.flash=สร้างบัญชีและเข้าร่วม ริมทะเล รีสอร์ท แล้ว ในบทบาท Site Manager';
+    var DOCS = {
+      terms: ['ข้อกำหนดการใช้งาน (สรุป)', 'ใช้ SolarCare เพื่อจัดการงานดูแลแผงของไซต์ที่คุณได้รับสิทธิ์เท่านั้น\nข้อมูลไซต์ รูป และใบงานเป็นขององค์กรเจ้าของไซต์\nห้ามแชร์บัญชี · ทุกการเปลี่ยนสิทธิ์ถูกบันทึกใน Audit log\n'],
+      privacy: ['นโยบายความเป็นส่วนตัว (สรุป)', 'เราเก็บชื่อ อีเมล และตำแหน่ง GPS ตอนเช็กอินงานเท่านั้น\nองค์กรที่คุณเป็นสมาชิกเห็นข้อมูลนี้ได้ตามสิทธิ์\nขอลบบัญชีได้ทุกเมื่อจากหน้าบัญชีของฉัน\n']
+    };
+    var doc = DOCS[this.state.doc];
+    return (self._v = {
+      // forms with 2+ fields and no submit button never submit on Enter; ask the form to submit itself
+      formEnter: function (e) { if (e.key !== 'Enter' || !e.target || e.target.tagName !== 'INPUT' || e.target.type === 'checkbox') return; e.preventDefault(); var name = e.currentTarget && e.currentTarget.getAttribute('data-submit'); var fn = self._v && self._v[name]; if (fn) fn(e); },
+      docOpen: !!doc, docTitle: doc ? doc[0] : '', docBody: doc ? doc[1] : '',
+      openTerms: function () { self.setState({ doc: 'terms' }); }, openPrivacy: function () { self.setState({ doc: 'privacy' }); },
+      closeDoc: function () { self.setState({ doc: '' }); },
+      pw: s.pw, pw2: s.pw2, agree: s.agree, ready: ready, notReady: !ready,
+      name: s.name, setName: function (e) { self.setState({ name: e.target.value }); },
+      email: INVITED, setEmail: function () {},
+      emailBad: (s.tried || s.pw.length > 0) && !emailOk,
+      emailStyle: 'min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; font-size: 14px; background: #F3F4F6; color: #374151',
+      toLogin: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.from', 'invite'); } catch (x) {} },
+      nameBad: (s.tried || s.pw.length > 0) && !nameOk,
+      nameStyle: 'min-height: 44px; padding: 0 12px; border: 1px solid ' + ((s.tried || s.pw.length > 0) && !nameOk ? '#B42318' : '#858D9B') + '; border-radius: 8px; font-size: 14px',
+      joinKeys: joinKeys,
+      saveJoin: saveJoin,
+      // Enter submits: only when everything is valid, then follow the hidden link so Play navigates
+      submit: function (e) { if (e && e.preventDefault) e.preventDefault(); if (!ready) { self.setState({ tried: true }); return; } saveJoin(); /* Enter clicks the same visible link the user would click; hidden link is only a fallback */ var a = document.querySelector('#su-primary a') || document.getElementById('su-go'); if (a) (function (el) { ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function (t) { var E = t.indexOf('pointer') === 0 && window.PointerEvent ? window.PointerEvent : window.MouseEvent; el.dispatchEvent(new E(t, { bubbles: true, cancelable: true, view: window, button: 0 })); }); })(a); },
+      setPw: function (e) { self.setState({ pw: e.target.value }); },
+      setPw2: function (e) { self.setState({ pw2: e.target.value }); },
+      toggleAgree: function () { self.setState({ agree: !s.agree }); },
+      rules: checks.map(function (c) { return { label: c[0], mark: c[1] ? '✓' : '·', style: 'display:flex;align-items:center;gap:6px;color:' + (c[1] ? '#0A4F44;font-weight:600' : '#4B5563') }; })
+    });
+  }
+}
+</script>
+</body>
+</html>

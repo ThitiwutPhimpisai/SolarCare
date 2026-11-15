@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>เลือกช่วงเวลา</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.dr-presets{scrollbar-width:thin}
+@media (max-width: 767px){.dr-presets{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:4px}.dr-field{flex:1 1 140px !important}}
+</style>
+</helmet>
+<section role="group" aria-label="{{groupLabel}}" style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0">
+  <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #374151"><dc-import name="Icon" icon="calendar" size="16" tone="muted" hint-size="16px,16px"></dc-import>ช่วงเวลา</div>
+  <div class="dr-presets" role="group" aria-label="ช่วงเวลาสำเร็จรูป" style="display: flex; flex-wrap: wrap; gap: 6px">
+    <sc-for list="{{presets}}" as="p" hint-placeholder-count="8">
+      <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="{{p.style}}">{{p.label}}</button>
+    </sc-for>
+  </div>
+  <sc-if value="{{showCustom}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start">
+      <label class="dr-field" for="dr-from" style="flex: 0 1 200px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #374151">ตั้งแต่วันที่
+        <input id="dr-from" type="date" min="{{minIso}}" max="{{maxIso}}" value="{{fromIso}}" onChange="{{setFrom}}" aria-invalid="{{fromInvalid}}" aria-describedby="dr-msg" style="{{inputStyle}}">
+        <span style="font-size: 12px; color: #4B5563">{{fromTh}}</span>
+      </label>
+      <label class="dr-field" for="dr-to" style="flex: 0 1 200px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #374151">ถึงวันที่
+        <input id="dr-to" type="date" min="{{minIso}}" max="{{maxIso}}" value="{{toIso}}" onChange="{{setTo}}" aria-invalid="{{toInvalid}}" aria-describedby="dr-msg" style="{{inputStyle}}">
+        <span style="font-size: 12px; color: #4B5563">{{toTh}}</span>
+      </label>
+    </div>
+    <sc-if value="{{hasErr}}" hint-placeholder-val="{{ false }}">
+      <p id="dr-msg" role="alert" style="margin: 0; font-size: 13px; color: #B42318; display: flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="alert" size="16" tone="danger" hint-size="16px,16px"></dc-import>{{err}}</p>
+    </sc-if>
+    <sc-if value="{{hasInfo}}" hint-placeholder-val="{{ false }}">
+      <p id="dr-msg" role="status" style="margin: 0; font-size: 13px; color: #4B5563">{{info}}</p>
+    </sc-if>
+  </sc-if>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center">
+    <label for="dr-group" style="font-size: 13px; color: #374151">แสดงผล</label>
+    <select id="dr-group" value="{{group}}" onChange="{{setGroup}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 14px; color: #111827">
+      <sc-for list="{{groups}}" as="g" hint-placeholder-count="5">
+        <option value="{{g.id}}" disabled="{{g.dis}}">{{g.text}}</option>
+      </sc-for>
+    </select>
+    <label style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; color: #374151; cursor: pointer">
+      <input type="checkbox" checked="{{compare}}" onChange="{{toggleCompare}}" style="width: 20px; height: 20px; accent-color: #0F6B5C; margin: 0">เทียบช่วงก่อนหน้า
+    </label>
+    <span role="status" style="font-size: 13px; color: #4B5563; flex: 1 1 220px; min-width: 0">{{summary}}</span>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ช่วงเวลารายงาน"},"onChange":{"editor":null},"$preview":{"width":900,"height":260}}'>
+// ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
+var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
+var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+var SCR_PRESETS = [['d7', '7 วัน'], ['d30', '30 วัน'], ['m3', '3 เดือน'], ['m6', '6 เดือน'], ['m12', '12 เดือน'], ['ytd', 'ปีนี้'], ['ly', 'ปีที่แล้ว'], ['custom', 'กำหนดเอง']];
+function scrDay(iso) { var p = String(iso || '').split('-'); if (p.length < 3) return NaN; var d = Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5); return isNaN(d) ? NaN : d; }
+function scrIso(d) { var x = new Date(d * 864e5); return x.getUTCFullYear() + '-' + ('0' + (x.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + x.getUTCDate()).slice(-2); }
+function scrTh(d, short) { var x = new Date(d * 864e5), y = x.getUTCFullYear() + 543; return x.getUTCDate() + ' ' + SCR_MN[x.getUTCMonth()] + ' ' + (short ? String(y).slice(-2) : y); }
+function scrPresetRange(p) {
+  var T = SCR_TODAY, ms = function (n) { return Math.round(Date.UTC(2026, 10 - n + 1, 1) / 864e5); };
+  if (p === 'd7') return [T - 6, T]; if (p === 'd30') return [T - 29, T]; if (p === 'm3') return [ms(3), T]; if (p === 'm6') return [ms(6), T];
+  if (p === 'ytd') return [Math.round(Date.UTC(2026, 0, 1) / 864e5), T]; if (p === 'ly') return [Math.round(Date.UTC(2025, 0, 1) / 864e5), Math.round(Date.UTC(2025, 11, 31) / 864e5)];
+  return [ms(12), T];
+}
+function scrGroups(len) { return [['day', 'รายวัน', len <= 62, 'ช่วงยาวเกิน 62 วัน'], ['week', 'รายสัปดาห์', len >= 7 && len <= 366, len < 7 ? 'ช่วงสั้นกว่า 7 วัน' : 'ช่วงยาวเกิน 1 ปี'], ['month', 'รายเดือน', len >= 28, 'ช่วงสั้นกว่า 1 เดือน'], ['quarter', 'รายไตรมาส', len >= 89, 'ช่วงสั้นกว่า 3 เดือน'], ['year', 'รายปี', len >= 300, 'ช่วงสั้นกว่า 1 ปี']]; }
+function scrDefaultGroup(len) { return len <= 31 ? 'day' : len <= 62 ? 'week' : 'month'; }
+function scrResolve(raw) {
+  var r = {}; try { r = typeof raw === 'string' ? (JSON.parse(raw || '{}') || {}) : (raw || {}); } catch (e) { r = {}; }
+  var preset = SCR_PRESETS.some(function (x) { return x[0] === r.preset; }) ? r.preset : 'm12', a, b, clamped = false;
+  if (preset === 'custom') { a = scrDay(r.from); b = scrDay(r.to); if (isNaN(a) || isNaN(b) || a > b) { preset = 'm12'; } }
+  if (preset !== 'custom') { var pr = scrPresetRange(preset); a = pr[0]; b = pr[1]; }
+  if (a < SCR_START) { a = SCR_START; clamped = true; } if (b > SCR_TODAY) { b = SCR_TODAY; clamped = true; } if (a > b) a = b;
+  if (b - a > 1095) { a = b - 1095; clamped = true; }
+  var len = b - a + 1, g = r.group, okG = scrGroups(len).filter(function (x) { return x[0] === g && x[2]; })[0]; if (!okG) g = scrDefaultGroup(len);
+  var pname = SCR_PRESETS.filter(function (x) { return x[0] === preset; })[0][1];
+  var pa = a - len, pb = a - 1, cmpOk = pa >= SCR_START;
+  return { preset: preset, from: a, to: b, fromIso: scrIso(a), toIso: scrIso(b), len: len, group: g, groupLabel: scrGroups(len).filter(function (x) { return x[0] === g; })[0][1],
+    compare: !!r.compare && cmpOk, compareAsked: !!r.compare, compareOk: cmpOk, prevFrom: pa, prevTo: pb, clamped: clamped,
+    label: (preset === 'custom' ? '' : pname + ' · ') + scrTh(a) + ' – ' + scrTh(b), short: preset === 'custom' ? scrTh(a, 1) + ' – ' + scrTh(b, 1) : pname,
+    prevLabel: scrTh(pa) + ' – ' + scrTh(pb) };
+}
+function scrBuckets(a, b, g) {
+  var out = [], d = a, guard = 0;
+  while (d <= b && guard++ < 2000) {
+    var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), e, lab;
+    if (g === 'day') { e = d; lab = x.getUTCDate() + ' ' + SCR_MN[m]; }
+    else if (g === 'week') { var wd = (x.getUTCDay() + 6) % 7; e = Math.min(b, d - wd + 6); var xe = new Date(e * 864e5); lab = x.getUTCDate() + (xe.getUTCMonth() !== m ? ' ' + SCR_MN[m] : '') + '–' + xe.getUTCDate() + ' ' + SCR_MN[xe.getUTCMonth()]; }
+    else if (g === 'month') { e = Math.round(Date.UTC(y, m + 1, 0) / 864e5); lab = SCR_MN[m] + ' ' + String(y + 543).slice(-2); if (x.getUTCDate() !== 1 || e > b) lab = x.getUTCDate() + '–' + new Date(Math.min(e, b) * 864e5).getUTCDate() + ' ' + lab; } // part of a month (e.g. 1–15 พ.ย. 69 month-to-date) says so
+    else if (g === 'quarter') { var q = Math.floor(m / 3); e = Math.round(Date.UTC(y, q * 3 + 3, 0) / 864e5); lab = 'ไตรมาส ' + (q + 1) + '/' + String(y + 543).slice(-2); }
+    else { e = Math.round(Date.UTC(y, 12, 0) / 864e5); lab = String(y + 543); }
+    e = Math.min(e, b); out.push({ s: d, e: e, label: lab }); d = e + 1;
+  }
+  return out;
+}
+function scrRead() { try { return window.sessionStorage.getItem('sc.range') || ''; } catch (e) { return ''; } }
+// ---- end sc.range resolver ----
+
+// One range picker for Reports and EnergyValue: presets, custom from/to, group-by, compare. Saves sc.range {preset, from, to, group, compare}.
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { draftFrom: '', draftTo: '', err: '', info: '' }; }
+  componentDidMount() {
+    var self = this;
+    self._snap = scrRead();
+    self._sync = function () { var n = scrRead(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ draftFrom: '', draftTo: '', err: '', info: '', sync: Date.now() });
+  }
+  componentWillUnmount() { if (this._sync) window.removeEventListener('storage', this._sync); if (this._iv) clearInterval(this._iv); }
+  save(next) {
+    var raw = {}; try { raw = JSON.parse(scrRead() || '{}') || {}; } catch (e) { raw = {}; }
+    var obj = Object.assign({}, raw, next), rr = scrResolve(obj);
+    var store = { preset: rr.preset, from: rr.fromIso, to: rr.toIso, group: rr.group, compare: !!obj.compare };
+    try { window.sessionStorage.setItem('sc.range', JSON.stringify(store)); } catch (e) {}
+    this._snap = JSON.stringify(store);
+    if (this.props.onChange) this.props.onChange(store);
+    return rr;
+  }
+  renderVals() {
+    var self = this, rr = scrResolve(scrRead()), st = self.state;
+    var chip = function (on) { return "font-family: inherit; min-height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; flex: none; cursor: pointer; border: 1px solid " + (on ? '#0F6B5C; background: #0F6B5C; color: #FFFFFF' : '#D5D9E0; background: #FFFFFF; color: #374151'); };
+    var custom = rr.preset === 'custom' || !!st.custom;
+    var fromIso = st.draftFrom || rr.fromIso, toIso = st.draftTo || rr.toIso;
+    var tryApply = function (f, t) {
+      var yr = function (v) { return parseInt(String(v || '').slice(0, 4), 10) || 0; }; // a year still being typed (e.g. 0020) is a draft, not a date to clamp
+      if ((f && yr(f) < 2000) || (t && yr(t) < 2000)) { self.setState({ draftFrom: f, draftTo: t, err: '', info: '', custom: true }); return; }
+      var a = scrDay(f), b = scrDay(t), err = '', info = '';
+      if (isNaN(a) || isNaN(b)) err = 'กรอกวันที่ให้ครบทั้งสองช่อง';
+      else if (a > b) err = 'วันเริ่มต้องไม่หลังวันสิ้นสุด';
+      if (!err && (a < SCR_START || b > SCR_TODAY)) { info = 'ปรับให้อยู่ในช่วงที่มีข้อมูล (1 ม.ค. 2568 – 15 พ.ย. 2569)'; a = Math.max(SCR_START, Math.min(a, SCR_TODAY)); b = Math.max(SCR_START, Math.min(b, SCR_TODAY)); }
+      if (!err && b - a > 1095) err = 'เลือกได้ไม่เกิน 3 ปีต่อครั้ง';
+      if (err) { self.setState({ draftFrom: f, draftTo: t, err: err, info: '', custom: true }); return; }
+      var r2 = self.save({ preset: 'custom', from: scrIso(a), to: scrIso(b) });
+      self.setState({ draftFrom: '', draftTo: '', err: '', info: info, custom: true, sync: Date.now() });
+      return r2;
+    };
+    var groups = scrGroups(rr.len).map(function (g) { return { id: g[0], dis: !g[2], text: g[1] + (g[2] ? '' : ' (' + g[3] + ')') }; });
+    return {
+      groupLabel: self.props.label || 'ช่วงเวลารายงาน',
+      presets: SCR_PRESETS.map(function (x) { var on = custom ? x[0] === 'custom' : x[0] === rr.preset; return { label: x[1], on: on, style: chip(on),
+        pick: function () { if (x[0] === 'custom') { self.save({ preset: 'custom', from: rr.fromIso, to: rr.toIso }); self.setState({ custom: true, err: '', info: '', sync: Date.now() }); return; } self.save({ preset: x[0], group: '' }); self.setState({ custom: false, draftFrom: '', draftTo: '', err: '', info: '', sync: Date.now() }); } }; }),
+      showCustom: custom, minIso: scrIso(SCR_START), maxIso: scrIso(SCR_TODAY), fromIso: fromIso, toIso: toIso,
+      fromTh: isNaN(scrDay(fromIso)) ? '' : scrTh(scrDay(fromIso)), toTh: isNaN(scrDay(toIso)) ? '' : scrTh(scrDay(toIso)),
+      fromInvalid: st.err ? 'true' : undefined, toInvalid: st.err ? 'true' : undefined,
+      inputStyle: 'min-height: 44px; padding: 0 12px; border-radius: 8px; font-family: inherit; font-size: 14px; color: #111827; background: #FFFFFF; border: ' + (st.err ? '2px solid #B42318' : '1px solid #D5D9E0'),
+      setFrom: function (e) { tryApply(e.target.value, st.draftTo || rr.toIso); },
+      setTo: function (e) { tryApply(st.draftFrom || rr.fromIso, e.target.value); },
+      hasErr: !!st.err, err: st.err, hasInfo: !st.err && !!st.info, info: st.info,
+      group: rr.group, groups: groups,
+      setGroup: function (e) { self.save({ group: e.target.value }); self.setState({ sync: Date.now() }); },
+      compare: rr.compareAsked, toggleCompare: function (e) { self.save({ compare: !!e.target.checked }); self.setState({ sync: Date.now() }); },
+      summary: scrTh(rr.from) + ' – ' + scrTh(rr.to) + ' · ' + rr.len + ' วัน · ' + rr.groupLabel + (rr.compareAsked ? (rr.compareOk ? ' · เทียบ ' + rr.prevLabel : ' · เทียบไม่ได้ (ก่อนหน้าไม่มีข้อมูล)') : '')
+    };
+  }
+}
+</script>
+</body>
+</html>

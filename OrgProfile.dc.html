@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>โปรไฟล์องค์กร</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input,textarea{font-family:inherit}
+button{cursor:pointer}
+input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="profile" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <sc-if value="{{fromEnergy}}" hint-placeholder-val="{{ false }}">
+      <a href="EnergyValue.dc.html" onPointerDown="{{leaveEnergy}}" onKeyDown="{{leaveEnergy}}" onClick="{{leaveEnergy}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; text-decoration: none; color: #0F6B5C; align-self: flex-start"><dc-import name="Icon" icon="arrowLeft" size="16" hint-size="16px,16px"></dc-import>กลับไปหน้าพลังงานและผลตอบแทน</a>
+    </sc-if>
+
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
+      <div style="position: relative; height: 200px">
+        <dc-import name="SiteThumb" site="{{org.cover}}" w="100%" h="100%" radius="{{0}}" hint-size="100%,200px"></dc-import>
+        <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+          <input id="op-cover" type="file" accept="image/*" onChange="{{pickedCover}}" aria-label="เลือกภาพปก" style="display: none">
+          <button type="button" onClick="{{chooseCover}}" style="position: absolute; right: 16px; top: 16px; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; background: rgba(17,24,39,0.75); color: #FFFFFF; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px">
+            <dc-import name="Icon" icon="camera" size="16" hint-size="16px,16px"></dc-import>เปลี่ยนภาพปก</button>
+        </sc-if>
+      </div>
+      <sc-if value="{{picked}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="margin: 12px 28px 0; font-size: 13px; padding: 8px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{picked}}</div>
+      </sc-if>
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; padding: 0 28px 24px">
+        <div style="position: relative; margin-top: -56px; flex: none">
+          <div style="display: flex; padding: 4px; border-radius: 31px; background: #FFFFFF; box-shadow: 0 4px 16px rgba(17,24,39,0.15)"><dc-import name="OrgBadge" org="{{org.badge}}" size="{{112}}" with-name="{{false}}" hint-size="112px,112px"></dc-import></div>
+          <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+            <input id="op-logo" type="file" accept="image/*" onChange="{{pickedLogo}}" aria-label="เลือกโลโก้" style="display: none">
+            <button type="button" onClick="{{chooseLogo}}" aria-label="เปลี่ยนโลโก้องค์กร" style="position: absolute; right: -6px; bottom: -6px; width: 44px; height: 44px; border-radius: 999px; border: 3px solid #FFFFFF; background: #0F6B5C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0">
+              <dc-import name="Icon" icon="camera" size="18" hint-size="18px,18px"></dc-import>
+            </button>
+          </sc-if>
+        </div>
+        <div style="flex: 1 1 320px; min-width: 0; padding-top: 12px">
+          <h1 style="margin: 0; font-size: 26px; font-weight: 700; line-height: 1.3">{{org.name}}</h1>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 6px; font-size: 13px; color: #4B5563; align-items: center">
+            <span style="font-family: ui-monospace, monospace">solarcare.app/o/{{org.slug}}</span>
+            <span>{{org.sites}} ไซต์ · {{org.members}} สมาชิก</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563">บทบาทของคุณ <dc-import name="StatusPill" kind="role" value="{{org.role}}" hint-size="100px,24px"></dc-import></div>
+      </div>
+    </section>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section style="flex: 999 1 600px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="building" size="18" tone="brand" hint-size="18px,18px"></dc-import>ข้อมูลองค์กร</h2>
+          <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 13px; padding: 6px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ดูอย่างเดียว — ต้องมีสิทธิ์ org.update (Org Owner / Org Admin)</span>
+          </sc-if>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px">
+          <sc-for list="{{fields}}" as="f" hint-placeholder-count="6">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <label for="{{f.id}}" style="font-size: 13px; font-weight: 600">{{f.label}}</label>
+              <input id="{{f.id}}" value="{{f.val}}" onChange="{{f.change}}" disabled="{{locked}}" aria-invalid="{{f.invalid}}" aria-describedby="{{f.errId}}" style="{{f.style}}">
+              <sc-if value="{{f.hasErr}}" hint-placeholder-val="{{ false }}"><span id="{{f.errId}}" role="alert" style="font-size: 13px; color: #B42318">{{f.err}}</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
+            <sc-if value="{{saved}}" hint-placeholder-val="{{ false }}">
+              <span role="status" style="align-self: center; margin-right: auto; font-size: 14px; font-weight: 600; color: #0A4F44">บันทึกแล้ว · บันทึกใน Audit log</span>
+            </sc-if>
+            <dc-import name="Button" label="ยกเลิก" variant="secondary" on-press="{{cancel}}" hint-size="90px,44px"></dc-import>
+            <dc-import name="Button" label="บันทึก" on-press="{{save}}" hint-size="90px,44px"></dc-import>
+          </div>
+        </sc-if>
+      </section>
+
+      <div style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 20px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="eye" size="18" tone="muted" hint-size="18px,18px"></dc-import>โลโก้จะแสดงที่</h2>
+          <div style="display: flex; align-items: flex-end; gap: 20px; flex-wrap: wrap">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #4B5563"><dc-import name="OrgBadge" org="{{org.badge}}" size="{{64}}" with-name="{{false}}" hint-size="64px,64px"></dc-import>หัวรายงาน PDF</div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #4B5563"><dc-import name="OrgBadge" org="{{org.badge}}" size="{{32}}" with-name="{{false}}" hint-size="32px,32px"></dc-import>ตัวสลับองค์กร</div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: #4B5563"><dc-import name="OrgBadge" org="{{org.badge}}" size="{{20}}" with-name="{{false}}" hint-size="20px,20px"></dc-import>การ์ดงานช่าง</div>
+          </div>
+          <p style="margin: 0; font-size: 13px; color: #4B5563; line-height: 1.6">แนะนำไฟล์ PNG หรือ SVG สี่เหลี่ยมจัตุรัส อย่างน้อย 256×256 px · ภาพปก 1600×400 px</p>
+        </section>
+
+      </div>
+    </div>
+
+    <section aria-labelledby="op-rates" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
+        <div>
+          <h2 id="op-rates" style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="coin" size="18" tone="brand" hint-size="18px,18px"></dc-import>อัตราและค่าคำนวณ</h2>
+          <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563">ใช้คำนวณผลตอบแทน คาร์บอนเครดิต และการขายไฟคืนในหน้า “พลังงานและผลตอบแทน” ของ {{org.name}}</p>
+        </div>
+        <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
+          <span style="font-size: 13px; padding: 6px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ดูอย่างเดียว — แก้ไขได้เฉพาะ Org Owner / Org Admin</span>
+        </sc-if>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+        <sc-for list="{{rateFields}}" as="r" hint-placeholder-count="7">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="{{r.id}}" style="font-size: 13px; font-weight: 600">{{r.label}} <span style="font-weight: 400; color: #4B5563">({{r.unit}})</span></label>
+            <input id="{{r.id}}" inputmode="decimal" value="{{r.val}}" onChange="{{r.change}}" disabled="{{locked}}" aria-describedby="{{r.hid}}" style="{{r.style}}">
+            <span id="{{r.hid}}" style="{{r.helpStyle}}">{{r.help}}</span>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
+          <sc-if value="{{rateBad}}" hint-placeholder-val="{{ false }}">
+            <span role="alert" style="align-self: center; margin-right: auto; font-size: 13px; color: #B42318">ใส่ตัวเลขที่มากกว่าหรือเท่ากับ 0 ให้ครบทุกช่อง</span>
+          </sc-if>
+          <sc-if value="{{ratesSaved}}" hint-placeholder-val="{{ false }}">
+            <span role="status" style="align-self: center; margin-right: auto; font-size: 13px; font-weight: 600; color: #0A4F44">{{ratesSaved}} · <a href="EnergyValue.dc.html" onPointerDown="{{leaveEnergy}}" onKeyDown="{{leaveEnergy}}" onClick="{{leaveEnergy}}" style="color: #0F6B5C">ดูผลที่หน้าพลังงาน</a></span>
+          </sc-if>
+          <dc-import name="Button" label="คืนค่าเริ่มต้น" variant="secondary" on-press="{{resetRates}}" hint-size="130px,44px"></dc-import>
+          <dc-import name="Button" label="บันทึกอัตรา" on-press="{{saveRates}}" disabled="{{rateBad}}" hint-size="120px,44px"></dc-import>
+        </div>
+      </sc-if>
+    </section>
+  </div>
+</main>
+  <dc-import name="Flash" page="OrgProfile.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+function scMemberCount(org, base) {
+  var J = function (k, d) { try { var v = JSON.parse(window.sessionStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+  var seeded = ({ a: ['ops@lopburi-parking.example'] })[org] || [];
+  var created = J('sc.createdInvites', []).filter(function (v) { return v && v.org === org && seeded.indexOf(v.email) < 0; }).map(function (v) { return v.email; });
+  var invites = seeded.concat(created), cancelled = J('sc.inviteCancel', []);
+  var gone = invites.filter(function (m) { return cancelled.indexOf(m) >= 0; });
+  var removed = J('sc.removed', []).filter(function (k) { k = String(k); return k.indexOf(org + '|') === 0 && gone.indexOf(k.slice(org.length + 1)) < 0; });
+  return Math.max(0, base + created.length - gone.length - removed.length);
+}
+
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { edits: {}, picked: '', rateEdits: {} }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.created', 'sc.joined', 'sc.createdName', 'sc.left', 'sc.rates', 'sc.owner', 'sc.orgProfile', 'sc.createdSites', 'sc.rateFrom', 'sc.createdInvites', 'sc.inviteCancel', 'sc.removed'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), edits: {}, saved: false, nameErr: false, ratesSaved: '', rateEdits: {}, fromEnergy: false });
+    try { setTimeout(function () { if (!self._fromEnergy) return; var el = document.getElementById('op-rates'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start' }); var inp = document.getElementById('rt-buy'); if (inp) inp.focus({ preventScroll: true }); }, 300); } catch (e) {} // fresh render + a new visit drops unsaved edits: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var orgId = SS('sc.org') || 'a';
+    // per DATA.md; edit = Org Owner / Org Admin only, everyone else reads
+    var orgs = [
+      { id: 'a', name: 'สยามโซลาร์ฟาร์ม จำกัด', en: 'Siam Solar Farm Co., Ltd.', slug: 'siamsolar', sites: 4, members: 6, role: 'Org Admin', edit: true,
+        badge: 'sf', cover: 'hero', tax: '0105556123456', email: 'ops@siamsolar.example', phone: '044 123 456', addr: 'นครราชสีมา' },
+      { id: 'b', name: 'กรีนมาร์ท รีเทล', en: 'Green Mart Retail', slug: 'greenmart', sites: 2, members: 4, role: 'Site Manager', edit: false,
+        badge: 'gm', cover: 'bn', tax: '0105559876543', email: 'facility@greenmart.example', phone: '02 987 6543', addr: 'ปทุมธานี' },
+      { id: 'c', name: 'นิคมฯ เหนือ', en: 'Northern Industrial Estate', slug: 'nikom-north', sites: 1, members: 3, role: 'Viewer', edit: false,
+        badge: 'nk', cover: 'lp', tax: '0505560011223', email: 'energy@nikom.example', phone: '053 555 010', addr: 'ลำพูน' },
+      { id: 'd', name: SS('sc.createdName') || 'ไร่ทองโซลาร์', en: 'Raithong Solar', slug: 'raithong', sites: 0, members: 1, role: (function () { try { return (JSON.parse(SS('sc.owner') || '{}') || {}).d ? 'Org Admin' : 'Org Owner'; } catch (e) { return 'Org Owner'; } })(), edit: true,
+        badge: 'rt', cover: 'farmType', tax: '0205569000123', email: 'contact@raithong.example', phone: '038 222 111', addr: 'ชลบุรี' },
+      { id: 'e', name: 'ริมทะเล รีสอร์ท', en: 'Rimtalay Resort', slug: 'rimtalay', sites: 1, members: 2, role: 'Site Manager', edit: false,
+        badge: 'rr', cover: 'rs', tax: '0775561234567', email: 'arunee@rimtalay.example', phone: '032 555 888', addr: 'ประจวบคีรีขันธ์' }
+    ].filter(function (o) {
+      var left = []; try { left = JSON.parse(SS('sc.left') || '[]') || []; } catch (e) { left = []; }
+      if (left.indexOf(o.id) >= 0 && o.id !== orgId) return false; // orgs you left (MyAccount)
+      if (o.id === 'd') return orgId === 'd' || SS('sc.created') === 'd';
+      if (o.id === 'e') return orgId === 'e' || SS('sc.joined') === 'e';
+      return true;
+    });
+    var org = orgs.filter(function (o) { return o.id === orgId; })[0] || orgs[0];
+    // member count = base + invites created here − cancelled − removed (DATA.md round 9)
+    org = Object.assign({}, org, { members: scMemberCount(org.id, org.members) }); // one shared helper (same in Members / PlatformOrgs / PlatformOrgDetail / SupportSession)
+    // saved profile fields (sc.orgProfile) and sites created in the prototype (sc.createdSites)
+    var prof = {}; try { prof = (JSON.parse(SS('sc.orgProfile') || '{}') || {})[org.id] || {}; } catch (e) { prof = {}; }
+    var nCreated = 0; try { nCreated = (JSON.parse(SS('sc.createdSites') || '[]') || []).filter(function (c) { return c && c.org === org.id && c.name; }).length; } catch (e) { nCreated = 0; }
+    // the Thai name prefill comes from the renamed source (sc.orgNames / sc.orgProfile), because typed values are never rewritten by scOrgFix
+    var renamed = ''; try { renamed = (JSON.parse(SS('sc.orgNames') || '{}') || {})[org.id] || ''; } catch (e) { renamed = ''; }
+    org = Object.assign({}, org, { name: (org.id === 'd' ? org.name : (renamed || prof.nameTh || org.name)), en: prof.nameEn || org.en, tax: prof.taxId || org.tax, email: prof.email || org.email, phone: prof.phone || org.phone, addr: prof.address || org.addr, sites: org.sites + nCreated });
+    // sc.rateFrom is one-shot: move it into state and remove the key, so a later visit (e.g. via the sidebar) starts clean
+    if (SS('sc.rateFrom') === 'EnergyValue' && !self._rateTaken) { self._rateTaken = true; setTimeout(function () { try { window.sessionStorage.removeItem('sc.rateFrom'); } catch (x) {} self._rateTaken = false; self.setState({ fromEnergy: true }); setTimeout(function () { var el = document.getElementById('op-rates'); if (el && el.scrollIntoView) el.scrollIntoView({ block: 'start' }); }, 60); }, 0); }
+    var fromEnergy = !!self.state.fromEnergy || SS('sc.rateFrom') === 'EnergyValue';
+    self._fromEnergy = fromEnergy;
+    var choose = function (id) { return function () { var el = document.getElementById(id); if (el) el.click(); }; };
+    var picked = function (what) { return function (e) { var f = e.target.files && e.target.files[0]; if (f) self.setState({ picked: 'เลือก ' + f.name + ' เป็น' + what + 'แล้ว · จะอัปโหลดเมื่อกด “บันทึก”' }); }; };
+    // rates & factors for EnergyStats (ENERGY.md); stored per org in sessionStorage 'sc.rates' = { a: {...}, b: {...} }
+    var RATE_DEF = [
+      ['buy', 'ค่าไฟที่ซื้อจากการไฟฟ้า', 'บาท/kWh', 4.18, 'เฉลี่ยรวม Ft · ปรับตามบิลจริง/TOU'],
+      ['export', 'ราคารับซื้อไฟส่วนเกิน', 'บาท/kWh', 2.20, 'โซลาร์ภาคประชาชน/Net billing · ตรวจประกาศ กฟน./กฟภ. ล่าสุด'],
+      ['fit', 'อัตรารับซื้อตามสัญญา PPA', 'บาท/kWh', 2.1679, 'โซลาร์ฟาร์ม (ตัวอย่าง) · ใช้อัตราตามสัญญาจริง'],
+      ['ef', 'ค่าการปล่อยก๊าซฯ ของระบบไฟฟ้า', 'tCO2/MWh', 0.4371, 'อบก. Premium T-VER ประกาศ 28 พ.ค. 2568 (ค่าปี 2565)'],
+      ['carbon', 'ราคาคาร์บอนเครดิต', 'บาท/tCO2e', 174.52, 'ราคาเฉลี่ย T-VER ไตรมาส 1 ปีงบ 2568 (ทุกประเภทโครงการ)'],
+      ['coal', 'ถ่านหินมาตรฐานที่ประหยัดได้', 'kg/kWh', 0.328, 'ค่าที่ระบบมอนิเตอร์อย่าง FusionSolar ใช้แสดง'],
+      ['tree', 'CO2 ที่ต้นไม้ 1 ต้นดูดซับ', 'kgCO2/ต้น/ปี', 21.8, 'ใช้แสดงเป็นต้นไม้เทียบเท่าเท่านั้น']
+    ];
+    var allRates = {}; try { allRates = JSON.parse(SS('sc.rates') || '{}') || {}; } catch (e) { allRates = {}; }
+    var savedRates = allRates[org.id] || {};
+    var rEd = self.state.rateEdits[org.id] || {};
+    var rateVal = function (d) { return rEd[d[0]] != null ? rEd[d[0]] : (savedRates[d[0]] != null ? String(savedRates[d[0]]) : String(d[3])); };
+    var rateOk = function (v) { return /^\s*\d+(\.\d+)?\s*$/.test(String(v)); };
+    var rateBad = RATE_DEF.some(function (d) { return !rateOk(rateVal(d)); });
+    var setFlash = function (msg) { try { var ss = window.sessionStorage; ss.setItem('sc.flash', msg); ss.setItem('sc.flashAt', String(Date.now())); ss.setItem('sc.flashTo', 'OrgProfile.dc.html'); } catch (e) {} };
+    var ed = self.state.edits[org.id] || {};
+    var defs = [['name', 'ชื่อองค์กร (ไทย)'], ['en', 'ชื่อองค์กร (อังกฤษ)'], ['tax', 'เลขประจำตัวผู้เสียภาษี'], ['email', 'อีเมลติดต่อ'], ['phone', 'เบอร์โทร'], ['addr', 'จังหวัดที่ตั้งสำนักงาน']];
+    return {
+      org: org, canEdit: org.edit, locked: !org.edit, orgId: org.id,
+      fromEnergy: fromEnergy, ratesSaved: self.state.ratesSaved || '', nameErr: !!self.state.nameErr,
+      leaveEnergy: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.removeItem('sc.rateFrom'); } catch (x) {} if (e && e.type === 'click') self.setState({ fromEnergy: false }); },
+      rateBad: rateBad,
+      rateFields: RATE_DEF.map(function (d) { var v = rateVal(d), bad = !rateOk(v); return { id: 'rt-' + d[0], hid: 'rt-' + d[0] + '-h', label: d[1], unit: d[2], val: v,
+        help: bad ? 'ใส่ตัวเลข เช่น ' + d[3] : 'ค่าเริ่มต้น ' + d[3] + ' · ' + d[4],
+        helpStyle: 'font-size: 12px; line-height: 1.5; color: ' + (bad ? '#B42318' : '#4B5563'),
+        style: 'min-height: 44px; padding: 0 12px; border-radius: 8px; font-size: 14px; border: 1px solid ' + (bad ? '#B42318' : '#858D9B'),
+        change: function (e) { var all = Object.assign({}, self.state.rateEdits); var mine = Object.assign({}, all[org.id]); mine[d[0]] = e.target.value; all[org.id] = mine; self.setState({ rateEdits: all }); } }; }),
+      saveRates: function () {
+        if (rateBad || !org.edit) return;
+        var mine = {}; RATE_DEF.forEach(function (d) { mine[d[0]] = parseFloat(rateVal(d)); });
+        var all = {}; try { all = JSON.parse(window.sessionStorage.getItem('sc.rates') || '{}') || {}; } catch (e) { all = {}; }
+        all[org.id] = mine;
+        try { window.sessionStorage.setItem('sc.rates', JSON.stringify(all)); } catch (e) {}
+        var re = Object.assign({}, self.state.rateEdits); delete re[org.id];
+        setFlash('บันทึกอัตราแล้ว · ทุกหน้าคำนวณใหม่');
+        self.setState({ rateEdits: re, sync: Date.now(), ratesSaved: 'บันทึกอัตราแล้ว' });
+      },
+      resetRates: function () {
+        if (!org.edit) return;
+        var all = {}; try { all = JSON.parse(window.sessionStorage.getItem('sc.rates') || '{}') || {}; } catch (e) { all = {}; }
+        delete all[org.id];
+        try { window.sessionStorage.setItem('sc.rates', JSON.stringify(all)); } catch (e) {}
+        var re = Object.assign({}, self.state.rateEdits); delete re[org.id];
+        setFlash('คืนค่าเริ่มต้นแล้ว · ทุกหน้าคำนวณใหม่');
+        self.setState({ rateEdits: re, sync: Date.now(), ratesSaved: 'คืนค่าเริ่มต้นแล้ว' });
+      },
+      chooseCover: choose('op-cover'), chooseLogo: choose('op-logo'), pickedCover: picked('ภาพปก'), pickedLogo: picked('โลโก้'), picked: self.state.picked,
+      saved: !!self.state.saved,
+      save: function () {
+        if (!org.edit) return;
+        var val = function (k) { return String(ed[k] != null ? ed[k] : org[k]).trim(); };
+        if (!val('name')) { self.setState({ nameErr: true, saved: false }); return; }
+        var changed = defs.filter(function (d) { return ed[d[0]] != null && String(ed[d[0]]) !== String(org[d[0]]); });
+        try {
+          var ss = window.sessionStorage;
+          var allP = {}; try { allP = JSON.parse(ss.getItem('sc.orgProfile') || '{}') || {}; } catch (x) { allP = {}; }
+          allP[org.id] = { nameTh: val('name'), nameEn: val('en'), taxId: val('tax'), email: val('email'), phone: val('phone'), address: val('addr') };
+          ss.setItem('sc.orgProfile', JSON.stringify(allP));
+          if (org.id === 'd' && ed.name != null && String(ed.name).trim()) ss.setItem('sc.createdName', String(ed.name).trim());
+          if (ed.name != null && String(ed.name).trim() && org.id !== 'd') { var onm = {}; try { onm = JSON.parse(ss.getItem('sc.orgNames') || '{}') || {}; } catch (x) { onm = {}; } onm[org.id] = String(ed.name).trim(); ss.setItem('sc.orgNames', JSON.stringify(onm)); }
+          var list = []; try { list = JSON.parse(ss.getItem('sc.auditExtra') || '[]') || []; } catch (x) { list = []; }
+          var nowT = Date.now(); if (self._auditAt && nowT - self._auditAt < 900) { ss.setItem('sc.auditExtra', JSON.stringify(list)); throw 0; } self._auditAt = nowT; // one row per save, even if the press fires twice
+          list.push({ org: org.id, action: 'org.update', cat: 'org', text: 'แก้ไขข้อมูลองค์กร' + (changed.length ? ': ' + changed.map(function (d) { return d[1]; }).join(', ') : '') });
+          ss.setItem('sc.auditExtra', JSON.stringify(list));
+        } catch (x) {}
+        var rest = Object.assign({}, self.state.edits); delete rest[org.id];
+        self.setState({ saved: true, nameErr: false, edits: rest });
+      },
+      cancel: function () { var all = Object.assign({}, self.state.edits); delete all[org.id]; self.setState({ edits: all, saved: false }); },
+      fields: defs.map(function (d) { var bad = d[0] === 'name' && !!self.state.nameErr; return { id: 'f-' + d[0], label: d[1], val: ed[d[0]] != null ? ed[d[0]] : org[d[0]],
+        invalid: bad ? 'true' : undefined, hasErr: bad, err: 'ใส่ชื่อองค์กร (ไทย) ก่อนบันทึก', errId: bad ? 'f-' + d[0] + '-err' : undefined,
+        style: 'min-height: 44px; padding: 0 12px; border-radius: 8px; font-size: 14px; border: ' + (bad ? '2px solid #B42318' : '1px solid #858D9B'),
+        change: function (e) { var all = Object.assign({}, self.state.edits); var mine = Object.assign({}, all[org.id]); mine[d[0]] = e.target.value; all[org.id] = mine; self.setState({ edits: all, saved: false }); } }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

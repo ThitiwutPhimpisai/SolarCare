@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>โลโก้องค์กร</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<span style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: inline-flex; align-items: center; gap: {{gap}}px; min-width: 0">
+  <sc-if value="{{logo}}" hint-placeholder-val="{{ true }}"><img src="{{logo}}" alt="{{alt}}" style="{{boxStyle}}"></sc-if>
+  <sc-if value="{{noLogo}}" hint-placeholder-val="{{ false }}"><span role="img" aria-label="{{alt}}" style="{{iniStyle}}">{{ini}}</span></sc-if>
+  <sc-if value="{{withName}}" hint-placeholder-val="{{ false }}">
+    <span style="min-width: 0"><span style="{{nameStyle}}">{{orgName}}</span><sc-if value="{{sub}}" hint-placeholder-val="{{ false }}"><span style="display: block; font-size: 12px; color: #4B5563">{{sub}}</span></sc-if></span>
+  </sc-if>
+</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"org":{"editor":"enum","options":["sf","gm","nk","rr","rt","cp","bs","qleen"],"default":"sf"},"size":{"editor":"int","default":32},"withName":{"editor":"boolean","default":true},"sub":{"editor":"text","default":""},"$preview":{"width":300,"height":60}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var ORGS = {
+      sf: { name: 'สยามโซลาร์ฟาร์ม จำกัด', ini: 'SF', logo: 'assets/ab7cf54e8276ce534736db1bd7c3a518.svg' },
+      gm: { name: 'กรีนมาร์ท รีเทล', ini: 'GM', logo: 'assets/dbba8b985af9b1691739c40f9d0ad004.svg' },
+      nk: { name: 'นิคมฯ เหนือ', ini: 'NK', logo: 'assets/6469ad40aa3886393b7cb9b1f91e60fa.svg' },
+      rr: { name: 'ริมทะเล รีสอร์ท', ini: 'RR', logo: '' },
+      rt: { name: 'ไร่ทองโซลาร์', ini: 'RT', logo: '' },
+      cp: { name: 'CleanPro Services', ini: 'CP', logo: '' },
+      bs: { name: 'บ้านสวนแพ็คกิ้ง', ini: 'BS', logo: '' },
+      qleen: { name: 'Qleen Support', ini: 'Q', logo: 'assets/b3a891f20193e7064e49afe42f693865.svg' }
+    };
+    var p = this.props;
+    var o = ORGS[p.org ?? 'sf'] || ORGS.sf;
+    var size = p.size ?? 32;
+    var r = Math.round(size * 0.24);
+    var showName = !!(p.withName ?? true);
+    return {
+      logo: o.logo, noLogo: !o.logo, ini: o.ini, orgName: o.name, alt: showName ? '' : o.name,
+      withName: showName, sub: p.sub ?? '', gap: Math.max(6, Math.round(size / 3.2)),
+      boxStyle: 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + r + 'px; flex: none; display: block',
+      iniStyle: 'width: ' + size + 'px; height: ' + size + 'px; border-radius: ' + r + 'px; flex: none; background: #FFF4E5; color: #8A3B06; font-weight: 700; font-size: ' + Math.max(9, Math.round(size * 0.36)) + 'px; display: inline-flex; align-items: center; justify-content: center',
+      nameStyle: 'display: block; font-weight: 600; font-size: ' + (size >= 40 ? 16 : 14) + 'px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'
+    };
+  }
+}
+</script>
+</body>
+</html>

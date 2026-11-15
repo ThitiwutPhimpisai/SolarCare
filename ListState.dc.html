@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>สถานะรายการ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827">
+  <sc-if value="{{isLoading}}" hint-placeholder-val="{{ true }}">
+    <div role="status" aria-live="polite" aria-label="{{loadingLabel}}" style="display: flex; flex-direction: column; gap: 10px; padding: 16px">
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+        <div aria-hidden="true" style="display: flex; align-items: center; gap: 12px">
+          <span style="width: 40px; height: 40px; border-radius: 8px; background: #F3F4F6; flex: none"></span>
+          <span style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+            <span style="{{r.a}}"></span>
+            <span style="{{r.b}}"></span>
+          </span>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+  <sc-if value="{{isError}}" hint-placeholder-val="{{ false }}">
+    <div role="alert" style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 32px 16px; text-align: center">
+      <dc-import name="Icon" icon="alert" size="22" bg="danger" hint-size="40px,40px"></dc-import>
+      <div style="font-weight: 600; font-size: 15px">โหลด{{unit}}ไม่สำเร็จ</div>
+      <div style="font-size: 13px; color: #4B5563; max-width: 360px">{{errorText}}</div>
+      <button type="button" onClick="{{retry}}" style="font-family: inherit; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; color: #374151; font-size: 14px; font-weight: 600; cursor: pointer">ลองใหม่</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{isEmpty}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 32px 16px; text-align: center">
+      <dc-import name="Icon" icon="{{emptyIcon}}" size="28" bg="gray" hint-size="50px,50px"></dc-import>
+      <div style="font-weight: 600; font-size: 15px">{{emptyTitle}}</div>
+      <div style="font-size: 13px; color: #4B5563; max-width: 360px">{{emptyText}}</div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["loading","error","empty"],"default":"loading"},"unit":{"editor":"text","default":"ใบงาน"},"icon":{"editor":"text","default":"workorder"},"rows":{"editor":"int","default":4},"errorText":{"editor":"text","default":""},"emptyTitle":{"editor":"text","default":""},"emptyText":{"editor":"text","default":""},"onRetry":{"editor":null},"$preview":{"width":560,"height":260}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props, st = p.state ?? 'loading', unit = p.unit ?? 'รายการ';
+    var bar = function (w, h) { return 'display: block; height: ' + h + 'px; width: ' + w + '%; border-radius: 6px; background: #F3F4F6'; };
+    var n = Number(p.rows ?? 4), rows = [];
+    for (var i = 0; i < n; i++) rows.push({ a: bar(70 - (i % 3) * 12, 12), b: bar(40 - (i % 2) * 10, 10) });
+    return {
+      emptyIcon: p.icon || 'info',
+      isLoading: st === 'loading', isError: st === 'error', isEmpty: st === 'empty',
+      unit: unit, rows: rows, loadingLabel: 'กำลังโหลด' + unit,
+      errorText: p.errorText || 'การเชื่อมต่อขัดข้อง ข้อมูลเดิมยังอยู่ ลองใหม่อีกครั้ง หรือรีเฟรชหน้า',
+      emptyTitle: p.emptyTitle || 'ยังไม่มี' + unit,
+      emptyText: p.emptyText || '',
+      retry: function () { if (p.onRetry) p.onRetry(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

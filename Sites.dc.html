@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ไซต์ทั้งหมด</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="sites" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" title="ไซต์ทั้งหมด" icon="site" subtitle="{{subtitle}}" actions="{{phActions}}" hint-size="100%,96px"></dc-import>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+      <label for="site-q" style="position: absolute; left: -9999px">ค้นหาไซต์</label>
+      <input id="site-q" type="search" placeholder="ค้นหาชื่อไซต์หรือจังหวัด" value="{{q}}" onChange="{{setQ}}" style="min-height: 44px; flex: 1 1 240px; width: 100%; max-width: 360px; box-sizing: border-box; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between">
+      <div style="min-width: 0; flex: 1 1 320px">
+        <dc-import name="FilterChips" label="สถานะไซต์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
+      </div>
+      <div role="group" aria-label="มุมมอง" style="display: inline-flex; border: 1px solid #D5D9E0; border-radius: 8px; overflow: hidden; background: #FFFFFF">
+        <sc-for list="{{views}}" as="w" hint-placeholder-count="2">
+          <button onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="{{w.style}}">{{w.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <dc-import name="ResultBar" unit="ไซต์" count="{{shownCount}}" total="{{totalCount}}" active="{{filtered}}" on-clear="{{clearAll}}" hint-size="100%,44px"></dc-import>
+
+
+    <sc-if value="{{listBusy}}" hint-placeholder-val="{{ false }}">
+      <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+        <dc-import name="ListState" state="{{listState}}" unit="ไซต์" icon="site" rows="{{4}}" on-retry="{{retry}}" hint-size="100%,260px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{orgEmpty}}" hint-placeholder-val="{{ false }}">
+      <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding-bottom: 24px; display: flex; flex-direction: column; align-items: center">
+        <dc-import name="ListState" state="empty" unit="ไซต์" icon="site" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="เพิ่มไซต์แรกเพื่อเริ่มตั้งรอบล้างและสร้างใบงาน" hint-size="100%,120px"></dc-import>
+        <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=Sites" hint-size="150px,44px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <div role="status" style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+        <div style="font-size: 16px; font-weight: 600">{{emptyText}}</div>
+        <div style="font-size: 13px; color: #4B5563">ลองค้นด้วยชื่อจังหวัด หรือเลือกสถานะ “ทั้งหมด”</div>
+        <dc-import name="Button" icon="x" label="ล้างตัวกรอง" variant="secondary" on-press="{{clearAll}}" hint-size="130px,44px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showMap}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+        <div style="flex: 999 1 480px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 12px">
+          <dc-import name="SiteMap" mode="sites" sites="{{siteIds}}" extra="{{mapExtra}}" statuses="{{mapStatuses}}" can-edit="{{canAdd}}" height="560" hint-size="100%,600px"></dc-import>
+        </div>
+        <ul aria-label="ไซต์บนแผนที่" style="flex: 1 1 280px; min-width: 0; list-style: none; margin: 0; padding: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
+          <sc-for list="{{sites}}" as="s" hint-placeholder-count="4">
+            <li style="border-top: 1px solid #EEF0F3">
+<sc-if value="{{s.link}}" hint-placeholder-val="{{ true }}">              <a href="SiteDetail.dc.html" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; min-height: 44px; text-decoration: none; color: #111827">
+                <dc-import name="SiteThumb" site="{{s.thumb}}" w="56px" h="40px" hint-size="56px,40px"></dc-import>
+                <span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 600; font-size: 14px">{{s.name}}</span><span style="display: block; font-size: 12px; color: #4B5563">{{s.prov}} · {{s.kwp}}</span></span>
+                <dc-import name="StatusPill" kind="site" value="{{s.st}}" hint-size="80px,24px"></dc-import>
+              </a></sc-if>
+            </li>
+          </sc-for>
+        </ul>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{showGrid}}" hint-placeholder-val="{{ true }}">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px">
+      <sc-for list="{{sites}}" as="s" hint-placeholder-count="4">
+        <sc-if value="{{s.link}}" hint-placeholder-val="{{ true }}">
+        <a href="SiteDetail.dc.html" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="{{s.cardStyle}}">
+          <div style="position: relative; height: 150px">
+            <dc-import name="SiteThumb" site="{{s.thumb}}" w="100%" h="150px" radius="{{0}}" hint-size="100%,150px"></dc-import>
+            <span style="position: absolute; left: 12px; top: 12px"><dc-import name="StatusPill" kind="site" value="{{s.st}}" hint-size="80px,24px"></dc-import></span>
+          </div>
+          <div style="padding: 16px; display: flex; flex-direction: column; gap: 10px">
+            <div>
+              <div style="font-size: 17px; font-weight: 700">{{s.name}}<sc-if value="{{s.isNew}}" hint-placeholder-val="{{ false }}"> <span style="display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #0F6B5C; color: #FFFFFF; font-size: 12px; font-weight: 700; vertical-align: 3px">ใหม่</span></sc-if></div>
+              <div style="font-size: 13px; color: #4B5563">{{s.prov}} · {{s.type}}</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; font-size: 12px; color: #4B5563">
+              <div>กำลังติดตั้ง<div style="font-size: 15px; font-weight: 700; color: #111827">{{s.kwp}}</div></div>
+              <div>ล้างล่าสุด<div style="font-size: 15px; font-weight: 700; color: #111827">{{s.last}}</div></div>
+              <div>ใบงานเปิด<div style="font-size: 15px; font-weight: 700; color: #111827">{{s.open}}</div></div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #EEF0F3; padding-top: 10px; font-size: 12px; color: #4B5563">
+              <div style="display: flex">
+                <sc-for list="{{s.people}}" as="p" hint-placeholder-count="3">
+                  <span style="display: inline-flex; border: 2px solid #FFFFFF; border-radius: 999px; margin-right: -6px"><dc-import name="Avatar" person="{{p}}" size="{{26}}" hint-size="26px,26px"></dc-import></span>
+                </sc-for>
+              </div>
+              <span style="margin-left: 8px">{{s.peopleNote}}</span>
+            </div>
+          </div>
+        </a>
+        </sc-if>
+      </sc-for>
+    </div>
+    </sc-if>
+  </div>
+</main>
+  <dc-import name="Flash" page="Sites.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading","error"],"default":"ready"},"$preview":{"width":1440,"height":980}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { f: 'all', q: '', view: 'list', retried: false }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.site', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.new', 'sc.newsite', 'sc.woStat', 'sc.createdWo', 'sc.createdSites', 'sc.siteEdits', 'sc.siteCycle'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), f: 'all', q: '', retried: false }); // fresh render + a new visit starts with no leftover search/filter
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() {
+    var self = this;
+    var A = { n: 'natthaphat', w: 'worawut', s: 'somsri', t: 'thanakorn', p: 'pimchanok' };
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var ORGS = { a: { role: 'Org Admin', admin: true }, b: { role: 'Site Manager', admin: false }, c: { role: 'Viewer', admin: false }, d: { role: 'Org Owner', admin: true }, e: { role: 'Site Manager', admin: false } };
+    var orgId = ORGS[SS('sc.org')] ? SS('sc.org') : 'a', org = ORGS[orgId];
+    var DATA = {};
+    DATA.a = [
+      { id: 'k1', name: 'ฟาร์มโคราช 1', prov: 'นครราชสีมา', type: 'โซลาร์ฟาร์ม', kwp: '8,400 kWp', last: '18 ส.ค. 2569', open: 2, st: 'due', thumb: 'k1', people: [A.s, A.t, A.w], peopleNote: '5 คนมีสิทธิ์' },
+      { id: 'k2', name: 'ฟาร์มโคราช 2', prov: 'นครราชสีมา', type: 'โซลาร์ฟาร์ม', kwp: '6,200 kWp', last: '12 ต.ค. 2569', open: 1, st: 'due', thumb: 'k2', people: [A.s, A.t], peopleNote: '4 คนมีสิทธิ์' },
+      { id: 'bp', name: 'หลังคาโรงงานบางปู', prov: 'สมุทรปราการ', type: 'หลังคา', kwp: '1,150 kWp', last: '28 ส.ค. 2569', open: 1, st: 'late', thumb: 'bp', people: [A.t, A.p], peopleNote: '4 คนมีสิทธิ์' },
+      { id: 'lb', name: 'ลานจอดรถลพบุรี', prov: 'ลพบุรี', type: 'Carport', kwp: '960 kWp', last: '5 พ.ย. 2569', open: 0, st: 'ok', thumb: 'lb', people: [A.n, A.w], peopleNote: '2 คนมีสิทธิ์ + 1 รอตอบรับ' }
+    ];
+    DATA.b = [
+      { id: 'rs', name: 'สาขารังสิต', prov: 'ปทุมธานี', type: 'หลังคา', kwp: '420 kWp', last: '28 ต.ค. 2569', open: 1, st: 'ok', thumb: 'rs', people: [A.n, A.t], peopleNote: '3 คนมีสิทธิ์' },
+      { id: 'bn', name: 'สาขาบางนา', prov: 'กรุงเทพฯ', type: 'Carport', kwp: '380 kWp', last: '13 ก.ย. 2569', open: 1, st: 'late', thumb: 'bn', people: [A.n, A.t, A.p], peopleNote: '3 คนมีสิทธิ์' }
+    ];
+    DATA.c = [
+      { id: 'lp', name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', type: 'หลังคา', kwp: '2,300 kWp', last: '30 ต.ค. 2569', open: 1, st: 'ok', thumb: 'lp', people: [A.n], peopleNote: 'คุณดูได้อย่างเดียว (Viewer)' }
+    ];
+    DATA.d = [];
+    DATA.e = [
+      { id: 'e1', name: 'หลังคาอาคาร A หัวหิน', prov: 'ประจวบคีรีขันธ์', type: 'หลังคา', kwp: '210 kWp', last: '—', open: 0, st: 'unset', thumb: 'e1', people: [A.n, A.w], peopleNote: '2 คนมีสิทธิ์' }
+    ];
+    // people with access = inherited Owner/Admins + people assigned to the site (same lists as SiteDetail, DATA.md)
+    var INH = { a: [A.w, A.n], b: [], c: [], d: [A.n], e: ['arunee'] };
+    var ASG = { k1: [A.s, A.t, A.p], k2: [A.s, A.t], bp: [A.t], lb: [], rs: [A.n, A.t], bn: [A.n, A.t, A.p], lp: [A.n], e1: [A.n] };
+    var PENDING = { lb: 1 };
+    var LAST = { k1: '18 ส.ค. 2569', k2: '12 ต.ค. 2569', bp: '28 ส.ค. 2569', lb: '5 พ.ย. 2569', rs: '28 ต.ค. 2569', bn: '13 ก.ย. 2569', lp: '30 ต.ค. 2569', e1: '—' };
+    var BASE = { 'WO-1043': ['ฟาร์มโคราช 1', 1], 'WO-1042': ['ฟาร์มโคราช 1', 1], 'WO-1041': ['ฟาร์มโคราช 2', 1], 'WO-1039': ['หลังคาโรงงานบางปู', 1], 'WO-1035': ['ลานจอดรถลพบุรี', 0], 'WO-1031': ['ฟาร์มโคราช 1', 0],
+      'GM-0211': ['สาขารังสิต', 1], 'GM-0209': ['สาขาบางนา', 1], 'GM-0204': ['สาขารังสิต', 0], 'NK-0102': ['โรงงาน A ลำพูน', 1], 'NK-0097': ['โรงงาน A ลำพูน', 0] };
+    var woStat = {}; try { woStat = JSON.parse(SS('sc.woStat') || '{}') || {}; } catch (e) { woStat = {}; }
+    var made = []; try { made = JSON.parse(SS('sc.createdWo') || '[]') || []; } catch (e) { made = []; }
+    var delta = {};
+    Object.keys(woStat).forEach(function (no) { var b = BASE[no]; if (!b) return; delta[b[0]] = (delta[b[0]] || 0) + (woStat[no] !== 'done' ? 1 : 0) - b[1]; });
+    made.forEach(function (m) { if (m && m.org === orgId && m.site) delta[m.site] = (delta[m.site] || 0) + ((woStat[m.no] || m.st || 'todo') !== 'done' ? 1 : 0); });
+    var JSN = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
+    var cycSet = JSN('sc.siteCycle', {});
+    if (woStat['WO-1043'] === 'done') { LAST.k1 = '14 พ.ย. 2569'; DATA.a = DATA.a.map(function (x) { return x.id === 'k1' ? Object.assign({}, x, { st: 'ok' }) : x; }); } // A–C approved → next due 12 ก.พ. 2570
+    var TT = { farm: ['โซลาร์ฟาร์ม', 'farmType'], roof: ['หลังคา', 'roofType'], carport: ['Carport', 'carportType'] };
+    var fresh = SS('sc.newsite') && (Date.now() - Number(SS('sc.flashAt') || 0) < 10000) ? SS('sc.newsite') : '';
+    var createdSites = JSN('sc.createdSites', []).filter(function (c) { return c && c.org === orgId && c.name; });
+    var known = {}; DATA[orgId].forEach(function (x) { known[x.name] = 1; });
+    createdSites.forEach(function (c, i) {
+      if (known[c.name]) return; known[c.name] = 1;
+      var T = TT[c.type] || TT.roof, cyc = Number(c.cycle) || 0;
+      DATA[orgId].unshift({ id: 'c' + i, lat: c.lat || '', lon: c.lon || '', name: c.name, prov: c.prov || 'ยังไม่ระบุจังหวัด', type: T[0], kwp: (c.kwp ? c.kwp + ' kWp' : '—'), last: '—', open: 0, st: cyc ? 'due' : 'unset', thumb: T[1], created: true });
+    });
+    // a cycle set in the prototype (sc.siteCycle) recomputes every site's status the same way SiteDetail does (last cleaned + cycle vs today 15 พ.ย. 2569)
+    var TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    var thParse = function (t) { var m = /^(\d+) (\S+) (\d{4})/.exec(t || ''); var mi = m ? TH_M.indexOf(m[2]) : -1; return mi < 0 ? null : new Date(Number(m[3]) - 543, mi, Number(m[1])); };
+    var TODAY = new Date(2026, 10, 15);
+    var cycSt = function (last, days) { var l = thParse(last); if (!l) return 'due'; var diff = Math.round((l.getTime() + days * 864e5 - TODAY) / 864e5); return diff < 0 ? 'late' : diff <= 14 ? 'due' : 'ok'; };
+    DATA[orgId] = DATA[orgId].map(function (x) { var d = Number(cycSet[x.name]) || 0; return d ? Object.assign({}, x, { st: cycSt(LAST[x.id] || x.last, d) }) : x; });
+    var siteEd = JSN('sc.siteEdits', {});
+    var all = DATA[orgId].map(function (x) {
+      var ppl = INH[orgId].concat(ASG[x.id] || []), n = ppl.length;
+      var note = orgId === 'c' ? 'คุณดูได้อย่างเดียว (Viewer)' : n + ' คนมีสิทธิ์' + (PENDING[x.id] ? ' + ' + PENDING[x.id] + ' รอยืนยัน' : '');
+      if (x.created) { ppl = INH[orgId].slice(); note = ppl.length + ' คนมีสิทธิ์ · ยังไม่ได้มอบสิทธิ์รายไซต์'; }
+      var ed = siteEd[x.name] || {};
+      return Object.assign({}, x, { key: x.name, name: ed.name || x.name, prov: ed.prov || x.prov, kwp: ed.kwp ? String(ed.kwp).replace(/\s*kWp$/, '') + (String(x.kwp).indexOf('kWp') >= 0 ? ' kWp' : '') : x.kwp, people: ppl.slice(0, 4), peopleNote: note, last: LAST[x.id] || x.last, link: true, isNew: x.name === fresh, open: Math.max(0, x.open + (delta[x.name] || 0)) });
+    });
+    all.forEach(function (x) { x.go = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.siteName', x.key); window.sessionStorage.setItem('sc.siteFrom', 'Sites'); } catch (er) {} }; });
+    all.forEach(function (x) { x.cardStyle = 'display: flex; flex-direction: column; background: #FFFFFF; border-radius: 12px; overflow: hidden; text-decoration: none; color: #111827; border: ' + (x.isNew ? '2px solid #0F6B5C; box-shadow: 0 0 0 4px #E7F2EF' : '1px solid #E3E6EB'); });
+    var f = self.state.f, q = self.state.q.trim().toLowerCase();
+    var shown = all.filter(function (s) { return (f === 'all' || s.st === f) && (!q || (s.name + ' ' + s.prov).toLowerCase().indexOf(q) >= 0); });
+    var propState = self.props.state || 'ready';
+    if (self._lastPropState !== undefined && self._lastPropState !== propState && self.state.retried) { setTimeout(function () { self.setState({ retried: false }); }, 0); }
+    self._lastPropState = propState;
+    var listState = self.state.retried && self._retriedFor === propState ? 'ready' : propState;
+    var busy = listState !== 'ready', orgEmpty = !busy && all.length === 0;
+    var view = self.state.view, empty = !busy && !orgEmpty && shown.length === 0;
+    var defs = [['all', 'ทั้งหมด'], ['ok', 'ปกติ'], ['due', 'ใกล้ครบรอบ'], ['late', 'เลยกำหนด'], ['unset', 'ยังไม่ตั้งรอบล้าง']];
+    var byQ = all.filter(function (s) { return !q || (s.name + ' ' + s.prov).toLowerCase().indexOf(q) >= 0; });
+    return (function (R) { R.phActions = R.canAdd ? [{ label: 'เพิ่มไซต์', icon: 'plus', href: 'SiteForm.dc.html', saveKeys: 'sc.editSite=|sc.siteFormFrom=Sites' }] : []; return R; })({
+      f: f, setF: function (id) { self.setState({ f: id }); },
+      chipOpts: defs.map(function (d) { return { id: d[0], label: d[1], count: byQ.filter(function (s) { return d[0] === 'all' || s.st === d[0]; }).length }; }),
+      shownCount: shown.length, totalCount: all.length, filtered: f !== 'all' || !!q,
+      sites: shown,
+      mapStatuses: shown.map(function (s) { return s.id + ':' + s.st; }).join(','),
+      mapExtra: shown.filter(function (s) { return s.created; }).map(function (s) { return [s.id, s.name, s.prov, s.lat || '', s.lon || '', s.st].join('|'); }).join(';'),
+      siteIds: shown.map(function (s) { return s.id; }).join(',') || 'none', // never '' (SiteMap would show every pin)
+      subtitle: org.admin ? 'แสดงทุกไซต์ในองค์กร · บทบาทของคุณ: ' + org.role : 'แสดงเฉพาะไซต์ที่คุณได้รับสิทธิ์ · บทบาทของคุณ: ' + org.role,
+      canAdd: org.admin, listBusy: busy, listState: busy ? listState : 'loading', orgEmpty: orgEmpty,
+      retry: function () { self._retriedFor = propState; self.setState({ retried: true }); },
+      q: self.state.q, setQ: function (e) { self.setState({ q: e.target.value }); },
+      empty: empty, emptyText: q ? 'ไม่พบไซต์ที่ตรงกับ “' + self.state.q.trim() + '”' : 'ไม่มีไซต์ในสถานะนี้',
+      clearAll: function () { self.setState({ q: '', f: 'all' }); },
+      showMap: !busy && !orgEmpty && !empty && view === 'map', showGrid: !busy && !orgEmpty && !empty && view === 'list',
+      views: [['list', 'รายการ'], ['map', 'แผนที่']].map(function (d) { var on = d[0] === view; return { label: d[1], on: on, pick: function () { self.setState({ view: d[0] }); },
+        style: 'min-height:44px;padding:0 16px;border:0;font-size:13px;font-weight:600;background:' + (on ? '#0F6B5C;color:#FFFFFF' : '#FFFFFF;color:#374151') }; })
+    });
+  }
+}
+</script>
+</body>
+</html>

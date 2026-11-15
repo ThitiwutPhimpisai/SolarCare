@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>User flows ทุกบทบาท</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F6B5C}
+</style>
+</helmet>
+<div style="width: 2600px; height: 1640px; box-sizing: border-box; padding: 48px 56px; background: #FFFFFF; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; gap: 18px">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
+    <div>
+      <h1 style="margin: 0; font-size: 34px">User flows ทุกบทบาท</h1>
+      <p style="margin: 6px 0 0; font-size: 16px; color: #4B5563">ตัวเลขในกล่อง = หน้าบน canvas · กดกล่องในโหมด Play เพื่อเปิดหน้านั้น</p>
+    </div>
+    <div style="display: flex; gap: 18px; font-size: 14px; color: #374151">
+      <span style="display: flex; align-items: center; gap: 8px"><span style="width: 18px; height: 18px; border-radius: 4px; border: 2px solid #0F6B5C; background: #F0F7F5"></span>หน้าในระบบ</span>
+      <span style="display: flex; align-items: center; gap: 8px"><span style="width: 18px; height: 18px; border-radius: 4px; border: 2px dashed #9CA3AF; background: #FFFFFF"></span>เหตุการณ์ / ระบบทำให้</span>
+      <span style="display: flex; align-items: center; gap: 8px"><span style="width: 18px; height: 18px; border-radius: 4px; border: 2px solid #B54708; background: #FFF4E5"></span>ทางแยก / กรณีพิเศษ</span>
+    </div>
+  </div>
+
+  <sc-for list="{{lanes}}" as="l" hint-placeholder-count="10">
+    <div style="display: flex; align-items: stretch; gap: 0; border-top: 1px solid #E3E6EB; padding-top: 14px; flex: 1; min-height: 0">
+      <div style="width: 210px; flex: none; padding-right: 16px; display: flex; flex-direction: column; justify-content: center; gap: 4px">
+        <div style="font-size: 17px; font-weight: 700">{{l.role}}</div>
+        <div style="font-size: 13px; color: #4B5563; line-height: 1.4">{{l.goal}}</div>
+      </div>
+      <div style="display: flex; align-items: center; flex: 1; min-width: 0">
+        <sc-for list="{{l.steps}}" as="s" hint-placeholder-count="6">
+          <sc-if value="{{s.arrow}}" hint-placeholder-val="{{ true }}">
+            <svg width="40" height="20" viewBox="0 0 40 20" fill="none" aria-hidden="true" style="flex: none"><path d="M2 10h32M28 4l6 6-6 6" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </sc-if>
+          <sc-if value="{{s.isLink}}" hint-placeholder-val="{{ true }}">
+            <a href="{{s.href}}" style="{{s.style}}">
+              <span style="display: flex; align-items: center; gap: 8px"><span style="{{s.chip}}">{{s.code}}</span><dc-import name="Icon" icon="{{s.ic}}" size="16" tone="{{s.icTone}}" hint-size="16px,16px"></dc-import></span>
+              <span style="font-size: 15px; font-weight: 600; color: #111827; line-height: 1.35">{{s.title}}</span>
+              <span style="font-size: 12px; color: #4B5563; line-height: 1.4">{{s.sub}}</span>
+            </a>
+          </sc-if>
+          <sc-if value="{{s.isEvent}}" hint-placeholder-val="{{ false }}">
+            <div style="{{s.style}}">
+              <span style="{{s.chip}}">{{s.code}}</span>
+              <span style="font-size: 15px; font-weight: 600; color: #111827; line-height: 1.35">{{s.title}}</span>
+              <span style="font-size: 12px; color: #4B5563; line-height: 1.4">{{s.sub}}</span>
+            </div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2600,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var P = function (code, title, sub, href, kind) { return { code: code, title: title, sub: sub || '', href: href, kind: kind || 'page' }; };
+    var E = function (title, sub) { return { code: 'เหตุการณ์', title: title, sub: sub || '', kind: 'event' }; };
+    var B = function (code, title, sub, href) { return { code: code, title: title, sub: sub || '', href: href, kind: 'branch' }; };
+    // every arrow follows a real link on the pages (round 8): CreateOrg is account + org name only, Main's setup checklist does the rest,
+    // invites follow sign-in state, support sessions start after one confirm and end on the org page
+    var lanes = [
+      { role: 'ผู้ใช้ที่ได้รับเชิญ', goal: 'เข้าร่วมองค์กรตามสิทธิ์ที่ถูกมอบ', steps: [
+        E('ได้รับอีเมลคำเชิญจาก อรุณี ท.', 'ส่ง 14 พ.ย. 2569 · หมดอายุ 21 พ.ย.'), P('1.3', 'ดูคำเชิญ', 'Role + ไซต์ · ดูสิทธิ์ในหน้าต่าง', 'AcceptInvite.dc.html'), P('1.1', 'มีบัญชีแล้ว: เข้าสู่ระบบ', 'ระบบพากลับมาที่คำเชิญ', 'Login.dc.html'), P('1.3', 'ยอมรับและเข้าร่วม', 'หรือปฏิเสธ → เลือกองค์กร', 'AcceptInvite.dc.html'), P('2.1', 'แดชบอร์ดของ ริมทะเล รีสอร์ท', 'บทบาท Site Manager', 'Main.dc.html'), Object.assign(B('1.4', 'คำเชิญถึงอีเมลที่ยังไม่มีบัญชี', 'แยกจาก 1.3: คำเชิญถึง newstaff@rimtalay.example → สร้างบัญชีด้วยอีเมลนั้น แล้วเข้าร่วมทันที', 'SignUpInvite.dc.html'), { alt: true }) ] },
+      { role: 'เจ้าของสร้างองค์กรใหม่', goal: 'ตั้งองค์กรจนพร้อมใช้งาน', steps: [
+        P('1.1', 'ยังไม่มีบัญชี', 'สร้างองค์กรใหม่', 'Login.dc.html'), P('1.5', 'สร้างบัญชี + องค์กร', 'แค่บัญชีและชื่อองค์กร', 'CreateOrg.dc.html'), P('2.1', 'แดชบอร์ด + เช็กลิสต์เริ่มต้น', 'อยู่จนทำครบ 4 ขั้น', 'Main.dc.html'), P('2.4', 'เพิ่มไซต์แรก', 'จากเช็กลิสต์ · บันทึกแล้วกลับแดชบอร์ด', 'SiteForm.dc.html'), P('2.1', 'แดชบอร์ด', 'เช็กลิสต์ขั้นไซต์ ✓', 'Main.dc.html'), P('2.3', 'รายละเอียดไซต์', 'เปิดจากแดชบอร์ด · ตั้งรอบล้าง', 'SiteDetail.dc.html'), P('4.2', 'เชิญทีม', 'จากเช็กลิสต์ · กำหนด Role + ไซต์', 'Members.dc.html'), P('3.3', 'สร้างใบงานแรก', 'เช็กลิสต์ครบ → ซ่อนเอง', 'CreateWorkOrder.dc.html') ] },
+      { role: 'Org Admin · งานประจำวัน', goal: 'ดูภาพรวม สั่งงาน ปิดงาน', steps: [
+        P('1.1', 'เข้าสู่ระบบ', '', 'Login.dc.html'), P('1.2', 'เลือกองค์กร', 'เลือกองค์กรที่จะทำงาน', 'SelectOrg.dc.html'), P('2.1', 'แดชบอร์ด', 'สิ่งที่ต้องทำวันนี้', 'Main.dc.html'), P('3.1', 'ติดตามใบงาน', 'ตามสถานะ · มอบหมายช่าง', 'WorkOrders.dc.html'), P('3.2', 'ตรวจรูป · อนุมัติ', 'หรือส่งกลับแก้ไข · กลับหน้าที่มา', 'WorkOrderDetail.dc.html'), P('3.6', 'รายงาน', 'เลือกแบบรายงานและช่วงเวลา · กดตัวเลขเพื่อดูใบงาน', 'Reports.dc.html'), P('3.1', 'ใบงานในช่วงเดียวกัน', 'ชิปช่วงเวลาจากรายงาน', 'WorkOrders.dc.html') ] },
+      { role: 'Org Admin · ไซต์ อุปกรณ์ และพลังงาน', goal: 'ดูแลไซต์ อุปกรณ์ และผลตอบแทน', steps: [
+        P('2.2', 'ไซต์ทั้งหมด', 'กริด · แผนที่', 'Sites.dc.html'), P('2.3', 'รายละเอียดไซต์', 'ภาพรวม · อุปกรณ์ · พลังงาน', 'SiteDetail.dc.html'), P('2.6', 'อุปกรณ์ INV-C03', 'แจ้งเตือนจุดร้อน → เปิด WO-1042', 'DeviceDetail.dc.html'), P('3.2', 'ใบงาน WO-1042', 'กลับไปหน้าอุปกรณ์ได้', 'WorkOrderDetail.dc.html'), P('3.7', 'พลังงานและผลตอบแทน', 'ค่าไฟ · ขายไฟคืน · คาร์บอน · ผลของการล้าง', 'EnergyValue.dc.html'), P('4.1', 'ปรับอัตรา', 'โปรไฟล์องค์กร › อัตรา · กลับไปหน้าพลังงาน', 'OrgProfile.dc.html'), P('3.7', 'คำนวณใหม่ทันที', 'ตัวเลขทุกหน้าใช้อัตราใหม่', 'EnergyValue.dc.html') ] },
+      { role: 'Org Admin · วิเคราะห์ข้อมูล', goal: 'จับปัญหาที่ inverter ไม่แจ้ง และวางแผนล่วงหน้า', steps: [
+        P('2.1', 'แดชบอร์ด', 'ข้อสังเกตจากการวิเคราะห์ใน "ต้องทำวันนี้"', 'Main.dc.html'), P('3.8', 'วิเคราะห์และเปรียบเทียบ', 'ข้อสังเกต · PM2.5 · สภาพอากาศ · พยากรณ์', 'Analytics.dc.html'), P('3.3', 'สร้างใบงานตรวจ', 'จากปุ่มของข้อสังเกต · บันทึกแล้วกลับมาหน้าวิเคราะห์', 'CreateWorkOrder.dc.html'), P('3.8', 'ข้อสังเกตเปลี่ยนเป็น "เปิดใบงาน"', 'ไม่สร้างใบงานซ้ำ', 'Analytics.dc.html'), Object.assign(B('2.6', 'ดูอุปกรณ์ INV-B04', 'แยกจาก 3.8: หน้าอุปกรณ์มีหมายเหตุจากการวิเคราะห์ · กลับหน้าวิเคราะห์', 'DeviceDetail.dc.html'), { alt: true })] },
+      { role: 'Org Admin · องค์กรและสิทธิ์', goal: 'ให้คนที่ใช่เห็นไซต์ที่ใช่', steps: [
+        P('4.1', 'โปรไฟล์องค์กร', 'ชื่อ · โลโก้ · อัตราค่าไฟ', 'OrgProfile.dc.html'), P('4.2', 'สมาชิก', 'เชิญ · ส่งใหม่ · ยกเลิกคำเชิญ', 'Members.dc.html'), P('4.3', 'แก้สิทธิ์รายไซต์', 'Role ต่อไซต์ · โอน Owner', 'MemberDetail.dc.html'), P('4.4', 'Role matrix', 'สิทธิ์ × ขอบเขต', 'Roles.dc.html'), P('4.5', 'Custom Role', 'สร้าง · ทำสำเนา', 'RoleEditor.dc.html'), P('4.6', 'Audit log', 'ทุกการเปลี่ยนสิทธิ์', 'AuditLog.dc.html') ] },
+      { role: 'Site Manager', goal: 'ดูแลเฉพาะไซต์ของตน', steps: [
+        E('แจ้งเตือน: งานรออนุมัติ', 'ในแอป / LINE'), P('5.1', 'การแจ้งเตือน', '', 'Notifications.dc.html'), P('3.2', 'ตรวจรูปก่อน/หลัง', 'อนุมัติ หรือ ส่งกลับพร้อมเหตุผล', 'WorkOrderDetail.dc.html'), P('2.5', 'ตารางล้าง', 'วางแผนรอบของไซต์ตน', 'Schedule.dc.html'), P('3.3', 'สร้างใบงานจากรอบ', 'เฉพาะไซต์ที่ได้รับ', 'CreateWorkOrder.dc.html'), B('6.4', 'เปิดสิ่งที่เกินสิทธิ์', 'เห็นหน้า 403 · ขอสิทธิ์', 'AccessDenied.dc.html') ] },
+      { role: 'ช่าง (มือถือ)', goal: 'ทำงานให้ครบแม้ไม่มีสัญญาณ', steps: [
+        P('1.1', 'เข้าสู่ระบบ (ธนากร ว.)', 'บัญชีช่าง → ไปแอปช่างทันที', 'Login.dc.html'), P('3.4', 'งานของฉัน', 'รวมทุกองค์กรที่สังกัด', 'TechMobile.dc.html'), E('เริ่มงาน', 'บันทึกเวลา + GPS'), E('เช็กลิสต์ตามประเภทงาน', 'ล้าง · ตรวจสภาพ · ซ่อม · เก็บในเครื่องถ้าออฟไลน์'), B('3.5', 'แจ้งปัญหาหน้างาน', 'ผู้จัดการเห็นในใบงาน · พักงานได้', 'TechMobileIssue.dc.html'), E('ส่งงาน', 'ออฟไลน์ = เข้าคิว ส่งเองเมื่อมีสัญญาณ'), E('รอผู้อนุมัติของไซต์', 'Site Manager หรือ Org Admin · ส่งกลับ = แก้แล้วส่งใหม่') ] },
+      { role: 'Viewer / ลูกค้า', goal: 'ดูสถานะไซต์ของตนอย่างเดียว', steps: [
+        P('1.1', 'เข้าสู่ระบบ', '', 'Login.dc.html'), P('1.2', 'เลือก นิคมฯ เหนือ', 'บทบาท Viewer', 'SelectOrg.dc.html'), P('2.1', 'แดชบอร์ด', 'อ่านอย่างเดียว', 'Main.dc.html'), P('2.3', 'รายละเอียดไซต์', 'รูปก่อน/หลังล่าสุด', 'SiteDetail.dc.html'), P('5.1', 'แจ้งเตือนเมื่อปิดงาน', '', 'Notifications.dc.html'), B('6.4', 'เปิดลิงก์หน้าสมาชิกจากแจ้งเตือน', 'Viewer เปิดไม่ได้ → หน้า 403 · ขอสิทธิ์', 'AccessDenied.dc.html') ] },
+      { role: 'Platform Admin (ทีม Qleen)', goal: 'ช่วยลูกค้าโดยตรวจสอบย้อนหลังได้', steps: [
+        P('1.1', 'เข้าสู่ระบบ', 'บัญชีทีม Qleen → คอนโซลแพลตฟอร์ม', 'Login.dc.html'), P('6.1', 'องค์กรทั้งหมด', 'ค้นหา · สร้างองค์กรให้ลูกค้า', 'PlatformOrgs.dc.html'), P('6.2', 'รายละเอียดองค์กร', 'การใช้งาน · ประวัติการเข้าถึง', 'PlatformOrgDetail.dc.html'), E('ใส่เหตุผล แล้วยืนยันครั้งเดียว', 'เลขเรื่อง (ticket) · เริ่มเซสชันทันที'), P('6.3', 'โหมดช่วยเหลือ', 'อ่านอย่างเดียว 60 นาที · เมนูกดไม่ได้', 'SupportSession.dc.html'), P('6.2', 'จบเซสชัน', 'กลับรายละเอียดองค์กร แท็บประวัติการเข้าถึง · บันทึกครั้งเดียว', 'PlatformOrgDetail.dc.html') ] },
+      { role: 'บัญชี & ความปลอดภัย', goal: 'กู้รหัส · จัดการบัญชีตัวเอง', steps: [
+        P('1.1', 'ลืมรหัสผ่าน', '', 'Login.dc.html'), P('1.6', 'รีเซ็ตรหัสผ่าน', 'ส่งลิงก์ · ตั้งรหัสใหม่', 'ResetPassword.dc.html'), B('1.2', 'กลับหน้าแรกของบัญชี', 'ผู้ดูแล → เลือกองค์กร · ช่าง → แอปช่าง · ทีม Qleen → คอนโซล', 'SelectOrg.dc.html'), P('5.2', 'บัญชีของฉัน', '2FA · อุปกรณ์ · เปลี่ยนรหัส', 'MyAccount.dc.html') ] }
+    ];
+    var box = 'flex: none; width: 220px; min-height: 108px; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; display: flex; flex-direction: column; gap: 4px; text-decoration: none;';
+    var styles = { page: box + 'border: 2px solid #0F6B5C; background: #F0F7F5;', event: box + 'border: 2px dashed #9CA3AF; background: #FFFFFF;', branch: box + 'border: 2px solid #B54708; background: #FFF4E5;' };
+    var chips = { page: 'align-self: flex-start; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; background: #0F6B5C; color: #FFFFFF;', event: 'align-self: flex-start; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; background: #F3F4F6; color: #374151;', branch: 'align-self: flex-start; padding: 1px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; background: #B54708; color: #FFFFFF;' };
+    var PI = { Analytics: 'trend', DeviceDetail: 'plug', Login: 'lock', ResetPassword: 'key', SelectOrg: 'swap', AcceptInvite: 'mail', SignUpInvite: 'mail', CreateOrg: 'building', Sites: 'site', OrgProfile: 'building', Main: 'overview', SiteDetail: 'site', SiteForm: 'site', Schedule: 'calendar', WorkOrders: 'workorder', WorkOrderDetail: 'workorder', CreateWorkOrder: 'workorder', Reports: 'report', EnergyValue: 'energy', Members: 'users', MemberDetail: 'user', Roles: 'shield', RoleEditor: 'shield', AuditLog: 'audit', Notifications: 'bell', MyAccount: 'user', AccessDenied: 'lock', PlatformOrgs: 'building', PlatformOrgDetail: 'building', SupportSession: 'support', TechMobile: 'phone', TechMobileIssue: 'alert', DeviceDetail: 'plug' };
+    var icOf = function (h) { return PI[String(h || '').replace('.dc.html', '')] || 'info'; };
+    return {
+      lanes: lanes.map(function (l) { return { role: l.role, goal: l.goal, steps: l.steps.map(function (s, i) {
+        return Object.assign({}, s, { arrow: i > 0 && !s.alt, isLink: s.kind !== 'event', isEvent: s.kind === 'event', style: styles[s.kind], chip: chips[s.kind], ic: icOf(s.href), icTone: s.kind === 'branch' ? 'warn' : 'brand' }); }) }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

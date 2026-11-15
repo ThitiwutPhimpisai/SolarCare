@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ผลการกรอง</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 44px; font-size: 13px; color: #4B5563">
+  <span role="status" aria-live="polite">{{text}}</span>
+  <sc-if value="{{active}}" hint-placeholder-val="{{ true }}">
+    <button type="button" onClick="{{clear}}" style="font-family: inherit; min-height: 44px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600; cursor: pointer">{{clearLabel}}</button>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"count":{"editor":"int","default":3},"total":{"editor":"int","default":7},"unit":{"editor":"text","default":"ใบงาน"},"active":{"editor":"boolean","default":true},"clearLabel":{"editor":"text","default":"ล้างตัวกรอง"},"onClear":{"editor":null},"$preview":{"width":420,"height":48}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props;
+    var n = p.count ?? 0, total = p.total, unit = p.unit ?? 'รายการ', active = !!(p.active ?? false);
+    var text = active && total != null ? 'แสดง ' + n + ' จาก ' + total + ' ' + unit : 'ทั้งหมด ' + n + ' ' + unit;
+    return { text: text, active: active, clearLabel: p.clearLabel ?? 'ล้างตัวกรอง', clear: function () { if (p.onClear) p.onClear(); } };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>วิเคราะห์และเปรียบเทียบ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="analytics" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+    <dc-import name="PageHeader" icon="trend" back-label="{{backLabel}}" back-href="{{backHref}}" eyebrow="{{orgName}}" title="วิเคราะห์และเปรียบเทียบ" subtitle="หาปัญหาที่ inverter ไม่แจ้ง และคาดการณ์ล่วงหน้าจากข้อมูลจริง อากาศ และ PM2.5" hint-size="100%,96px"></dc-import>
+
+    <sc-if value="{{denied}}" hint-placeholder-val="{{ false }}">
+      <section role="alert" style="display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px">
+        <dc-import name="Icon" icon="lock" size="20" bg="gray" hint-size="36px,36px"></dc-import>
+        <div style="flex: 1 1 260px; min-width: 0"><div style="font-weight: 600">บัญชีช่างไม่มีสิทธิ์ดูหน้าวิเคราะห์</div><div style="font-size: 13px; color: #4B5563; margin-top: 2px">หน้านี้สำหรับผู้ดูแลองค์กรและผู้จัดการไซต์ ใช้แอปช่างเพื่อดูงานของคุณ</div></div>
+        <dc-import name="Button" variant="secondary" label="รายละเอียดสิทธิ์" href="AccessDenied.dc.html" save-keys="sc.deniedFrom=Analytics.dc.html|sc.denied=หน้าวิเคราะห์" hint-size="150px,44px"></dc-import>
+        <dc-import name="Button" variant="primary" icon="phone" label="ไปที่แอปช่าง" href="TechMobile.dc.html" hint-size="150px,44px"></dc-import>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{allowed}}" hint-placeholder-val="{{ true }}">
+      <dc-import name="Insights" view="kpis" site="{{siteF}}" hint-size="100%,120px"></dc-import>
+      <sc-if value="{{viewer}}" hint-placeholder-val="{{ false }}">
+        <div role="note" style="font-size: 13px; color: #374151; background: #F3F4F6; border-radius: 8px; padding: 10px 14px">บทบาท Viewer ดูผลการวิเคราะห์ได้อย่างเดียว · การสร้างใบงานหรือรับทราบข้อสังเกตทำได้โดย Org Owner / Org Admin / Site Manager</div>
+      </sc-if>
+      <div style="min-width: 0">
+        <dc-import name="FilterChips" label="ไซต์ที่วิเคราะห์" value="{{siteF}}" options="{{siteOpts}}" on-change="{{setSiteF}}" hint-size="100%,44px"></dc-import>
+      </div>
+
+      <div role="tablist" aria-label="มุมมองการวิเคราะห์" style="display: flex; gap: 4px; border-bottom: 1px solid #E3E6EB; overflow-x: auto">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+          <button type="button" role="tab" id="{{t.tid}}" aria-selected="{{t.on}}" aria-controls="{{t.pid}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{tFindings}}" hint-placeholder-val="{{ true }}">
+        <div role="tabpanel" id="an-p-findings" aria-labelledby="an-t-findings">
+          <dc-import name="Insights" view="findings" site="{{siteF}}" focus="{{focus}}" hint-size="100%,900px"></dc-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{tCompare}}" hint-placeholder-val="{{ false }}">
+        <div role="tabpanel" id="an-p-compare" aria-labelledby="an-t-compare" style="display: flex; flex-direction: column; gap: 16px">
+          <dc-import name="DateRange" label="ช่วงเวลาที่เปรียบเทียบ" on-change="{{onRange}}" hint-size="100%,170px"></dc-import>
+          <dc-import name="Insights" view="compare" site="{{siteF}}" hint-size="100%,1000px"></dc-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{tForecast}}" hint-placeholder-val="{{ false }}">
+        <div role="tabpanel" id="an-p-forecast" aria-labelledby="an-t-forecast">
+          <dc-import name="Insights" view="forecast" site="{{siteF}}" hint-size="100%,900px"></dc-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{tSources}}" hint-placeholder-val="{{ false }}">
+        <div role="tabpanel" id="an-p-sources" aria-labelledby="an-t-sources">
+          <dc-import name="Insights" view="sources" site="{{siteF}}" hint-size="100%,900px"></dc-import>
+        </div>
+      </sc-if>
+    </sc-if>
+  </div>
+</main>
+  <dc-import name="Flash" page="Analytics.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+var AN_SITES = { a: [['ฟาร์มโคราช 1', 'k1'], ['ฟาร์มโคราช 2', 'k2'], ['หลังคาโรงงานบางปู', 'bp'], ['ลานจอดรถลพบุรี', 'lb']], b: [['สาขารังสิต', 'rs'], ['สาขาบางนา', 'bn']], c: [['โรงงาน A ลำพูน', 'lp']], d: [], e: [['หลังคาอาคาร A หัวหิน', 'e1']] };
+var AN_ORG = { a: ['สยามโซลาร์ฟาร์ม จำกัด', 'Org Admin'], b: ['กรีนมาร์ท รีเทล', 'Site Manager'], c: ['นิคมฯ เหนือ', 'Viewer'], d: ['ไร่ทองโซลาร์', 'Org Owner'], e: ['ริมทะเล รีสอร์ท', 'Site Manager'] };
+var AN_TABS = [['findings', 'ข้อสังเกต'], ['compare', 'เปรียบเทียบ'], ['forecast', 'พยากรณ์'], ['sources', 'แหล่งข้อมูล']];
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { tab: 'findings', focus: '', from: '' };
+  }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.createdName', 'sc.insightSite', 'sc.site', 'sc.range', 'sc.authed', 'sc.siteEdits', 'sc.flash', 'sc.flashAt'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var oneShot = function () { var f = ''; try { f = window.sessionStorage.getItem('sc.finding') || ''; if (f) window.sessionStorage.removeItem('sc.finding'); } catch (x) {} return f; };
+    var fromShot = function () { var v = ''; try { v = window.sessionStorage.getItem('sc.findingFrom') || ''; if (v) window.sessionStorage.removeItem('sc.findingFrom'); } catch (x) {} return v; };
+    self._scrollTo = function (f) { if (!f) return; var n = 0; var go = function () { var el = document.getElementById('in-f-' + f); if (el && el.scrollIntoView) { el.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; } if (++n < 10) setTimeout(go, 150); }; setTimeout(go, 120); };
+    self._snap = snap();
+    self._sync = function () { var f = oneShot(), fr = fromShot(); if (f || fr) { self.setState({ tab: 'findings', focus: f || self.state.focus, from: fr || self.state.from, sync: Date.now() }); self._scrollTo(f); } var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } }; // sc.finding also arrives while the page stays mounted
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    var f0 = oneShot(), fr0 = fromShot();
+    self.setState({ sync: Date.now(), tab: 'findings', focus: f0, from: fr0 });
+    self._scrollTo(f0);
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var org = SS('sc.org') || 'a'; if (!AN_ORG[org]) org = 'a';
+    var O = AN_ORG[org], sites = AN_SITES[org];
+    var orgName = org === 'd' ? (SS('sc.createdName') || O[0]) : O[0];
+    var EDITS = (function () { try { return JSON.parse(SS('sc.siteEdits') || '{}') || {}; } catch (e) { return {}; } })();
+    var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    // one site filter for Reports, EnergyValue and Analytics: sc.site (Thai name) seeds the analytics filter when it has none
+    var sel = SS('sc.insightSite'); if (!sel || sel === 'all') { var byName = sites.filter(function (r) { return r[0] === SS('sc.site'); })[0]; if (byName) sel = byName[1]; } if (!sites.some(function (r) { return r[1] === sel; })) sel = 'all';
+    var tab = AN_TABS.some(function (t) { return t[0] === self.state.tab; }) ? self.state.tab : 'findings';
+    var tech = false; // console access follows the org role like every other page; the technician persona only has the mobile app (TechMobile)
+    return {
+      orgName: orgName + ' · ' + (sel === 'all' ? 'ทุกไซต์' : DN((sites.filter(function (r) { return r[1] === sel; })[0] || [''])[0])),
+      denied: tech, allowed: !tech, viewer: O[1] === 'Viewer',
+      siteF: sel,
+      siteOpts: [{ id: 'all', label: 'ทุกไซต์' }].concat(sites.map(function (r) { return { id: r[1], label: DN(r[0]) }; })),
+      setSiteF: function (id) { var r = sites.filter(function (x) { return x[1] === id; })[0]; try { window.sessionStorage.setItem('sc.insightSite', id || 'all'); window.sessionStorage.setItem('sc.site', r ? r[0] : 'all'); } catch (e) {} self.setState({ sync: Date.now(), focus: '' }); },
+      backLabel: self.state.from === 'Main' ? 'ภาพรวม' : self.state.from === 'SiteDetail' ? DN(SS('sc.siteName') || 'รายละเอียดไซต์') : '',
+      backHref: self.state.from === 'Main' ? 'Main.dc.html' : self.state.from === 'SiteDetail' ? 'SiteDetail.dc.html' : '',
+      onRange: function () { self.setState({ sync: Date.now() }); },
+      focus: self.state.focus || '',
+      tabs: AN_TABS.map(function (t) { var on = t[0] === tab; return { label: t[1], on: on ? 'true' : 'false', tid: 'an-t-' + t[0], pid: 'an-p-' + t[0],
+        pick: function () { self.setState({ tab: t[0] }); },
+        style: 'flex: none; min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-size: 14px; font-weight: 600; white-space: nowrap; margin-bottom: -1px; border-bottom: ' + (on ? '3px solid #0F6B5C; color: #111827' : '3px solid transparent; color: #4B5563') }; }),
+      tFindings: tab === 'findings', tCompare: tab === 'compare', tForecast: tab === 'forecast', tSources: tab === 'sources'
+    };
+  }
+}
+</script>
+</body>
+</html>

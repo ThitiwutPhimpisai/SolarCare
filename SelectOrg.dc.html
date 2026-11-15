@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>เลือกองค์กร</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; box-sizing: border-box; padding: clamp(24px, 6vw, 56px) 16px; display: flex; justify-content: center">
+  <div style="width: 100%; max-width: 560px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: #111827"><dc-import name="Icon" icon="sun" size="20" bg="brand" hint-size="36px,36px"></dc-import>SolarCare</div>
+    <div style="display: flex; align-items: center; gap: 14px">
+      <sc-if value="{{knownUser}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="natthaphat" size="56" hint-size="56px,56px"></dc-import></sc-if>
+      <sc-if value="{{newUser}}" hint-placeholder-val="{{ false }}"><dc-import name="Avatar" person="me" size="56" hint-size="56px,56px"></dc-import></sc-if>
+      <div>
+        <div style="font-size: 14px; color: #4B5563">สวัสดี {{firstName}}</div>
+        <h1 style="margin: 2px 0 0; font-size: 24px">เลือกองค์กรที่จะทำงาน</h1>
+      </div>
+    </div>
+
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 8px">
+      <dc-import name="OrgList" items="{{orgs}}" size="lg" label="องค์กรของคุณ" hint-size="100%,232px"></dc-import>
+    </section>
+    <p style="margin: -10px 0 0; font-size: 12px; color: #4B5563">สลับองค์กรภายหลังได้ที่เมนูซ้าย</p>
+
+    <sc-if value="{{showInvite}}" hint-placeholder-val="{{ true }}">
+    <section style="background: #FFFFFF; border: 1px solid #F3D7B0; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap">
+      <dc-import name="OrgBadge" org="rr" size="48" with-name="{{false}}" hint-size="48px,48px"></dc-import>
+      <div style="flex: 1 1 240px; min-width: 0">
+        <div style="font-size: 12px; font-weight: 700; color: #8A3B06">คำเชิญรอตอบรับ</div>
+        <div style="font-weight: 600">ริมทะเล รีสอร์ท เชิญคุณเป็น Site Manager</div>
+      </div>
+      <dc-import name="Button" variant="secondary" label="ดูคำเชิญ" href="AcceptInvite.dc.html" save-keys="sc.authed=admin|sc.inviteFrom=SelectOrg" hint-size="100px,44px"></dc-import>
+    </section>
+    </sc-if>
+
+    <a href="CreateOrg.dc.html" onPointerDown="{{fromSelect}}" onKeyDown="{{fromSelect}}" onClick="{{fromSelect}}" style="min-height: 52px; border-radius: 12px; border: 1px dashed #9CA3AF; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; text-decoration: none"><dc-import name="Icon" icon="plus" size="16" hint-size="16px,16px"></dc-import>สร้างองค์กรใหม่</a>
+
+    <p style="margin: 0; font-size: 13px; color: #4B5563">ไม่ใช่บัญชีของคุณ? <a href="Login.dc.html" onPointerDown="{{logout}}" onKeyDown="{{logout}}" onClick="{{logout}}">ออกจากระบบ</a></p>
+  </div>
+  <dc-import name="Flash" page="SelectOrg.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.site', 'sc.siteName', 'sc.wo', 'sc.member', 'sc.porg', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.joined', 'sc.created', 'sc.inviteDone', 'sc.left', 'sc.createdName', 'sc.read', 'sc.createdSites', 'sc.myName', 'sc.newAccount', 'sc.authed', 'sc.owner', 'sc.myEmail'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now() }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var guard = function (e) { return e && e.type === 'keydown' && e.key !== 'Enter'; };
+    var fromSelect = function (e) { if (guard(e)) return; try { window.sessionStorage.setItem('sc.from', 'select'); } catch (x) {} };
+    // logging out clears every shared prototype key so the next sign-in starts fresh
+    var logout = function (e) { if (guard(e)) return; try { var ss = window.sessionStorage, ks = []; for (var i = 0; i < ss.length; i++) { var k = ss.key(i); if (k && k.indexOf('sc.') === 0) ks.push(k); } ks.forEach(function (k) { ss.removeItem(k); }); } catch (x) {} };
+    // orgs per DATA.md; ริมทะเล appears after accepting the invite, ไร่ทองโซลาร์ after creating it
+    // a brand-new account (signed up from Login → CreateOrg) has only the org it just created
+    var newAcct = SS('sc.newAccount') === '1';
+    var myName = SS('sc.myName');
+    // one org-list rule (DATA round 12, same as Sidebar): base orgs + created/joined, created sites counted, sc.owner flips your role in d
+    var allSites = []; try { allSites = JSON.parse(SS('sc.createdSites') || '[]') || []; } catch (e) { allSites = []; }
+    var nSites = function (id, base) { var n = base + allSites.filter(function (x) { return x && x.org === id && x.name; }).length; return n ? n + ' ไซต์' : 'ยังไม่มีไซต์'; };
+    var ownerD = false; try { ownerD = !!(JSON.parse(SS('sc.owner') || '{}') || {}).d; } catch (e) { ownerD = false; }
+    var list = newAcct ? [] : [
+      { id: 'a', badge: 'sf', name: 'สยามโซลาร์ฟาร์ม จำกัด', note: 'Org Admin · ' + nSites('a', 4), href: 'Main.dc.html' },
+      { id: 'b', badge: 'gm', name: 'กรีนมาร์ท รีเทล', note: 'Site Manager · ' + nSites('b', 2), href: 'Main.dc.html' },
+      { id: 'c', badge: 'nk', name: 'นิคมฯ เหนือ', note: 'Viewer · ' + nSites('c', 1), href: 'Main.dc.html' }
+    ];
+    if (SS('sc.joined') === 'e') list.push({ id: 'e', badge: 'rr', name: 'ริมทะเล รีสอร์ท', note: 'Site Manager · ' + nSites('e', 1) + ' · เพิ่งเข้าร่วม', href: 'Main.dc.html' });
+    if (SS('sc.created') === 'd') list.push({ id: 'd', badge: 'rt', name: SS('sc.createdName') || 'ไร่ทองโซลาร์', note: (ownerD ? 'Org Admin' : 'Org Owner') + ' · ' + nSites('d', 0), href: 'Main.dc.html' });
+    var leftIds = []; try { leftIds = JSON.parse(SS('sc.left') || '[]'); } catch (e) { leftIds = []; }
+    list = list.filter(function (o) { return leftIds.indexOf(o.id) < 0; });
+    var last = SS('sc.org') || 'a';
+    if (!list.some(function (o) { return o.id === last; })) last = list.length ? list[0].id : 'a';
+    return {
+      fromSelect: fromSelect, logout: logout,
+      knownUser: !newAcct, newUser: newAcct,
+      firstName: newAcct ? (myName.split(' ')[0] || 'คุณ') : 'ณัฐภัทร',
+      initials: (myName.replace(/\s+/g, '').slice(0, 2) || '?'),
+      showInvite: !newAcct && !SS('sc.inviteDone'),
+      orgs: list.map(function (o) {
+        var on = o.id === last;
+        return { name: o.name, badge: o.badge, href: o.href, current: on, saveKeys: 'sc.org=' + o.id + '|sc.site=all',
+          note: o.note + (on ? ' · ใช้ล่าสุด' : '') };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

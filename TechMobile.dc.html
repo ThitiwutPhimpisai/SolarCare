@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แอปช่าง SolarCare</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 100%; max-width: 390px; height: 100dvh; max-height: 844px; margin: 0 auto; box-sizing: border-box; background: #F5F6F8; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; overflow: hidden">
+
+  <sc-if value="{{preview}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="background: #1E3A8A; color: #FFFFFF; padding: 44px 12px 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 13px">
+      <dc-import name="Icon" icon="eye" size="16" tone="current" hint-size="16px,16px"></dc-import>
+      <span style="flex: 1 1 180px">มุมมองตัวอย่างของช่าง · ดูได้อย่างเดียว</span>
+      <a href="WorkOrderDetail.dc.html" onPointerDown="{{exitPreview}}" onKeyDown="{{exitPreview}}" onClick="{{exitPreview}}" style="min-height: 44px; display: inline-flex; align-items: center; gap: 4px; color: #FFFFFF; font-weight: 700"><dc-import name="Icon" icon="arrowLeft" size="16" tone="current" hint-size="16px,16px"></dc-import>กลับไปที่ใบงาน {{previewNo}}</a>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{offline}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="background: #111827; color: #FFFFFF; padding: 44px 16px 10px; display: flex; align-items: center; gap: 8px; font-size: 13px">
+      <dc-import name="Icon" icon="wifiOff" size="16" tone="current" hint-size="16px,16px"></dc-import>
+      <span style="flex: 1">ออฟไลน์ · {{pendingNote}}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="{{headStyle}}">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span style="display: inline-flex; flex: none; border: 2px solid #FFFFFF; border-radius: 999px"><dc-import name="Avatar" person="thanakorn" size="48" hint-size="48px,48px"></dc-import></span>
+          <div>
+            <div style="font-size: 13px">สวัสดี ธนากร · ช่างผู้รับเหมา</div>
+            <h1 style="font-size: 22px; font-weight: 700; margin: 2px 0 0">{{tabTitle}}</h1>
+          </div>
+        </div>
+        <div style="font-size: 13px; margin-top: 6px">สังกัด 2 องค์กร · เห็นเฉพาะใบงานที่มอบหมายให้คุณ</div>
+      </div>
+
+      <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display: flex; align-items: center; gap: 8px; margin: 12px 16px 0; padding: 10px 12px; border-radius: 10px; background: #E7F2EF; color: #0A4F44; font-size: 13px; font-weight: 600"><dc-import name="Icon" icon="checkCircle" size="18" hint-size="18px,18px"></dc-import><span style="flex: 1">{{toast}}</span><button type="button" onClick="{{closeToast}}" aria-label="ปิดข้อความ" style="min-width: 44px; min-height: 44px; border: 0; background: transparent; color: #0A4F44"><dc-import name="Icon" icon="x" size="16" hint-size="16px,16px"></dc-import></button></div>
+      </sc-if>
+      <sc-if value="{{tabJobs}}" hint-placeholder-val="{{ true }}">
+        <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+          <div style="padding: 14px 16px 6px">
+            <dc-import name="FilterChips" label="องค์กร" value="{{orgSel}}" options="{{orgOpts}}" on-change="{{setOrgF}}" hint-size="100%,44px"></dc-import>
+          </div>
+          <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 8px 16px 16px; display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{jobs}}" as="j" hint-placeholder-count="3">
+              <button onClick="{{j.open}}" style="flex: none; text-align: left; width: 100%; border: 1px solid #E3E6EB; background: #FFFFFF; border-radius: 14px; padding: 10px; display: flex; gap: 12px; align-items: flex-start; font-family: inherit; cursor: pointer">
+                <span style="flex: none; width: 76px; height: 76px; border-radius: 10px; overflow: hidden; display: block"><dc-import name="SiteThumb" site="{{j.img}}" w="76px" h="76px" radius="0" hint-size="76px,76px"></dc-import></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+                  <span style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap">
+                    <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #374151; min-width: 0"><dc-import name="OrgBadge" org="{{j.logo}}" size="18" with-name="{{false}}" hint-size="18px,18px"></dc-import>{{j.org}}</span>
+                    <dc-import name="StatusPill" kind="wo" value="{{j.st}}" hint-size="100px,24px"></dc-import>
+                  </span>
+                  <span style="font-size: 15px; font-weight: 600; color: #111827; line-height: 1.35">{{j.title}}</span>
+                  <span style="display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 12px; color: #4B5563"><span style="display: inline-flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="site" size="14" tone="muted" hint-size="14px,14px"></dc-import>{{j.site}}</span><span style="display: inline-flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="clock" size="14" tone="muted" hint-size="14px,14px"></dc-import>{{j.due}}</span></span>
+                  <sc-if value="{{j.unsynced}}" hint-placeholder-val="{{ false }}">
+                    <span style="align-self: flex-start"><dc-import name="StatusPill" kind="wo" value="queued" label="ยังไม่ได้ส่งขึ้นระบบ" hint-size="130px,24px"></dc-import></span>
+                  </sc-if>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{tabSchedule}}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+          <sc-for list="{{days}}" as="d" hint-placeholder-count="2">
+            <section style="display: flex; flex-direction: column; gap: 8px">
+              <h2 style="margin: 0; font-size: 14px; color: #4B5563">{{d.label}}</h2>
+              <sc-for list="{{d.items}}" as="j" hint-placeholder-count="2">
+                <button onClick="{{j.open}}" style="flex: none; display: flex; gap: 12px; align-items: center; width: 100%; min-height: 64px; padding: 10px 12px; border: 1px solid #E3E6EB; border-radius: 12px; background: #FFFFFF; text-align: left">
+                  <span style="font-size: 14px; font-weight: 700; width: 48px; flex: none">{{j.time}}</span>
+                  <span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 600; font-size: 14px; color: #111827">{{j.title}}</span><span style="display: block; font-size: 12px; color: #4B5563">{{j.site}}</span></span>
+                  <dc-import name="OrgBadge" org="{{j.logo}}" size="24" with-name="{{false}}" hint-size="24px,24px"></dc-import>
+                </button>
+              </sc-for>
+            </section>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{tabProfile}}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+          <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 6px 14px">
+            <h2 style="display: flex; align-items: center; gap: 6px; margin: 0; font-size: 14px; padding: 10px 0 4px"><dc-import name="Icon" icon="building" size="16" tone="muted" hint-size="16px,16px"></dc-import>องค์กรที่สังกัด</h2>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 56px; border-top: 1px solid #EEF0F3">
+              <dc-import name="OrgBadge" org="sf" size="36" with-name="{{false}}" hint-size="36px,36px"></dc-import>
+              <span style="flex: 1"><span style="display: block; font-weight: 600; font-size: 14px">{{orgNameA}}</span><span style="display: block; font-size: 12px; color: #4B5563">Technician · 3 ไซต์</span></span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; min-height: 56px; border-top: 1px solid #EEF0F3">
+              <dc-import name="OrgBadge" org="gm" size="36" with-name="{{false}}" hint-size="36px,36px"></dc-import>
+              <span style="flex: 1"><span style="display: block; font-weight: 600; font-size: 14px">{{orgNameB}}</span><span style="display: block; font-size: 12px; color: #4B5563">Technician · 2 ไซต์</span></span>
+            </div>
+          </section>
+          <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 14px; font-size: 14px; display: flex; flex-direction: column; gap: 6px">
+            <h2 style="display: flex; align-items: center; gap: 6px; margin: 0; font-size: 14px"><dc-import name="Icon" icon="sync" size="16" tone="muted" hint-size="16px,16px"></dc-import>ข้อมูลรอส่ง</h2>
+            <span style="color: #374151">{{pendingNote}}</span>
+          </section>
+          <sc-if value="{{notPreview}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" label="ออกจากระบบ" href="Login.dc.html" on-press="{{logout}}" variant="secondary" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if>
+        </div>
+      </sc-if>
+
+      <nav aria-label="เมนูแอป" style="background: #FFFFFF; border-top: 1px solid #E3E6EB; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 8px 24px">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
+          <button onClick="{{t.pick}}" aria-current="{{t.current}}" style="{{t.style}}">
+            <dc-import name="Icon" icon="{{t.icon}}" size="22" hint-size="22px,22px"></dc-import>{{t.label}}</button>
+        </sc-for>
+      </nav>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isJob}}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="{{jobHeadStyle}}">
+        <sc-if value="{{notPreview}}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{back}}" aria-label="กลับ" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center">
+            <dc-import name="Icon" icon="arrowLeft" size="22" hint-size="22px,22px"></dc-import>
+          </button>
+        </sc-if>
+        <sc-if value="{{preview}}" hint-placeholder-val="{{ false }}">
+          <a href="WorkOrderDetail.dc.html" onPointerDown="{{exitPreview}}" onKeyDown="{{exitPreview}}" onClick="{{exitPreview}}" aria-label="กลับไปที่ใบงาน" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #111827"><dc-import name="Icon" icon="arrowLeft" size="22" hint-size="22px,22px"></dc-import></a>
+        </sc-if>
+        <div style="min-width: 0">
+          <div style="font-size: 12px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="OrgBadge" org="{{job.logo}}" size="16" with-name="{{false}}" hint-size="16px,16px"></dc-import>{{job.no}} · {{job.org}}</div>
+          <h1 style="font-size: 16px; font-weight: 700; margin: 0">{{job.title}}</h1>
+        </div>
+      </div>
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; font-size: 13px">
+          <div><div style="color: #4B5563; display: flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="site" size="16" tone="muted" hint-size="16px,16px"></dc-import>ไซต์</div><div style="font-weight: 600">{{job.site}}</div></div>
+          <div><div style="color: #4B5563; display: flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="clock" size="16" tone="muted" hint-size="16px,16px"></dc-import>กำหนด</div><div style="font-weight: 600">{{job.due}}</div></div>
+          <div><div style="color: #4B5563; display: flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="panel" size="16" tone="muted" hint-size="16px,16px"></dc-import>จำนวนแผง</div><div style="font-weight: 600">{{job.panels}}</div></div>
+          <div><div style="color: #4B5563; display: flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="info" size="16" tone="muted" hint-size="16px,16px"></dc-import>สถานะ</div><div><dc-import name="StatusPill" kind="wo" value="{{job.st}}" hint-size="110px,26px"></dc-import></div></div>
+          <a href="{{job.maps}}" target="_blank" rel="noopener" style="grid-column: span 2; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; border: 1px solid #D5D9E0; color: #0F6B5C; font-weight: 600; text-decoration: none">
+            <dc-import name="Icon" icon="map" size="16" hint-size="16px,16px"></dc-import>นำทางไปไซต์ (Google Maps)</a>
+          <sc-if value="{{notPreview}}" hint-placeholder-val="{{ true }}">
+          <a href="TechMobileIssue.dc.html" onPointerDown="{{issueGo}}" onKeyDown="{{issueGo}}" onClick="{{issueGo}}" style="grid-column: span 2; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 8px; border: 1px solid #F3D7B0; background: #FFF4E5; color: #8A3B06; font-weight: 600; text-decoration: none"><dc-import name="Icon" icon="alert" size="16" hint-size="16px,16px"></dc-import>แจ้งปัญหาหน้างาน</a>
+          </sc-if>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 6px 14px">
+          <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; padding: 8px 0 4px; margin: 0"><dc-import name="Icon" icon="checkCircle" size="16" tone="muted" hint-size="16px,16px"></dc-import>เช็กลิสต์ ({{doneCount}}/{{totalCount}})</h2>
+          <sc-for list="{{checks}}" as="c" hint-placeholder-count="4">
+            <label style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-top: 1px solid #EEF0F3; font-size: 14px">
+              <input type="checkbox" checked="{{c.on}}" onChange="{{c.toggle}}" disabled="{{locked}}" style="width: 22px; height: 22px; accent-color: #0F6B5C">
+              <span>{{c.label}}</span>
+            </label>
+          </sc-for>
+        </div>
+
+        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; margin: 0"><dc-import name="Icon" icon="camera" size="16" tone="muted" hint-size="16px,16px"></dc-import>รูปถ่าย (บังคับ)</h2>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+            <sc-for list="{{photos}}" as="p" hint-placeholder-count="2">
+              <button onClick="{{p.toggle}}" disabled="{{locked}}" aria-label="{{p.label}}" style="{{p.style}}">
+                <sc-if value="{{p.has}}" hint-placeholder-val="{{ false }}">
+                  <span style="position: absolute; inset: 0; display: block"><dc-import name="SiteThumb" site="{{p.src}}" w="100%" h="110px" radius="0" hint-size="100%,110px"></dc-import></span>
+                  <span style="position: absolute; left: 6px; bottom: 6px; padding: 2px 8px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px">{{p.caption}}</span>
+                </sc-if>
+                <sc-if value="{{p.none}}" hint-placeholder-val="{{ true }}">
+                  <dc-import name="Icon" icon="camera" size="22" hint-size="22px,22px"></dc-import>
+                  <span>{{p.label}}</span>
+                </sc-if>
+              </button>
+            </sc-for>
+          </div>
+          <sc-if value="{{offline}}" hint-placeholder-val="{{ false }}">
+            <span style="font-size: 12px; color: #4B5563">รูปเก็บไว้ในเครื่องก่อน และจะส่งขึ้นระบบอัตโนมัติเมื่อมีสัญญาณ</span>
+          </sc-if>
+        </div>
+        <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="font-size: 13px; padding: 12px; border-radius: 10px; background: #FFF4E5; color: #8A3B06">{{lockedNote}}</div>
+        </sc-if>
+      </div>
+      <div style="background: #FFFFFF; border-top: 1px solid #E3E6EB; padding: 12px 16px 28px">
+        <dc-import name="Button" label="{{primary.label}}" on-press="{{primary.act}}" disabled="{{primary.disabled}}" full="{{true}}" hint-size="100%,44px"></dc-import>
+        <div style="font-size: 12px; color: #4B5563; text-align: center; margin-top: 6px">{{primary.hint}}</div>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"offline":{"editor":"boolean","default":false},"$preview":{"width":390,"height":844}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { screen: 'list', tab: 'jobs', jobId: null, org: 'all', st: {}, checks: {}, photos: {}, toast: '' };
+  }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var get = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var snap = function () { return ['sc.wo', 'sc.woStat', 'sc.from', 'sc.createdWo', 'sc.woAssign', 'sc.techView', 'sc.techProgress', 'sc.siteEdits'].map(get).join('|'); };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    // a new visit starts on the job list, unless the manager asked to see a job from the technician's side
+    self._lastWo = get('sc.wo');
+    var wantJob = get('sc.from') === 'techView' && !!get('sc.wo');
+    self.setState({ sync: Date.now(), screen: wantJob ? 'job' : 'list', jobId: wantJob ? get('sc.wo') : null, tab: 'jobs', toast: '' }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var __r = this._rv0(); __r.orgNameA = 'สยามโซลาร์ฟาร์ม'; __r.orgNameB = 'กรีนมาร์ท รีเทล'; return __r;
+  }
+  _rv0() {
+    var self = this, s = self.state;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var woStat = (function () { try { return JSON.parse(SS('sc.woStat') || 'null') || {}; } catch (e) { return {}; } })();
+    var offline = self.props.offline ?? false;
+    var SF = 'sf', GM = 'gm', farm = 'k1', roof = 'bp';
+    // ธนากร ว.'s jobs only (canonical data: ../DATA.md; today = 15 พ.ย. 2569)
+    var base = [
+      { id: 'WO-1039', no: 'WO-1039', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: roof, title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', due: 'เลยกำหนด 5 วัน (10 พ.ย.)', day: 'today', time: '08:00', panels: '420 แผง', st: 'doing', type: 'clean', q: 'บางปู+สมุทรปราการ' },
+      { id: 'GM-0209', no: 'GM-0209', orgId: 'GM', org: 'กรีนมาร์ท รีเทล', logo: GM, img: 'bn', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', due: 'เลยกำหนด 3 วัน (12 พ.ย.)', day: 'today', time: '13:00', panels: '690 แผง', st: 'doing', type: 'clean', q: 'สาขาบางนา+กรุงเทพ' },
+      { id: 'WO-1042', no: 'WO-1042', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: farm, title: 'ตรวจจุดร้อน (hotspot) หลังพายุ', site: 'ฟาร์มโคราช 1', due: 'พรุ่งนี้ (16 พ.ย.)', day: 'tomorrow', time: '08:00', panels: '600 แผง', st: 'doing', type: 'inspect', q: 'ฟาร์มโคราช+1' },
+      { id: 'GM-0211', no: 'GM-0211', orgId: 'GM', org: 'กรีนมาร์ท รีเทล', logo: GM, img: 'rs', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', due: '20 พ.ย. 2569', day: 'later', time: '08:00', panels: '760 แผง', st: 'todo', type: 'clean', q: 'สาขารังสิต+ปทุมธานี' },
+      { id: 'WO-1043', no: 'WO-1043', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: farm, title: 'ล้างแผงรอบไตรมาส โซน A–C', site: 'ฟาร์มโคราช 1', due: '18 พ.ย. 2569', day: 'later', time: '—', panels: '12,000 แผง', st: 'review', type: 'clean', q: 'ฟาร์มโคราช+1' }
+    ];
+    var IMG = { 'ฟาร์มโคราช 1': 'k1', 'ฟาร์มโคราช 2': 'k2', 'หลังคาโรงงานบางปู': 'bp', 'ลานจอดรถลพบุรี': 'lb', 'สาขารังสิต': 'rs', 'สาขาบางนา': 'bn' };
+    var ORGOF = { a: ['SF', 'สยามโซลาร์ฟาร์ม', SF], b: ['GM', 'กรีนมาร์ท รีเทล', GM] };
+    var createdJobs = (function () { try { return JSON.parse(SS('sc.createdWo') || 'null') || []; } catch (e) { return []; } })()
+      .filter(function (c) { return c && c.who === 'ธนากร ว.' && ORGOF[c.org]; })
+      .map(function (c) { var o = ORGOF[c.org], d = parseInt(c.due, 10), nov = / พ.ย. 2569$/.test(c.due || '');
+        return { id: c.no, no: c.no, orgId: o[0], org: o[1], logo: o[2], img: IMG[c.site] || 'k1', title: c.title, site: c.site, due: c.due,
+          day: nov && d === 15 ? 'today' : (nov && d === 16 ? 'tomorrow' : 'later'), time: '08:00', panels: '—', st: c.st || 'todo', type: /ตรวจ/.test(c.type || '') ? 'inspect' : (/ซ่อม/.test(c.type || '') ? 'repair' : 'clean'), q: encodeURIComponent(c.site) }; });
+    // a new job assigned to ธนากร in the console (sc.woAssign) shows up here too
+    var woAssign = (function () { try { return JSON.parse(SS('sc.woAssign') || 'null') || {}; } catch (e) { return {}; } })();
+    var ASSIGNABLE = { 'WO-1041': { id: 'WO-1041', no: 'WO-1041', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: 'k2', title: 'ล้างแผงตามรอบ', site: 'ฟาร์มโคราช 2', due: '25 พ.ย. 2569', day: 'later', time: '08:00', panels: '11,400 แผง', st: 'todo', type: 'clean', q: 'ฟาร์มโคราช+2' } };
+    var assignedJobs = Object.keys(ASSIGNABLE).filter(function (k) { return woAssign[k] === 'ธนากร ว.'; }).map(function (k) { return ASSIGNABLE[k]; });
+    base = createdJobs.concat(assignedJobs, base);
+    var preview = SS('sc.techView') === '1';
+    var EDITS = (function () { try { return JSON.parse(SS('sc.siteEdits') || '{}') || {}; } catch (e) { return {}; } })();
+    var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    var jobs = base.map(function (j) {
+      // a queued (offline) submission stays local; otherwise the shared status (sc.woStat) wins —
+      // the technician's own start / submit is written there too, so every page agrees
+      var st = s.st[j.id] === 'queued' ? 'queued' : (woStat[j.id] || s.st[j.id] || j.st);
+      if (st === 'queued' && !offline) st = 'review';
+      var ph = s.photos[j.id] || {};
+      var unsynced = offline && (st === 'queued' || ph.before || ph.after);
+      return Object.assign({}, j, { st: st, unsynced: !!unsynced, siteKey: j.site, site: DN(j.site),
+        maps: 'https://www.google.com/maps/search/?api=1&query=' + j.q,
+        open: function () { try { window.sessionStorage.setItem('sc.wo', j.id); } catch (e) {} self._lastWo = j.id; self.setState({ screen: 'job', jobId: j.id }); } });
+    });
+    var pending = 0;
+    jobs.forEach(function (j) { var ph = s.photos[j.id] || {}; if (offline) { if (ph.before) pending++; if (ph.after) pending++; } });
+    var queuedJobs = jobs.filter(function (j) { return j.st === 'queued'; }).length;
+    var pendingNote = pending || queuedJobs ? ('รอส่ง ' + pending + ' รูป' + (queuedJobs ? ' · ' + queuedJobs + ' งาน' : '') + ' — ส่งอัตโนมัติเมื่อมีสัญญาณ') : (offline ? 'ยังทำงานต่อได้ ข้อมูลจะเก็บไว้ในเครื่อง' : 'ส่งข้อมูลครบแล้ว');
+    // sc.wo changed since the last render (e.g. "ดูมุมมองช่าง" or back from the issue page) → open that job
+    var wantWo = SS('sc.wo');
+    if (wantWo !== self._lastWo) {
+      self._lastWo = wantWo;
+      if (jobs.some(function (j) { return j.id === wantWo; }) && !(s.screen === 'job' && s.jobId === wantWo)) setTimeout(function () { self.setState({ screen: 'job', jobId: wantWo }); }, 0);
+    }
+    var job = jobs.filter(function (j) { return j.id === s.jobId; })[0] || jobs[0];
+    // one checklist per job type (DATA.md round 5)
+    var labels = {
+      clean: ['ถ่ายรูปก่อนล้าง', 'ล้างด้วยน้ำ DI', 'ถ่ายรูปหลังล้าง', 'ตรวจรอยร้าว / ขั้วต่อ'],
+      inspect: ['ถ่ายภาพความร้อน (thermal)', 'ระบุแผงที่พบปัญหา', 'วัดค่าแรงดัน / กระแสสตริง', 'สรุปผลและข้อเสนอแนะ'],
+      repair: ['ตัดไฟ / ล็อกเอาต์ก่อนเริ่ม', 'เปลี่ยนชิ้นส่วน', 'ทดสอบหลังซ่อม', 'ถ่ายรูปหลังซ่อม']
+    }[job.type || 'clean'];
+    var photoWord = job.type === 'inspect' ? ['ก่อนตรวจ', 'หลังตรวจ'] : (job.type === 'repair' ? ['ก่อนซ่อม', 'หลังซ่อม'] : ['ก่อนล้าง', 'หลังล้าง']);
+    // who approves a submitted job: the site's Site Manager, else the Org Admin (DATA.md round 5)
+    var approver = { 'ฟาร์มโคราช 1': 'สมศรี ป.', 'ฟาร์มโคราช 2': 'สมศรี ป.', 'สาขารังสิต': 'ณัฐภัทร ส.', 'สาขาบางนา': 'ณัฐภัทร ส.' }[job.siteKey || job.site] || 'ณัฐภัทร ส. (Org Admin)';
+    // checklist / photo progress is kept per job in sc.techProgress, so leaving for the issue page (or reloading) keeps it
+    var PROG = (function () { try { return JSON.parse(SS('sc.techProgress') || 'null') || {}; } catch (e) { return {}; } })();
+    var jc = s.checks[job.id] || (PROG[job.id] && PROG[job.id].checks) || {}, jp = s.photos[job.id] || (PROG[job.id] && PROG[job.id].photos) || {};
+    var done = labels.filter(function (l, i) { return jc[i]; }).length;
+    var notStarted = job.st === 'todo' || job.st === 'new';
+    var locked = preview || notStarted || job.st === 'review' || job.st === 'queued' || job.st === 'done' || job.st === 'paused';
+    var setJob = function (key, val) {
+      var o = Object.assign({}, s[key]); o[job.id] = val; var u = {}; u[key] = o; self.setState(u);
+      if (key === 'checks' || key === 'photos') { try { var pr = JSON.parse(window.sessionStorage.getItem('sc.techProgress') || 'null') || {}; pr[job.id] = Object.assign({}, pr[job.id] || {}); pr[job.id][key] = val; window.sessionStorage.setItem('sc.techProgress', JSON.stringify(pr)); } catch (e) {} }
+    };
+    var setStatus = function (val) {
+      if (val !== 'queued') { try { var ws = JSON.parse(window.sessionStorage.getItem('sc.woStat') || 'null') || {}; ws[job.id] = val; window.sessionStorage.setItem('sc.woStat', JSON.stringify(ws)); } catch (e) {} }
+      setJob('st', val);
+    };
+    var primary;
+    if (job.st === 'todo') primary = { label: 'เริ่มงาน', disabled: false, hint: 'ระบบจะบันทึกเวลาและพิกัด GPS', act: function () { setStatus('doing'); } };
+    else if (job.st === 'doing' || job.st === 'returned') { var ok = done === labels.length && jp.before && jp.after;
+      primary = { label: offline ? 'ส่งงาน (จะส่งเมื่อมีสัญญาณ)' : 'ส่งงานให้อนุมัติ', disabled: !ok, hint: ok ? 'ส่งให้ ' + approver + ' อนุมัติ' : 'ทำเช็กลิสต์ให้ครบและถ่ายรูปก่อน/หลัง', act: function () { setStatus(offline ? 'queued' : 'review'); self.setState({ screen: 'list', toast: offline ? 'เก็บงาน ' + job.no + ' ไว้แล้ว · จะส่งให้ ' + approver + ' เมื่อมีสัญญาณ' : 'ส่งงาน ' + job.no + ' ให้ ' + approver + ' อนุมัติแล้ว' }); } }; }
+    else if (job.st === 'done') primary = { label: 'ปิดงานแล้ว', disabled: true, hint: approver + ' อนุมัติงานนี้แล้ว', act: function () {} };
+    else if (job.st === 'paused') primary = { label: 'พักงานอยู่', disabled: true, hint: 'รอ ' + approver + ' แก้ปัญหาที่แจ้งไว้ แล้วจะแจ้งให้ทำงานต่อ', act: function () {} };
+    else primary = { label: job.st === 'queued' ? 'รอส่ง' : 'ส่งแล้ว', disabled: true, hint: job.st === 'queued' ? 'อยู่ในคิว จะส่งอัตโนมัติ' : 'รอ ' + approver + ' อนุมัติ', act: function () {} };
+    // a manager's preview ("ดูมุมมองช่าง") is read-only: nothing here changes the job
+    if (preview) primary = { label: 'มุมมองตัวอย่าง · กดไม่ได้', disabled: true, hint: 'ช่างเป็นผู้เริ่มและส่งงานจากแอปของตน', act: function () {} };
+    var tabDefs = [['jobs', 'งานของฉัน', 'workorder'], ['schedule', 'ตารางงาน', 'calendar'], ['profile', 'โปรไฟล์', 'user']];
+    var dayLabel = { today: 'วันนี้', tomorrow: 'พรุ่งนี้', later: 'ถัดไป' };
+    return {
+      offline: offline, pendingNote: pendingNote,
+      headStyle: 'background:#0F6B5C;color:#FFFFFF;padding:' + (offline || preview ? '16px' : '52px') + ' 20px 18px',
+      jobHeadStyle: 'background:#FFFFFF;border-bottom:1px solid #E3E6EB;padding:' + (offline || preview ? '8px' : '48px') + ' 8px 10px;display:flex;align-items:center;gap:4px',
+      preview: preview, notPreview: !preview, previewNo: SS('sc.wo') || job.no, backToConsole: !!preview,
+      exitPreview: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.removeItem('sc.techView'); ss.setItem('sc.from', ''); } catch (x) {} },
+      isList: s.screen === 'list', isJob: s.screen === 'job',
+      tabJobs: s.tab === 'jobs', tabSchedule: s.tab === 'schedule', tabProfile: s.tab === 'profile',
+      tabTitle: { jobs: 'งานของฉัน', schedule: 'ตารางงาน', profile: 'โปรไฟล์' }[s.tab],
+      tabs: tabDefs.map(function (t) { var on = t[0] === s.tab; return { label: t[1], icon: t[2], current: on ? 'page' : 'false', pick: function () { self.setState({ tab: t[0] }); },
+        style: 'min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:transparent;font-size: 12px;font-weight:' + (on ? '700;color:#0F6B5C' : '500;color:#4B5563') }; }),
+      orgSel: s.org, setOrgF: function (id) { self.setState({ org: id }); },
+      orgOpts: [['all', 'ทุกองค์กร'], ['SF', 'สยามโซลาร์ฟาร์ม'], ['GM', 'กรีนมาร์ท']].map(function (o) { return { id: o[0], label: o[1], count: jobs.filter(function (j) { return o[0] === 'all' || j.orgId === o[0]; }).length }; }),
+      jobs: jobs.filter(function (j) { return s.org === 'all' || j.orgId === s.org; }),
+      days: ['today', 'tomorrow', 'later'].map(function (d) { return { label: dayLabel[d], items: jobs.filter(function (j) { return j.day === d; }) }; }),
+      back: function () { try { if (window.sessionStorage.getItem('sc.from') === 'techView') window.sessionStorage.setItem('sc.from', ''); } catch (e) {} self.setState({ screen: 'list' }); },
+      // logout clears every sc.* key (DATA.md round 3)
+      logout: function () { try { var ss = window.sessionStorage, ks = []; for (var i = 0; i < ss.length; i++) { var k = ss.key(i); if (k && k.indexOf('sc.') === 0) ks.push(k); } ks.forEach(function (k) { ss.removeItem(k); }); } catch (e) {} },
+      job: job, locked: locked, doneCount: done, totalCount: labels.length,
+      lockedNote: preview ? 'มุมมองตัวอย่างของผู้จัดการ — ช่างเป็นผู้ติ๊กเช็กลิสต์และถ่ายรูปจากแอปของตน' : notStarted ? 'กดเริ่มงานก่อน แล้วจึงติ๊กเช็กลิสต์และถ่ายรูป' : job.st === 'paused' ? 'พักงานไว้เพราะแจ้งปัญหา — รอ ' + approver + ' แก้ปัญหา' : job.st === 'done' ? 'ปิดงานแล้ว — เช็กลิสต์และรูปถูกบันทึกไว้ในใบงาน' : job.st === 'queued' ? 'ส่งงานแล้วแต่ยังออฟไลน์ — งานอยู่ในคิว จะส่งให้ ' + approver + ' อัตโนมัติเมื่อมีสัญญาณ' : 'ส่งงานแล้ว — รอ ' + approver + ' อนุมัติ แก้ไขไม่ได้จนกว่าจะถูกส่งกลับ',
+      checks: labels.map(function (l, i) { return { label: l, on: !!jc[i], toggle: function () { var c = Object.assign({}, jc); c[i] = !c[i]; setJob('checks', c); } }; }),
+      photos: [['before', photoWord[0], 'before'], ['after', photoWord[1], 'after']].map(function (p) { var has = !!jp[p[0]]; return {
+        has: has, none: !has, src: p[2],
+        label: has ? 'ถ่ายรูป' + p[1] + 'ใหม่' : 'ถ่ายรูป' + p[1],
+        caption: p[1] + (offline ? ' · รอส่ง' : ' · ส่งแล้ว'),
+        style: 'position:relative;overflow:hidden;padding:0;min-height:110px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;border:' + (has ? '1px solid #0F6B5C;background:#E7F2EF;color:#0A4F44' : '1px dashed #4B5563;background:#FAFBFC;color:#374151'),
+        toggle: function () { var o = Object.assign({}, jp); o[p[0]] = !o[p[0]]; setJob('photos', o); } }; }),
+      primary: primary,
+      toast: s.toast || '', hasToast: !!s.toast && s.screen === 'list', closeToast: function () { self.setState({ toast: '' }); },
+      issueGo: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.wo', job.id); window.sessionStorage.setItem('sc.issueDone', ''); } catch (x) {} self._lastWo = job.id; }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>อุปกรณ์ในไซต์</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+@media (max-width: 767px){.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}.dv-grp td{padding:8px 12px !important}}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827">
+
+  <sc-if value="{{isEmpty}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 28px 16px; text-align: center">
+      <dc-import name="Icon" icon="plug" size="24" bg="gray" hint-size="44px,44px"></dc-import>
+      <div style="font-weight: 600; font-size: 15px">ยังไม่มีอุปกรณ์</div>
+      <div style="font-size: 13px; color: #4B5563; max-width: 380px">เชื่อม SmartLogger เพื่อดึงรายการอุปกรณ์ (อินเวอร์เตอร์ มิเตอร์ไฟฟ้า) ของไซต์นี้จาก FusionSolar</div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <sc-if value="{{hasZone}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 20px; font-size: 13px">
+          <span style="display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 4px 0 12px; border-radius: 999px; background: #E7F2EF; color: #0F6B5C; font-weight: 600">{{zoneLabel}}<button type="button" onClick="{{clearZone}}" aria-label="ล้างตัวกรองโซน" style="width: 32px; height: 32px; border: 0; background: transparent; color: #0F6B5C; display: inline-flex; align-items: center; justify-content: center; cursor: pointer"><dc-import name="Icon" icon="x" size="16" hint-size="16px,16px"></dc-import></button></span>
+        </div>
+      </sc-if>
+      <div style="padding: 0 20px">
+        <dc-import name="FilterChips" label="กรองอุปกรณ์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
+      </div>
+      <div style="padding: 0 20px; font-size: 12px; color: #4B5563">ดึงข้อมูลจาก {{loggerName}} ทุก 5 นาที · กดที่อุปกรณ์เพื่อดูสเปกและค่าล่าสุด</div>
+      <table class="rt" aria-label="{{tableLabel}}" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px">
+        <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">อุปกรณ์</th><th scope="col" style="padding: 10px 12px; font-weight: 600">สถานะ</th><th scope="col" style="padding: 10px 12px; font-weight: 600">ประเภท</th><th scope="col" style="padding: 10px 12px; font-weight: 600">รุ่น</th></tr></thead>
+        <tbody>
+          <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+            <tr class="dv-grp" style="{{g.rowStyle}}"><td class="rt-main" colspan="4" style="{{g.cellStyle}}">{{g.title}}</td></tr>
+            <sc-for list="{{g.rows}}" as="d" hint-placeholder-count="3">
+              <tr style="border-top: 1px solid #EEF0F3">
+                <td class="rt-main" style="padding: 8px 20px">
+                  <a href="DeviceDetail.dc.html" onPointerDown="{{d.go}}" onKeyDown="{{d.go}}" onClick="{{d.go}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #111827">
+                    <img src="{{d.img}}" alt="" width="40" height="40" style="width: 40px; height: 40px; object-fit: contain; flex: none; border-radius: 6px; background: #FFFFFF; border: 1px solid #EEF0F3">
+                    <span style="display: flex; flex-direction: column; min-width: 0"><span style="font-weight: 600; color: #0F6B5C; overflow-wrap: anywhere">{{d.name}}</span><span style="font-size: 12px; color: #4B5563">{{d.sub}}</span></span>
+                  </a>
+                </td>
+                <td data-label="สถานะ" style="padding: 8px 12px"><span style="{{d.stStyle}}"><dc-import name="Icon" icon="{{d.stIcon}}" size="16" tone="{{d.stTone}}" hint-size="16px,16px"></dc-import>{{d.stText}}</span></td>
+                <td data-label="ประเภท" style="padding: 8px 12px">{{d.typeTh}}</td>
+                <td data-label="รุ่น" style="padding: 8px 20px 8px 12px">{{d.model}}</td>
+              </tr>
+            </sc-for>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isDetail}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <sc-if value="{{hasNote}}" hint-placeholder-val="{{ true }}">
+        <div role="note" style="{{noteStyle}}">
+          <dc-import name="Icon" icon="{{noteIcon}}" size="20" tone="{{noteTone}}" hint-size="20px,20px"></dc-import>
+          <div style="flex: 1 1 260px; min-width: 0">
+            <div style="font-weight: 600">{{noteTitle}}</div>
+            <div style="font-size: 13px; margin-top: 2px">{{noteText}}</div>
+          </div>
+          <sc-if value="{{hasRepair}}" hint-placeholder-val="{{ false }}">
+            <dc-import name="Button" icon="wrench" label="สร้างใบงานซ่อม" href="CreateWorkOrder.dc.html" save-keys="{{repairKeys}}" hint-size="150px,44px"></dc-import>
+          </sc-if>
+          <sc-if value="{{hasWoLink}}" hint-placeholder-val="{{ true }}">
+            <a href="WorkOrderDetail.dc.html" onPointerDown="{{goWo}}" onKeyDown="{{goWo}}" onClick="{{goWo}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none">{{woLinkLabel}}</a>
+          </sc-if>
+        </div>
+      </sc-if>
+      <dc-import name="Insights" view="device" site="{{insSite}}" device="{{insDevice}}" hint-size="100%,0px"></dc-import>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+        <section aria-label="รูปอุปกรณ์" style="flex: 1 1 280px; max-width: 420px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <img src="{{dv.img}}" alt="{{dv.model}}" style="width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #FFFFFF">
+          <div style="font-size: 12px; color: #4B5563">รูปสินค้าจริงจากผู้ผลิต (Huawei) · {{dv.model}}</div>
+        </section>
+        <section aria-labelledby="dv-info" style="flex: 999 1 420px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px">
+          <h2 id="dv-info" style="display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font-size: 16px"><dc-import name="Icon" icon="info" size="18" tone="muted" hint-size="18px,18px"></dc-import>ข้อมูลพื้นฐาน</h2>
+          <dl style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px 24px; margin: 0">
+            <sc-for list="{{info}}" as="r" hint-placeholder-count="8">
+              <div style="min-width: 0"><dt style="font-size: 12px; color: #4B5563">{{r.k}}</dt><dd style="{{r.style}}">{{r.v}}</dd></div>
+            </sc-for>
+          </dl>
+        </section>
+      </div>
+
+      <section aria-labelledby="dv-live" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 12px">
+          <h2 id="dv-live" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="gauge" size="18" tone="muted" hint-size="18px,18px"></dc-import>ค่าล่าสุด</h2>
+          <span style="font-size: 12px; color: #4B5563">{{readAt}}</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px">
+          <sc-for list="{{readings}}" as="x" hint-placeholder-count="6">
+            <div style="border: 1px solid #EEF0F3; border-radius: 10px; padding: 12px 14px; background: #FAFBFC">
+              <div style="font-size: 12px; color: #4B5563">{{x.label}}</div>
+              <div style="font-size: 20px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums">{{x.value}} <span style="font-size: 13px; font-weight: 500; color: #4B5563">{{x.unit}}</span></div>
+              <sc-if value="{{x.hasNote}}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; color: #4B5563; margin-top: 2px">{{x.note}}</div></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section aria-labelledby="dv-spec" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
+        <h2 id="dv-spec" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 16px 20px; border-bottom: 1px solid #E3E6EB"><dc-import name="Icon" icon="audit" size="18" tone="muted" hint-size="18px,18px"></dc-import>สเปกจากผู้ผลิต · {{dv.model}}</h2>
+        <table aria-label="{{specLabel}}" style="width: 100%; border-collapse: collapse; font-size: 14px">
+          <tbody>
+            <sc-for list="{{spec}}" as="s" hint-placeholder-count="8">
+              <tr style="border-top: 1px solid #EEF0F3"><th scope="row" style="text-align: left; font-weight: 500; color: #4B5563; padding: 10px 20px; width: 42%">{{s.k}}</th><td style="padding: 10px 20px 10px 0">{{s.v}}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <div style="padding: 12px 20px; border-top: 1px solid #EEF0F3; font-size: 13px; color: #4B5563">ที่มาของสเปก: <a href="{{dv.src}}" target="_blank" rel="noopener noreferrer" style="overflow-wrap: anywhere">{{srcLabel}}</a> · ค่าจริงอาจต่างตามรุ่นย่อยและประเทศ</div>
+      </section>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["list","detail"],"default":"list"},"site":{"editor":"text","default":"ฟาร์มโคราช 1"},"device":{"editor":"text","default":"INV-C03"},"zone":{"editor":"text","default":""},"onClearZone":{"editor":null},"onOpen":{"editor":null},"$preview":{"width":1100,"height":900}}'>
+// One catalog + one fleet for every page (DATA.md "Round 7"). Photos: official Huawei product images stored as artifact assets.
+var DV_CAT = {
+  'SUN2000-330KTL-H1': { type: 'inv', rated: 300, mppt: 6, vdc: [1080, 1150], eff: [98.7, 98.9], sw: 'V500R008C10SPC100', img: 'assets/41e93c32def52d9f398a10b9073f6479.png',
+    src: 'https://solar.huawei.com/en/products/SUN2000-330KTL-H1-H2/specs',
+    spec: [['กำลังไฟฟ้า AC พิกัด', '300 kW'], ['กำลังไฟฟ้าปรากฏสูงสุด', '330 kVA'], ['ประสิทธิภาพสูงสุด', '≥ 99.0%'], ['ประสิทธิภาพ European', '98.8%'], ['จำนวน MPPT', '6'], ['แรงดัน DC สูงสุด', '1,500 V'], ['แรงดันขาออก AC', '800 V · 3W + PE'], ['ระดับการป้องกัน', 'IP66'], ['ขนาด (ก × ส × ล)', '1,048 × 732 × 395 มม.'], ['น้ำหนัก', '≤ 112 กก.'], ['อุณหภูมิใช้งาน', '-25 ~ 60 °C']] },
+  'SUN2000-150K-MG0': { type: 'inv', rated: 150, mppt: 7, vdc: [610, 690], eff: [98.4, 98.7], sw: 'V300R023C10SPC110', img: 'assets/dd21ec9b9fe1404e4e4f04f1840920e4.png',
+    src: 'https://solar.huawei.com/en/products/sun2000-150k-mg0/specs/',
+    spec: [['กำลังไฟฟ้า AC พิกัด', '150 kW'], ['กำลังไฟฟ้าปรากฏสูงสุด', '165 kVA'], ['ประสิทธิภาพสูงสุด', '98.8% @480 V (98.6% @400 V)'], ['จำนวน MPPT', '7'], ['แรงดัน DC สูงสุด', '1,100 V'], ['ระดับการป้องกัน', 'IP66'], ['ขนาด (ก × ส × ล)', '1,000 × 710 × 395 มม.'], ['น้ำหนัก', '≤ 99 กก.']] },
+  'SUN2000-50KTL-M3': { type: 'inv', rated: 50, mppt: 4, vdc: [600, 680], eff: [98.2, 98.4], sw: 'V100R001C10SPC120', img: 'assets/b85e1bd822c720f342765da1e5a313f1.png',
+    src: 'https://solar.huawei.com/en/products/sun2000-50ktl-m3/specs/',
+    spec: [['กำลังไฟฟ้า AC พิกัด', '50 kW'], ['กำลังไฟฟ้าปรากฏสูงสุด', '55 kVA'], ['ประสิทธิภาพสูงสุด', '98.5%'], ['จำนวน MPPT', '4 (8 อินพุต)'], ['แรงดัน DC สูงสุด', '1,100 V'], ['ระดับการป้องกัน', 'IP66'], ['ขนาด (ก × ส × ล)', '640 × 530 × 270 มม.'], ['น้ำหนัก', '49 กก.'], ['อุณหภูมิใช้งาน', '-25 ~ 60 °C'], ['ฟังก์ชันป้องกัน', 'AFCI · PID recovery']] },
+  'SmartLogger3000A': { type: 'logger', sw: 'V300R023C10SPC311', img: 'assets/9299871acc42e50fe9a441c9690b489b.png',
+    src: 'https://solar.huawei.com/-/media/Solar/attachment/pdf/mea/datasheet/SmartLogger3000A.pdf',
+    spec: [['อุปกรณ์ที่เชื่อมได้สูงสุด', '80 เครื่อง'], ['พอร์ตเครือข่าย', 'WAN / LAN 10/100/1000 Mbps'], ['RS485', '3 พอร์ต'], ['การสื่อสารอื่น', 'MBUS · 4G'], ['อินพุต / เอาต์พุต', 'DI × 4 · DO × 2 · AI × 4'], ['โปรโตคอล', 'Modbus-TCP · IEC 60870-5-104'], ['ไฟเลี้ยง', '100–240 V AC หรือ 12/24 V DC'], ['การใช้ไฟ', '8 W (ทั่วไป)'], ['ขนาด (ก × ส × ล)', '225 × 160 × 44 มม.'], ['น้ำหนัก', '2 กก.'], ['ระดับการป้องกัน', 'IP20']] },
+  'DTSU666-H': { type: 'meter', sw: 'V100R001C01', img: 'assets/a3c6ac8aec2276bed52f1c9c05440862.png',
+    src: 'https://solar.huawei.com/en/products/dtsu666-h-100a/specs/',
+    spec: [['ชนิด', 'Smart Power Sensor 3 เฟส'], ['ระดับความแม่นยำ', 'Class 1'], ['แรงดัน / กระแส', '±0.5%'], ['กำลังไฟฟ้า / พลังงาน', '±1%'], ['การสื่อสาร', 'RS485 · Modbus-RTU'], ['การใช้ไฟ', '≤ 1 W'], ['อุณหภูมิใช้งาน', '-25 ~ 60 °C'], ['การติดตั้ง', 'ราง DIN'], ['การวัดกระแส', 'CT 250A/50mA']] }
+};
+var DV_TYPE = { inv: 'อินเวอร์เตอร์', meter: 'มิเตอร์ไฟฟ้า', logger: 'ดาต้าล็อกเกอร์' };
+// id, kWp, inverter model, zones (farms) or inverter count, installed, logger SN, IP octet, export share of PV, grid import today (kWh), disconnected / alarm device
+var DV_SITES = {
+  'ฟาร์มโคราช 1': { id: 'k1', kwp: 8400, model: 'SUN2000-330KTL-H1', zones: [['A', 6], ['B', 6], ['C', 5], ['D', 5]], inst: 'มี.ค. 2567', lsn: '1021A0160627', ip: 10, exp: 0.99, imp: 14, farm: true, alarm: 'INV-C03' },
+  'ฟาร์มโคราช 2': { id: 'k2', kwp: 6200, model: 'SUN2000-330KTL-H1', zones: [['A', 5], ['B', 5], ['C', 4], ['D', 4]], inst: 'ส.ค. 2567', ip: 11, exp: 0.99, imp: 11, farm: true },
+  'หลังคาโรงงานบางปู': { id: 'bp', kwp: 1150, model: 'SUN2000-150K-MG0', n: 7, inst: 'ก.พ. 2567', ip: 12, exp: 0, imp: 3180 },
+  'ลานจอดรถลพบุรี': { id: 'lb', kwp: 960, model: 'SUN2000-150K-MG0', n: 6, inst: 'มิ.ย. 2567', ip: 13, exp: 0.35, imp: 420 },
+  'สาขารังสิต': { id: 'rs', kwp: 420, model: 'SUN2000-50KTL-M3', n: 7, inst: 'ก.ค. 2566', ip: 14, exp: 0.1, imp: 610 },
+  'สาขาบางนา': { id: 'bn', kwp: 380, model: 'SUN2000-50KTL-M3', n: 6, inst: 'ก.ค. 2566', ip: 15, exp: 0.15, imp: 560, off: 'INV-04' },
+  'โรงงาน A ลำพูน': { id: 'lp', kwp: 2300, model: 'SUN2000-150K-MG0', n: 13, inst: 'พ.ค. 2567', ip: 16, exp: 0, imp: 5240 },
+  'หลังคาอาคาร A หัวหิน': { id: 'e1', kwp: 210, model: 'SUN2000-50KTL-M3', n: 4, inst: 'ก.ย. 2569', ip: 17, exp: 0.2, imp: 980 }
+};
+var DV_MONTHS = { 'ม.ค.': 1, 'ก.พ.': 2, 'มี.ค.': 3, 'เม.ย.': 4, 'พ.ค.': 5, 'มิ.ย.': 6, 'ก.ค.': 7, 'ส.ค.': 8, 'ก.ย.': 9, 'ต.ค.': 10, 'พ.ย.': 11, 'ธ.ค.': 12 };
+function dvHash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return Math.abs(h); }
+function dvJit(s, lo, hi) { return lo + (dvHash(s) % 1000) / 1000 * (hi - lo); }
+function dvDigits(s, n) { var x = String(dvHash(s)) + String(dvHash(s + '#')); return x.slice(0, n); }
+function dvNum(x, d) { return Number(x).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+// build the device list of one site (deterministic, so list and detail always agree)
+function dvFleet(siteName) {
+  var S = DV_SITES[siteName]; if (!S) return null;
+  var C = DV_CAT[S.model], out = [];
+  var lsn = S.lsn || ('1021A01' + dvDigits(S.id + 'L', 5)), logger = 'Logger-' + lsn;
+  var msn = 'AM0010210' + dvDigits(S.id + 'M', 5);
+  var invs = [];
+  if (S.zones) S.zones.forEach(function (z) { for (var i = 1; i <= z[1]; i++) invs.push({ name: 'INV-' + z[0] + (i < 10 ? '0' : '') + i, zone: 'โซน ' + z[0] }); });
+  else for (var i = 1; i <= S.n; i++) invs.push({ name: 'INV-' + (i < 10 ? '0' : '') + i, zone: '' });
+  out.push({ name: logger, type: 'logger', model: 'SmartLogger3000A', zone: S.farm ? 'ห้องควบคุม' : 'ตู้ควบคุม', sn: lsn, addr: '192.168.' + S.ip + '.10', link: 'FusionSolar (คลาวด์)' });
+  out.push({ name: 'Meter-' + msn, type: 'meter', model: 'DTSU666-H', zone: S.farm ? 'ตู้มิเตอร์ MV (ผ่าน CT + PT)' : 'ตู้ MDB', sn: msn, addr: 'COM3 · Address 1', link: logger });
+  var half = Math.ceil(invs.length / 2);
+  invs.forEach(function (v, k) {
+    out.push({ name: v.name, type: 'inv', model: S.model, zone: v.zone, sn: '6T21A00' + dvDigits(S.id + v.name, 5), addr: (k < half ? 'COM1' : 'COM2') + ' · Address ' + ((k < half ? k : k - half) + 1), link: logger });
+  });
+  out.forEach(function (d) { d.st = d.name === S.alarm ? 'alarm' : d.name === S.off ? 'off' : 'ok'; d.sw = DV_CAT[d.model].sw; d.img = DV_CAT[d.model].img; });
+  return { S: S, C: C, devices: out, logger: logger, nInv: invs.length };
+}
+// readings at 15 พ.ย. 2569 10:40 (clear morning; ~60% of DC peak, ~1.55 kWh/kWp so far)
+function dvRead(F, d) {
+  var S = F.S, C = DV_CAT[d.model];
+  var invKwp = S.kwp / F.nInv;
+  var m = S.inst.split(' '), months = (2569 - Number(m[1])) * 12 + (11 - DV_MONTHS[m[0]]) + 0.5;
+  if (d.type === 'inv') {
+    if (d.st === 'off') return { at: 'ข้อมูลล่าสุด 14 พ.ย. 2569 22:10 · ขาดการสื่อสารกับ ' + d.link, rows: [['กำลังไฟฟ้าขณะนี้', '—', 'kW'], ['พลังงานวันนี้', '—', 'kWh'], ['พลังงานสะสม', dvNum(invKwp * 1.35 * months / 12, 1), 'MWh', 'ถึง 14 พ.ย. 22:10'], ['ประสิทธิภาพ', '—', '%'], ['อุณหภูมิภายใน', '—', '°C'], ['อินพุต MPPT', '—', '']] };
+    var low = d.st === 'alarm' ? 0.93 : 1;
+    var p = Math.min(C.rated, invKwp * 0.6 * dvJit(d.name + 'p', 0.97, 1.03) * low);
+    var e = invKwp * 1.55 * dvJit(d.name + 'e', 0.97, 1.03) * low;
+    var v = Math.round(dvJit(d.name + 'v', C.vdc[0], C.vdc[1]));
+    var a = p * 1000 / v / C.mppt / 0.985;
+    return { at: 'อัปเดต 15 พ.ย. 2569 10:40 · ผ่าน ' + d.link, rows: [
+      ['กำลังไฟฟ้าขณะนี้', dvNum(p, 1), 'kW', 'พิกัด ' + C.rated + ' kW'], ['พลังงานวันนี้', dvNum(e, 0), 'kWh'], ['พลังงานสะสม', dvNum(invKwp * 1.35 * months / 12, 1), 'MWh', 'ตั้งแต่ ' + S.inst],
+      ['ประสิทธิภาพ', dvNum(dvJit(d.name + 'f', C.eff[0], C.eff[1]), 2), '%'], ['อุณหภูมิภายใน', dvNum(dvJit(d.name + 't', 41, 49), 1), '°C'],
+      ['อินพุต MPPT', C.mppt + ' × ' + dvNum(v) + ' V', '', d.st === 'alarm' ? 'MPPT 4: กระแสต่ำกว่าค่าเฉลี่ย 18%' : 'เฉลี่ย ' + dvNum(a, 1) + ' A ต่อ MPPT']] };
+  }
+  var sumP = 0, sumE = 0, online = 0;
+  F.devices.forEach(function (x) { if (x.type === 'inv' && x.st !== 'off') { var kk = x.st === 'alarm' ? 0.93 : 1; sumP += Math.min(DV_CAT[x.model].rated, invKwp * 0.6 * dvJit(x.name + 'p', 0.97, 1.03) * kk); sumE += invKwp * 1.55 * dvJit(x.name + 'e', 0.97, 1.03) * kk; } if (x.st !== 'off') online++; });
+  if (d.type === 'meter') {
+    var volts = S.farm ? ['22.08', '22.11', '22.05'] : ['230.4', '231.1', '229.8'];
+    var grid = S.exp > 0 ? 'ส่งออก ' + dvNum(sumP * Math.max(S.exp, 0.05), 1) : 'นำเข้า ' + dvNum(S.imp / 7, 1);
+    return { at: 'อัปเดต 15 พ.ย. 2569 10:40 · ผ่าน ' + d.link, rows: [
+      ['แรงดัน L1 / L2 / L3', volts.join(' / '), S.farm ? 'kV' : 'V', S.farm ? 'วัดผ่าน PT ที่ตู้มิเตอร์ MV' : 'ระบบ 400 V 3 เฟส'],
+      ['กำลังไฟฟ้าที่จุดเชื่อมต่อ', grid, 'kW', S.exp > 0 ? 'ผลิตเกินใช้ ส่งเข้ากริด' : 'โหลดอาคารมากกว่ากำลังผลิต'],
+      ['ซื้อไฟวันนี้ (นำเข้า)', dvNum(S.imp), 'kWh'], ['ขายไฟวันนี้ (ส่งออก)', dvNum(sumE * S.exp), 'kWh'],
+      ['ความถี่', '50.01', 'Hz'], ['ตัวประกอบกำลัง', S.farm ? '0.99' : '0.97', '']] };
+  }
+  return { at: 'อัปโหลดล่าสุด 15 พ.ย. 2569 10:35 · ทุก 5 นาที', rows: [
+    ['อุปกรณ์ที่เชื่อมอยู่', online + ' / ' + F.devices.length, 'เครื่อง', online < F.devices.length ? 'มีอุปกรณ์ขาดการเชื่อมต่อ' : 'ออนไลน์ครบ'],
+    ['LAN (หลัก)', 'เชื่อมต่อ', '', '1 Gbps · 192.168.' + S.ip + '.10'], ['4G (สำรอง)', 'พร้อมใช้', '', 'สัญญาณ -79 dBm'],
+    ['กำลังผลิตรวมขณะนี้', dvNum(sumP, 0), 'kW'], ['พลังงานรวมวันนี้', dvNum(sumE / (S.kwp >= 2000 ? 1000 : 1), S.kwp >= 2000 ? 2 : 0), S.kwp >= 2000 ? 'MWh' : 'kWh']] };
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { f: 'all' }; }
+  renderVals() {
+    var self = this, p = this.props, mode = p.mode ?? 'list', site = p.site ?? 'ฟาร์มโคราช 1';
+    var F = dvFleet(site);
+    var siteDN = site; try { var se = JSON.parse(window.sessionStorage.getItem('sc.siteEdits') || '{}') || {}; if (se[site] && se[site].name) siteDN = se[site].name; } catch (x) {}
+    var key = function (fn) { return function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { fn(window.sessionStorage); } catch (x) {} if (self.props.onOpen) self.props.onOpen(e); }; };
+    var stv = { ok: ['checkCircle', 'brand', 'ออนไลน์'], alarm: ['alert', 'warn', 'แจ้งเตือน'], off: ['wifiOff', 'danger', 'ขาดการเชื่อมต่อ'] };
+    var base = { insSite: site, insDevice: p.device ?? '', isEmpty: !F, isList: !!F && mode === 'list', isDetail: !!F && mode === 'detail', hasNote: false, noteStyle: '', noteIcon: 'info', noteTone: 'muted', noteTitle: '', noteText: '', hasWoLink: false, goWo: null, woLinkLabel: '', readAt: '', specLabel: 'สเปก', srcLabel: '', f: 'all', setF: null, nOk: 0, nAlarm: 0, nOff: 0, loggerName: '', tableLabel: 'อุปกรณ์', hasZone: false, zoneLabel: '', clearZone: null, hasRepair: false, repairKeys: '' };
+    if (!F) return Object.assign(base, { groups: [], info: [], readings: [], spec: [], dv: {}, chipOpts: [] });
+    var devs = F.devices;
+    var count = function (fn) { return devs.filter(fn).length; };
+    if (mode !== 'detail') {
+      var FILT = ['all', 'check', 'ok', 'inv', 'meter', 'logger'];
+      var f = FILT.indexOf(self.state.f) >= 0 ? self.state.f : 'all';
+      if (f === 'check' && !nAl) f = 'all';
+      var zq = String(p.zone ?? '').replace(/^โซน\s*/, '').trim();
+      var zoneOk = zq && F.S.zones && F.S.zones.some(function (z) { return z[0] === zq; });
+      // chip counts follow the zone filter (only that zone's inverters are listed)
+      var inZone = function (d) { return !zoneOk || (d.type === 'inv' && d.zone === 'โซน ' + zq); };
+      count = function (fn) { return devs.filter(function (d) { return inZone(d) && fn(d); }).length; };
+      var nAl = count(function (d) { return d.st !== 'ok'; });
+      var row = function (d) {
+        var s = stv[d.st];
+        return { name: d.name, sub: d.type === 'inv' ? (d.zone ? d.zone + ' · ' : '') + d.addr : d.zone, img: d.img, typeTh: DV_TYPE[d.type], model: d.model,
+          stIcon: s[0], stTone: s[1], stText: s[2], stStyle: 'display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: ' + (d.st === 'ok' ? '#0F6B5C' : d.st === 'alarm' ? '#8A3B06' : '#B42318'),
+          go: key(function (ss) { ss.setItem('sc.device', d.name); ss.setItem('sc.siteName', site); ss.setItem('sc.deviceFrom', 'SiteDetail'); }) };
+      };
+      var keep = function (d) {
+        if (zoneOk && !(d.type === 'inv' && d.zone === 'โซน ' + zq)) return false;
+        if (f === 'all') return true; if (f === 'check') return d.st !== 'ok'; if (f === 'ok') return d.st === 'ok';
+        return d.type === f;
+      };
+      var G = function (title, rows, warn) { return { title: title, rows: rows.map(row),
+        rowStyle: 'border-top: 1px solid ' + (warn ? '#F3D7B0' : '#EEF0F3') + '; background: ' + (warn ? '#FFF4E5' : '#FAFBFC'),
+        cellStyle: 'padding: 8px 20px; font-size: 12px; font-weight: 700; color: ' + (warn ? '#8A3B06' : '#374151') }; };
+      var groups = [];
+      var bad = devs.filter(function (d) { return d.st !== 'ok' && keep(d); });
+      if (bad.length) groups.push(G('ต้องตรวจ · ' + bad.length + ' เครื่อง', bad, true));
+      var okOnly = function (d) { return d.st === 'ok' && keep(d); };
+      var sys = devs.filter(function (d) { return d.type !== 'inv' && okOnly(d); });
+      if (sys.length) groups.push(G('ระบบสื่อสารและมิเตอร์ · ' + sys.length + ' เครื่อง', sys));
+      if (F.S.zones) F.S.zones.forEach(function (z) {
+        var r = devs.filter(function (d) { return d.type === 'inv' && d.zone === 'โซน ' + z[0] && okOnly(d); });
+        if (r.length) groups.push(G('อินเวอร์เตอร์ · โซน ' + z[0] + ' · ' + r.length + ' เครื่อง', r));
+      });
+      else { var r2 = devs.filter(function (d) { return d.type === 'inv' && okOnly(d); }); if (r2.length) groups.push(G('อินเวอร์เตอร์ · ' + r2.length + ' เครื่อง', r2)); }
+      var opts = [{ id: 'all', label: 'ทั้งหมด', count: count(function () { return true; }) }];
+      if (nAl) opts.push({ id: 'check', label: 'ต้องตรวจ', count: nAl });
+      opts.push({ id: 'ok', label: 'ออนไลน์', count: count(function (d) { return d.st === 'ok'; }) }, { id: 'inv', label: 'อินเวอร์เตอร์', count: count(function (d) { return d.type === 'inv'; }) }, { id: 'meter', label: 'มิเตอร์', count: count(function (d) { return d.type === 'meter'; }) }, { id: 'logger', label: 'ล็อกเกอร์', count: count(function (d) { return d.type === 'logger'; }) });
+      return Object.assign(base, {
+        f: f, setF: function (id) { self.setState({ f: id }); },
+        chipOpts: opts,
+        nOk: count(function (d) { return d.st === 'ok'; }), nAlarm: count(function (d) { return d.st === 'alarm'; }), nOff: count(function (d) { return d.st === 'off'; }),
+        hasZone: !!zoneOk, zoneLabel: zoneOk ? 'อินเวอร์เตอร์โซน ' + zq : '', clearZone: function () { if (self.props.onClearZone) self.props.onClearZone(); },
+        loggerName: F.logger, tableLabel: 'อุปกรณ์ในไซต์ ' + site, groups: groups,
+        info: [], readings: [], spec: [], dv: {}
+      });
+    }
+    var want = p.device ?? '', d = devs.filter(function (x) { return x.name === want; })[0] || devs.filter(function (x) { return x.st !== 'ok'; })[0] || devs[2];
+    var C = DV_CAT[d.model], R = dvRead(F, d), s = stv[d.st];
+    // a repair job already created for this device (sc.createdWo, matched by device field or device name in the title) replaces "สร้างใบงานซ่อม"
+    var repWo = null; try { var wst = JSON.parse(window.sessionStorage.getItem('sc.woStat') || '{}') || {}; repWo = (JSON.parse(window.sessionStorage.getItem('sc.createdWo') || '[]') || []).filter(function (w) { return w && w.site === site && (w.device === d.name || String(w.title || '').indexOf(d.name) >= 0) && (wst[w.no] || w.st) !== 'done'; }).pop() || null; } catch (x) { repWo = null; }
+    var mono = 'margin: 2px 0 0; font-family: ui-monospace, monospace; font-size: 14px; overflow-wrap: anywhere', plain = 'margin: 2px 0 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere';
+    var info = [['ชื่ออุปกรณ์', d.name], ['ประเภท', DV_TYPE[d.type]], ['รุ่น', d.model], ['SN', d.sn, 1], ['เวอร์ชันซอฟต์แวร์', d.sw, 1], [d.type === 'logger' ? 'IP address' : 'การเชื่อมต่อ RS485', d.addr, 1],
+      ['เชื่อมกับ', d.link], ['ตำแหน่ง', (d.zone || 'ทั้งไซต์') + ' · ' + siteDN], ['ติดตั้ง', F.S.inst], ['สถานะ', s[2]]].map(function (x) { return { k: x[0], v: x[1], style: x[2] ? mono : plain }; });
+    var note = d.st === 'alarm' ? ['แจ้งเตือน: กระแสสตริง 4 ต่ำ', 'MPPT 4 ของ ' + d.name + ' ต่ำกว่าค่าเฉลี่ย 18% ตั้งแต่ 14 พ.ย. 15:10 · ตรงกับจุดร้อน (hotspot) 2 แผงในโซน C ที่กำลังตรวจตามใบงาน WO-1042', 'alert', 'warn', '#FFF4E5', '#F3D7B0', '#8A3B06']
+      : d.st === 'off' ? ['ขาดการเชื่อมต่อ', d.name + ' ไม่ส่งข้อมูลถึง ' + d.link + ' ตั้งแต่ 14 พ.ย. 2569 22:10 · ตรวจสาย RS485 (COM2) และไฟเลี้ยงที่ตู้ ถ้ายังไม่กลับมา ให้สร้างใบงานซ่อม', 'wifiOff', 'danger', '#FDECEA', '#F3C4BF', '#B42318'] : null;
+    return Object.assign(base, {
+      dv: { img: d.img, model: d.model, src: C.src, name: d.name, sn: d.sn },
+      info: info, readAt: R.at,
+      readings: R.rows.map(function (x) { return { label: x[0], value: x[1], unit: x[2], note: x[3] || '', hasNote: !!x[3] }; }),
+      spec: C.spec.map(function (x) { return { k: x[0], v: x[1] }; }), specLabel: 'สเปก ' + d.model,
+      srcLabel: C.src.replace(/^https:\/\//, ''),
+      hasNote: !!note, noteTitle: note ? note[0] : '', noteText: note ? note[1] : '', noteIcon: note ? note[2] : 'info', noteTone: note ? note[3] : 'muted',
+      noteStyle: note ? 'display: flex; flex-wrap: wrap; gap: 10px 12px; align-items: center; padding: 14px 16px; border-radius: 12px; background: ' + note[4] + '; border: 1px solid ' + note[5] + '; color: ' + note[6] : '',
+      hasWoLink: d.st === 'alarm' || !!repWo, woLinkLabel: 'เปิดใบงาน ' + (repWo ? repWo.no : 'WO-1042'),
+      goWo: key(function (ss) { ss.setItem('sc.wo', repWo ? repWo.no : 'WO-1042'); ss.setItem('sc.woFrom', 'DeviceDetail'); ss.setItem('sc.device', d.name); ss.setItem('sc.siteName', site); }),
+      hasRepair: d.st === 'off' && !repWo, repairKeys: 'sc.from=DeviceDetail|sc.siteName=' + site + '|sc.device=' + d.name + '|sc.woType=repair',
+      groups: [], chipOpts: []
+    });
+  }
+}
+</script>
+</body>
+</html>

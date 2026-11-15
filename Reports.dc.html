@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รายงาน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@media (max-width: 767px){
+.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}
+}
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button{font-family:inherit;cursor:pointer}
+.rp-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.rp-sel{display:none}
+@media (max-width: 767px){.rp-types{display:none !important}.rp-sel{display:block !important}}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="reports" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
+    <dc-import name="PageHeader" icon="report" title="รายงาน" subtitle="{{scopeText}}" actions="{{headActs}}" hint-size="100%,96px"></dc-import>
+
+    <section aria-labelledby="rp-type-h" style="display: flex; flex-direction: column; gap: 8px">
+      <h2 id="rp-type-h" style="margin: 0; font-size: 14px; color: #374151">ประเภทรายงาน</h2>
+      <select class="rp-sel" id="rp-type-sel" aria-labelledby="rp-type-h" value="{{type}}" onChange="{{pickSel}}" style="width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600; color: #111827">
+        <sc-for list="{{types}}" as="t" hint-placeholder-count="6"><option value="{{t.id}}">{{t.title}}</option></sc-for>
+      </select>
+      <div class="rp-types" role="group" aria-labelledby="rp-type-h">
+        <sc-for list="{{types}}" as="t" hint-placeholder-count="6">
+          <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="{{t.style}}">
+            <dc-import name="Icon" icon="{{t.icon}}" size="18" bg="{{t.iconBg}}" hint-size="32px,32px"></dc-import>
+            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left"><span style="font-size: 14px; font-weight: 700; color: #111827">{{t.title}}</span><span style="font-size: 12px; color: #4B5563; line-height: 1.4">{{t.desc}}</span></span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <dc-import name="DateRange" label="ช่วงเวลาของรายงาน" on-change="{{onRange}}" hint-size="100%,170px"></dc-import>
+
+    <div style="min-width: 0">
+      <dc-import name="FilterChips" label="ไซต์ในรายงาน" value="{{siteF}}" options="{{siteOpts}}" on-change="{{setSiteF}}" hint-size="100%,44px"></dc-import>
+    </div>
+
+    <sc-if value="{{showState}}" hint-placeholder-val="{{ false }}">
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+        <dc-import name="ListState" state="{{listState}}" unit="รายงาน" icon="report" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="รายงานจะเริ่มแสดงเมื่อมีไซต์และข้อมูลจาก inverter" on-retry="{{retry}}" hint-size="100%,260px"></dc-import>
+      </section>
+    </sc-if>
+    <sc-if value="{{showData}}" hint-placeholder-val="{{ true }}">
+      <h2 style="margin: 4px 0 0; font-size: 18px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline">{{typeTitle}}<span style="font-size: 13px; font-weight: 400; color: #4B5563">{{rangeText}}</span></h2>
+      <dc-import name="EnergyStats" view="report" report="{{type}}" org="{{org}}" site="{{siteF}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" compare="{{rCompare}}" range-label="{{rShort}}" hint-size="100%,1100px"></dc-import>
+      <sc-if value="{{isEnergy}}" hint-placeholder-val="{{ false }}">
+        <a href="EnergyValue.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none">ดูความคุ้มค่าการล้างและสมมติฐานที่หน้าพลังงานและผลตอบแทน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
+      </sc-if>
+    </sc-if>
+  </div>
+</main>
+  <dc-import name="Flash" page="Reports.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading","error"],"default":"ready"},"$preview":{"width":1440,"height":1400}}'>
+// ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
+var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
+var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+var SCR_PRESETS = [['d7', '7 วัน'], ['d30', '30 วัน'], ['m3', '3 เดือน'], ['m6', '6 เดือน'], ['m12', '12 เดือน'], ['ytd', 'ปีนี้'], ['ly', 'ปีที่แล้ว'], ['custom', 'กำหนดเอง']];
+function scrDay(iso) { var p = String(iso || '').split('-'); if (p.length < 3) return NaN; var d = Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5); return isNaN(d) ? NaN : d; }
+function scrIso(d) { var x = new Date(d * 864e5); return x.getUTCFullYear() + '-' + ('0' + (x.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + x.getUTCDate()).slice(-2); }
+function scrTh(d, short) { var x = new Date(d * 864e5), y = x.getUTCFullYear() + 543; return x.getUTCDate() + ' ' + SCR_MN[x.getUTCMonth()] + ' ' + (short ? String(y).slice(-2) : y); }
+function scrPresetRange(p) {
+  var T = SCR_TODAY, ms = function (n) { return Math.round(Date.UTC(2026, 10 - n + 1, 1) / 864e5); };
+  if (p === 'd7') return [T - 6, T]; if (p === 'd30') return [T - 29, T]; if (p === 'm3') return [ms(3), T]; if (p === 'm6') return [ms(6), T];
+  if (p === 'ytd') return [Math.round(Date.UTC(2026, 0, 1) / 864e5), T]; if (p === 'ly') return [Math.round(Date.UTC(2025, 0, 1) / 864e5), Math.round(Date.UTC(2025, 11, 31) / 864e5)];
+  return [ms(12), T];
+}
+function scrGroups(len) { return [['day', 'รายวัน', len <= 62, 'ช่วงยาวเกิน 62 วัน'], ['week', 'รายสัปดาห์', len >= 7 && len <= 366, len < 7 ? 'ช่วงสั้นกว่า 7 วัน' : 'ช่วงยาวเกิน 1 ปี'], ['month', 'รายเดือน', len >= 28, 'ช่วงสั้นกว่า 1 เดือน'], ['quarter', 'รายไตรมาส', len >= 89, 'ช่วงสั้นกว่า 3 เดือน'], ['year', 'รายปี', len >= 300, 'ช่วงสั้นกว่า 1 ปี']]; }
+function scrDefaultGroup(len) { return len <= 31 ? 'day' : len <= 62 ? 'week' : 'month'; }
+function scrResolve(raw) {
+  var r = {}; try { r = typeof raw === 'string' ? (JSON.parse(raw || '{}') || {}) : (raw || {}); } catch (e) { r = {}; }
+  var preset = SCR_PRESETS.some(function (x) { return x[0] === r.preset; }) ? r.preset : 'm12', a, b, clamped = false;
+  if (preset === 'custom') { a = scrDay(r.from); b = scrDay(r.to); if (isNaN(a) || isNaN(b) || a > b) { preset = 'm12'; } }
+  if (preset !== 'custom') { var pr = scrPresetRange(preset); a = pr[0]; b = pr[1]; }
+  if (a < SCR_START) { a = SCR_START; clamped = true; } if (b > SCR_TODAY) { b = SCR_TODAY; clamped = true; } if (a > b) a = b;
+  if (b - a > 1095) { a = b - 1095; clamped = true; }
+  var len = b - a + 1, g = r.group, okG = scrGroups(len).filter(function (x) { return x[0] === g && x[2]; })[0]; if (!okG) g = scrDefaultGroup(len);
+  var pname = SCR_PRESETS.filter(function (x) { return x[0] === preset; })[0][1];
+  var pa = a - len, pb = a - 1, cmpOk = pa >= SCR_START;
+  return { preset: preset, from: a, to: b, fromIso: scrIso(a), toIso: scrIso(b), len: len, group: g, groupLabel: scrGroups(len).filter(function (x) { return x[0] === g; })[0][1],
+    compare: !!r.compare && cmpOk, compareAsked: !!r.compare, compareOk: cmpOk, prevFrom: pa, prevTo: pb, clamped: clamped,
+    label: (preset === 'custom' ? '' : pname + ' · ') + scrTh(a) + ' – ' + scrTh(b), short: preset === 'custom' ? scrTh(a, 1) + ' – ' + scrTh(b, 1) : pname,
+    prevLabel: scrTh(pa) + ' – ' + scrTh(pb) };
+}
+function scrBuckets(a, b, g) {
+  var out = [], d = a, guard = 0;
+  while (d <= b && guard++ < 2000) {
+    var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), e, lab;
+    if (g === 'day') { e = d; lab = x.getUTCDate() + ' ' + SCR_MN[m]; }
+    else if (g === 'week') { var wd = (x.getUTCDay() + 6) % 7; e = Math.min(b, d - wd + 6); var xe = new Date(e * 864e5); lab = x.getUTCDate() + (xe.getUTCMonth() !== m ? ' ' + SCR_MN[m] : '') + '–' + xe.getUTCDate() + ' ' + SCR_MN[xe.getUTCMonth()]; }
+    else if (g === 'month') { e = Math.round(Date.UTC(y, m + 1, 0) / 864e5); lab = SCR_MN[m] + ' ' + String(y + 543).slice(-2); if (x.getUTCDate() !== 1 || e > b) lab = x.getUTCDate() + '–' + new Date(Math.min(e, b) * 864e5).getUTCDate() + ' ' + lab; } // part of a month (e.g. 1–15 พ.ย. 69 month-to-date) says so
+    else if (g === 'quarter') { var q = Math.floor(m / 3); e = Math.round(Date.UTC(y, q * 3 + 3, 0) / 864e5); lab = 'ไตรมาส ' + (q + 1) + '/' + String(y + 543).slice(-2); }
+    else { e = Math.round(Date.UTC(y, 12, 0) / 864e5); lab = String(y + 543); }
+    e = Math.min(e, b); out.push({ s: d, e: e, label: lab }); d = e + 1;
+  }
+  return out;
+}
+function scrRead() { try { return window.sessionStorage.getItem('sc.range') || ''; } catch (e) { return ''; } }
+// ---- end sc.range resolver ----
+
+var RP_TYPES = [
+  ['clean', 'สรุปงานล้าง', 'ใบงานที่ปิด ตรงเวลา แผงที่ล้าง', 'broom'],
+  ['energy', 'พลังงานและผลตอบแทน', 'ไฟที่ผลิต มูลค่า PR ฝุ่น', 'energy'],
+  ['carbon', 'คาร์บอนและสิ่งแวดล้อม', 'CO2 เครดิต ต้นไม้ ถ่านหิน', 'leaf'],
+  ['tech', 'ประสิทธิภาพทีมช่าง', 'งานต่อช่าง ตรงเวลา ส่งกลับ', 'users'],
+  ['device', 'อุปกรณ์และการแจ้งเตือน', 'ความพร้อมใช้ เหตุขัดข้อง MTTR', 'plug'],
+  ['sla', 'SLA รายไซต์', 'ล้างตรงรอบ ล่าช้า ครบรอบถัดไป', 'calendar']
+];
+var RP_SITES = { a: [['ฟาร์มโคราช 1', 'k1'], ['ฟาร์มโคราช 2', 'k2'], ['หลังคาโรงงานบางปู', 'bp'], ['ลานจอดรถลพบุรี', 'lb']], b: [['สาขารังสิต', 'rs'], ['สาขาบางนา', 'bn']], c: [['โรงงาน A ลำพูน', 'lp']], d: [], e: [['หลังคาอาคาร A หัวหิน', 'e1']] };
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = {}; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.site', 'sc.siteEdits', 'sc.woStat', 'sc.woAssign', 'sc.createdWo', 'sc.range', 'sc.reportType', 'sc.rates'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), retried: false });
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var org = SS('sc.org') || 'a'; if (!RP_SITES[org]) org = 'a';
+    var sites = RP_SITES[org];
+    var EDITS = (function () { try { return JSON.parse(SS('sc.siteEdits') || '{}') || {}; } catch (e) { return {}; } })();
+    var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    var stored = SS('sc.site'), one = sites.filter(function (r) { return r[0] === stored; })[0] || null;
+    if (stored && stored !== 'all' && !one) { try { window.sessionStorage.setItem('sc.site', 'all'); } catch (e) {} } // site from another org
+    var siteF = one ? one[1] : 'all';
+    var type = SS('sc.reportType'); if (!RP_TYPES.some(function (t) { return t[0] === type; })) type = 'clean';
+    var T = RP_TYPES.filter(function (t) { return t[0] === type; })[0];
+    var rr = scrResolve(scrRead());
+    var propState = self.props.state ?? 'ready';
+    if (self._lastPropState !== undefined && self._lastPropState !== propState && self.state.retried) { setTimeout(function () { self.setState({ retried: false }); }, 0); }
+    self._lastPropState = propState;
+    var st = self.state.retried && self._retriedFor === propState ? 'ready' : propState;
+    var listState = st !== 'ready' ? st : (sites.length ? 'ready' : 'empty');
+    var siteLabel = one ? DN(one[0]) : 'ทุกไซต์';
+    var exportAs = function (kind, ext) { return function () {
+      var fname = 'รายงาน-' + T[1].replace(/\s+/g, '') + '-' + rr.fromIso + '_' + rr.toIso + '.' + ext;
+      try { var ss = window.sessionStorage; ss.setItem('sc.flash', 'กำลังเตรียมไฟล์ ' + kind + ' · ' + T[1] + ' · ' + rr.label + ' · ' + siteLabel + ' · ' + fname); ss.setItem('sc.flashAt', String(Date.now())); ss.setItem('sc.flashTo', 'Reports.dc.html'); } catch (e) {}
+      self.setState({ sync: Date.now() }); }; };
+    var card = function (on) { return 'display: flex; align-items: flex-start; gap: 10px; min-height: 64px; padding: 12px 14px; border-radius: 12px; font-family: inherit; cursor: pointer; text-align: left; background: ' + (on ? '#F0F7F5; border: 2px solid #0F6B5C' : '#FFFFFF; border: 1px solid #E3E6EB'); };
+    return {
+      headActs: [{ label: 'Excel', icon: 'download', variant: 'secondary', onPress: exportAs('Excel', 'xlsx'), disabled: listState !== 'ready' }, { label: 'PDF', icon: 'download', variant: 'secondary', onPress: exportAs('PDF', 'pdf'), disabled: listState !== 'ready' }, { label: 'CSV', icon: 'download', variant: 'secondary', onPress: exportAs('CSV', 'csv'), disabled: listState !== 'ready' }],
+      isEnergy: type === 'energy',
+      pickSel: function (e) { var v = e.target.value; try { window.sessionStorage.setItem('sc.reportType', v); } catch (x) {} self.setState({ sync: Date.now() }); },
+      types: RP_TYPES.map(function (t) { var on = t[0] === type; return { id: t[0], title: t[1], desc: t[2], icon: t[3], iconBg: on ? 'brand' : 'gray', on: on, style: card(on),
+        pick: function () { try { window.sessionStorage.setItem('sc.reportType', t[0]); } catch (e) {} self.setState({ sync: Date.now() }); } }; }),
+      type: type, typeTitle: T[1], rangeText: rr.label + ' · ' + siteLabel + (rr.compare ? ' · เทียบช่วงก่อนหน้า' : ''),
+      onRange: function () { self.setState({ sync: Date.now() }); },
+      org: org, rFrom: rr.fromIso, rTo: rr.toIso, rGroup: rr.group, rCompare: rr.compareAsked ? 'true' : 'false', rShort: rr.short,
+      isLoading: st === 'loading', listState: listState, showState: listState !== 'ready', showData: listState === 'ready',
+      retry: function () { self._retriedFor = propState; self.setState({ retried: true }); },
+      siteF: siteF, siteOpts: [{ id: 'all', label: 'ทุกไซต์' }].concat(sites.map(function (r) { return { id: r[1], label: DN(r[0]) }; })),
+      setSiteF: function (id) { var r = sites.filter(function (x) { return x[1] === id; })[0]; try { window.sessionStorage.setItem('sc.site', r ? r[0] : 'all'); } catch (e) {} self.setState({ sync: Date.now() }); },
+      scopeText: (one ? DN(one[0]) : (org === 'c' ? 'ไซต์ที่คุณได้รับสิทธิ์ (ดูอย่างเดียว)' : 'ทุกไซต์')) + ' · ' + rr.label
+    };
+  }
+}
+</script>
+</body>
+</html>

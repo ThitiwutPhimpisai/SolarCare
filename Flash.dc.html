@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ข้อความสำเร็จ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div role="status" aria-live="polite" style="{{wrapStyle}}">
+  <sc-if value="{{show}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px; border-radius: 10px; background: #E7F2EF; border: 1px solid #B9DACF; color: #0A4F44; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(17,24,39,0.16); pointer-events: auto">
+      <dc-import name="Icon" icon="checkCircle" size="18" tone="brand" hint-size="18px,18px"></dc-import>
+      <span style="flex: 1; min-width: 0">{{text}}</span>
+      <button type="button" onClick="{{close}}" aria-label="ปิดข้อความ" style="flex: none; width: 36px; height: 36px; border: 0; border-radius: 8px; background: transparent; color: #0A4F44; font-size: 18px; cursor: pointer">×</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"sample":{"editor":"text","default":"สร้างใบงาน WO-1044 แล้ว · แจ้งธนากร ว. แล้ว"},"page":{"editor":"text","default":""},"$preview":{"width":560,"height":64}}'>
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { closedAt: 0 };
+  }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.flash', 'sc.flashAt', 'sc.flashTo'].map(function (k) { return s.getItem(k); }).join('|') + (Date.now() - Number(s.getItem('sc.flashAt') || 0) < 10000 ? '|live' : ''); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now() }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() {
+    // Read storage on every render: Play restores saved page state, so values read once in the constructor go stale.
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var at = Number(SS('sc.flashAt') || 0);
+    var here = !this.props.page || SS('sc.flashTo') === this.props.page;
+    var live = here && Date.now() - at < 10000 && at > (this.state.closedAt || 0) ? SS('sc.flash') : '';
+    var text = live || (this.props.sample ?? '');
+    // floating toast: takes no layout space, so an empty Flash never leaves a gap in the page
+    var floating = !(this.props.sample ?? '');
+    if (live && !this._hideT) { this._hideT = setTimeout(function () { self._hideT = null; self.setState({ closedAt: Date.now() }); }, 8000); }
+    return { show: !!text, text: text,
+      wrapStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif;" + (floating ? ' position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 2000; width: min(560px, calc(100vw - 32px)); pointer-events: none' : ''), close: function () { try { window.sessionStorage.removeItem('sc.flashAt'); } catch (e) {} self.setState({ closedAt: Date.now() }); } };
+  }
+}
+</script>
+</body>
+</html>

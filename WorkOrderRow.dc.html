@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>แถวใบงาน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+@media (max-width: 767px){
+.wor{position:relative;align-items:flex-start !important}
+.wor-main{padding-right:104px}
+.wor-side{flex:1 1 100% !important;justify-content:flex-start !important;margin-left:0 !important;gap:4px 10px !important;padding-left:54px}
+.wor-due{flex-direction:row !important;align-items:center !important;gap:6px !important}
+.wor-pill{position:absolute;top:10px;right:12px}
+.wor[data-sel="true"]{background:#FFFFFF !important;box-shadow:none !important}
+.wor[data-sel="true"][data-card="true"]{border:1px solid #E3E6EB !important}
+}
+</style>
+</helmet>
+<sc-if value="{{isLink}}" hint-placeholder-val="{{ true }}">
+  <a href="{{href}}" onPointerDown="{{save}}" onPointerUp="{{save}}" onKeyDown="{{save}}" onClick="{{save}}" aria-current="{{current}}" class="wor" data-sel="{{selOnly}}" data-card="{{isCard}}" style="{{boxStyle}}">
+    <dc-import name="Icon" icon="workorder" size="{{iconSize}}" bg="{{iconBg}}" hint-size="40px,40px"></dc-import>
+    <span class="wor-main" style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px"><span style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{no}}</span><sc-if value="{{isNew}}" hint-placeholder-val="{{ false }}"><span style="padding: 1px 8px; border-radius: 999px; background: #0F6B5C; color: #FFFFFF; font-size: 12px; font-weight: 600">ใหม่</span></sc-if></span>
+      <span style="{{titleStyle}}">{{title}}</span>
+      <span style="font-size: 12px; color: #4B5563">{{meta}}</span>
+    </span>
+    <span class="wor-side" style="{{sideStyle}}">
+      <sc-if value="{{hasAssignee}}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #374151"><sc-if value="{{hasAv}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{av}}" size="24" hint-size="24px,24px"></dc-import></sc-if>{{assignee}}</span></sc-if>
+      <span class="wor-due" style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; color: #4B5563"><span>กำหนด {{due}}</span><sc-if value="{{hasOverdue}}" hint-placeholder-val="{{ false }}"><span style="font-weight: 600; color: #B42318">เลยกำหนด {{overdue}}</span></sc-if></span>
+      <span class="wor-pill"><dc-import name="StatusPill" kind="wo" value="{{status}}" hint-size="110px,26px"></dc-import></span>
+    </span>
+  </a>
+</sc-if>
+<sc-if value="{{isButton}}" hint-placeholder-val="{{ false }}">
+  <button type="button" onClick="{{press}}" aria-pressed="{{pressed}}" class="wor" data-sel="{{selOnly}}" data-card="{{isCard}}" style="{{boxStyle}}">
+    <dc-import name="Icon" icon="workorder" size="{{iconSize}}" bg="{{iconBg}}" hint-size="40px,40px"></dc-import>
+    <span class="wor-main" style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px"><span style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{no}}</span><sc-if value="{{isNew}}" hint-placeholder-val="{{ false }}"><span style="padding: 1px 8px; border-radius: 999px; background: #0F6B5C; color: #FFFFFF; font-size: 12px; font-weight: 600">ใหม่</span></sc-if></span>
+      <span style="{{titleStyle}}">{{title}}</span>
+      <span style="font-size: 12px; color: #4B5563">{{meta}}</span>
+    </span>
+    <span class="wor-side" style="{{sideStyle}}">
+      <sc-if value="{{hasAssignee}}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #374151"><sc-if value="{{hasAv}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{av}}" size="24" hint-size="24px,24px"></dc-import></sc-if>{{assignee}}</span></sc-if>
+      <span class="wor-due" style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; color: #4B5563"><span>กำหนด {{due}}</span><sc-if value="{{hasOverdue}}" hint-placeholder-val="{{ false }}"><span style="font-weight: 600; color: #B42318">เลยกำหนด {{overdue}}</span></sc-if></span>
+      <span class="wor-pill"><dc-import name="StatusPill" kind="wo" value="{{status}}" hint-size="110px,26px"></dc-import></span>
+    </span>
+  </button>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"no":{"editor":"text","default":"WO-1043"},"title":{"editor":"text","default":"ล้างแผงรอบไตรมาส โซน A–C"},"site":{"editor":"text","default":"ฟาร์มโคราช 1"},"due":{"editor":"text","default":"18 พ.ย. 2569"},"status":{"editor":"enum","options":["new","todo","doing","review","returned","paused","done"],"default":"review"},"assignee":{"editor":"text","default":"ธนากร ว."},"av":{"editor":"text","default":"thanakorn"},"overdue":{"editor":"text","default":""},"isNew":{"editor":"boolean","default":false},"href":{"editor":"text","default":""},"saveKeys":{"editor":"text","default":""},"selected":{"editor":"boolean","default":false},"compact":{"editor":"boolean","default":false},"variant":{"editor":"enum","options":["row","card"],"default":"row"},"onPress":{"editor":null},"$preview":{"width":760,"height":90}}'>
+// One row for a work order wherever a WO list appears (WorkOrders, SiteDetail, Schedule agenda).
+// With href it is a link that writes saveKeys ("k=v|k=v") before navigating; without href it is a button that calls onPress.
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props, self = this;
+    var v = function (k, d) { var x = p[k]; return x == null ? (d == null ? '' : d) : x; };
+    var compact = !!v('compact', false), card = v('variant', 'row') === 'card', sel = !!v('selected', false), isNew = !!v('isNew', false);
+    var href = v('href');
+    var bg = isNew ? '#E7F2EF' : (sel ? '#F0F7F5' : '#FFFFFF');
+    var edge = sel || isNew ? 'box-shadow: inset 3px 0 0 #0F6B5C;' : '';
+    var box = "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; box-sizing: border-box; width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; text-align: left; text-decoration: none; color: #111827; cursor: pointer; font-size: 14px; " +
+      'min-height: ' + (compact ? 56 : 64) + 'px; padding: ' + (compact ? '10px 16px' : '12px 20px') + '; background: ' + bg + '; ' + edge +
+      (card ? 'border: ' + (sel ? '2px solid #0F6B5C' : '1px solid #E3E6EB') + '; border-radius: 12px;' : 'border: 0; border-top: 1px solid #EEF0F3; border-radius: 0;');
+    var who = v('assignee');
+    var site = v('site');
+    var meta = compact && who ? [site, who].filter(Boolean).join(' · ') : site;
+    var save = function (e) {
+      if (e && e.type === 'keydown' && e.key !== 'Enter') return;
+      if (e && e.type === 'pointerdown') { if (e.button !== 0) return; if (e.pointerType === 'touch') { self._td = { x: e.clientX, y: e.clientY }; return; } } if (e && e.type === 'pointerup') { var td = self._td; self._td = null; if (!td || Math.abs(e.clientX - td.x) + Math.abs(e.clientY - td.y) > 10) return; } 
+      var st = self.props.saveKeys;
+      if (st) { try { String(st).split('|').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) window.sessionStorage.setItem(kv.slice(0, i).trim(), kv.slice(i + 1)); }); } catch (x) {} }
+      if (self.props.onPress) { var now = Date.now(); if (self._pressAt && now - self._pressAt < 900) return; self._pressAt = now; self.props.onPress(e); }
+    };
+    return {
+      isLink: !!href, isButton: !href, href: href, save: save,
+      press: function (e) { if (self.props.onPress) self.props.onPress(e); },
+      current: sel ? 'true' : undefined, pressed: sel ? 'true' : 'false',
+      boxStyle: box, selOnly: sel && !isNew ? 'true' : 'false', isCard: card ? 'true' : 'false',
+      iconSize: compact ? 16 : 20, iconBg: v('status') === 'done' ? 'gray' : 'brand',
+      no: v('no'), isNew: isNew, title: v('title'), meta: meta,
+      titleStyle: 'font-weight: 600; font-size: ' + (compact ? 14 : 15) + 'px; color: ' + (href || p.onPress ? '#0F6B5C' : '#111827'),
+      sideStyle: 'display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 16px; margin-left: auto',
+      hasAssignee: !compact && !!who, assignee: who, av: v('av'), hasAv: !!v('av'),
+      due: v('due', '—'), overdue: v('overdue'), hasOverdue: !!v('overdue'),
+      status: v('status', 'new')
+    };
+  }
+}
+</script>
+</body>
+</html>

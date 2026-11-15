@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รูปไซต์</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<img src="{{src}}" alt="{{alt}}" style="{{style}}">
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"site":{"editor":"enum","options":["k1","k2","bp","lb","rs","bn","lp","e1","hero","before","after","farmType","roofType","carportType"],"default":"k1"},"w":{"editor":"text","default":"64px"},"h":{"editor":"text","default":"40px"},"radius":{"editor":"int","default":6},"label":{"editor":"boolean","default":false},"$preview":{"width":160,"height":100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var B = {
+      farm: 'assets/2c530b4ad89427120b06abbde9c61350.jpg', farm2: 'assets/a4595656cbe0e6155d167e68453ee3c4.jpg',
+      roof: 'assets/a3a11e82976037bdfe3bc0fbb4f6b3cf.jpg', roof2: 'assets/778cfe04d11712d55b7178ab3262d43c.jpg', roof3: 'assets/09d140ccf9dcbc03c58ad6a4dc263674.jpg',
+      carport: 'assets/99a8cbcabbbae2276544263deda3703d.jpg', hero: 'assets/0589f45332f6b8e464ce9b76c0f2981b.jpg',
+      before: 'assets/5b4540777c19ece30a22a0d5cb6a5716.jpg', after: 'assets/1fb9753596defe23ed811354086079e1.jpg',
+      resort: 'assets/c9e2c4e8690ba001605abc0312d3a9ac.jpg', carport2: 'assets/d54c057eded0ba2a15933d035d82516b.jpg'
+    };
+    var S = {
+      k1: ['ฟาร์มโคราช 1', B.farm], k2: ['ฟาร์มโคราช 2', B.farm2], bp: ['หลังคาโรงงานบางปู', B.roof], lb: ['ลานจอดรถลพบุรี', B.carport],
+      rs: ['สาขารังสิต', B.roof2], bn: ['สาขาบางนา', B.carport2], lp: ['โรงงาน A ลำพูน', B.roof3], e1: ['หลังคาอาคาร A หัวหิน', B.resort],
+      hero: ['โซลาร์ฟาร์มยามเช้า', B.hero], before: ['แผงก่อนล้าง', B.before], after: ['แผงหลังล้าง', B.after],
+      farmType: ['โซลาร์ฟาร์ม', B.farm], roofType: ['หลังคา', B.roof], carportType: ['Carport', B.carport]
+    };
+    var p = this.props;
+    var s = S[p.site ?? 'k1'] || S.k1;
+    return {
+      src: s[1], alt: (p.label ?? false) ? s[0] : '',
+      style: 'display: block; flex: none; object-fit: cover; width: ' + (p.w ?? '64px') + '; height: ' + (p.h ?? '40px') + '; border-radius: ' + (p.radius ?? 6) + 'px'
+    };
+  }
+}
+</script>
+</body>
+</html>

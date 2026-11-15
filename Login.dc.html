@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>เข้าสู่ระบบ SolarCare</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@media (max-width: 767px){.lg-hero{min-height:160px !important;flex-basis:auto !important}.lg-copy{display:none !important}.lg-pad{padding:24px !important}}
+body{margin:0;background:#FFFFFF}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; min-height: 100vh; display: flex; flex-wrap: wrap">
+  <div class="lg-hero" style="flex: 1 1 520px; min-height: 280px; position: relative; overflow: hidden; background: #0A4F44">
+    <div aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 50%; height: 140vh; min-height: 100%; transform: translateY(-50%)"><dc-import name="SiteThumb" site="hero" w="100%" h="140vh" radius="0" hint-size="100%,100%"></dc-import></div>
+    <div class="lg-pad" style="position: relative; padding: 48px; color: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; height: 100%; box-sizing: border-box; gap: 32px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.25); display: flex; align-items: center; justify-content: center">
+          <dc-import name="Icon" icon="sun" size="22" tone="brand" hint-size="22px,22px"></dc-import>
+        </div>
+        <div style="font-size: 20px; font-weight: 700; text-shadow: 0 1px 6px rgba(0,0,0,0.5)">SolarCare</div>
+      </div>
+      <div class="lg-copy" style="max-width: 460px; background: rgba(10,47,40,0.82); padding: 20px 24px; border-radius: 12px">
+        <div style="font-size: 34px; font-weight: 700; line-height: 1.3">ดูแลแผงโซลาร์ทุกไซต์ ทุกองค์กร ในที่เดียว</div>
+        <ul style="list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 16px; line-height: 1.5"><li style="display: flex; align-items: center; gap: 10px"><dc-import name="Icon" icon="calendar" size="18" hint-size="18px,18px"></dc-import>วางรอบล้างทุกไซต์</li><li style="display: flex; align-items: center; gap: 10px"><dc-import name="Icon" icon="wrench" size="18" hint-size="18px,18px"></dc-import>มอบหมายช่าง</li><li style="display: flex; align-items: center; gap: 10px"><dc-import name="Icon" icon="camera" size="18" hint-size="18px,18px"></dc-import>ติดตามรูปก่อน/หลัง</li><li style="display: flex; align-items: center; gap: 10px"><dc-import name="Icon" icon="shield" size="18" hint-size="18px,18px"></dc-import>อนุมัติงานตามสิทธิ์ของแต่ละคน</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 1 1 480px; display: flex; align-items: center; justify-content: center; padding: 48px 24px; box-sizing: border-box">
+    <div style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 20px">
+      <div>
+        <h1 style="margin: 0; font-size: 24px">เข้าสู่ระบบ</h1>
+        <p style="margin: 6px 0 0; color: #4B5563; font-size: 14px">ใช้บัญชีเดียวสำหรับทุกองค์กรที่คุณเป็นสมาชิก</p>
+        <sc-if value="{{inviteMode}}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="margin-top: 12px; display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44; font-size: 13px"><dc-import name="Icon" icon="mail" size="18" hint-size="18px,18px"></dc-import>เข้าสู่ระบบเพื่อตอบรับคำเชิญจาก ริมทะเล รีสอร์ท · <a href="AcceptInvite.dc.html" onPointerDown="{{clearFrom}}" onKeyDown="{{clearFrom}}" onClick="{{clearFrom}}" style="font-weight: 600">กลับไปที่คำเชิญ</a></div>
+        </sc-if>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <dc-import name="Button" variant="secondary" full="{{true}}" label="ดำเนินการต่อด้วย Google" href="{{dest}}" save-keys="{{authKeys}}" hint-size="100%,44px"></dc-import>
+        <dc-import name="Button" variant="secondary" full="{{true}}" label="ดำเนินการต่อด้วย Microsoft (SSO องค์กร)" href="{{dest}}" save-keys="{{authKeys}}" hint-size="100%,44px"></dc-import>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; color: #4B5563; font-size: 13px">
+        <div style="flex: 1; height: 1px; background: #E3E6EB"></div>หรือใช้อีเมล<div style="flex: 1; height: 1px; background: #E3E6EB"></div>
+      </div>
+      <form aria-label="เข้าสู่ระบบด้วยอีเมล" data-submit="submit" onSubmit="{{submit}}" onKeyDown="{{formEnter}}" noValidate="{{true}}" style="display: flex; flex-direction: column; gap: 16px">
+        <button type="submit" tabIndex="-1" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); border: 0; padding: 0">ส่ง</button>
+        <sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FDECEA; color: #B42318; border: 1px solid #F3C4BF">{{errorText}}</div>
+        </sc-if>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="lg-email" style="font-size: 13px; font-weight: 600">อีเมล</label>
+          <input id="lg-email" type="email" name="email" autocomplete="email" inputmode="email" placeholder="{{emailHint}}" value="{{email}}" onChange="{{setEmail}}" aria-invalid="{{emailBad}}" aria-describedby="lg-email-err" style="{{emailStyle}}">
+          <sc-if value="{{emailBad}}" hint-placeholder-val="{{ false }}"><span id="lg-email-err" style="font-size: 12px; color: #B42318">กรอกอีเมล</span></sc-if>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between; align-items: center">
+            <label for="lg-pw" style="font-size: 13px; font-weight: 600">รหัสผ่าน</label>
+            <a href="ResetPassword.dc.html" onPointerDown="{{fromReset}}" onKeyDown="{{fromReset}}" onClick="{{fromReset}}" style="min-height: 32px; display: inline-flex; align-items: center; font-size: 13px; font-weight: 600; text-decoration: none">ลืมรหัสผ่าน?</a>
+          </div>
+          <input id="lg-pw" type="password" name="password" autocomplete="current-password" value="{{pw}}" onChange="{{setPw}}" aria-invalid="{{pwBad}}" aria-describedby="lg-pw-err" style="{{pwStyle}}">
+          <sc-if value="{{pwBad}}" hint-placeholder-val="{{ false }}"><span id="lg-pw-err" style="font-size: 12px; color: #B42318">กรอกรหัสผ่าน</span></sc-if>
+        </div>
+        <sc-if value="{{canGo}}" hint-placeholder-val="{{ true }}"><a id="lg-go" href="{{dest}}" onPointerDown="{{auth}}" onKeyDown="{{auth}}" onClick="{{auth}}" style="font-family: inherit; min-height: 44px; width: 100%; border-radius: 8px; border: 1px solid #0F6B5C; background: #0F6B5C; color: #FFFFFF; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none; box-sizing: border-box">เข้าสู่ระบบ</a></sc-if>
+        <sc-if value="{{cantGo}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{submit}}" style="font-family: inherit; min-height: 44px; width: 100%; border-radius: 8px; border: 1px solid #0F6B5C; background: #0F6B5C; color: #FFFFFF; font-size: 14px; font-weight: 600; cursor: pointer">เข้าสู่ระบบ</button></sc-if>
+      </form>
+      <p style="margin: 0; font-size: 13px; color: #4B5563; text-align: center">ยังไม่มีบัญชี? <a href="CreateOrg.dc.html" onPointerDown="{{fromLogin}}" onKeyDown="{{fromLogin}}" onClick="{{fromLogin}}">สร้างองค์กรใหม่</a> หรือเปิดลิงก์คำเชิญจากอีเมล</p>
+      <div style="display: flex; justify-content: center">
+        <button type="button" onClick="{{toggleDemo}}" aria-expanded="{{demoExp}}" aria-controls="lg-demo-panel" style="font-family: inherit; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #4B5563; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="{{demoIcon}}" size="16" hint-size="16px,16px"></dc-import>โหมดต้นแบบ · เลือกบัญชีตัวอย่าง</button>
+      </div>
+      <sc-if value="{{demoOpen}}" hint-placeholder-val="{{ false }}">
+      <section id="lg-demo-panel" aria-labelledby="lg-demo" style="border: 1px dashed #B54708; background: #FFF4E5; border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+        <div id="lg-demo" style="font-size: 13px; font-weight: 700; color: #8A3B06">ต้นแบบ: เลือกบัญชีตัวอย่างเพื่อดูแต่ละเส้นทาง</div>
+        <div role="group" aria-labelledby="lg-demo" style="display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{personas}}" as="p" hint-placeholder-count="3">
+            <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="{{p.style}}"><span style="{{p.dot}}"></span><span style="display: flex; flex-direction: column; text-align: left"><span style="font-weight: 600">{{p.name}}</span><span style="font-size: 12px; color: #4B5563">{{p.note}}</span></span></button>
+          </sc-for>
+        </div>
+        <div style="font-size: 12px; color: #4B5563">ระบบจริงพาไปหน้าที่ถูกต้องตามบัญชีเอง ส่วนนี้มีไว้ในต้นแบบเท่านั้น</div>
+      </section>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","invalid","locked"],"default":"ready"},"$preview":{"width":1440,"height":900}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { who: 'admin', email: 'natthaphat@siamsolar.example', pw: 'demo1234', tried: false, demo: false }; // prefilled so the prototype flows with one click
+  }
+  componentDidMount() {
+    var self = this;
+    var snap = function () { try { return String(window.sessionStorage.getItem('sc.from')); } catch (e) { return ''; } };
+    self._snap = snap(); self.setState({ tried: false, sync: Date.now() });
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync); self._iv = setInterval(self._sync, 400);
+  }
+  componentWillUnmount() { window.removeEventListener('storage', this._sync); clearInterval(this._iv); }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var P = [
+      { id: 'admin', name: 'ณัฐภัทร · ผู้ดูแลองค์กร', note: 'อยู่ 3 องค์กร → เลือกองค์กร', dest: 'SelectOrg.dc.html', email: 'natthaphat@siamsolar.example' },
+      { id: 'tech', name: 'ธนากร · ช่าง (CleanPro)', note: 'เป็นช่างใน 2 องค์กร → แอปช่าง', dest: 'TechMobile.dc.html', email: 'thanakorn@cleanpro.example' },
+      { id: 'platform', name: 'ทีม Qleen · ผู้ดูแลแพลตฟอร์ม', note: 'บัญชีทีมงาน → คอนโซลแพลตฟอร์ม', dest: 'PlatformOrgs.dc.html', email: 'support@qleen.example' }
+    ];
+    var cur = P.filter(function (p) { return p.id === self.state.who; })[0] || P[0];
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    // signing in from an invite returns to the invite (only the invited account, ณัฐภัทร, can answer it)
+    var inviteMode = SS('sc.from') === 'invite';
+    var dest = inviteMode && cur.id === 'admin' ? 'AcceptInvite.dc.html' : cur.dest;
+    var auth = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.authed', cur.id); ['sc.techView', 'sc.newAccount', 'sc.myName', 'sc.myEmail'].forEach(function (k) { ss.removeItem(k); }); } catch (x) {} }; // a new sign-in never keeps the manager's technician-preview lock
+    var st = self.state, mode = self.props.state ?? 'ready';
+    var emailBad = st.tried && !st.email.trim(), pwBad = st.tried && !st.pw;
+    var field = function (bad) { return 'min-height: 44px; padding: 0 12px; border: 1px solid ' + (bad ? '#B42318' : '#858D9B') + '; border-radius: 8px; font-size: 14px'; };
+    var fromLogin = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.from', 'login'); } catch (e) {} };
+    return (self._v = {
+      demoOpen: !!self.state.demo, demoExp: self.state.demo ? 'true' : 'false', demoIcon: self.state.demo ? 'chevronDown' : 'arrowRight',
+      toggleDemo: function () { self.setState({ demo: !self.state.demo }); },
+      // forms with 2+ fields and no submit button never submit on Enter; ask the form to submit itself
+      formEnter: function (e) { if (e.key !== 'Enter' || !e.target || e.target.tagName !== 'INPUT' || e.target.type === 'checkbox') return; e.preventDefault(); var name = e.currentTarget && e.currentTarget.getAttribute('data-submit'); var fn = self._v && self._v[name]; if (fn) fn(e); },
+      fromLogin: fromLogin,
+      fromReset: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss0 = window.sessionStorage; if (ss0.getItem('sc.from') !== 'invite') ss0.setItem('sc.from', 'login'); ss0.setItem('sc.loginEmail', String(self.state.email || '').trim()); } catch (x) {} }, // an invite in progress survives the reset
+      dest: dest, emailHint: cur.email, auth: auth, authKeys: 'sc.authed=' + cur.id + '|sc.techView=|sc.newAccount=|sc.myName=|sc.myEmail=', inviteMode: inviteMode,
+      clearFrom: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.removeItem('sc.from'); } catch (x) {} },
+      email: st.email, pw: st.pw,
+      setEmail: function (e) { self.setState({ email: e.target.value }); },
+      setPw: function (e) { self.setState({ pw: e.target.value }); },
+      emailBad: emailBad, pwBad: pwBad,
+      emailStyle: field(emailBad), pwStyle: field(pwBad),
+      hasError: mode !== 'ready', errorText: mode === 'locked' ? 'บัญชีถูกล็อกชั่วคราวหลังใส่รหัสผิด 5 ครั้ง ลองใหม่ใน 15 นาที หรือรีเซ็ตรหัสผ่าน' : 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
+      // valid form: the sign-in control is the real link the user clicks; Enter clicks that same link.
+      // invalid fields or the editor's invalid/locked states: a plain button that only shows the error.
+      canGo: mode === 'ready' && !!st.email.trim() && !!st.pw,
+      cantGo: !(mode === 'ready' && !!st.email.trim() && !!st.pw),
+      submit: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (mode !== 'ready' || !st.email.trim() || !st.pw) { self.setState({ tried: true }); return; }
+        var a = document.getElementById('lg-go'); if (a) (function (el) { ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function (t) { var E = t.indexOf('pointer') === 0 && window.PointerEvent ? window.PointerEvent : window.MouseEvent; el.dispatchEvent(new E(t, { bubbles: true, cancelable: true, view: window, button: 0 })); }); })(a);
+      },
+      personas: P.map(function (p) { var on = p.id === cur.id; return { name: p.name, note: p.note, on: on ? 'true' : 'false',
+        pick: function () { self.setState({ who: p.id, email: p.email, pw: 'demo1234', tried: false }); },
+        style: 'display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 10px;border-radius:8px;font-size:14px;color:#111827;border:1px solid ' + (on ? '#0F6B5C;background:#E7F2EF' : '#E3E6EB;background:#FFFFFF'),
+        dot: 'width:16px;height:16px;flex:none;border-radius:999px;box-sizing:border-box;border:' + (on ? '5px solid #0F6B5C' : '2px solid #9CA3AF') }; })
+    });
+  }
+}
+</script>
+</body>
+</html>

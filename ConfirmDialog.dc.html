@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>หน้าต่างยืนยัน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+  <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; position: fixed; inset: 0; z-index: 50; background: rgba(17,24,39,0.45); display: flex; align-items: center; justify-content: center; padding: 16px">
+    <div id="{{dlgId}}" role="dialog" aria-modal="true" aria-labelledby="cd-title" style="width: 100%; max-width: 460px; background: #FFFFFF; border-radius: 14px; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 20px 48px rgba(17,24,39,0.25)">
+      <div style="display: flex; align-items: center; gap: 12px"><dc-import name="Icon" icon="{{toneIcon}}" size="20" bg="{{toneBg}}" hint-size="36px,36px"></dc-import><h2 id="cd-title" style="margin: 0; font-size: 18px">{{title}}</h2></div>
+      <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6; white-space: pre-line">{{body}}</p>
+      <sc-if value="{{hasReason}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="cd-reason" style="font-size: 13px; font-weight: 600">{{reasonLabel}}</label>
+          <textarea id="cd-reason" autoFocus="{{true}}" rows="3" value="{{reason}}" onChange="{{setReason}}" placeholder="{{reasonPlaceholder}}" style="padding: 10px 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical"></textarea>
+        </div>
+      </sc-if>
+      <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px">
+        <button type="button" onClick="{{cancel}}" autoFocus="{{noReason}}" style="font-family: inherit; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; font-size: 14px; font-weight: 600; color: #374151; cursor: pointer">{{cancelLabel}}</button>
+        <button type="button" onClick="{{confirm}}" disabled="{{blocked}}" style="{{confirmStyle}}">{{confirmLabel}}</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"open":{"editor":"boolean","default":true},"title":{"editor":"text","default":"ส่งกลับให้ช่างแก้ไข"},"body":{"editor":"text","default":"ช่างจะได้รับแจ้งพร้อมเหตุผล และใบงานจะเปลี่ยนเป็น “ส่งกลับแก้ไข”"},"reasonLabel":{"editor":"text","default":"เหตุผล (บังคับ)"},"reasonPlaceholder":{"editor":"text","default":""},"confirmLabel":{"editor":"text","default":"ยืนยัน"},"cancelLabel":{"editor":"text","default":"ยกเลิก"},"tone":{"editor":"enum","options":["primary","danger","dark"],"default":"danger"},"onConfirm":{"editor":null},"onClose":{"editor":null},"$preview":{"width":600,"height":420}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { reason: '' }; this.dlgId = 'cd-' + Math.random().toString(36).slice(2, 9); }
+  componentDidMount() { this.syncOpen(); }
+  componentWillUnmount() { this.release(false); }
+  // While open: Esc closes from anywhere, Tab stays inside the dialog; on close focus goes back to what opened it
+  syncOpen() {
+    var self = this, open = !!(this.props.open == null ? true : this.props.open);
+    if (open && !this._onKey) {
+      this._returnTo = document.activeElement;
+      this._onKey = function (e) {
+        var dlg = document.getElementById(self.dlgId);
+        if (!dlg) return;
+        if (e.key === 'Escape') { e.preventDefault(); self.closeNow(); return; }
+        if (e.key !== 'Tab') return;
+        var f = Array.prototype.slice.call(dlg.querySelectorAll('button:not([disabled]), textarea, input, select, a[href]'));
+        if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        else if (!dlg.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      };
+      window.addEventListener('keydown', this._onKey);
+    } else if (!open && this._onKey) {
+      this.release(true);
+    }
+  }
+  release(restore) {
+    if (this._onKey) window.removeEventListener('keydown', this._onKey);
+    this._onKey = null;
+    var t = this._returnTo; this._returnTo = null;
+    if (restore && t && t.focus) setTimeout(function () { try { t.focus(); } catch (e) {} }, 0);
+  }
+  closeNow() { this.setState({ reason: '' }); this.release(true); if (this.props.onClose) this.props.onClose(); }
+  renderVals() {
+    var self = this, p = this.props;
+    setTimeout(function () { self.syncOpen(); }, 0);
+    var v = function (k, d) { var x = p[k]; return x == null ? d : x; };
+    var hasReason = !!v('reasonLabel', 'เหตุผล (บังคับ)');
+    var blocked = hasReason && !this.state.reason.trim();
+    var tones = { primary: '#0F6B5C', danger: '#B42318', dark: '#111827' };
+    var close = function () { self.closeNow(); };
+    return {
+      open: !!v('open', true), title: v('title', ''), body: v('body', ''),
+      hasReason: hasReason, noReason: !hasReason, reasonLabel: v('reasonLabel', ''), reasonPlaceholder: v('reasonPlaceholder', ''),
+      reason: this.state.reason, setReason: function (e) { self.setState({ reason: e.target.value }); },
+      cancelLabel: v('cancelLabel', 'ยกเลิก'), confirmLabel: v('confirmLabel', 'ยืนยัน'), blocked: blocked,
+      toneIcon: v('tone', 'danger') === 'danger' ? 'alert' : 'info', toneBg: v('tone', 'danger') === 'danger' ? 'danger' : (v('tone', 'danger') === 'dark' ? 'gray' : 'brand'),
+      confirmStyle: 'font-family: inherit; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 0; font-size: 14px; font-weight: 600; color: #FFFFFF; cursor: pointer; background: ' + (tones[v('tone', 'danger')] || tones.danger) + (blocked ? '; opacity: 0.45; cursor: not-allowed' : ''),
+      cancel: close,
+      dlgId: this.dlgId,
+      confirm: function () { if (blocked) return; var r = self.state.reason; self.setState({ reason: '' }); self.release(true); if (p.onConfirm) p.onConfirm(r); }
+    };
+  }
+}
+</script>
+</body>
+</html>

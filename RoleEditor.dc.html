@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>สร้าง Custom Role</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="roles" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" back-label="Role &amp; สิทธิ์" back-href="Roles.dc.html" icon="shield" title="{{pageTitle}}" hint-size="100%,76px"></dc-import>
+
+    <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
+      <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
+        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>สร้างหรือแก้ Custom Role ได้เฉพาะ Org Owner และ Org Admin</h2>
+        <p style="margin: 0; font-size: 14px; color: #374151">คุณเป็น {{youRole}} ใน {{orgName}} · ดูสิทธิ์ของแต่ละ Role ได้ที่หน้า Role &amp; สิทธิ์</p>
+        <dc-import name="Button" icon="arrowLeft" label="กลับไปหน้า Role &amp; สิทธิ์" variant="secondary" href="Roles.dc.html" hint-size="200px,44px"></dc-import>
+      </section>
+    </sc-if>
+    <sc-if value="{{canManage}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section style="flex: 999 1 600px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="re-name" style="font-size: 13px; font-weight: 600">ชื่อ Role</label>
+            <input id="re-name" value="{{roleName}}" onChange="{{setName}}" placeholder="เช่น หัวหน้าทีมช่าง" aria-invalid="{{nameBad}}" aria-describedby="re-name-err" style="{{nameStyle}}">
+            <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><div id="re-name-err" role="alert" style="font-size: 12px; color: #B42318">{{nameErr}}</div></sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="re-base" style="font-size: 13px; font-weight: 600">เริ่มจากแม่แบบ</label>
+            <select id="re-base" value="{{base}}" onChange="{{setBase}}" style="min-height: 44px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF; font-family: inherit"><sc-for list="{{baseOpts}}" as="b" hint-placeholder-count="5"><option value="{{b.v}}">{{b.t}}</option></sc-for></select>
+            <span style="font-size: 12px; color: #4B5563">{{baseNote}}</span>
+          </div>
+        </div>
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 8px">ระดับของ Role</legend>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+            <sc-for list="{{levels}}" as="l" hint-placeholder-count="2">
+              <button onClick="{{l.pick}}" aria-pressed="{{l.on}}" style="{{l.style}}"><span style="font-weight: 700">{{l.label}}</span><span style="font-size: 12px; color: #4B5563">{{l.desc}}</span></button>
+            </sc-for>
+          </div>
+        </fieldset>
+
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+          <fieldset style="border: 1px solid #E3E6EB; border-radius: 10px; margin: 0; padding: 4px 16px 8px">
+            <legend style="font-size: 13px; font-weight: 700; color: #0F6B5C; padding: 0 6px">{{g.title}}</legend>
+            <sc-for list="{{g.items}}" as="it" hint-placeholder-count="3">
+              <label style="{{it.rowStyle}}">
+                <input type="checkbox" checked="{{it.on}}" disabled="{{it.off}}" onChange="{{it.toggle}}" style="width: 20px; height: 20px; accent-color: #0F6B5C; flex: none">
+                <span style="flex: 1">{{it.label}}</span>
+                <code style="font-size: 12px; color: #4B5563">{{it.key}}</code>
+              </label>
+            </sc-for>
+          </fieldset>
+        </sc-for>
+      </section>
+
+      <aside style="flex: 1 1 340px; display: flex; flex-direction: column; gap: 16px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="checkCircle" size="18" tone="brand" hint-size="18px,18px"></dc-import>สรุป</h2>
+          <div style="font-size: 32px; font-weight: 700">{{count}} <span style="font-size: 14px; font-weight: 500; color: #4B5563">สิทธิ์</span></div>
+          <div style="font-size: 13px; color: #374151; line-height: 1.6">{{levelNote}}</div>
+          <sc-if value="{{warnSelf}}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FFF4E5; color: #8A3B06; line-height: 1.5">มีทั้ง wo.update และ wo.approve — คนเดียวกันจะอนุมัติงานที่ตัวเองทำได้ ระบบจะบล็อกการอนุมัติงานของตนเองอัตโนมัติ</div>
+          </sc-if>
+          <div style="font-size: 12px; color: #4B5563">สิทธิ์โอนความเป็นเจ้าของและลบองค์กร ให้ Custom Role ไม่ได้</div>
+        </section>
+        <div style="display: flex; gap: 8px">
+          <div style="flex: 1"><dc-import name="Button" label="ยกเลิก" href="Roles.dc.html" variant="secondary" full="{{true}}" hint-size="100%,44px"></dc-import></div>
+          <div style="flex: 1"><sc-if value="{{canSave}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" label="บันทึก Role" href="Roles.dc.html" save-keys="{{saveStore}}" on-press="{{saveRole}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if><sc-if value="{{cantSave}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" label="บันทึก Role" on-press="{{trySave}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if></div>
+        </div>
+      </aside>
+    </div>
+    </sc-if>
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { forKey: '', roleName: '', level: 'site', on: {}, base: 'none', tried: false }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.roleMode', 'sc.roleCopy', 'sc.createdName', 'sc.owner', 'sc.customRoles'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), saved: false, forKey: '', tried: false }); // fresh render + clear a restored save message: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this, st = self.state;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var orgId = SS('sc.org') || 'a';
+    var dOwner = true; try { dOwner = !(JSON.parse(SS('sc.owner') || '{}') || {}).d; } catch (e) {}
+    var ORG = { a: ['สยามโซลาร์ฟาร์ม จำกัด', 'Org Admin'], b: ['กรีนมาร์ท รีเทล', 'Site Manager'], c: ['นิคมฯ เหนือ', 'Viewer'], d: [SS('sc.createdName') || 'ไร่ทองโซลาร์', dOwner ? 'Org Owner' : 'Org Admin'], e: ['ริมทะเล รีสอร์ท', 'Site Manager'] }[orgId] || ['สยามโซลาร์ฟาร์ม จำกัด', 'Org Admin'];
+    // templates = the columns of the Roles matrix (same keys as DATA.md)
+    var ALL = ['org.read', 'org.update', 'site.read', 'site.create', 'asset.update', 'wo.read', 'wo.assign', 'wo.update', 'wo.approve', 'report.read', 'report.export', 'member.invite', 'member.role', 'role.manage', 'audit.read'];
+    var TPL = {
+      none: [],
+      'Org Owner': ALL, 'Org Admin': ALL,
+      'Site Manager': ['org.read', 'site.read', 'asset.update', 'wo.read', 'wo.assign', 'wo.update', 'wo.approve', 'report.read', 'report.export', 'member.invite', 'member.role'],
+      Technician: ['org.read', 'site.read', 'wo.read', 'wo.update'],
+      Viewer: ['org.read', 'site.read', 'wo.read', 'report.read'],
+      'หัวหน้าทีมช่าง': ['org.read', 'site.read', 'wo.read', 'wo.assign', 'wo.update', 'wo.approve', 'report.read']
+    };
+    // Custom Roles saved earlier (sc.customRoles) are templates too, and editable
+    var savedRoles = []; try { savedRoles = (JSON.parse(SS('sc.customRoles') || '[]') || []).filter(function (r) { return r && r.org === orgId && r.name; }); } catch (e) { savedRoles = []; }
+    savedRoles.forEach(function (r) { TPL[r.name] = Object.keys(r.perms || {}).filter(function (k) { return r.perms[k] && r.perms[k] !== '-'; }); });
+    var toOn = function (list) { var o = {}; list.forEach(function (k) { o[k] = true; }); return o; };
+    var roleMode = SS('sc.roleMode') || 'new';
+    var src = TPL[SS('sc.roleCopy')] ? SS('sc.roleCopy') : 'Site Manager';
+    var key = roleMode + '|' + (roleMode === 'copy' ? src : '');
+    // a new visit (mode / source changed) starts from the mode's defaults: new = blank, copy = the chosen role, edit = the custom role
+    var leadSaved = savedRoles.filter(function (r) { return r.lead; })[0];
+    var editName = roleMode === 'edit' && TPL[SS('sc.roleCopy')] && ['Org Owner', 'Org Admin', 'Site Manager', 'Technician', 'Viewer'].indexOf(SS('sc.roleCopy')) < 0 ? SS('sc.roleCopy') : (leadSaved ? leadSaved.name : 'หัวหน้าทีมช่าง');
+    if (roleMode === 'edit') key = 'edit|' + editName;
+    var savedEd = savedRoles.filter(function (r) { return r.name === editName; })[0];
+    var init = roleMode === 'edit' ? { roleName: editName, level: savedEd && Object.keys(savedEd.perms || {}).some(function (k) { return savedEd.perms[k] === 'O'; }) ? 'org' : 'site', base: editName, on: toOn(TPL[editName]) }
+      : roleMode === 'copy' ? { roleName: 'สำเนา ' + src, level: (src === 'Org Owner' || src === 'Org Admin') ? 'org' : 'site', base: src, on: toOn(TPL[src]) }
+      : { roleName: '', level: 'site', base: 'none', on: {} };
+    var s = st.forKey === key ? st : Object.assign({}, st, init, { tried: false });
+    var setS = function (patch) { self.setState(Object.assign({ forKey: key, roleName: s.roleName, level: s.level, base: s.base, on: s.on }, patch)); };
+    var canManage = ORG[1] === 'Org Owner' || ORG[1] === 'Org Admin';
+    // one permission list (keys + labels) shared with Roles.dc.html / DATA.md; these only exist at org level
+    var orgOnly = { 'org.update': 1, 'site.create': 1, 'role.manage': 1, 'audit.read': 1 };
+    var groups = [
+      ['องค์กร', [['ดูข้อมูลองค์กร', 'org.read'], ['แก้ไขการตั้งค่าองค์กร', 'org.update']]],
+      ['ไซต์ & อุปกรณ์', [['ดูไซต์', 'site.read'], ['สร้าง / ลบไซต์', 'site.create'], ['แก้ไขข้อมูลไซต์ / แผง / อินเวอร์เตอร์', 'asset.update']]],
+      ['ใบงาน', [['ดูใบงาน', 'wo.read'], ['สร้าง / มอบหมายใบงาน', 'wo.assign'], ['อัปเดตผล / แนบรูป', 'wo.update'], ['อนุมัติปิดงาน', 'wo.approve']]],
+      ['รายงาน', [['ดูรายงาน', 'report.read'], ['ส่งออก PDF / Excel', 'report.export']]],
+      ['สมาชิก & สิทธิ์', [['เชิญสมาชิก', 'member.invite'], ['กำหนด Role', 'member.role'], ['สร้าง Custom Role', 'role.manage'], ['ดู Audit log', 'audit.read']]]
+    ];
+    var isSite = s.level === 'site';
+    var count = Object.keys(s.on).filter(function (k) { return s.on[k] && !(isSite && orgOnly[k]); }).length;
+    var lv = [['site', 'ระดับไซต์', 'มอบให้รายไซต์ผ่าน SiteAssignment'], ['org', 'ระดับองค์กร', 'มีผลทุกไซต์ในองค์กร']];
+    // edit mode changes a role people already hold; new/copy starts with nobody on it
+    var modeNote = roleMode === 'edit' ? 'มีผลกับสมาชิกที่ถือ Role นี้' : 'ยังไม่มีสมาชิกได้รับ Role นี้';
+    var nm = String(s.roleName || '').trim();
+    var taken = ['Org Owner', 'Org Admin', 'Site Manager', 'Technician', 'Viewer'].concat(roleMode === 'edit' || leadSaved ? [] : ['หัวหน้าทีมช่าง']).concat(savedRoles.map(function (r) { return r.name; }).filter(function (n) { return roleMode !== 'edit' || n !== editName; })).indexOf(nm) >= 0;
+    var nameOk = !!nm && !taken && count > 0;
+    var nameBad = s.tried && !nameOk;
+    var saveStore = 'sc.flash=บันทึก Role “' + nm + '” แล้ว · ' + modeNote + (roleMode === 'edit' ? '' : ' มอบได้ที่หน้าสมาชิก');
+    return {
+      pageTitle: ({ edit: 'แก้ไข ' + editName, copy: 'ทำสำเนา ' + src })[roleMode] || 'สร้าง Custom Role',
+      blocked: !canManage, canManage: canManage, youRole: ORG[1], orgName: ORG[0],
+      saveStore: saveStore,
+      saveRole: function () {
+        if (!nameOk) return;
+        var perms = {}; ALL.forEach(function (k) { perms[k] = s.on[k] && !(isSite && orgOnly[k]) ? (isSite ? 'S' : 'O') : '-'; });
+        var list = savedRoles.slice(); try { list = JSON.parse(SS('sc.customRoles') || '[]') || []; } catch (e) { list = []; }
+        var oldName = roleMode === 'edit' ? editName : nm;
+        list = list.filter(function (r) { return !(r && r.org === orgId && (r.name === oldName || r.name === nm)); });
+        var isLead = roleMode === 'edit' && (editName === 'หัวหน้าทีมช่าง' || !!(savedEd && savedEd.lead));
+        var entry = { org: orgId, name: nm, base: s.base === 'none' ? '' : s.base, perms: perms, created: roleMode === 'edit' ? !!(savedEd && savedEd.created) : true };
+        if (isLead) entry.lead = true;
+        list.push(entry);
+        try { window.sessionStorage.setItem('sc.customRoles', JSON.stringify(list)); } catch (e) {}
+        // a renamed custom role keeps its members: rewrite cr:<old> references (the lead role is stored as 'lead' and needs no rewrite)
+        if (roleMode === 'edit' && !isLead && oldName !== nm) { try { var me = JSON.parse(SS('sc.memberEdits') || '{}') || {}; Object.keys(me).forEach(function (k) { if (k.split('|')[0] !== orgId) return; var rr = (me[k] || {}).roles || {}; Object.keys(rr).forEach(function (sid) { if (rr[sid] === 'cr:' + oldName) rr[sid] = 'cr:' + nm; }); }); window.sessionStorage.setItem('sc.memberEdits', JSON.stringify(me)); } catch (e) {} }
+      },
+      roleName: s.roleName, setName: function (e) { setS({ roleName: e.target.value }); },
+      nameBad: nameBad, nameErr: !nm ? 'ตั้งชื่อ Role ก่อนบันทึก' : taken ? 'มี Role ชื่อนี้อยู่แล้ว ตั้งชื่ออื่น' : 'เลือกอย่างน้อย 1 สิทธิ์',
+      nameStyle: 'min-height: 44px; padding: 0 12px; border-radius: 8px; font-size: 14px; border: 1px solid ' + (nameBad ? '#B42318' : '#858D9B'),
+      canSave: nameOk, cantSave: !nameOk, trySave: function () { setS({ tried: true }); },
+      base: s.base, baseOpts: [{ v: 'none', t: 'เริ่มจากศูนย์ (ไม่มีสิทธิ์)' }, { v: 'Technician', t: 'Technician' }, { v: 'Site Manager', t: 'Site Manager' }, { v: 'Viewer', t: 'Viewer' }, { v: 'Org Admin', t: 'Org Admin' }].concat(roleMode === 'edit' ? [{ v: editName, t: editName + ' (ค่าปัจจุบัน)' }] : []).concat(savedRoles.filter(function (r) { return roleMode !== 'edit' || r.name !== editName; }).map(function (r) { return { v: r.name, t: r.name + ' (Custom)' }; })),
+      baseNote: s.base === 'none' ? 'ติ๊กสิทธิ์เองด้านล่าง' : 'คัดลอกสิทธิ์จาก ' + s.base + ' แล้ว ปรับเพิ่ม/ลดได้',
+      setBase: function (e) { var b = e.target.value; setS({ base: b, on: toOn(TPL[b] || []), level: (b === 'Org Admin' || b === 'Org Owner') ? 'org' : s.level }); },
+      count: count, warnSelf: !!(s.on['wo.update'] && s.on['wo.approve']),
+      levelNote: isSite ? 'ผู้ได้รับ Role นี้จะมีสิทธิ์เฉพาะไซต์ที่ถูกมอบหมาย สิทธิ์ที่เป็นระดับองค์กรถูกปิดไว้' : 'ผู้ได้รับ Role นี้จะมีสิทธิ์ในทุกไซต์ขององค์กร รวมไซต์ที่เพิ่มในอนาคต',
+      levels: lv.map(function (l) { var on = l[0] === s.level; return { label: l[1], desc: l[2], on: on, pick: function () { setS({ level: l[0] }); },
+        style: 'min-height:68px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 14px;border-radius:10px;text-align:left;color:#111827;border:' + (on ? '2px solid #0F6B5C;background:#F0F7F5' : '1px solid #D5D9E0;background:#FFFFFF') }; }),
+      groups: groups.map(function (g) { return { title: g[0], items: g[1].map(function (it) { var off = isSite && !!orgOnly[it[1]];
+        return { label: it[0] + (off ? ' (ระดับองค์กรเท่านั้น)' : ''), key: it[1], on: !!s.on[it[1]] && !off, off: off,
+          rowStyle: 'display:flex;align-items:center;gap:12px;min-height:44px;font-size:14px;border-top:1px solid #EEF0F3;' + (off ? 'color:#4B5563' : 'cursor:pointer'),
+          toggle: function () { var o = Object.assign({}, s.on); o[it[1]] = !o[it[1]]; setS({ on: o }); } }; }) }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

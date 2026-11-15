@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>สมาชิก สมศรี ป.</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+@media (max-width: 767px){
+.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}
+}
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,select{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="members" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+
+    <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" icon="lock" icon-bg="gray" title="ดูข้อมูลสมาชิกไม่ได้" hint-size="100%,96px"></dc-import>
+      <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
+        <p style="margin: 0; font-size: 14px; color: #374151">บทบาท Viewer ใน {{orgName}} ดูรายชื่อและสิทธิ์ของสมาชิกไม่ได้</p>
+        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ Site Manager" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
+        <sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if>
+      </section>
+    </sc-if>
+    <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
+    <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" eyebrow="{{orgName}}" status-kind="member" status-value="{{statusValue}}" person="{{m.person}}" icon="user" title="{{m.name}}" subtitle="{{headSub}}" hint-size="100%,140px"></dc-import>
+    <sc-if value="{{readOnly}}" hint-placeholder-val="{{ false }}"><div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{readOnlyNote}}</div></sc-if>
+    <sc-if value="{{smNote}}" hint-placeholder-val="{{ false }}"><div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">คุณเป็น Site Manager · เปลี่ยน Role รายไซต์ได้เฉพาะ Technician / Viewer · Role ระดับองค์กรเปลี่ยนได้โดย Org Admin</div></sc-if>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
+          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="shield" size="18" tone="brand" hint-size="18px,18px"></dc-import>Role ระดับองค์กร</h2>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+            <label for="md-org" style="position: absolute; left: -9999px">Role ระดับองค์กร</label>
+            <select id="md-org" value="{{orgRole}}" onChange="{{setOrgRole}}" disabled="{{orgLocked}}" style="min-height: 44px; min-width: 240px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+              <option value="none">ไม่มี · ใช้สิทธิ์รายไซต์</option>
+              <option value="admin">Org Admin · ทุกไซต์</option>
+              <option value="owner" disabled>{{ownerOptText}}</option>
+            </select>
+            <span style="font-size: 13px; color: #4B5563">{{orgHint}}</span>
+          </div>
+          <sc-if value="{{canTransfer}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid #EEF0F3; padding-top: 12px">
+              <div style="flex: 1 1 280px"><div style="font-weight: 600">โอนความเป็นเจ้าของ (Org Owner)</div><div style="font-size: 13px; color: #4B5563">{{m.name}} จะเป็น Org Owner และคุณจะเป็น Org Admin แทน</div></div>
+              <dc-import name="Button" icon="key" label="{{transferLabel}}" variant="secondary" on-press="{{openTransfer}}" hint-size="180px,44px"></dc-import>
+            </div>
+          </sc-if>
+          <sc-if value="{{transferred}}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">{{m.name}} เป็น Org Owner แล้ว · คุณเป็น Org Admin · บันทึกใน Audit log</div>
+          </sc-if>
+        </section>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
+          <div style="padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
+            <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="site" size="18" tone="brand" hint-size="18px,18px"></dc-import>สิทธิ์รายไซต์</h2>
+            <sc-if value="{{isAdmin}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 4px 0 0; font-size: 13px; color: #8A3B06">Org Admin เข้าถึงทุกไซต์อยู่แล้ว สิทธิ์รายไซต์ด้านล่างจะไม่มีผล</p>
+            </sc-if>
+          </div>
+          <table class="rt" aria-label="สิทธิ์รายไซต์ของสมาชิก" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px">
+            <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">ไซต์</th><th scope="col" style="padding: 10px 12px; font-weight: 600">Role</th><th scope="col" style="padding: 10px 20px; font-weight: 600">ทำอะไรได้บ้าง</th></tr></thead>
+            <tbody>
+              <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+                <tr style="border-top: 1px solid #EEF0F3">
+                  <td class="rt-main" style="padding: 12px 20px"><div style="display: flex; align-items: center; gap: 10px"><dc-import name="SiteThumb" site="{{r.key}}" w="48px" h="32px" radius="{{5}}" hint-size="48px,32px"></dc-import>{{r.name}}</div></td>
+                  <td data-label="Role" style="padding: 8px 12px">
+                    <label for="{{r.id}}" style="position: absolute; left: -9999px">Role ที่ {{r.name}}</label>
+                    <select id="{{r.id}}" value="{{r.role}}" onChange="{{r.change}}" disabled="{{siteLocked}}" style="min-height: 44px; min-width: 190px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+                      <sc-for list="{{r.opts}}" as="op" hint-placeholder-count="5"><option value="{{op.v}}">{{op.t}}</option></sc-for>
+                    </select>
+                  </td>
+                  <td data-label="ทำอะไรได้บ้าง" style="padding: 8px 20px">
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px">
+                      <sc-for list="{{r.caps}}" as="c" hint-placeholder-count="3">
+                        <span style="padding: 2px 8px; border-radius: 6px; background: #F3F4F6; font-size: 12px; color: #374151">{{c}}</span>
+                      </sc-for>
+                    </div>
+                  </td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; padding: 14px 20px; border-top: 1px solid #E3E6EB">
+            <sc-if value="{{saved}}" hint-placeholder-val="{{ false }}">
+              <span role="status" style="margin-right: auto; font-size: 14px; font-weight: 600; color: #0A4F44">บันทึกแล้ว · แจ้ง {{m.name}} และบันทึกใน Audit log</span>
+            </sc-if>
+            <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+            <dc-import name="Button" label="ยกเลิก" variant="secondary" on-press="{{cancel}}" hint-size="90px,44px"></dc-import>
+            <dc-import name="Button" label="บันทึกการเปลี่ยนแปลง" on-press="{{save}}" hint-size="190px,44px"></dc-import>
+            </sc-if>
+          </div>
+        </section>
+
+        <sc-if value="{{canManage}}" hint-placeholder-val="{{ true }}">
+        <section style="background: #FFFFFF; border: 1px solid #F3C4BF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 16px; color: #B42318; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="alert" size="18" tone="danger" hint-size="18px,18px"></dc-import>การจัดการบัญชี</h2>
+          <sc-if value="{{notRemoved}}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between">
+            <div style="flex: 1 1 280px"><div style="font-weight: 600">ระงับการใช้งานชั่วคราว</div><div style="font-size: 13px; color: #4B5563">เข้าระบบไม่ได้จนกว่าจะเปิดใช้อีกครั้ง สิทธิ์เดิมยังเก็บไว้</div></div>
+            <dc-import name="Button" icon="pause" label="{{suspendLabel}}" variant="secondary" on-press="{{toggleSuspend}}" hint-size="160px,44px"></dc-import>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid #EEF0F3; padding-top: 12px">
+            <div style="flex: 1 1 280px"><div style="font-weight: 600">นำออกจากองค์กร</div><div style="font-size: 13px; color: #4B5563">ลบสิทธิ์ทั้งหมดใน{{orgName}} บัญชีในองค์กรอื่นไม่ได้รับผลกระทบ</div></div>
+            <dc-import name="Button" icon="trash" label="นำออกจากองค์กร" variant="danger" on-press="{{openRemove}}" hint-size="160px,44px"></dc-import>
+          </div>
+          </sc-if>
+          <sc-if value="{{removed}}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 14px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">นำ {{m.name}} ออกจากองค์กรแล้ว · <a href="{{backHref}}" style="font-weight: 600">{{backLong}}</a></div>
+          </sc-if>
+        </section>
+        </sc-if>
+        <sc-if value="{{canInvite}}" hint-placeholder-val="{{ false }}">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="mail" size="18" tone="brand" hint-size="18px,18px"></dc-import>คำเชิญ</h2>
+          <p style="margin: 0; font-size: 13px; color: #4B5563">{{inviteNote}}</p>
+          <sc-if value="{{inviteOpen}}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <dc-import name="Button" icon="sync" label="ส่งคำเชิญใหม่" variant="secondary" on-press="{{resend}}" hint-size="150px,44px"></dc-import>
+              <dc-import name="Button" icon="x" label="ยกเลิกคำเชิญ" variant="danger" on-press="{{cancelInvite}}" hint-size="150px,44px"></dc-import>
+            </div>
+            <sc-if value="{{canSimAccept}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px dashed #E3E6EB">
+                <dc-import name="Button" icon="checkCircle" label="จำลอง: ผู้รับเชิญตอบรับแล้ว" variant="ghost" on-press="{{simAccept}}" hint-size="220px,44px"></dc-import>
+                <span style="font-size: 12px; color: #4B5563">ใช้ทดสอบขั้นถัดไป เช่น โอนความเป็นเจ้าของ</span>
+              </div>
+            </sc-if>
+          </sc-if>
+          <sc-if value="{{inviteMsg}}" hint-placeholder-val="{{ false }}">
+            <div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">{{inviteMsg}} · <a href="{{backHref}}" style="font-weight: 600">{{backLong}}</a></div>
+          </sc-if>
+        </section>
+        </sc-if>
+        <sc-if value="{{cantManage}}" hint-placeholder-val="{{ false }}">
+          <div role="note" style="font-size: 13px; color: #4B5563; background: #F3F4F6; border-radius: 8px; padding: 10px 12px">{{manageNote}}</div>
+        </sc-if>
+      </div>
+
+      <aside style="flex: 1 1 340px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="clock" size="18" tone="muted" hint-size="18px,18px"></dc-import>กิจกรรมล่าสุด</h2>
+        <sc-for list="{{activity}}" as="a" hint-placeholder-count="4">
+          <div style="display: flex; gap: 10px; font-size: 13px; padding-top: 8px; border-top: 1px solid #EEF0F3">
+            <div style="width: 8px; height: 8px; border-radius: 999px; background: #0F6B5C; margin-top: 7px; flex: none"></div>
+            <div>{{a.what}}<div style="font-size: 12px; color: #4B5563">{{a.when}}</div></div>
+          </div>
+        </sc-for>
+        <sc-if value="{{canAudit}}" hint-placeholder-val="{{ true }}"><a href="AuditLog.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; min-height: 40px; display: flex; align-items: center">ดูทั้งหมดใน Audit log</a></sc-if>
+      </aside>
+    </div>
+    </sc-if>
+  </div>
+</main>
+
+<dc-import name="ConfirmDialog" open="{{dlg}}" title="{{dlgTitle}}" body="{{dlgBody}}" reason-label="" confirm-label="นำออกจากองค์กร" tone="danger" on-confirm="{{confirmRemove}}" on-close="{{closeDlg}}" hint-size="0px,0px"></dc-import>
+<dc-import name="ConfirmDialog" open="{{cDlg}}" title="{{cTitle}}" body="{{cBody}}" reason-label="" confirm-label="ยกเลิกคำเชิญ" tone="danger" on-confirm="{{confirmCancelInvite}}" on-close="{{closeCancel}}" hint-size="0px,0px"></dc-import>
+<dc-import name="ConfirmDialog" open="{{tDlg}}" title="{{tTitle}}" body="{{tBody}}" reason-label="" confirm-label="โอนความเป็นเจ้าของ" tone="danger" on-confirm="{{confirmTransfer}}" on-close="{{closeTransfer}}" hint-size="0px,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { edits: {}, orgRoleEdit: null, saved: false, suspended: false, dlg: false, removed: false, forKey: '', tDlg: false, transferred: '', requested: false, inviteMsg: '', inviteFor: '' }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.member', 'sc.createdName', 'sc.created', 'sc.createdInvites', 'sc.inviteCancel', 'sc.owner', 'sc.memberEdits', 'sc.removed', 'sc.customRoles', 'sc.siteEdits', 'sc.createdSites', 'sc.memberFrom', 'sc.siteName'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), dlg: false, saved: false, tDlg: false, transferred: '', requested: false, inviteMsg: '', inviteFor: '', cDlg: false }); // fresh render + close any dialog Play restored
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this, s = self.state;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    // same people and sites as Members.dc.html / DATA.md
+    var ORGS = {
+      a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', you: 'Org Admin', sites: [['k1', 'ฟาร์มโคราช 1', 'k1'], ['k2', 'ฟาร์มโคราช 2', 'k2'], ['bp', 'หลังคาโรงงานบางปู', 'bp'], ['lb', 'ลานจอดรถลพบุรี', 'lb']],
+        people: [
+          { person: 'somsri', name: 'สมศรี ป.', email: 'somsri@siamsolar.example', org: 'none', roles: { k1: 'sm', k2: 'sm' }, since: 'เข้าร่วม 3 มี.ค. 2569 · เข้าใช้ล่าสุด วันนี้ 09:12 น.', open: 2,
+            act: [['ได้รับ Site Manager ที่ฟาร์มโคราช 2 จาก วรวุฒิ ก.', '10 พ.ย. 2569'], ['มอบหมาย WO-1043 ให้ ธนากร ว.', '3 พ.ย. 2569'], ['อนุมัติปิด WO-1031 ที่ฟาร์มโคราช 1', '2 พ.ย. 2569']] },
+          { person: 'natthaphat', name: 'ณัฐภัทร ส.', email: 'natthaphat@siamsolar.example', org: 'admin', roles: {}, since: 'คุณ · เข้าร่วม 12 ม.ค. 2568', self: true, open: 0,
+            act: [['สร้าง WO-1042 ตรวจจุดร้อน (hotspot) ที่ฟาร์มโคราช 1', '14 พ.ย. 2569'], ['เชิญ ops@lopburi-parking.example เป็น Site Manager', '14 พ.ย. 2569'], ['มอบ Technician ที่หลังคาโรงงานบางปู ให้ ธนากร ว.', '12 พ.ย. 2569']] },
+          { person: 'worawut', name: 'วรวุฒิ ก.', email: 'worawut@siamsolar.example', org: 'owner', roles: {}, since: 'Org Owner · เข้าร่วม 5 ม.ค. 2568', open: 0,
+            act: [['เปลี่ยน สมศรี ป. เป็น Site Manager ที่ฟาร์มโคราช 2', '10 พ.ย. 2569'], ['อนุมัติปิด WO-1035', '5 พ.ย. 2569'], ['เพิ่มสิทธิ์ report.read ให้ Custom Role หัวหน้าทีมช่าง', '2 ต.ค. 2569']] },
+          { person: 'thanakorn', name: 'ธนากร ว.', email: 'thanakorn@cleanpro.example', org: 'none', roles: { k1: 'tech', k2: 'tech', bp: 'tech' }, since: 'ผู้รับเหมา CleanPro · เข้าใช้ล่าสุด วันนี้ 08:00 น.', open: 3,
+            act: [['ส่ง WO-1043 พร้อมรูป 24 รูป', '14 พ.ย. 2569 16:20 น.'], ['เริ่ม WO-1042', '14 พ.ย. 2569 15:50 น.']] },
+          { person: 'pimchanok', name: 'พิมพ์ชนก ร.', email: 'pimchanok@customer.example', org: 'none', roles: { k1: 'viewer' }, since: 'ลูกค้า · เข้าใช้ล่าสุด 12 พ.ย. 2569', open: 0, act: [['ดาวน์โหลดรายงานเดือน ต.ค.', '1 พ.ย. 2569']] },
+          { person: 'invited', name: 'รอยืนยัน', email: 'ops@lopburi-parking.example', org: 'none', roles: { lb: 'sm' }, since: 'คำเชิญหมดอายุใน 6 วัน', invited: true, open: 0, act: [] }
+        ] },
+      b: { name: 'กรีนมาร์ท รีเทล', you: 'Site Manager', sites: [['rs', 'สาขารังสิต', 'rs'], ['bn', 'สาขาบางนา', 'bn']],
+        people: [
+          { person: 'kitti', name: 'กิตติ พ.', email: 'kitti@greenmart.example', org: 'owner', roles: {}, since: 'Org Owner · เข้าร่วม 2 ก.พ. 2569', open: 0, act: [['เชิญ ณัฐภัทร ส. เป็น Site Manager', '2 ก.พ. 2569']] },
+          { person: 'natthaphat', name: 'ณัฐภัทร ส.', email: 'natthaphat@siamsolar.example', org: 'none', roles: { rs: 'sm', bn: 'sm' }, since: 'คุณ · เข้าร่วม 2 ก.พ. 2569', self: true, open: 0, act: [] },
+          { person: 'thanakorn', name: 'ธนากร ว.', email: 'thanakorn@cleanpro.example', org: 'none', roles: { rs: 'tech', bn: 'tech' }, since: 'ผู้รับเหมา CleanPro', open: 2, act: [['เริ่ม GM-0209', '12 พ.ย. 2569']] },
+          { person: 'pimchanok', name: 'พิมพ์ชนก ร.', email: 'pimchanok@customer.example', org: 'none', roles: { bn: 'viewer' }, since: 'ลูกค้า', open: 0, act: [] }
+        ] },
+      c: { name: 'นิคมฯ เหนือ', you: 'Viewer', sites: [['lp', 'โรงงาน A ลำพูน', 'lp']], ownerName: 'สุนทร ม. (Org Owner)',
+        people: [
+          { person: 'sunthorn', name: 'สุนทร ม.', email: 'sunthorn@nikom-north.example', org: 'owner', roles: {}, since: 'Org Owner', open: 0, act: [] },
+          { person: 'siriporn', name: 'ศิริพร ก.', email: 'siriporn@nikom-north.example', org: 'none', roles: { lp: 'sm' }, since: 'Site Manager โรงงาน A ลำพูน', open: 0, act: [] },
+          { person: 'natthaphat', name: 'ณัฐภัทร ส.', email: 'natthaphat@siamsolar.example', org: 'none', roles: { lp: 'viewer' }, since: 'คุณ', self: true, open: 0, act: [] }
+        ] },
+      d: { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', you: 'Org Owner', sites: [],
+        people: [
+          { person: 'natthaphat', name: 'ณัฐภัทร ส.', email: 'natthaphat@siamsolar.example', org: 'owner', roles: {}, since: 'คุณ · สร้างองค์กรวันนี้', self: true, open: 0, act: [['สร้างองค์กร ' + (SS('sc.createdName') || 'ไร่ทองโซลาร์'), 'วันนี้']] }
+        ] },
+      e: { name: 'ริมทะเล รีสอร์ท', you: 'Site Manager', sites: [['e1', 'หลังคาอาคาร A หัวหิน', 'e1']],
+        people: [
+          { person: 'arunee', name: 'อรุณี ท.', email: 'arunee@rimtalay.example', org: 'owner', roles: {}, since: 'Org Owner', open: 0, act: [['เชิญ ณัฐภัทร ส. เป็น Site Manager', '14 พ.ย. 2569']] },
+          { person: 'natthaphat', name: 'ณัฐภัทร ส.', email: 'natthaphat@siamsolar.example', org: 'none', roles: { e1: 'sm' }, since: 'คุณ · เพิ่งเข้าร่วม', self: true, open: 0, act: [] }
+        ] }
+    };
+    var J = function (k, d) { try { var v = JSON.parse(SS(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+    var setJ = function (k, v) { try { window.sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+    var orgId = SS('sc.org') || 'a';
+    var O = ORGS[orgId] || ORGS.a;
+    // sites: built-in + created in the prototype (sc.createdSites), names after edits (sc.siteEdits)
+    var siteEd = J('sc.siteEdits', {}) || {};
+    var TH = { farm: 'farmType', roof: 'roofType', carport: 'carportType' };
+    var extraSites = J('sc.createdSites', []).filter(function (c) { return c && c.org === orgId && c.name && !O.sites.some(function (x) { return x[1] === c.name; }); }).map(function (c, i) { return ['c' + i, c.name, TH[c.type] || 'roofType']; });
+    O = Object.assign({}, O, { sites: O.sites.concat(extraSites).map(function (x) { var ed = siteEd[x[1]]; return ed && ed.name ? [x[0], ed.name, x[2], x[1]] : [x[0], x[1], x[2], x[1]]; }) });
+    // custom roles from RoleEditor (sc.customRoles)
+    var customRoles = J('sc.customRoles', []).filter(function (r) { return r && r.org === orgId && r.name; });
+    var PERM_T = { 'site.read': 'ดูไซต์', 'wo.read': 'ดูใบงาน', 'wo.assign': 'มอบหมายใบงาน', 'wo.update': 'อัปเดตผล', 'wo.approve': 'อนุมัติปิดงาน', 'report.read': 'ดูรายงาน', 'report.export': 'ส่งออกรายงาน', 'member.invite': 'เชิญสมาชิก', 'asset.update': 'แก้ข้อมูลไซต์' };
+    // invites created in the prototype, ownership transfer (sc.owner) and cancelled invites
+    var createdInv = J('sc.createdInvites', []).filter(function (v) { return v && v.org === orgId && !O.people.some(function (p) { return p.email === v.email; }); });
+    var people = O.people.concat(createdInv.map(function (v) { return { person: 'invited', name: 'รอยืนยัน', email: v.email, org: v.role === 'Org Admin' ? 'admin' : 'none', roles: (function () { var r = {}; var RM = { 'Site Manager': 'sm', 'Technician': 'tech', 'Viewer': 'viewer' }; var st = O.sites.filter(function (x) { return x[3] === v.site || x[1] === v.site; })[0]; if (st && RM[v.role]) r[st[0]] = RM[v.role]; return r; })(), since: 'คำเชิญหมดอายุใน 7 วัน · ' + v.role + (v.site ? ' ที่ ' + v.site : ''), invited: true, open: 0, act: [] }; }));
+    var cancelledList = J('sc.inviteCancel', []);
+    var newOwner = (J('sc.owner', {}) || {})[orgId] || '';
+    var mEd = J('sc.memberEdits', {}) || {}, removedList = J('sc.removed', []);
+    people = people.map(function (p) { var e = mEd[orgId + '|' + p.email]; if (!e) return p; var q = Object.assign({}, p, { org: e.orgRole || p.org, roles: Object.assign({}, p.roles, e.roles || {}), status: e.status || '' }); if (p.invited && e.accepted) q = Object.assign(q, { invited: false, person: 'ini:' + p.email.replace(/[^a-zA-Z]/g, '').slice(0, 2), name: p.email.split('@')[0], since: 'ตอบรับคำเชิญแล้ว' }); return q; });
+    // ownership (sc.owner) is applied AFTER member edits so a saved orgRole never overrides the transfer
+    if (newOwner) {
+      people = people.map(function (p) { if (p.email === newOwner) return Object.assign({}, p, { org: 'owner' }); if (p.org === 'owner') return Object.assign({}, p, { org: 'admin' }); return p; });
+      if (O.you === 'Org Owner') O = Object.assign({}, O, { you: 'Org Admin' });
+    }
+    // a new account (sc.newAccount=1) shows its own name / email
+    var newAcct = SS('sc.newAccount') === '1';
+    if (newAcct) people = people.map(function (p) { return p.self ? Object.assign({}, p, { person: 'me', name: SS('sc.myName') || p.name, email: SS('sc.myEmail') || p.email }) : p; });
+    var ownerP = people.filter(function (p) { return p.org === 'owner'; })[0];
+    var email = SS('sc.member');
+    var M = people.filter(function (p) { return p.email === email; })[0] || people[0] || { person: 'invited', name: '—', email: '', org: 'none', roles: {}, since: '', open: 0, act: [] };
+    // edits belong to one person in one org; reset when the selection changes
+    var key = orgId + '|' + M.email;
+    var edits = s.forKey === key ? s.edits : {};
+    var isSuspended = s.forKey === key && s.suspendedSet ? !!s.suspended : M.status === 'suspended';
+    var isRemoved = removedList.indexOf(key) >= 0;
+    var from = SS('sc.memberFrom') === 'SiteDetail' ? ['SiteDetail', SS('sc.siteName') || 'รายละเอียดไซต์', 'SiteDetail.dc.html'] : ['Members', 'สมาชิก', 'Members.dc.html'];
+    var persist = function (patch) { var all = J('sc.memberEdits', {}) || {}; all[key] = Object.assign({ orgRole: M.org, roles: M.roles, status: M.status || 'active' }, all[key] || {}, patch); setJ('sc.memberEdits', all); };
+    var orgRole = s.forKey === key && s.orgRoleEdit ? s.orgRoleEdit : M.org;
+    var roleOf = function (id) { return edits[id] || M.roles[id] || 'none'; };
+    var caps = {
+      none: ['มองไม่เห็นไซต์นี้'],
+      viewer: ['ดูไซต์', 'ดูใบงาน', 'ดูรายงาน'],
+      tech: ['ดูไซต์', 'รับใบงานของตน', 'อัปโหลดรูป'],
+      lead: ['มอบหมายใบงาน', 'อัปเดตผล', 'อนุมัติปิดงาน', 'ดูรายงาน'],
+      sm: ['สร้าง/มอบหมายใบงาน', 'อนุมัติปิดงาน', 'เชิญช่าง', 'ส่งออกรายงาน']
+    };
+    var youAdmin = O.you === 'Org Owner' || O.you === 'Org Admin';
+    var isOrgWide = orgRole === 'admin' || orgRole === 'owner';
+    var canEdit = youAdmin && !M.self && M.org !== 'owner';
+    // a Site Manager may change site roles on their own sites, but only to Technician / Viewer and only for site-level members
+    var youSM = O.you === 'Site Manager';
+    var smEdit = youSM && !M.self && !M.invited && M.org !== 'owner' && M.org !== 'admin';
+    var siteEdit = canEdit || smEdit;
+    var isLeadRole = function (r) { return !!(r && (r.lead || r.name === 'หัวหน้าทีมช่าง')); };
+    var leadEd = customRoles.filter(isLeadRole)[0];
+    customRoles = customRoles.filter(function (r) { return !isLeadRole(r); }); // its edits apply to the built-in 'lead' option, never a second entry
+    var OPTS = [['none', 'ไม่มีสิทธิ์'], ['viewer', 'Viewer'], ['tech', 'Technician'], ['lead', (leadEd ? leadEd.name : 'หัวหน้าทีมช่าง') + ' (กำหนดเอง)'], ['sm', 'Site Manager']].concat(customRoles.map(function (r) { return ['cr:' + r.name, r.name + ' (กำหนดเอง)']; }));
+    customRoles.forEach(function (r) { caps['cr:' + r.name] = Object.keys(r.perms || {}).filter(function (k) { return r.perms[k] && r.perms[k] !== '-' && PERM_T[k]; }).map(function (k) { return PERM_T[k]; }); if (!caps['cr:' + r.name].length) caps['cr:' + r.name] = ['ยังไม่ได้เลือกสิทธิ์']; });
+    if (leadEd) { var lc = Object.keys(leadEd.perms || {}).filter(function (k) { return leadEd.perms[k] && leadEd.perms[k] !== '-' && PERM_T[k]; }).map(function (k) { return PERM_T[k]; }); if (lc.length) caps.lead = lc; }
+    var canManage = canEdit && !M.invited;
+    var youOwner = O.you === 'Org Owner';
+    var canTransfer = youOwner && !M.self && !M.invited && M.org !== 'owner' && !isSuspended && !isRemoved;
+    var isCancelled = M.invited && cancelledList.indexOf(M.email) >= 0;
+    var canInvite = !!M.invited && (youAdmin || youSM);
+    var label = { sm: 'Site Manager', viewer: 'Viewer', tech: 'Technician', lead: leadEd ? leadEd.name : 'หัวหน้าทีมช่าง', none: '' };
+    customRoles.forEach(function (r) { label['cr:' + r.name] = r.name; });
+    var granted = O.sites.filter(function (x) { return roleOf(x[0]) !== 'none'; }).map(function (x) { return label[roleOf(x[0])] + ' ที่' + x[1]; });
+    var setEdit = function (patch) { self.setState(Object.assign({ forKey: key, edits: edits, orgRoleEdit: s.forKey === key ? s.orgRoleEdit : null, saved: false }, patch)); };
+    return {
+      backLabel: from[1], backHref: from[2], backLong: from[0] === 'SiteDetail' ? 'กลับไปที่' + from[1] : 'กลับไปหน้าสมาชิก',
+      blocked: O.you === 'Viewer', canSee: O.you !== 'Viewer', orgName: O.name,
+      ownerName: O.ownerName || (ownerP ? ownerP.name + ' (Org Owner)' : 'ผู้ดูแลองค์กร'),
+      notRequested: !s.requested, requested: !!s.requested, requestAccess: function () { self.setState({ requested: true }); },
+      canAudit: youAdmin, ownerOptText: youOwner ? 'Org Owner · ใช้ปุ่ม “โอนความเป็นเจ้าของ” ด้านล่าง' : 'Org Owner · โอนได้โดย Owner คนปัจจุบันเท่านั้น',
+      canTransfer: canTransfer && !s.transferred, transferLabel: 'โอนให้ ' + M.name, transferred: !!s.transferred && s.transferred === key,
+      tDlg: !!s.tDlg, tTitle: 'โอนความเป็นเจ้าของให้ ' + M.name + '?',
+      tBody: '• ' + M.name + ' จะเป็น Org Owner ของ' + O.name + '\n• คุณจะเป็น Org Admin และออกจากองค์กรได้หลังโอน\n• ย้อนกลับได้เฉพาะเมื่อ Owner คนใหม่โอนคืน',
+      openTransfer: function () { self.setState({ tDlg: true }); },
+      closeTransfer: function () { self.setState({ tDlg: false }); },
+      confirmTransfer: function () { var o = J('sc.owner', {}) || {}; if (o[orgId] === M.email) { self.setState({ tDlg: false }); return; } var prev = (people.filter(function (p) { return p.org === 'owner'; })[0] || {}).email; o[orgId] = M.email; setJ('sc.owner', o); var all = J('sc.memberEdits', {}) || {}; all[orgId + '|' + M.email] = Object.assign({ roles: M.roles, status: 'active' }, all[orgId + '|' + M.email] || {}, { orgRole: 'owner' }); if (prev && prev !== M.email) all[orgId + '|' + prev] = Object.assign({ roles: {}, status: 'active' }, all[orgId + '|' + prev] || {}, { orgRole: 'admin' }); setJ('sc.memberEdits', all); self.setState({ tDlg: false, transferred: key }); },
+      canSimAccept: canInvite && !isCancelled && youAdmin,
+      simAccept: function () { var all = J('sc.memberEdits', {}) || {}; var cur = all[key] || {}; if (cur.accepted) return; all[key] = Object.assign({ orgRole: M.org, roles: M.roles }, cur, { status: 'active', accepted: true }); setJ('sc.memberEdits', all); self.setState({ sync: Date.now() }); },
+      canInvite: canInvite, inviteOpen: canInvite && !isCancelled && s.inviteFor !== key + '|cancel',
+      inviteNote: isCancelled ? 'คำเชิญนี้ถูกยกเลิกแล้ว · ลิงก์ในอีเมลใช้ไม่ได้' : 'ส่งไปที่ ' + M.email + ' · ' + M.since,
+      inviteMsg: s.inviteFor && s.inviteFor.indexOf(key) === 0 ? s.inviteMsg : '',
+      resend: function () { self.setState({ inviteFor: key + '|resend', inviteMsg: 'ส่งคำเชิญถึง ' + M.email + ' อีกครั้งแล้ว · นับเวลาตอบรับ 7 วันใหม่' }); },
+      cancelInvite: function () { self.setState({ cDlg: true }); },
+      cDlg: !!s.cDlg, cTitle: 'ยกเลิกคำเชิญของ ' + M.email + '?', cBody: '• ลิงก์ในอีเมลจะใช้ไม่ได้ทันที\n• เชิญใหม่ได้ภายหลังที่หน้าสมาชิก',
+      closeCancel: function () { self.setState({ cDlg: false }); },
+      confirmCancelInvite: function () { var c = J('sc.inviteCancel', []); if (c.indexOf(M.email) < 0) c.push(M.email); setJ('sc.inviteCancel', c); self.setState({ cDlg: false, inviteFor: key + '|cancel', inviteMsg: 'ยกเลิกคำเชิญของ ' + M.email + ' แล้ว' }); },
+      m: { person: M.person, name: M.name, email: M.email, since: M.since }, headSub: M.email + ' · ' + M.since,
+      readOnly: !siteEdit, smNote: smEdit && !canEdit, readOnlyNote: M.self ? 'นี่คือบัญชีของคุณ · แก้สิทธิ์ของตัวเองไม่ได้' : M.org === 'owner' ? 'Org Owner · โอนความเป็นเจ้าของได้โดย Owner เท่านั้น' : 'ดูได้อย่างเดียว · บทบาท ' + O.you + ' แก้สิทธิ์สมาชิกไม่ได้',
+      orgRole: orgRole, isAdmin: isOrgWide, orgLocked: !canEdit, siteLocked: !siteEdit || isOrgWide,
+      orgHint: isOrgWide ? 'เข้าถึงและจัดการได้ทุกไซต์ รวมไซต์ใหม่ในอนาคต' : (O.sites.length ? 'เห็นเฉพาะไซต์ที่มอบสิทธิ์ด้านล่าง' : 'องค์กรนี้ยังไม่มีไซต์'),
+      setOrgRole: function (e) { setEdit({ orgRoleEdit: e.target.value }); },
+      statusValue: M.invited ? 'invited' : (isSuspended ? 'suspended' : 'active'),
+      rows: O.sites.map(function (x) { var r = isOrgWide ? 'sm' : roleOf(x[0]); return { id: 'md-' + x[0], key: x[2], name: x[1], role: roleOf(x[0]), caps: isOrgWide ? ['ทุกสิทธิ์ผ่าน ' + (orgRole === 'owner' ? 'Org Owner' : 'Org Admin')] : caps[r],
+        opts: OPTS.filter(function (o) { return canEdit || !smEdit || ['none', 'viewer', 'tech'].indexOf(o[0]) >= 0 || o[0] === roleOf(x[0]); }).map(function (o) { return { v: o[0], t: o[1] }; }),
+        change: function (e) { var o = Object.assign({}, edits); o[x[0]] = e.target.value; setEdit({ edits: o }); } }; }),
+      canEdit: siteEdit && !isRemoved, canManage: canManage, notRemoved: !isRemoved, cantManage: !canManage && !(M.invited && canInvite),
+      manageNote: M.invited ? (canInvite ? 'จัดการสิทธิ์ได้หลังผู้รับตอบรับคำเชิญ' : 'คำเชิญยังไม่ถูกตอบรับ · Org Owner / Org Admin จัดการคำเชิญได้') : M.self ? 'ออกจากองค์กรได้ที่ “บัญชีของฉัน”' : M.org === 'owner' ? 'นำ Org Owner ออกไม่ได้' : 'เฉพาะ Org Owner / Org Admin จัดการบัญชีสมาชิกได้',
+      saved: s.forKey === key && s.saved,
+      save: function () { var roles = Object.assign({}, M.roles, edits); persist({ orgRole: orgRole, roles: roles, edited: true }); self.setState({ forKey: key, edits: {}, orgRoleEdit: null, saved: true }); },
+      cancel: function () { self.setState({ forKey: key, edits: {}, orgRoleEdit: null, saved: false }); },
+      suspendLabel: isSuspended ? 'เปิดใช้งานอีกครั้ง' : 'ระงับการใช้งาน',
+      toggleSuspend: function () { var nv = !isSuspended; persist({ status: nv ? 'suspended' : 'active' }); self.setState({ forKey: key, edits: edits, suspended: nv, suspendedSet: true }); },
+      dlg: s.dlg, dlgTitle: 'นำ ' + M.name + ' ออกจากองค์กร?',
+      openRemove: function () { self.setState({ dlg: true }); },
+      closeDlg: function () { self.setState({ dlg: false }); },
+      removed: isRemoved,
+      confirmRemove: function () { var rl = J('sc.removed', []); if (rl.indexOf(key) < 0) rl.push(key); setJ('sc.removed', rl); self.setState({ dlg: false, forKey: key, edits: edits }); },
+      dlgBody: (M.open ? '• ใบงานที่ค้าง ' + M.open + ' งาน จะต้องมอบหมายใหม่\n' : '') + (granted.length ? '• สิทธิ์ ' + granted.join(' และ ') + ' จะถูกลบ\n' : '') + '• ประวัติใน Audit log ยังอยู่ครบ',
+      activity: (M.act.length ? M.act : [['ยังไม่มีกิจกรรม', '—']]).map(function (a) { return { what: a[0], when: a[1] }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

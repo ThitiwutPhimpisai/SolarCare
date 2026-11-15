@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ไม่มีสิทธิ์เข้าถึง</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; box-sizing: border-box; padding: clamp(24px, 6vw, 48px) 16px">
+  <div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+    <sc-if value="{{is403}}" hint-placeholder-val="{{ true }}">
+    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(20px, 5vw, 32px); display: flex; flex-direction: column; gap: 14px">
+      <div style="font-size: 12px; font-weight: 700; color: #4B5563; letter-spacing: 0.04em">403 · ไม่มีสิทธิ์ทำรายการนี้</div>
+      <div style="width: 56px; height: 56px; border-radius: 12px; background: #FFF4E5; color: #8A3B06; display: flex; align-items: center; justify-content: center">
+        <dc-import name="Icon" icon="lock" size="28" hint-size="28px,28px"></dc-import>
+      </div>
+      <h1 style="margin: 0; font-size: 24px">เปิด{{denied}}ของ{{orgName}}ไม่ได้</h1>
+      <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6">คุณเป็น <b>{{role}}</b> ใน <b>{{orgName}}</b> จึงเปิด{{denied}}ไม่ได้ {{canDo}}</p>
+      <div style="display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; background: #F3F4F6">
+        <dc-import name="OrgBadge" org="{{badge}}" size="36" with-name="{{false}}" hint-size="36px,36px"></dc-import>
+        <div style="font-size: 13px; color: #374151">ผู้ที่ให้สิทธิ์ได้: <b>{{grantBy}}</b></div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <dc-import name="Button" variant="primary" label="{{reqLabel}}" disabled="{{requested}}" on-press="{{request}}" hint-size="160px,44px"></dc-import>
+        <dc-import name="Button" variant="secondary" icon="arrowLeft" label="{{backLabel}}" href="{{backHref}}" hint-size="200px,44px"></dc-import>
+        <dc-import name="Button" variant="ghost" label="สลับองค์กร" href="SelectOrg.dc.html" hint-size="110px,44px"></dc-import>
+      </div>
+      <sc-if value="{{requested}}" hint-placeholder-val="{{ false }}">
+        <p role="status" style="margin: 0; font-size: 13px; color: #0A4F44">ส่งคำขอถึงผู้ดูแลของ{{orgName}}แล้ว จะได้รับแจ้งเตือนเมื่อมีการตอบรับ</p>
+      </sc-if>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{is404}}" hint-placeholder-val="{{ false }}">
+    <section aria-labelledby="ad-404" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(20px, 5vw, 32px); display: flex; flex-direction: column; gap: 14px">
+      <div style="font-size: 12px; font-weight: 700; color: #4B5563; letter-spacing: 0.04em">404 · ไม่พบหน้า</div>
+      <div style="width: 56px; height: 56px; border-radius: 12px; background: #F3F4F6; color: #374151; display: flex; align-items: center; justify-content: center">
+        <dc-import name="Icon" icon="search" size="28" hint-size="28px,28px"></dc-import>
+      </div>
+      <h2 id="ad-404" style="margin: 0; font-size: 24px">ไม่พบหน้าที่คุณต้องการ</h2>
+      <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6">ลิงก์อาจผิด หรือคุณไม่ได้อยู่ในองค์กรที่เป็นเจ้าของหน้านี้ ลองสลับองค์กรหรือขอคำเชิญจากผู้ดูแลองค์กรนั้น</p>
+      <code style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">solarcare.app/o/greenmart/s/rangsit-2</code>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <dc-import name="Button" variant="primary" label="สลับองค์กร" href="SelectOrg.dc.html" hint-size="110px,44px"></dc-import>
+        <dc-import name="Button" variant="secondary" label="กลับหน้าแรก" href="Main.dc.html" hint-size="120px,44px"></dc-import>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{is401}}" hint-placeholder-val="{{ false }}">
+    <section aria-labelledby="ad-401" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(20px, 5vw, 32px); display: flex; flex-direction: column; gap: 14px">
+      <div style="font-size: 12px; font-weight: 700; color: #4B5563; letter-spacing: 0.04em">401 · เซสชันหมดอายุ</div>
+      <div style="width: 56px; height: 56px; border-radius: 12px; background: #EEF2FF; color: #3730A3; display: flex; align-items: center; justify-content: center">
+        <dc-import name="Icon" icon="clock" size="28" hint-size="28px,28px"></dc-import>
+      </div>
+      <h2 id="ad-401" style="margin: 0; font-size: 24px">เซสชันหมดอายุ กรุณาเข้าสู่ระบบอีกครั้ง</h2>
+      <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6">เพื่อความปลอดภัย ระบบออกจากระบบอัตโนมัติหลังไม่มีการใช้งาน 8 ชั่วโมง งานที่ยังไม่บันทึกจะถูกเก็บเป็นฉบับร่าง</p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <dc-import name="Button" variant="primary" label="เข้าสู่ระบบอีกครั้ง" href="Login.dc.html" hint-size="160px,44px"></dc-import>
+      </div>
+    </section>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["403","404","401"],"default":"403"},"$preview":{"width":1440,"height":800}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { requested: '' }; }
+  componentDidMount() {
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.denied', 'sc.createdName', 'sc.deniedFrom', 'sc.errorKind'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    // a new visit starts without the old "request sent" state that Play restores
+    self.setState({ requested: '', sync: Date.now() });
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var ORGS = {
+      a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', badge: 'sf', role: 'Org Admin' },
+      b: { name: 'กรีนมาร์ท รีเทล', badge: 'gm', role: 'Site Manager' },
+      c: { name: 'นิคมฯ เหนือ', badge: 'nk', role: 'Viewer' },
+      d: { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', badge: 'rt', role: (function () { try { return (JSON.parse(SS('sc.owner') || '{}') || {}).d ? 'Org Admin' : 'Org Owner'; } catch (e) { return 'Org Owner'; } })() },
+      e: { name: 'ริมทะเล รีสอร์ท', badge: 'rr', role: 'Site Manager' }
+    };
+    var id = SS('sc.org') || 'c';
+    var o = ORGS[id] || ORGS.c;
+    var denied = SS('sc.denied') || 'หน้าสมาชิก';
+    // a leftover sc.denied must never claim a page this role can open (DATA.md permissions)
+    var opens = { 'Org Owner': ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'Audit log', 'Role & สิทธิ์', 'แก้ไข Role'], 'Org Admin': ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'Audit log', 'Role & สิทธิ์', 'แก้ไข Role'],
+      'Site Manager': ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'Role & สิทธิ์'], 'Viewer': [] }[o.role] || [];
+    if (opens.indexOf(denied) >= 0) denied = { 'Site Manager': 'Audit log', 'Org Admin': 'หน้าลบองค์กร', 'Org Owner': 'หน้าลบองค์กร' }[o.role] || 'หน้าสมาชิก';
+    var can = {
+      'Viewer': 'Viewer ดูภาพรวม ไซต์ ใบงาน และรายงานได้แบบอ่านอย่างเดียว ส่วนการจัดการสมาชิก สิทธิ์ และ Audit log ทำได้เฉพาะ Org Owner / Org Admin',
+      'Site Manager': 'Site Manager ดูแลไซต์ ใบงาน และเชิญช่างในไซต์ของตนได้ ส่วนการตั้งค่าสิทธิ์และ Audit log ทำได้เฉพาะ Org Owner / Org Admin',
+      'Org Admin': 'หน้านี้ต้องใช้สิทธิ์ที่บทบาทของคุณยังไม่มี ขอให้ Org Owner เปิดสิทธิ์ให้',
+      'Org Owner': 'หน้านี้ต้องใช้สิทธิ์ที่บัญชีนี้ยังไม่มี'
+    }[o.role];
+    var key = id + '|' + denied;
+    // one state per visit: 403 (default), 404 or 401 via the kind prop or sc.errorKind
+    var kind = String(self.props.kind || SS('sc.errorKind') || '403'); if (['403', '404', '401'].indexOf(kind) < 0) kind = '403';
+    var FROM = { 'Notifications.dc.html': 'การแจ้งเตือน', 'Members.dc.html': 'หน้าสมาชิก', 'MemberDetail.dc.html': 'หน้าสมาชิก', 'Roles.dc.html': 'Role & สิทธิ์', 'RoleEditor.dc.html': 'Role & สิทธิ์', 'AuditLog.dc.html': 'Audit log', 'Main.dc.html': 'ภาพรวม' };
+    var fromF = SS('sc.deniedFrom');
+    var back = FROM[fromF] ? ['กลับไปที่' + (/^[A-Za-z]/.test(FROM[fromF]) ? ' ' : '') + FROM[fromF], fromF === 'RoleEditor.dc.html' ? 'Roles.dc.html' : fromF] : ['กลับไปภาพรวม' + o.name, 'Main.dc.html'];
+    var requested = this.state.requested === key;
+    return {
+      grantBy: ({ a: 'วรวุฒิ ก. (Org Owner) หรือ Org Admin ของ', b: 'กิตติ พ. (Org Owner) ของ', c: 'สุนทร ม. (Org Owner) ของ', e: 'อรุณี ท. (Org Owner) ของ' }[id] || 'Org Owner ของ') + o.name,
+      orgName: o.name, badge: o.badge, role: o.role, denied: /^[A-Za-z]/.test(denied) ? ' ' + denied + ' ' : denied, canDo: can,
+      backLabel: back[0], backHref: back[1],
+      is403: kind === '403', is404: kind === '404', is401: kind === '401',
+      requested: requested,
+      reqLabel: requested ? 'ส่งคำขอแล้ว' : 'ขอสิทธิ์จากผู้ดูแล',
+      request: function () { self.setState({ requested: key }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รับคำเชิญ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; box-sizing: border-box; padding: clamp(24px, 6vw, 56px) 16px; display: flex; flex-direction: column; align-items: center; gap: 20px">
+  <div style="width: 100%; max-width: 520px"><div style="display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; color: #111827"><dc-import name="Icon" icon="sun" size="20" bg="brand" hint-size="36px,36px"></dc-import>SolarCare</div></div>
+  <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}"><div style="width: 100%; max-width: 520px"><a href="{{backHref}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; text-decoration: none; color: #0F6B5C"><dc-import name="Icon" icon="arrowLeft" size="16" hint-size="16px,16px"></dc-import>{{backLabel}}</a></div></sc-if>
+  <div style="width: 100%; max-width: 520px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
+    <div style="height: 120px; position: relative">
+      <dc-import name="SiteThumb" site="e1" w="100%" h="120px" radius="0" hint-size="100%,120px"></dc-import>
+    </div>
+    <div style="padding: 0 28px 28px; display: flex; flex-direction: column; gap: 18px">
+      <div style="position: relative; z-index: 1; align-self: flex-start; display: flex; margin-top: -40px; border-radius: 20px; border: 4px solid #FFFFFF; background: #FFFFFF"><dc-import name="OrgBadge" org="rr" size="72" with-name="{{false}}" hint-size="72px,72px"></dc-import></div>
+      <div>
+        <div style="font-size: 14px; color: #4B5563; display: flex; align-items: center; gap: 8px"><dc-import name="Avatar" person="arunee" size="24" hint-size="24px,24px"></dc-import>คุณอรุณี ท. (Org Owner) เชิญคุณเข้าร่วม</div>
+        <h1 style="margin: 6px 0 0; font-size: 24px">ริมทะเล รีสอร์ท</h1>
+      </div>
+      <div style="border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px"><span style="color: #4B5563">Role</span><span style="font-weight: 700">Site Manager</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px"><span style="color: #4B5563">ขอบเขต</span><span style="font-weight: 600">1 ไซต์</span></div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <span style="padding: 4px 10px; border-radius: 6px; background: #F3F4F6; font-size: 13px">หลังคาอาคาร A หัวหิน</span>
+        </div>
+        <div style="font-size: 13px; color: #374151; line-height: 1.6">คุณจะสร้างและมอบหมายใบงาน อนุมัติงาน และเชิญช่างเข้าไซต์นี้ได้ — <button type="button" onClick="{{openPerms}}" style="font-family: inherit; font-size: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-weight: 600; text-decoration: underline; cursor: pointer">ดูสิทธิ์ทั้งหมด</button></div>
+      </div>
+      <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ส่งถึง {{inviteTo}} เมื่อ 14 พ.ย. 2569 · หมดอายุ 21 พ.ย. 2569 · องค์กรเดิมของคุณไม่ได้รับผลกระทบ</div>
+      <sc-if value="{{answered}}" hint-placeholder-val="{{ false }}">
+        <div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-radius: 8px; background: #E7F2EF; color: #0A4F44; font-size: 14px"><span>{{answeredText}}</span><dc-import name="Button" variant="secondary" label="{{answeredGo}}" href="{{answeredHref}}" hint-size="140px,44px"></dc-import></div>
+      </sc-if>
+      <sc-if value="{{canAnswer}}" hint-placeholder-val="{{ true }}">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <dc-import name="Button" variant="secondary" full="{{true}}" label="ปฏิเสธ" href="SelectOrg.dc.html" save-keys="sc.from=|sc.inviteDone=declined|sc.flash=ปฏิเสธคำเชิญจาก ริมทะเล รีสอร์ท แล้ว" hint-size="100%,44px"></dc-import>
+          <dc-import name="Button" variant="primary" full="{{true}}" label="ยอมรับและเข้าร่วม" href="Main.dc.html" save-keys="sc.org=e|sc.site=all|sc.joined=e|sc.inviteDone=accepted|sc.from=|sc.flash=เข้าร่วม ริมทะเล รีสอร์ท แล้ว ในบทบาท Site Manager" hint-size="100%,44px"></dc-import>
+        </div>
+      </sc-if>
+      <sc-if value="{{needAuthExisting}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 14px; color: #374151">เข้าสู่ระบบด้วยอีเมลที่ได้รับคำเชิญก่อน แล้วระบบจะพากลับมาที่หน้านี้เพื่อตอบรับ</p>
+          <dc-import name="Button" variant="primary" full="{{true}}" label="เข้าสู่ระบบเพื่อตอบรับ" href="Login.dc.html" save-keys="sc.from=invite" hint-size="100%,44px"></dc-import>
+          <button type="button" onClick="{{showNewInvite}}" style="align-self: flex-start; font-family: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left">ได้รับคำเชิญที่อีเมลอื่นและยังไม่มีบัญชี? เปิดคำเชิญที่ส่งถึง newstaff@rimtalay.example</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{needAuthNew}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 10px">
+          <p style="margin: 0; font-size: 14px; color: #374151">อีเมลนี้ยังไม่มีบัญชี SolarCare · สร้างบัญชีด้วยอีเมลที่ได้รับคำเชิญ แล้วระบบจะพาเข้าองค์กรให้ทันที</p>
+          <dc-import name="Button" variant="primary" full="{{true}}" label="สร้างบัญชีเพื่อตอบรับ" href="SignUpInvite.dc.html" save-keys="sc.inviteTo=newstaff" hint-size="100%,44px"></dc-import>
+          <button type="button" onClick="{{showOwnInvite}}" style="align-self: flex-start; font-family: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left">กลับไปคำเชิญที่ส่งถึง natthaphat@siamsolar.example</button>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+  <dc-import name="ConfirmDialog" open="{{permsOpen}}" title="สิทธิ์ของ Site Manager ที่ริมทะเล รีสอร์ท" body="{{permsBody}}" reason-label="" confirm-label="เข้าใจแล้ว" cancel-label="ปิด" tone="primary" on-confirm="{{closePerms}}" on-close="{{closePerms}}" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    this.state = { perms: false };
+  }
+  componentDidMount() {
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.authed', 'sc.inviteTo', 'sc.inviteFrom', 'sc.org', 'sc.inviteDone', 'sc.joined', 'sc.from'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap(); self.setState({ perms: false, sync: Date.now() });
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync); self._iv = setInterval(self._sync, 400);
+  }
+  componentWillUnmount() { window.removeEventListener('storage', this._sync); clearInterval(this._iv); }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    // signed in = came through Login (sc.authed) or is already working in the console (sc.org)
+    var authed = !!(SS('sc.authed') || SS('sc.org'));
+    var done = SS('sc.inviteDone');
+    // two invites from RR (DATA round 12): ณัฐภัทร's (existing account) and พนักงานใหม่ at newstaff@rimtalay.example (no account yet); signed-in users always see their own
+    var isNew = !authed && SS('sc.inviteTo') === 'newstaff';
+    var setInv = function (v) { return function () { try { window.sessionStorage.setItem('sc.inviteTo', v); } catch (x) {} self.setState({ sync: Date.now() }); }; };
+    return {
+      // signed in: a way back to where the invite was opened (SelectOrg writes sc.inviteFrom; console users default to การแจ้งเตือน)
+      hasBack: authed && !done, backHref: (SS('sc.inviteFrom') === 'SelectOrg' || !SS('sc.org')) ? 'SelectOrg.dc.html' : 'Notifications.dc.html', backLabel: (SS('sc.inviteFrom') === 'SelectOrg' || !SS('sc.org')) ? 'เลือกองค์กร' : 'การแจ้งเตือน',
+      authed: authed, needAuth: !authed && !done, needAuthExisting: !authed && !done && !isNew, needAuthNew: !authed && !done && isNew, canAnswer: authed && !done,
+      inviteTo: isNew ? 'newstaff@rimtalay.example (พนักงานใหม่ · หัวหน้าอาคาร A)' : 'natthaphat@siamsolar.example',
+      showNewInvite: setInv('newstaff'), showOwnInvite: setInv(''),
+      answered: !!done,
+      answeredText: done === 'accepted' ? 'คุณตอบรับคำเชิญนี้แล้ว · เป็น Site Manager ที่ริมทะเล รีสอร์ท' : 'คุณปฏิเสธคำเชิญนี้แล้ว · ขอให้คุณอรุณีส่งคำเชิญใหม่ได้',
+      answeredGo: done === 'accepted' ? 'ไปที่ภาพรวม' : 'เลือกองค์กร',
+      answeredHref: done === 'accepted' ? 'Main.dc.html' : 'SelectOrg.dc.html',
+      permsOpen: !!self.state.perms,
+      permsBody: 'ทำได้ในไซต์หลังคาอาคาร A หัวหิน:\n• ดูไซต์ ใบงาน และรายงานของไซต์นี้\n• สร้างและมอบหมายใบงาน อัปเดตผลและแนบรูป\n• อนุมัติปิดงาน\n• เชิญช่างเข้าไซต์นี้ และดูรายชื่อสมาชิก\n\nทำไม่ได้: แก้ข้อมูลไซต์ สร้างหรือลบไซต์ ตั้งค่าองค์กร กำหนด Role ดู Audit log',
+      openPerms: function () { self.setState({ perms: true }); },
+      closePerms: function () { self.setState({ perms: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

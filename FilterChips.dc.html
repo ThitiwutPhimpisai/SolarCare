@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ชิปตัวกรอง</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div role="group" aria-label="{{label}}" style="{{rowStyle}}">
+  <sc-for list="{{items}}" as="c" hint-placeholder-count="5">
+    <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="{{c.style}}">
+      <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="font-size: 12px">✓</span></sc-if>
+      <span>{{c.label}}</span>
+      <sc-if value="{{c.hasCount}}" hint-placeholder-val="{{ true }}"><span style="{{c.countStyle}}">{{c.count}}</span></sc-if>
+    </button>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"สถานะ"},"value":{"editor":"text","default":"all"},"options":{"editor":null},"onChange":{"editor":null},"$preview":{"width":640,"height":60}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { mobile: false, local: '' }; }
+  componentDidMount() {
+    var self = this;
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    this._mq = window.matchMedia('(max-width: 767px)');
+    this._on = function () { self.setState({ mobile: self._mq.matches }); };
+    this._on();
+    if (this._mq.addEventListener) this._mq.addEventListener('change', this._on); else this._mq.addListener(this._on);
+  }
+  componentWillUnmount() {
+    if (!this._mq) return;
+    if (this._mq.removeEventListener) this._mq.removeEventListener('change', this._on); else this._mq.removeListener(this._on);
+  }
+  renderVals() {
+    var self = this, p = this.props;
+    // options: [{ id, label, count }] — count is optional; hide options with count 0 except the selected one and "all"
+    var opts = p.options || [
+      { id: 'all', label: 'ทั้งหมด', count: 7 }, { id: 'new', label: 'รอมอบหมาย', count: 1 }, { id: 'todo', label: 'มอบหมายแล้ว', count: 1 },
+      { id: 'doing', label: 'กำลังดำเนินการ', count: 2 }, { id: 'review', label: 'รออนุมัติ', count: 1 }, { id: 'done', label: 'เสร็จสิ้น', count: 2 }
+    ];
+    var value = p.value ?? (this.state.local || 'all');
+    var shown = opts.filter(function (o) { return o.id === 'all' || o.id === value || o.count == null || o.count > 0; });
+    return {
+      label: p.label ?? 'ตัวกรอง',
+      rowStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: flex; gap: 8px; " + (this.state.mobile ? 'flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin' : 'flex-wrap: wrap'),
+      items: shown.map(function (o) {
+        var on = o.id === value;
+        return {
+          label: o.label, on: on, hasCount: o.count != null, count: o.count,
+          pick: function () { self.setState({ local: o.id }); if (p.onChange) p.onChange(o.id); },
+          style: 'flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 999px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; border: 1px solid ' + (on ? '#0F6B5C; background: #0F6B5C; color: #FFFFFF' : '#D5D9E0; background: #FFFFFF; color: #374151'),
+          countStyle: 'min-width: 20px; padding: 0 6px; border-radius: 999px; font-size: 12px; line-height: 20px; text-align: center; font-variant-numeric: tabular-nums; ' + (on ? 'background: rgba(255,255,255,0.22); color: #FFFFFF' : 'background: #F3F4F6; color: #374151')
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

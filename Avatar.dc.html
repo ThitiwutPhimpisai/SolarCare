@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รูปโปรไฟล์</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<span style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: inline-flex">
+  <sc-if value="{{src}}" hint-placeholder-val="{{ true }}"><img src="{{src}}" alt="{{alt}}" style="{{imgStyle}}"></sc-if>
+  <sc-if value="{{noSrc}}" hint-placeholder-val="{{ false }}"><span role="img" aria-label="{{alt}}" style="{{phStyle}}">{{ini}}</span></sc-if>
+</span>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"person":{"editor":"enum","options":["natthaphat","worawut","somsri","thanakorn","pimchanok","arunee","kitti","sunthorn","siriporn","me","qleen","invited"],"default":"somsri"},"size":{"editor":"int","default":40},"initials":{"editor":"text","default":""},"label":{"editor":"boolean","default":false},"$preview":{"width":80,"height":80}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var P = {
+      natthaphat: ['ณัฐภัทร ส.', 'assets/adede18fd0b813d69dca7bc6b5336f31.jpg'],
+      worawut: ['วรวุฒิ ก.', 'assets/bdaf8c8ddbb6ba1d930a5dd435f1c35f.jpg'],
+      somsri: ['สมศรี ป.', 'assets/0343f2e71cd6d1c0134175055ce9e20c.jpg'],
+      thanakorn: ['ธนากร ว.', 'assets/a15192b3a6ee4925fa1cf7e5a7c15fbf.jpg'],
+      pimchanok: ['พิมพ์ชนก ร.', 'assets/5d62ae5f7f07cfb26bc5afc91316beca.jpg'],
+      qleen: ['Qleen Support', 'assets/b3a891f20193e7064e49afe42f693865.svg'],
+      arunee: ['อรุณี ท.', '', 'อร'],
+      kitti: ['กิตติ พ.', '', 'กต'],
+      me: (function () { var n = ''; try { n = window.sessionStorage.getItem('sc.myName') || ''; } catch (e) {} n = n.trim() || 'บัญชีใหม่'; var w = n.replace(/[^\u0E01-\u0E2Ea-zA-Z]/g, ''); return [n, '', (w.slice(0, 2) || 'ฉ')]; })(), // new account (sc.myName) → initials
+      sunthorn: ['สุนทร ม.', '', 'สน'],
+      siriporn: ['ศิริพร ก.', '', 'ศพ'],
+      invited: ['รอยืนยัน', '']
+    };
+    var p = this.props;
+    var pr = String(p.person ?? 'somsri');
+    // any person without a stored profile: person="ini:XX" (works through PageHeader) or the initials prop → initials circle
+    var ini = (p.initials ?? '') || (pr.indexOf('ini:') === 0 ? pr.slice(4) : '');
+    var who = ini ? [ini, '', String(ini).slice(0, 2).toUpperCase()] : (P[pr] || P.invited);
+    var size = p.size ?? 40;
+    var base = 'width: ' + size + 'px; height: ' + size + 'px; border-radius: 999px; flex: none; box-sizing: border-box;';
+    return {
+      src: who[1], noSrc: !who[1], ini: who[2] || '@', alt: (p.label ?? false) ? who[0] : '',
+      imgStyle: base + ' display: block; object-fit: cover',
+      // people without a photo get an initials circle; a pending invite keeps the dashed '@'
+      phStyle: base + (who[2] ? ' background: #E7F2EF; color: #0A4F44; font-weight: 700;' : ' border: 1px dashed #9CA3AF; color: #4B5563;') + ' font-size: ' + Math.round(size * (who[2] ? 0.36 : 0.4)) + 'px; display: inline-flex; align-items: center; justify-content: center'
+    };
+  }
+}
+</script>
+</body>
+</html>

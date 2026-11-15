@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รายการองค์กร</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<ul aria-label="{{label}}" style="{{ulStyle}}">
+  <sc-for list="{{rows}}" as="o" hint-placeholder-count="3">
+    <li style="{{o.liStyle}}">
+      <sc-if value="{{o.isLink}}" hint-placeholder-val="{{ true }}">
+        <a href="{{o.href}}" onPointerDown="{{o.save}}" onPointerUp="{{o.save}}" onKeyDown="{{o.save}}" onClick="{{o.save}}" aria-current="{{o.current}}" style="{{o.style}}">
+          <dc-import name="OrgBadge" org="{{o.badge}}" size="{{o.badgeSize}}" with-name="{{false}}" hint-size="48px,48px"></dc-import>
+          <span style="flex: 1; min-width: 0"><span style="{{o.nameStyle}}">{{o.name}}</span><span style="{{o.noteStyle}}">{{o.note}}</span></span>
+          <sc-if value="{{o.showArrow}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="arrowRight" size="20" tone="muted" hint-size="20px,20px"></dc-import></sc-if>
+        </a>
+      </sc-if>
+      <sc-if value="{{o.isButton}}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{o.pick}}" aria-current="{{o.current}}" style="{{o.style}}">
+          <dc-import name="OrgBadge" org="{{o.badge}}" size="{{o.badgeSize}}" with-name="{{false}}" hint-size="28px,28px"></dc-import>
+          <span style="flex: 1; min-width: 0"><span style="{{o.nameStyle}}">{{o.name}}</span><span style="{{o.noteStyle}}">{{o.note}}</span></span>
+        </button>
+      </sc-if>
+      <sc-if value="{{o.isStatic}}" hint-placeholder-val="{{ false }}">
+        <div style="{{o.style}}">
+          <dc-import name="OrgBadge" org="{{o.badge}}" size="{{o.badgeSize}}" with-name="{{false}}" hint-size="48px,48px"></dc-import>
+          <span style="flex: 1; min-width: 0"><span style="{{o.nameStyle}}">{{o.name}}</span><span style="{{o.noteStyle}}">{{o.note}}</span></span>
+        </div>
+      </sc-if>
+      <sc-if value="{{o.hasAction}}" hint-placeholder-val="{{ false }}">
+        <dc-import name="Button" label="{{o.actionLabel}}" variant="{{o.actionVariant}}" on-press="{{o.onAction}}" hint-size="130px,44px"></dc-import>
+      </sc-if>
+    </li>
+  </sc-for>
+</ul>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"items":{"editor":null},"size":{"editor":"enum","options":["lg","sm"],"default":"lg"},"label":{"editor":"text","default":"องค์กรของคุณ"},"$preview":{"width":560,"height":260}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+// One org list for SelectOrg, the Sidebar switcher and MyAccount.
+// items: [{ badge, name, note, href?, current?, saveKeys? 'k=v|k=v', onPick?, actionLabel?, actionVariant?, onAction? }]
+// href → link (saveKeys written on pointerdown before navigation); onPick without href → button; neither → static row.
+var SAMPLE = [
+  { badge: 'sf', name: 'สยามโซลาร์ฟาร์ม จำกัด', note: 'Org Admin · 4 ไซต์ · ใช้ล่าสุด', href: 'Main.dc.html', current: true, saveKeys: 'sc.org=a|sc.site=all' },
+  { badge: 'gm', name: 'กรีนมาร์ท รีเทล', note: 'Site Manager · 2 ไซต์', href: 'Main.dc.html', saveKeys: 'sc.org=b|sc.site=all' },
+  { badge: 'nk', name: 'นิคมฯ เหนือ', note: 'Viewer · 1 ไซต์', href: 'Main.dc.html', saveKeys: 'sc.org=c|sc.site=all' }
+];
+class Component extends DCLogic {
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var p = this.props, lg = (p.size ?? 'lg') !== 'sm';
+    var items = Array.isArray(p.items) ? p.items : SAMPLE;
+    var write = function (st, href) { if (!st) return; try { String(st).split('|').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) { var k = kv.slice(0, i).trim(); window.sessionStorage.setItem(k, kv.slice(i + 1)); if (k === 'sc.flash') { window.sessionStorage.setItem('sc.flashAt', String(Date.now())); window.sessionStorage.setItem('sc.flashTo', String(href || '')); } } }); } catch (x) {} };
+    var base = lg
+      ? 'display: flex; align-items: center; gap: 14px; min-height: 72px; padding: 10px 14px; border-radius: 10px; text-decoration: none; color: #111827; flex: 1 1 200px; min-width: 0; box-sizing: border-box;'
+      : 'display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 6px 8px; border-radius: 8px; text-decoration: none; color: #111827; flex: 1 1 160px; min-width: 0; box-sizing: border-box; width: 100%; border: 0; text-align: left; font-family: inherit; cursor: pointer;';
+    var on = lg ? ' background: #F0F7F5; box-shadow: inset 0 0 0 2px #0F6B5C' : ' background: #E7F2EF';
+    var off = lg ? '' : ' background: #FFFFFF';
+    var nameStyle = 'display: block; color: #111827; ' + (lg ? 'font-weight: 700; font-size: 16px' : 'font-weight: 600; font-size: 13px');
+    var noteStyle = 'display: block; color: #4B5563; font-size: ' + (lg ? 13 : 12) + 'px';
+    return {
+      label: p.label ?? 'องค์กรของคุณ',
+      ulStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: " + (lg ? 4 : 2) + 'px',
+      rows: items.map(function (o) {
+        var cur = !!o.current, isLink = !!o.href, isButton = !isLink && !!o.onPick;
+        return {
+          badgeSize: lg ? 48 : 28, showArrow: lg && isLink, nameStyle: nameStyle, noteStyle: noteStyle,
+          badge: o.badge, name: o.name, note: o.note || '', href: o.href || '',
+          current: cur ? 'true' : 'false',
+          isLink: isLink, isButton: isButton, isStatic: !isLink && !isButton,
+          style: base + (cur ? on : off),
+          liStyle: 'display: flex; align-items: center; gap: 12px; flex-wrap: wrap;' + (o.actionLabel ? ' padding-right: 12px' : ''),
+          save: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; if (e && e.type === 'pointerdown') { if (e.button !== 0) return; if (e.pointerType === 'touch') { self._td = { x: e.clientX, y: e.clientY }; return; } } if (e && e.type === 'pointerup') { var td = self._td; self._td = null; if (!td || Math.abs(e.clientX - td.x) + Math.abs(e.clientY - td.y) > 10) return; } write(o.saveKeys, o.href); },
+          pick: function (e) { write(o.saveKeys, ''); if (o.onPick) o.onPick(e); },
+          hasAction: !!o.actionLabel, actionLabel: o.actionLabel || '', actionVariant: o.actionVariant || 'secondary', onAction: o.onAction || null
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

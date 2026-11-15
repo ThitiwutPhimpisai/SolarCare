@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>SolarCare แดชบอร์ด</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button{font-family:inherit;cursor:pointer}
+.mn-toggle{display:none}
+.mn-energy:empty,.mn-todo:empty{display:none}
+@media (max-width: 767px){.mn-kpi{order:10}.mn-energy{order:11}.mn-toggle{display:inline-flex}.mn-energy[data-open="false"] .mn-energy-body{display:none}}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="overview" org-id="{{orgId}}" on-org="{{setOrg}}" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px; box-sizing: border-box">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+  <div style="display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; justify-content: space-between">
+    <div style="flex: 1 1 420px; min-width: 0">
+      <dc-import name="PageHeader" eyebrow="{{headEyebrow}}" icon="overview" title="ภาพรวมการดูแลแผงโซลาร์" hint-size="100%,72px"></dc-import>
+    </div>
+    <div role="note" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #FFF4E5; color: #8A3B06; font-size: 13px; font-weight: 600">
+      <dc-import name="Icon" icon="shield" size="16" tone="current" hint-size="16px,16px"></dc-import>
+      {{scopeNote}}
+    </div>
+  </div>
+
+  <sc-if value="{{showSetup}}" hint-placeholder-val="{{ false }}">
+  <section aria-labelledby="mn-setup" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
+      <h2 id="mn-setup" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="checkCircle" size="18" tone="muted" hint-size="18px,18px"></dc-import>เริ่มต้นใช้งาน{{orgName}}</h2>
+      <span style="display: inline-flex; align-items: center; gap: 12px; font-size: 13px; color: #4B5563">ทำแล้ว {{setupDone}} จาก 4<button type="button" onClick="{{dismissSetup}}" style="min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600">{{dismissLabel}}</button></span>
+    </div>
+    <div style="height: 8px; border-radius: 999px; background: #EEF0F3"><div style="{{setupBar}}"></div></div>
+    <sc-if value="{{noSites}}" hint-placeholder-val="{{ true }}"><p style="margin: 0; font-size: 14px; color: #4B5563">แดชบอร์ดจะแสดงตัวเลขและงานที่ต้องทำเมื่อเพิ่มไซต์แรกแล้ว</p></sc-if>
+    <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+      <sc-for list="{{setup}}" as="st" hint-placeholder-count="4">
+        <li style="display: flex; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid #EEF0F3; flex-wrap: wrap">
+          <span style="{{st.dot}}"><sc-if value="{{st.done}}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" icon="check" size="16" tone="white" hint-size="16px,16px"></dc-import></sc-if><sc-if value="{{st.todo}}" hint-placeholder-val="{{ true }}">{{st.n}}</sc-if></span>
+          <span style="flex: 1 1 240px"><span style="display: block; font-weight: 600">{{st.title}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{st.note}}</span></span>
+          <sc-if value="{{st.done}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #0A4F44; font-weight: 600">ทำแล้ว</span></sc-if>
+          <sc-if value="{{st.canAct}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="{{st.variant}}" icon="{{st.icon}}" label="{{st.cta}}" href="{{st.href}}" save-keys="{{st.keys}}" hint-size="120px,44px"></dc-import></sc-if>
+          <sc-if value="{{st.blocked}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #4B5563">{{st.why}}</span></sc-if>
+        </li>
+      </sc-for>
+    </ol>
+    <sc-if value="{{cannotCreateSite}}" hint-placeholder-val="{{ false }}">
+      <div style="font-size: 13px; color: #4B5563">การเพิ่มไซต์ต้องเป็น Org Owner / Org Admin</div>
+    </sc-if>
+  </section>
+  </sc-if>
+  <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+  <section aria-label="เลือกไซต์">
+    <dc-import name="FilterChips" label="ไซต์" value="{{sel}}" options="{{siteOpts}}" on-change="{{pickSite}}" hint-size="100%,44px"></dc-import>
+  </section>
+  </sc-if>
+
+  <div class="mn-todo"><sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+  <section aria-labelledby="mn-todo" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+    <div style="display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #E3E6EB">
+      <h2 id="mn-todo" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="clock" size="18" tone="muted" hint-size="18px,18px"></dc-import>ต้องทำวันนี้<span style="font-size: 13px; font-weight: 500; color: #4B5563">· {{todoCount}} รายการ</span></h2>
+      <a href="WorkOrders.dc.html" onPointerDown="{{toAllWo}}" onKeyDown="{{toAllWo}}" onClick="{{toAllWo}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูใบงานทั้งหมด<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
+    </div>
+    <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="ListState" state="loading" unit="งานวันนี้" rows="{{3}}" hint-size="100%,180px"></dc-import>
+    </sc-if>
+    <sc-if value="{{todoEmpty}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="ListState" state="empty" unit="งานด่วน" icon="checkCircle" empty-title="ไม่มีงานด่วนวันนี้" empty-text="{{todoEmptyText}}" hint-size="100%,180px"></dc-import>
+    </sc-if>
+    <sc-if value="{{todoReady}}" hint-placeholder-val="{{ true }}">
+      <ul style="list-style: none; margin: 0; padding: 0">
+        <sc-for list="{{todo}}" as="t" hint-placeholder-count="4">
+          <li style="border-top: 1px solid #EEF0F3">
+            <a href="{{t.href}}" onPointerDown="{{t.go}}" onKeyDown="{{t.go}}" onClick="{{t.go}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px; text-decoration: none; color: #111827; flex-wrap: wrap">
+              <dc-import name="Icon" icon="{{t.icon}}" size="18" bg="{{t.bg}}" hint-size="32px,32px"></dc-import>
+              <span style="flex: 1 1 240px; min-width: 0">
+                <span style="{{t.kindStyle}}">{{t.kind}}</span>
+                <span style="display: block; font-weight: 600">{{t.title}}</span>
+                <span style="display: block; font-size: 13px; color: #4B5563">{{t.meta}}</span>
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #0F6B5C">{{t.cta}}<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></span>
+            </a>
+          </li>
+        </sc-for>
+      </ul>
+    </sc-if>
+    <dc-import name="Insights" view="summary" place="main" site="{{energySite}}" hint-size="100%,72px"></dc-import>
+  </section>
+  </sc-if></div>
+
+  <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+  <section class="mn-kpi" aria-busy="{{loading}}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
+    <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+      <sc-if value="{{k.link}}" hint-placeholder-val="{{ true }}">
+        <a href="{{k.href}}" onPointerDown="{{k.go}}" onKeyDown="{{k.go}}" onClick="{{k.go}}" aria-label="{{k.aria}}" title="{{k.aria}}" style="display: block; text-decoration: none; color: inherit; border-radius: 12px">
+          <dc-import name="KpiCard" icon="{{k.icon}}" label="{{k.label}}" value="{{k.value}}" unit="{{k.unit}}" tone="{{k.tone}}" note="{{k.note}}" loading="{{loading}}" hint-size="100%,100px"></dc-import>
+        </a>
+      </sc-if>
+      <sc-if value="{{k.plain}}" hint-placeholder-val="{{ false }}">
+        <dc-import name="KpiCard" icon="{{k.icon}}" label="{{k.label}}" value="{{k.value}}" unit="{{k.unit}}" tone="{{k.tone}}" note="{{k.note}}" loading="{{loading}}" hint-size="100%,100px"></dc-import>
+      </sc-if>
+    </sc-for>
+  </section>
+  </sc-if>
+
+  <div class="mn-energy" data-open="{{energyOpen}}"><sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+    <section aria-labelledby="mn-energy" style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between">
+        <h2 id="mn-energy" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="energy" size="18" tone="muted" hint-size="18px,18px"></dc-import>พลังงานและผลตอบแทน · 12 เดือน</h2>
+        <a href="EnergyValue.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูพลังงานและผลตอบแทน →</a>
+      <button type="button" class="mn-toggle" onClick="{{toggleEnergy}}" aria-expanded="{{energyOpenAria}}" aria-controls="mn-energy-body" style="align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; color: #374151; font-size: 13px; font-weight: 600">{{energyToggleLabel}}<dc-import name="Icon" icon="chevronDown" size="16" hint-size="16px,16px"></dc-import></button>
+      </div>
+      <div id="mn-energy-body" class="mn-energy-body"><dc-import name="EnergyStats" view="summary" org="{{orgId}}" site="{{energySite}}" period="12" hint-size="100%,140px"></dc-import></div>
+    </section>
+  </sc-if></div>
+
+
+  </div>
+</main>
+  <dc-import name="Flash" page="Main.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading"],"default":"ready"},"$preview":{"width":1440,"height":980}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { tick: 0 }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.insightDismissed', 'sc.siteCycle', 'sc.site', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.new', 'sc.newsite', 'sc.woStat', 'sc.createdWo', 'sc.createdName', 'sc.createdSites', 'sc.createdInvites', 'sc.woAssign', 'sc.siteEdits', 'sc.setupDismissed'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now(), energyOpen: false }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this;
+    var loading = (this.props.state ?? 'ready') === 'loading';
+    // DATA.md: orgs, sites (last APPROVED cleaning, cycle, next due) and the open work orders
+    var orgs = [
+      { id: 'a', name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', techs: 4, sites: [
+        { id: 'a1', thumb: 'k1', name: 'ฟาร์มโคราช 1', kwp: 8400, st: 'due', next: '16 พ.ย. 2569 (พรุ่งนี้)', dueIn: 1 },
+        { id: 'a2', thumb: 'k2', name: 'ฟาร์มโคราช 2', kwp: 6200, st: 'due', next: '26 พ.ย. 2569', dueIn: 11 },
+        { id: 'a3', thumb: 'bp', name: 'หลังคาโรงงานบางปู', kwp: 1150, st: 'late', next: '27 ต.ค. 2569', dueIn: -19 },
+        { id: 'a4', thumb: 'lb', name: 'ลานจอดรถลพบุรี', kwp: 960, st: 'ok', next: '4 ม.ค. 2570', dueIn: 50 } ] },
+      { id: 'b', name: 'กรีนมาร์ท รีเทล', role: 'Site Manager', techs: 1, sites: [
+        { id: 'b1', thumb: 'rs', name: 'สาขารังสิต', kwp: 420, st: 'ok', next: '27 พ.ย. 2569', dueIn: 12 },
+        { id: 'b2', thumb: 'bn', name: 'สาขาบางนา', kwp: 380, st: 'late', next: '12 พ.ย. 2569', dueIn: -3 } ] },
+      { id: 'c', name: 'นิคมฯ เหนือ', role: 'Viewer', techs: 3, sites: [
+        { id: 'c1', thumb: 'lp', name: 'โรงงาน A ลำพูน', kwp: 2300, st: 'ok', next: '29 พ.ย. 2569', dueIn: 14 } ] },
+      { id: 'd', name: 'ไร่ทองโซลาร์', role: 'Org Owner', techs: 0, invites: 1, sites: [] },
+      { id: 'e', name: 'ริมทะเล รีสอร์ท', role: 'Site Manager', techs: 0, sites: [
+        { id: 'e1', thumb: 'e1', name: 'หลังคาอาคาร A หัวหิน', kwp: 210, st: 'unset', next: '—', dueIn: null } ] }
+    ];
+    var WOS = [
+      { no: 'WO-1043', org: 'a', title: 'ล้างแผงรอบไตรมาส โซน A–C', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '18 พ.ย. 2569', dueIn: 3, st: 'review' },
+      { no: 'WO-1042', org: 'a', title: 'ตรวจจุดร้อน (hotspot) หลังพายุ', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '16 พ.ย. 2569', dueIn: 1, st: 'doing' },
+      { no: 'WO-1041', org: 'a', title: 'ล้างแผงตามรอบ', site: 'ฟาร์มโคราช 2', who: '', due: '25 พ.ย. 2569', dueIn: 10, st: 'new' },
+      { no: 'WO-1039', org: 'a', title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', who: 'ธนากร ว.', due: '10 พ.ย. 2569', dueIn: -5, st: 'doing' },
+      { no: 'GM-0211', org: 'b', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '20 พ.ย. 2569', dueIn: 5, st: 'todo' },
+      { no: 'GM-0209', org: 'b', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', dueIn: -3, st: 'doing' },
+      { no: 'NK-0102', org: 'c', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '22 พ.ย. 2569', dueIn: 7, st: 'doing' }
+    ];
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var J = function (k, d) { try { return JSON.parse(SS(k) || d) || JSON.parse(d); } catch (e) { return JSON.parse(d); } };
+    var org = orgs.filter(function (o) { return o.id === (SS('sc.org') || 'a'); })[0] || orgs[0];
+    var orgName = org.id === 'd' && SS('sc.createdName') ? SS('sc.createdName') : org.name;
+    var admin = org.role === 'Org Owner' || org.role === 'Org Admin';
+    var canApprove = admin || org.role === 'Site Manager';
+    // sites created in the prototype (SiteForm / CreateOrg step 3)
+    var THUMB = { 'โซลาร์ฟาร์ม': 'farmType', farm: 'farmType', 'หลังคา': 'roofType', roof: 'roofType', Carport: 'carportType', carport: 'carportType' };
+    var EDITS = J('sc.siteEdits', '{}');
+    var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    var APPROVER = { 'ฟาร์มโคราช 1': 'สมศรี ป.', 'ฟาร์มโคราช 2': 'สมศรี ป.', 'สาขารังสิต': 'ณัฐภัทร ส.', 'สาขาบางนา': 'ณัฐภัทร ส.', 'โรงงาน A ลำพูน': 'ศิริพร ก.', 'หลังคาอาคาร A หัวหิน': 'ณัฐภัทร ส.', 'หลังคาโรงงานบางปู': 'ณัฐภัทร ส.', 'ลานจอดรถลพบุรี': 'ณัฐภัทร ส.' };
+    var made = J('sc.createdSites', '[]').filter(function (x) { return x && x.org === org.id && x.name; });
+    var sites = org.sites.concat(made.filter(function (x) { return !org.sites.some(function (s) { return s.name === x.name; }); }).map(function (x, i) {
+      var kwp = parseInt(String(x.kwp || '0').replace(/,/g, ''), 10) || 0;
+      return { id: 'n' + i, thumb: THUMB[x.type] || 'roofType', name: x.name, kwp: kwp, st: x.cycle ? 'ok' : 'unset', next: '—', dueIn: null, fresh: true, cycle: x.cycle || '' };
+    }));
+    // a cycle set on SiteDetail (sc.siteCycle, keyed by original site name) counts as set: no more "ยังไม่ตั้งรอบล้าง"
+    var CYC = J('sc.siteCycle', '{}');
+    sites = sites.map(function (x) { return x.st === 'unset' && Number(CYC[x.name]) > 0 ? Object.assign({}, x, { st: 'due', cycle: String(CYC[x.name]), next: 'รอล้างครั้งแรก' }) : x; });
+    sites = sites.map(function (x) { var ed = EDITS[x.name]; if (!ed) return x; var k2 = parseInt(String(ed.kwp || '').replace(/,/g, ''), 10); return Object.assign({}, x, { kwp: k2 || x.kwp }); });
+    // open work orders: DATA.md, then prototype changes (sc.woStat / sc.woAssign / sc.createdWo)
+    var woStat = J('sc.woStat', '{}'), woAssign = J('sc.woAssign', '{}');
+    var wos = WOS.filter(function (w) { return w.org === org.id; }).concat(J('sc.createdWo', '[]').filter(function (m) { return m && m.org === org.id && m.no; }).map(function (m) {
+      return { no: m.no, org: m.org, title: m.title || 'ใบงานใหม่', site: m.site || '', who: m.who || '', due: m.due || '', dueIn: 10, st: m.st || 'todo' };
+    })).map(function (w) {
+      var st = woStat[w.no] || w.st, who = woAssign[w.no] || w.who;
+      if (woAssign[w.no] && st === 'new') st = 'todo';
+      return Object.assign({}, w, { st: st, who: who });
+    }).filter(function (w) { return w.st !== 'done'; });
+    // shared site choice (Thai site name) — Schedule / WorkOrders / Reports read the same key
+    var siteName = SS('sc.site');
+    var picked = sites.filter(function (s) { return s.name === siteName; })[0];
+    var sel = picked ? picked.id : 'all';
+    var shownSites = sites.filter(function (s) { return sel === 'all' || s.id === sel; });
+    var shownNames = shownSites.map(function (s) { return s.name; });
+    var shownWos = wos.filter(function (w) { return shownNames.indexOf(w.site) >= 0; });
+    var siteOpts = [{ id: 'all', label: 'ทุกไซต์' }].concat(sites.map(function (s) { return { id: s.id, label: DN(s.name) }; }));
+    var sum = 0; shownSites.forEach(function (s) { sum += s.kwp; });
+    var overdue = shownWos.filter(function (w) { return w.dueIn < 0; });
+    var lateSites = shownSites.filter(function (s) { return s.st === 'late'; }).length;
+    var cur = sites.filter(function (s) { return s.id === sel; })[0];
+    var link = function (keys) { return function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { Object.keys(keys).forEach(function (k) { window.sessionStorage.setItem(k, keys[k]); }); } catch (x) {} }; };
+    // "ต้องทำวันนี้": approvals, overdue jobs, unassigned jobs, jobs due within 3 days, sites late/unset without an open job
+    var todo = [];
+    var woRow = function (w, kind, icon, bg, cta, kindColor) {
+      return { kind: kind, icon: icon, bg: bg, title: w.no + ' · ' + w.title, meta: DN(w.site) + ' · ' + (w.who || 'ยังไม่มีผู้รับผิดชอบ') + ' · กำหนด ' + w.due, cta: cta,
+        kindStyle: 'display: block; font-size: 12px; font-weight: 700; color: ' + kindColor, href: 'WorkOrderDetail.dc.html', go: link({ 'sc.wo': w.no, 'sc.woFrom': 'Main' }) };
+    };
+    shownWos.forEach(function (w) {
+      if (w.st === 'review') { var apv = APPROVER[w.site] || (admin ? 'ณัฐภัทร ส.' : 'Org Admin'), mine = apv === 'ณัฐภัทร ส.'; todo.push([0, woRow(w, mine ? 'รอคุณตรวจและอนุมัติ' : 'รอ ' + apv + ' อนุมัติ' + (admin ? ' · คุณอนุมัติแทนได้' : ''), 'checkCircle', 'info', (mine || admin) ? 'ตรวจงาน' : 'ดูใบงาน', '#1E3A8A')]); }
+      else if (w.dueIn < 0) todo.push([1, woRow(w, 'เลยกำหนด ' + (-w.dueIn) + ' วัน', 'alert', 'danger', 'ดูใบงาน', '#B42318')]);
+      else if (w.st === 'new' && !w.who) todo.push([2, woRow(w, 'ยังไม่มอบหมายช่าง', 'user', 'warn', admin || org.role === 'Site Manager' ? 'มอบหมาย' : 'ดูใบงาน', '#8A3B06')]);
+      else if (w.dueIn <= 3) todo.push([3, woRow(w, w.dueIn === 0 ? 'ครบกำหนดวันนี้' : (w.dueIn === 1 ? 'ครบกำหนดพรุ่งนี้' : 'ครบกำหนดใน ' + w.dueIn + ' วัน'), 'clock', 'warn', 'ดูใบงาน', '#8A3B06')]);
+    });
+    shownSites.forEach(function (s) {
+      var hasJob = wos.some(function (w) { return w.site === s.name; });
+      var row = function (kind, meta, icon, bg, color) { return { kind: kind, icon: icon, bg: bg, title: DN(s.name), meta: meta, cta: 'ดูไซต์', kindStyle: 'display: block; font-size: 12px; font-weight: 700; color: ' + color, href: 'SiteDetail.dc.html', go: link({ 'sc.siteName': s.name, 'sc.siteFrom': 'Main' }) }; };
+      if (s.st === 'unset') todo.push([4, row('ยังไม่ตั้งรอบล้าง', 'ตั้งรอบล้างเพื่อให้ระบบสร้างใบงานอัตโนมัติ', 'calendar', 'gray', '#374151')]);
+      else if (!hasJob && s.st === 'late') todo.push([1, row('เลยกำหนดล้าง ' + (-s.dueIn) + ' วัน', 'ครบรอบ ' + s.next + ' · ยังไม่มีใบงาน', 'alert', 'danger', '#B42318')]);
+      else if (!hasJob && s.next === 'รอล้างครั้งแรก') todo.push([4, row('รอล้างครั้งแรก', 'ตั้งรอบทุก ' + s.cycle + ' วันแล้ว · ยังไม่มีใบงาน', 'calendar', 'warn', '#8A3B06')]);
+      else if (!hasJob && s.dueIn != null && s.dueIn <= 14) todo.push([4, row('ครบรอบล้างใน ' + s.dueIn + ' วัน', 'ครบรอบ ' + s.next + ' · ยังไม่มีใบงาน', 'calendar', 'warn', '#8A3B06')]);
+    });
+    todo.sort(function (x, y) { return x[0] - y[0]; });
+    todo = todo.map(function (x) { return x[1]; });
+    // setup checklist (no sites yet): computed from what was done in the prototype
+    var invites = (org.invites || 0) + J('sc.createdInvites', '[]').filter(function (x) { return x && x.org === org.id; }).length;
+    var hasSite = sites.length > 0, firstWo = wos.length > 0;
+    var dot = function (done, active) { return 'width: 32px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box; font-weight: 700; ' + (done ? 'background: #0F6B5C; color: #FFFFFF' : (active ? 'border: 2px solid #0F6B5C; color: #0F6B5C' : 'border: 2px solid #D5D9E0; color: #4B5563')); };
+    var steps = [
+      { title: 'สร้างองค์กร', note: 'คุณเป็น ' + org.role, done: true },
+      { title: 'เพิ่มไซต์แรก', note: 'ชื่อ จังหวัด กำลังติดตั้ง และรอบล้าง', done: hasSite, cta: 'เพิ่มไซต์', icon: 'plus', href: 'SiteForm.dc.html', keys: 'sc.editSite=|sc.from=Main|sc.siteFormFrom=Main', can: admin, why: 'ต้องเป็น Org Owner / Org Admin' },
+      { title: 'เชิญทีมและช่าง', note: invites ? 'ส่งคำเชิญแล้ว ' + invites + ' คน · เชิญเพิ่มได้ที่หน้าสมาชิก' : 'กำหนด Role และไซต์ที่แต่ละคนเข้าถึงได้', done: invites > 0, cta: 'เชิญสมาชิก', icon: 'users', href: 'Members.dc.html', keys: '', can: admin, why: 'ต้องเป็น Org Owner / Org Admin', variant: 'secondary' },
+      { title: 'สร้างใบงานแรก', note: 'หรือรอให้ระบบสร้างตามรอบล้างอัตโนมัติ', done: firstWo, cta: 'สร้างใบงาน', icon: 'workorder', href: 'CreateWorkOrder.dc.html', keys: 'sc.from=Main', can: admin && hasSite, why: hasSite ? 'ต้องเป็น Org Owner / Org Admin' : 'เพิ่มไซต์ก่อน (ขั้นที่ 2)', variant: 'secondary' }
+    ];
+    var nDone = steps.filter(function (x) { return x.done; }).length;
+    var dismissed = SS('sc.setupDismissed').split(',').indexOf(org.id) >= 0;
+    var setupEligible = org.id === 'd' || !hasSite; // new orgs only: established orgs never see the checklist
+    var showSetup = setupEligible && !dismissed;
+    var firstOpen = steps.filter(function (x) { return !x.done; })[0];
+    var tile = function (o) { return Object.assign({ link: true, plain: false, note: '' }, o); };
+    var kpis = [
+      tile({ label: 'กำลังติดตั้งรวม', value: sum.toLocaleString('en-US'), unit: 'kWp', tone: 'default', icon: 'panel', note: shownSites.length + ' ไซต์', href: 'Sites.dc.html', go: link({ 'sc.from': 'Main' }), aria: 'ดูไซต์ทั้งหมด ' + shownSites.length + ' ไซต์' }),
+      tile({ label: 'ใบงานเปิดอยู่', value: String(shownWos.length), unit: '', tone: 'default', icon: 'workorder', note: 'ดูในหน้าใบงาน', href: 'WorkOrders.dc.html', go: link({ 'sc.from': 'Main', 'sc.woTab': 'open' }), aria: 'เปิดหน้าใบงาน · ใบงานเปิดอยู่ ' + shownWos.length + ' ใบ' }),
+      tile({ label: 'ใบงานเลยกำหนด', value: String(overdue.length), unit: 'ใบ', tone: overdue.length ? 'danger' : 'default', icon: 'clock', note: lateSites ? 'ไซต์เลยรอบล้าง ' + lateSites + ' ไซต์' : 'ไม่มีไซต์เลยรอบล้าง', href: 'WorkOrders.dc.html', go: link({ 'sc.from': 'Main', 'sc.woTab': 'overdue' }), aria: 'เปิดใบงานที่เลยกำหนด ' + overdue.length + ' ใบ' }),
+      tile({ label: 'ทีมช่างที่เข้าถึงได้', value: String(org.techs), unit: 'คน', tone: 'default', icon: 'wrench', link: false, plain: true })
+    ];
+    var eOpen = !!this.state.energyOpen, selfE = this;
+    // analytics findings shown as the last row of "ต้องทำวันนี้" (same ids as Insights; forecast-only f5 is not a to-do)
+    var IN_NOW = { f1: 'หลังคาโรงงานบางปู', f2: 'ฟาร์มโคราช 1', f3: 'ลานจอดรถลพบุรี', f4: 'ฟาร์มโคราช 2', f6: 'สาขาบางนา', f7: 'โรงงาน A ลำพูน', f8: 'สาขารังสิต' };
+    var insDis = (function () { try { return (window.sessionStorage.getItem('sc.insightDismissed') || '').split(','); } catch (e) { return []; } })();
+    var insN = Object.keys(IN_NOW).filter(function (k) { var nm = IN_NOW[k]; return insDis.indexOf(k) < 0 && sites.some(function (x) { return x.name === nm; }) && (!picked || picked.name === nm); }).length > 0 ? 1 : 0;
+    return {
+      energyOpen: eOpen ? 'true' : 'false', energyOpenAria: eOpen ? 'true' : 'false', energyToggleLabel: eOpen ? 'ซ่อนพลังงาน' : 'ดูพลังงาน',
+      toggleEnergy: function () { selfE.setState({ energyOpen: !selfE.state.energyOpen }); },
+      orgId: org.id, orgName: orgName, loading: loading,
+      setOrg: function (id) { try { window.sessionStorage.setItem('sc.org', id); } catch (e) {} try { window.sessionStorage.setItem('sc.site', 'all'); } catch (e) {} self.setState({ tick: Date.now() }); },
+      sel: sel, siteOpts: siteOpts,
+      pickSite: function (id) { var s = sites.filter(function (x) { return x.id === id; })[0]; try { window.sessionStorage.setItem('sc.site', s ? s.name : 'all'); } catch (e) {} self.setState({ tick: Date.now() }); },
+      headEyebrow: orgName + ' / ' + (cur ? DN(cur.name) : 'ทุกไซต์'),
+      scopeNote: admin ? 'สิทธิ์: ทั้งองค์กร' : (org.role === 'Viewer' ? 'สิทธิ์: ดูอย่างเดียว' : 'สิทธิ์: เฉพาะไซต์ที่ได้รับมอบหมาย'),
+      cannotCreateSite: !admin,
+      kpis: kpis,
+      hasSites: hasSite, noSites: !hasSite, showSetup: showSetup,
+      dismissLabel: nDone === 4 ? 'เสร็จครบแล้ว · ซ่อนเช็กลิสต์' : 'ซ่อน',
+      dismissSetup: function () { try { var cur0 = (window.sessionStorage.getItem('sc.setupDismissed') || '').split(',').filter(Boolean); if (cur0.indexOf(org.id) < 0) cur0.push(org.id); window.sessionStorage.setItem('sc.setupDismissed', cur0.join(',')); } catch (e) {} self.setState({ tick: Date.now() }); },
+      toAllWo: link({ 'sc.from': 'Main', 'sc.woTab': 'all' }),
+      energySite: picked ? picked.name : 'all',
+      todo: todo, todoCount: todo.length + insN,
+      todoEmpty: !loading && todo.length === 0 && !insN, todoReady: !loading && todo.length > 0,
+      todoEmptyText: 'ทุกใบงานอยู่ในกำหนด และไม่มีงานรออนุมัติ · ดูทั้งหมดที่หน้าใบงาน',
+      setupDone: nDone, setupBar: 'width: ' + Math.round(nDone / 4 * 100) + '%; height: 8px; border-radius: 999px; background: #0F6B5C',
+      setup: steps.map(function (x, i) {
+        var active = x === firstOpen;
+        return { n: String(i + 1), title: x.title, note: x.note, done: x.done, todo: !x.done, dot: dot(x.done, active),
+          canAct: !x.done && !!x.can && !!x.href, blocked: !x.done && !x.can && !!x.why, why: x.why || '',
+          cta: x.cta || '', icon: x.icon || '', href: x.href || '', keys: x.keys || '', variant: active ? 'primary' : (x.variant || 'secondary') };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

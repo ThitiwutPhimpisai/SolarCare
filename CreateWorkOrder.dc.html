@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>สร้างใบงาน</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="wo" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" icon="workorder" back-label="{{backLabel}}" back-href="{{backHref}}" title="สร้างใบงาน" subtitle="{{subtitle}}" hint-size="100%,96px"></dc-import>
+
+    <sc-if value="{{noSites}}" hint-placeholder-val="{{ false }}">
+      <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding-bottom: 24px; display: flex; flex-direction: column; align-items: center">
+        <dc-import name="ListState" state="empty" unit="ไซต์" icon="site" empty-title="{{blockTitle}}" empty-text="{{blockText}}" hint-size="100%,120px"></dc-import>
+        <sc-if value="{{canAddSite}}" hint-placeholder-val="{{ true }}">
+          <dc-import name="Button" icon="plus" label="เพิ่มไซต์ก่อน" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=CreateWorkOrder" hint-size="130px,44px"></dc-import>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+      <section style="flex: 1 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="wo-site" style="font-size: 13px; font-weight: 600">ไซต์</label>
+            <sc-if value="{{siteFixed}}" hint-placeholder-val="{{ true }}">
+              <div id="wo-site" style="min-height: 44px; padding: 0 12px; border: 1px solid #E3E6EB; border-radius: 8px; font-size: 14px; background: #F5F6F8; display: flex; align-items: center; font-weight: 600">{{siteShown}}</div>
+              <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; color: #4B5563">{{siteFixedNote}}<button type="button" onClick="{{unfixSite}}" style="min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600">เปลี่ยนไซต์</button></span>
+            </sc-if>
+            <sc-if value="{{sitePick}}" hint-placeholder-val="{{ false }}">
+              <select id="wo-site" value="{{site}}" onChange="{{setSite}}" style="min-height: 44px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+                <sc-for list="{{sites}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}">{{o.t}}</option></sc-for>
+              </select>
+              <span style="font-size: 12px; color: #4B5563">แสดงเฉพาะไซต์ที่คุณมีสิทธิ์สร้างใบงาน</span>
+            </sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="wo-due" style="font-size: 13px; font-weight: 600">กำหนดเสร็จ</label>
+            <input id="wo-due" type="date" min="2026-11-15" value="{{due}}" onChange="{{setDue}}" aria-invalid="{{dueBad}}" aria-describedby="wo-due-msg" style="{{dueStyle}}">
+            <span id="wo-due-msg" style="{{dueMsgStyle}}">{{dueMsg}}</span>
+          </div>
+        </div>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 8px">ประเภทงาน</legend>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px">
+            <sc-for list="{{types}}" as="t" hint-placeholder-count="3">
+              <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="{{t.style}}">
+                <span style="font-weight: 700; font-size: 15px">{{t.label}}</span>
+                <span style="font-size: 12px; color: #4B5563">{{t.desc}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </fieldset>
+
+        <fieldset style="border: 0; margin: 0; padding: 0">
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 8px">โซน / พื้นที่ <span style="font-weight: 400; color: #4B5563">(เลือกอย่างน้อย 1)</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <sc-for list="{{zones}}" as="z" hint-placeholder-count="4">
+              <label style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border: 1px solid #D5D9E0; border-radius: 8px; font-size: 14px; cursor: pointer"><input type="checkbox" checked="{{z.on}}" onChange="{{z.toggle}}" style="width: 18px; height: 18px; accent-color: #0F6B5C">{{z.label}}</label>
+            </sc-for>
+          </div>
+          <sc-if value="{{showZoneErr}}" hint-placeholder-val="{{ false }}"><div style="margin-top: 6px; font-size: 12px; color: #B42318">เลือกโซนอย่างน้อย 1 โซน</div></sc-if>
+        </fieldset>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 4px">ผู้รับผิดชอบ <span style="font-weight: 400; color: #4B5563">· เฉพาะคนที่มีสิทธิ์ในไซต์นี้</span></legend>
+          <div style="border: 1px solid #D5D9E0; border-radius: 10px; overflow: hidden">
+            <sc-for list="{{techs}}" as="p" hint-placeholder-count="4">
+          <button onClick="{{p.pick}}" disabled="{{p.off}}" aria-pressed="{{p.on}}" style="{{p.style}}">
+            <sc-if value="{{p.av}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{p.av}}" size="40" hint-size="40px,40px"></dc-import></sc-if>
+            <sc-if value="{{p.noAv}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="width: 40px; height: 40px; border-radius: 999px; background: #F3F4F6; color: #374151; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex: none">{{p.ini}}</span></sc-if>
+            <span style="flex: 1; min-width: 0; text-align: left">
+              <span style="display: block; font-size: 14px; font-weight: 600">{{p.name}}</span>
+              <span style="display: block; font-size: 12px; color: #4B5563">{{p.note}}</span>
+            </span>
+            <sc-if value="{{p.on}}" hint-placeholder-val="{{ false }}">
+              <dc-import name="Icon" icon="check" size="20" tone="brand" hint-size="20px,20px"></dc-import>
+            </sc-if>
+          </button>
+        </sc-for>
+          </div>
+          <sc-if value="{{showTechErr}}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; color: #B42318">เลือกผู้รับผิดชอบ 1 คน</div></sc-if>
+        </fieldset>
+
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="wo-note" style="font-size: 13px; font-weight: 600">หมายเหตุถึงช่าง</label>
+          <textarea id="wo-note" rows="3" placeholder="เช่น โซน D ฝุ่นหนา ใช้น้ำ DI เท่านั้น" style="padding: 10px 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical"></textarea>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
+          <sc-if value="{{showMissing}}" hint-placeholder-val="{{ false }}"><span role="status" style="margin-right: auto; font-size: 13px; color: #B42318">{{missing}}</span></sc-if>
+          <dc-import name="Button" label="ยกเลิก" href="{{backHref}}" variant="secondary" hint-size="90px,44px"></dc-import>
+          <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="checkCircle" label="สร้างและแจ้งช่าง" href="{{createHref}}" save-keys="{{createStore}}" hint-size="160px,44px"></dc-import></sc-if><sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" icon="checkCircle" label="สร้างและแจ้งช่าง" on-press="{{tryCreate}}" hint-size="160px,44px"></dc-import></sc-if>
+        </div>
+      </section>
+
+    </div>
+    </sc-if>
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { type: 'clean', tech: '', due: '2026-11-25', zones: {}, site: '', unfix: false, tried: false, dueTouched: false, typeTouched: false }; }
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.from', 'sc.siteName', 'sc.createdWo', 'sc.createdSites', 'sc.cycleDue', 'sc.device', 'sc.siteEdits', 'sc.woType'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    // each visit starts with an empty form, not the one Play restored (DATA.md round 3)
+    self.setState({ sync: Date.now(), type: 'clean', tech: '', due: '2026-11-25', zones: {}, site: '', unfix: false, tried: false, dueTouched: false, typeTouched: false }); // force one fresh render: Play may reuse a restored render
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var self = this, st = self.state;
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var orgId = ['a', 'b', 'c', 'd', 'e'].indexOf(SS('sc.org')) >= 0 ? SS('sc.org') : 'a';
+    // canonical data: ../DATA.md
+    var ORG = {
+      a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', sites: { 'ฟาร์มโคราช 1': ['A', 'B', 'C', 'D'], 'ฟาร์มโคราช 2': ['A', 'B', 'C', 'D'], 'หลังคาโรงงานบางปู': ['หลังคา'], 'ลานจอดรถลพบุรี': ['ลานจอด'] },
+        techs: [{ id: 't', av: 'thanakorn', name: 'ธนากร ว.', note: 'Technician · ผู้รับเหมา CleanPro · งานค้าง 3' },
+          { id: 'b', av: '', ini: 'ทB', name: 'ทีมช่าง B', note: 'ทีมช่างผู้รับเหมา CleanPro · ว่าง' },
+          { id: 's', av: 'somsri', name: 'สมศรี ป.', note: 'Site Manager ของไซต์นี้ · ทำเองได้', sites: ['ฟาร์มโคราช 1', 'ฟาร์มโคราช 2'] },
+          { id: 'p', av: 'pimchanok', name: 'พิมพ์ชนก ร.', note: 'Viewer — ไม่มีสิทธิ์รับงาน', off: true, sites: ['ฟาร์มโคราช 1'] }] },
+      b: { name: 'กรีนมาร์ท รีเทล', role: 'Site Manager', sites: { 'สาขารังสิต': ['หลังคา'], 'สาขาบางนา': ['ลานจอด'] },
+        techs: [{ id: 't', av: 'thanakorn', name: 'ธนากร ว.', note: 'Technician · ผู้รับเหมา CleanPro · งานค้าง 2' }, { id: 'n', av: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', note: 'Site Manager · ทำเองได้' },
+          { id: 'p', av: 'pimchanok', name: 'พิมพ์ชนก ร.', note: 'Viewer — ไม่มีสิทธิ์รับงาน', off: true, sites: ['สาขาบางนา'] }] },
+      c: { name: 'นิคมฯ เหนือ', role: 'Viewer', sites: { 'โรงงาน A ลำพูน': ['หลังคา'] }, techs: [] },
+      d: { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', role: 'Org Owner', sites: {}, techs: [{ id: 'n', av: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', note: 'Org Owner · ทำเองได้ · องค์กรนี้ยังไม่มีช่าง' }] },
+      e: { name: 'ริมทะเล รีสอร์ท', role: 'Site Manager', sites: { 'หลังคาอาคาร A หัวหิน': ['หลังคา'] },
+        techs: [{ id: 'n', av: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', note: 'Site Manager · ทำเองได้ · องค์กรนี้ยังไม่มีช่าง' }] }
+    }[orgId];
+    // sites added in the prototype (SiteForm / CreateOrg → sc.createdSites) can get jobs too
+    try { (JSON.parse(SS('sc.createdSites') || 'null') || []).forEach(function (x) { if (x && x.org === orgId && x.name && !ORG.sites[x.name]) ORG.sites[x.name] = ['ทั้งไซต์']; }); } catch (e) {}
+    var siteNames = Object.keys(ORG.sites);
+    var viewer = ORG.role === 'Viewer';
+    var types = [['clean', 'ล้างตามรอบ', 'ใช้เช็กลิสต์ล้างมาตรฐาน'], ['inspect', 'ตรวจสภาพ', 'จุดร้อน (hotspot), รอยร้าว, ขั้วต่อ'], ['repair', 'ซ่อมบำรุง', 'เปลี่ยนชิ้นส่วน / สายไฟ']];
+    var DN0 = function (n) { try { var e = JSON.parse(SS('sc.siteEdits') || '{}') || {}; return (e[n] && e[n].name) || n; } catch (x) { return n; } };
+    var ORIGIN = {
+      WorkOrders: { label: 'ใบงาน', href: 'WorkOrders.dc.html' },
+      Schedule: { label: 'ตารางล้าง', href: 'Schedule.dc.html' },
+      SiteDetail: { label: DN0(siteNames.indexOf(SS('sc.siteName')) >= 0 ? SS('sc.siteName') : (siteNames[0] || 'ไซต์')), href: 'SiteDetail.dc.html' },
+      Main: { label: 'ภาพรวม', href: 'Main.dc.html' },
+      OrgEmpty: { label: 'ภาพรวม', href: 'Main.dc.html' },
+      DeviceDetail: { label: SS('sc.device') || 'อุปกรณ์', href: 'DeviceDetail.dc.html' },
+      Analytics: { label: 'วิเคราะห์', href: 'Analytics.dc.html' }
+    };
+    var from = ORIGIN[SS('sc.from')] ? SS('sc.from') : 'WorkOrders';
+    var fromSite = (from === 'SiteDetail' || from === 'Schedule' || from === 'DeviceDetail' || from === 'Analytics') && siteNames.indexOf(SS('sc.siteName')) >= 0 ? SS('sc.siteName') : '';
+    var fixed = !!fromSite && !st.unfix;
+    var site = fixed ? fromSite : (siteNames.indexOf(st.site) >= 0 ? st.site : siteNames[0] || '');
+    var zoneList = ORG.sites[site] || [];
+    var zoneOn = function (z) { var k = site + '|' + z; return st.zones[k] !== undefined ? !!st.zones[k] : zoneList.length === 1; }; // a single zone is picked for you
+    var zonesOn = zoneList.filter(zoneOn);
+    // defaults from where the form was opened: a cycle's due date (Schedule) or a repair job (DeviceDetail)
+    var cycDue = /^\d{4}-\d{2}-\d{2}$/.test(SS('sc.cycleDue')) ? SS('sc.cycleDue') : '';
+    var due = !st.dueTouched && from === 'Schedule' && cycDue ? cycDue : st.due;
+    var presetType = ['clean', 'inspect', 'repair'].indexOf(SS('sc.woType')) >= 0 ? SS('sc.woType') : 'repair';
+    var typeId = !st.typeTouched && (from === 'DeviceDetail' || (from === 'Analytics' && SS('sc.woType'))) ? presetType : st.type;
+    var EDITS = (function () { try { return JSON.parse(SS('sc.siteEdits') || '{}') || {}; } catch (e) { return {}; } })();
+    var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
+    // only people with rights on the chosen site (DATA.md round 5)
+    var techs = ORG.techs.filter(function (p) { return !p.sites || p.sites.indexOf(site) >= 0; });
+    var tech = techs.filter(function (p) { return p.id === st.tech && !p.off; })[0];
+    var dueBad = !due || due < '2026-11-15';
+    var zoneBad = zonesOn.length === 0, techBad = !tech;
+    var miss = [];
+    if (zoneBad) miss.push('เลือกโซน'); if (dueBad) miss.push('กำหนดเสร็จต้องไม่ก่อนวันนี้'); if (techBad) miss.push('เลือกผู้รับผิดชอบ');
+    var blocked = miss.length > 0;
+    var techName = tech ? tech.name.replace(' (คุณ)', '') : '';
+    // the new job: org prefix + next number (DATA.md round 3), with the form's type, due date and zones
+    var JS = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
+    var created = JS('sc.createdWo', []);
+    var PFX = { a: ['WO-', 1044, 4], b: ['GM-', 212, 4], c: ['NK-', 103, 4], d: ['RT-', 1, 4], e: ['RR-', 1, 4] }[orgId];
+    var newNo = '';
+    if (PFX) { var n = PFX[1] + created.filter(function (c) { return c && c.org === orgId; }).length; newNo = PFX[0] + String(n).padStart(PFX[2], '0'); }
+    var TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+    var dueTh = (function () { var p = String(due).split('-'); return p.length === 3 ? parseInt(p[2], 10) + ' ' + TH_M[parseInt(p[1], 10) - 1] + ' ' + (parseInt(p[0], 10) + 543) : ''; })();
+    var typeRow = types.filter(function (t) { return t[0] === typeId; })[0] || types[0];
+    var TITLE = { clean: 'ล้างแผงตามรอบ', inspect: 'ตรวจสภาพแผง', repair: 'ซ่อมบำรุง' };
+    var zonesOut = zonesOn.map(function (z) { return z.length === 1 ? 'โซน ' + z : z; });
+    var nextCreated = created.concat([{ no: newNo, org: orgId, title: TITLE[typeRow[0]] + ((from === 'DeviceDetail' || from === 'Analytics') && SS('sc.device') ? ' ' + SS('sc.device') : ''), site: site, who: techName, due: dueTh, st: 'todo', type: typeRow[1], zones: zonesOut }]);
+    var noSites = siteNames.length === 0 || viewer;
+    return {
+      noSites: noSites, hasSites: !noSites,
+      blockTitle: viewer ? 'บทบาท Viewer สร้างใบงานไม่ได้' : 'ยังไม่มีไซต์ในองค์กรนี้',
+      blockText: viewer ? 'ขอให้ผู้จัดการไซต์ของ ' + ORG.name + ' สร้างใบงานให้' : 'เพิ่มไซต์แรกก่อน แล้วจึงสร้างใบงานให้ช่าง',
+      canAddSite: !viewer && (ORG.role === 'Org Admin' || ORG.role === 'Org Owner'),
+      backLabel: ORIGIN[from].label, backHref: ORIGIN[from].href,
+      subtitle: fixed ? DN(site) + ' · ' + ORG.name : ORG.name,
+      siteFixed: fixed, sitePick: !fixed, site: site, siteShown: DN(site),
+      siteFixedNote: 'เลือกไว้จากหน้า ' + ORIGIN[from].label,
+      unfixSite: function () { self.setState({ unfix: true, site: site }); },
+      sites: siteNames.map(function (n) { return { v: n, t: DN(n) }; }),
+      setSite: function (e) { self.setState({ site: e.target.value }); },
+      createHref: blocked ? '' : (['Schedule', 'Main', 'SiteDetail', 'DeviceDetail', 'OrgEmpty', 'Analytics'].indexOf(from) >= 0 ? ORIGIN[from].href : 'WorkOrders.dc.html'), /* return where the user started; the flash lands there */ blocked: blocked, ready: !blocked, missing: 'ยังสร้างไม่ได้: ' + miss.join(' · '),
+      showMissing: blocked && st.tried, showZoneErr: zoneBad && st.tried, showTechErr: techBad && st.tried,
+      tryCreate: function () { self.setState({ tried: true }); },
+      createStore: blocked || !newNo ? '' : 'sc.flash=สร้างใบงาน ' + newNo + ' แล้ว · แจ้ง' + techName + ' แล้ว|sc.newno=' + newNo + '|sc.newtype=' + typeRow[1] + '|sc.newdue=' + dueTh + '|sc.createdWo=' + JSON.stringify(nextCreated),
+      due: due, dueBad: (dueBad && (st.tried || st.dueTouched)) ? 'true' : 'false',
+      dueStyle: 'min-height: 44px; padding: 0 12px; border: 1px solid ' + (dueBad && (st.tried || st.dueTouched) ? '#B42318' : '#858D9B') + '; border-radius: 8px; font-size: 14px',
+      dueMsg: dueBad && (st.tried || st.dueTouched) ? 'กำหนดเสร็จต้องเป็นวันนี้ (15 พ.ย. 2569) หรือหลังจากนี้' : '',
+      dueMsgStyle: 'font-size: 12px; color: #B42318' + (dueBad && (st.tried || st.dueTouched) ? '' : '; display: none'),
+      setDue: function (e) { self.setState({ due: e.target.value, dueTouched: true }); },
+      zoneBad: zoneBad, techBad: techBad,
+      zones: zoneList.map(function (z) { var k = site + '|' + z, on = zoneOn(z); return { label: z.length === 1 ? 'โซน ' + z : z, on: on,
+        toggle: function () { var o = Object.assign({}, self.state.zones); o[k] = !on; self.setState({ zones: o }); } }; }),
+      types: types.map(function (t) { var on = t[0] === typeId; return { label: t[1], desc: t[2], on: on, pick: function () { self.setState({ type: t[0], typeTouched: true }); },
+        style: 'min-height:72px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border-radius:10px;text-align:left;color:#111827;border:' + (on ? '2px solid #0F6B5C;background:#F0F7F5' : '1px solid #D5D9E0;background:#FFFFFF') }; }),
+      techs: techs.map(function (p) { var on = !!tech && p.id === tech.id; return Object.assign({ off: false, ini: '' }, p, { on: on, noAv: !p.av, pick: function () { if (!p.off) self.setState({ tech: p.id }); },
+        style: 'width:100%;min-height:60px;display:flex;align-items:center;gap:12px;padding:8px 14px;border:0;border-top:1px solid #EEF0F3;color:#111827;background:' + (on ? '#F0F7F5' : '#FFFFFF') + (p.off ? ';opacity:0.55;cursor:not-allowed' : '') }); })
+    };
+  }
+}
+</script>
+</body>
+</html>

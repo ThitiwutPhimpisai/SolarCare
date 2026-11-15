@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>หัวหน้า</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<header style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
+  <div style="min-width: 0; flex: 1 1 320px">
+    <sc-if value="{{hasBack}}" hint-placeholder-val="{{ true }}">
+      <a href="{{backHref}}" onPointerDown="{{back}}" onKeyDown="{{back}}" onClick="{{back}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; text-decoration: none; color: #0F6B5C"><dc-import name="Icon" icon="arrowLeft" size="16" hint-size="16px,16px"></dc-import>{{backLabel}}</a>
+    </sc-if>
+    <sc-if value="{{hasEyebrow}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4B5563"><sc-if value="{{hasEyebrowOrg}}" hint-placeholder-val="{{ false }}"><dc-import name="OrgBadge" org="{{eyebrowOrg}}" size="18" with-name="{{false}}" hint-size="18px,18px"></dc-import></sc-if>{{eyebrow}}</div>
+    </sc-if>
+    <sc-if value="{{hasMeta}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px">
+        <sc-if value="{{hasCode}}" hint-placeholder-val="{{ true }}"><span style="font-size: 14px; color: #4B5563; font-family: ui-monospace, monospace">{{code}}</span></sc-if>
+        <sc-if value="{{hasStatus}}" hint-placeholder-val="{{ true }}"><dc-import name="StatusPill" kind="{{statusKind}}" value="{{statusValue}}" hint-size="110px,26px"></dc-import></sc-if>
+        <sc-if value="{{hasAlert}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 600; color: #B42318">{{alert}}</span></sc-if>
+      </div>
+    </sc-if>
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px"><sc-if value="{{hasPerson}}" hint-placeholder-val="{{ false }}"><dc-import name="Avatar" person="{{person}}" size="{{48}}" hint-size="48px,48px"></dc-import></sc-if><sc-if value="{{hasOrg}}" hint-placeholder-val="{{ false }}"><dc-import name="OrgBadge" org="{{org}}" size="48" with-name="{{false}}" hint-size="48px,48px"></dc-import></sc-if><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{icon}}" size="22" bg="{{iconBg}}" hint-size="40px,40px"></dc-import></sc-if><h1 style="margin: 0; font-size: 26px; font-weight: 700; line-height: 1.3; min-width: 0; overflow-wrap: anywhere">{{title}}</h1></div>
+    <sc-if value="{{hasSubtitle}}" hint-placeholder-val="{{ true }}">
+      <p style="margin: 6px 0 0; font-size: 14px; color: #4B5563; max-width: 720px">{{subtitle}}</p>
+    </sc-if>
+  </div>
+  <sc-if value="{{hasActions}}" hint-placeholder-val="{{ true }}">
+    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+      <sc-for list="{{actions}}" as="a" hint-placeholder-count="2">
+        <dc-import name="Button" variant="{{a.variant}}" icon="{{a.icon}}" label="{{a.label}}" href="{{a.href}}" save-keys="{{a.saveKeys}}" on-press="{{a.onPress}}" disabled="{{a.disabled}}" hint-size="140px,44px"></dc-import>
+      </sc-for>
+    </div>
+  </sc-if>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"title":{"editor":"text","default":"ไซต์ทั้งหมด"},"icon":{"editor":"text","default":""},"person":{"editor":"text","default":""},"org":{"editor":"text","default":""},"iconBg":{"editor":"enum","options":["brand","gray","danger","warn","info"],"default":"brand"},"subtitle":{"editor":"text","default":""},"eyebrow":{"editor":"text","default":""},"eyebrowOrg":{"editor":"text","default":""},"code":{"editor":"text","default":""},"statusKind":{"editor":"text","default":"wo"},"statusValue":{"editor":"text","default":""},"alert":{"editor":"text","default":""},"backLabel":{"editor":"text","default":""},"backHref":{"editor":"text","default":""},"backKeys":{"editor":"text","default":""},"primaryLabel":{"editor":"text","default":""},"primaryHref":{"editor":"text","default":""},"primaryIcon":{"editor":"text","default":""},"primaryKeys":{"editor":"text","default":""},"secondaryLabel":{"editor":"text","default":""},"secondaryHref":{"editor":"text","default":""},"secondaryIcon":{"editor":"text","default":""},"actions":{"editor":null},"$preview":{"width":1100,"height":140}}'>
+// The one page header for every console page: back link, eyebrow, code + status row, icon tile + h1, subtitle, actions.
+// actions: [{label, href?, icon?, variant?, saveKeys?, onPress?, disabled?}] (first = rightmost primary is up to the page order).
+// Shortcut props primary*/secondary* build the same list when a page only needs links.
+class Component extends DCLogic {
+  renderVals() {
+    var p = this.props;
+    var v = function (k, d) { var x = p[k]; return x == null ? (d || '') : x; };
+    var acts = Array.isArray(p.actions) ? p.actions.filter(Boolean) : [];
+    if (!Array.isArray(p.actions)) {
+      if (v('secondaryLabel')) acts.push({ label: v('secondaryLabel'), href: v('secondaryHref'), icon: v('secondaryIcon'), variant: 'secondary' });
+      if (v('primaryLabel')) acts.push({ label: v('primaryLabel'), href: v('primaryHref'), icon: v('primaryIcon'), saveKeys: v('primaryKeys'), variant: 'primary' });
+    }
+    acts = acts.map(function (a) { return { label: a.label, href: a.href || '', icon: a.icon || '', variant: a.variant || 'primary', saveKeys: a.saveKeys || '', onPress: a.onPress || null, disabled: !!a.disabled }; });
+    var self = this;
+    return {
+      hasPerson: !!v('person'), person: v('person'), hasOrg: !v('person') && !!v('org'), org: v('org'), hasIcon: !v('person') && !v('org') && !!v('icon'), icon: v('icon'), iconBg: v('iconBg', 'brand'),
+      title: v('title', 'ไซต์ทั้งหมด'), subtitle: v('subtitle'), eyebrow: v('eyebrow'), eyebrowOrg: v('eyebrowOrg'), hasEyebrowOrg: !!v('eyebrowOrg'),
+      code: v('code'), statusKind: v('statusKind', 'wo'), statusValue: v('statusValue'), alert: v('alert'),
+      hasCode: !!v('code'), hasStatus: !!v('statusValue'), hasAlert: !!v('alert'), hasMeta: !!(v('code') || v('statusValue') || v('alert')),
+      backLabel: v('backLabel'), backHref: v('backHref'), hasBack: !!v('backLabel'), hasEyebrow: !!v('eyebrow'), hasSubtitle: !!v('subtitle'),
+      back: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; var st = self.props.backKeys; if (st) { try { String(st).split('|').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) window.sessionStorage.setItem(kv.slice(0, i).trim(), kv.slice(i + 1)); }); } catch (x) {} } },
+      actions: acts, hasActions: acts.length > 0
+    };
+  }
+}
+</script>
+</body>
+</html>

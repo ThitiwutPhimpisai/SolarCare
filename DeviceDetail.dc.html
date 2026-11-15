@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>รายละเอียดอุปกรณ์</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0F6B5C}a:hover{color:#0A4F44}
+button{font-family:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="{{navActive}}" hint-size="260px,900px"></dc-import>
+</div>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
+  <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+    <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" back-keys="{{backKeys}}" eyebrow="{{eyebrow}}" icon="plug" title="{{device}}" subtitle="{{subtitle}}" hint-size="100%,120px"></dc-import>
+    <dc-import name="Devices" mode="detail" site="{{site}}" device="{{device}}" hint-size="100%,1200px"></dc-import>
+  </div>
+</main>
+  <dc-import name="Flash" page="DeviceDetail.dc.html" sample="" hint-size="100%,0px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+// org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
+var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
+function scOrgFix(v) {
+  var m = {}; try { m = JSON.parse(window.sessionStorage.getItem('sc.orgNames') || '{}') || {}; } catch (e) { m = {}; }
+  var map = {};
+  Object.keys(SC_ORG_DEF).forEach(function (k) { if (m[k] && m[k] !== SC_ORG_DEF[k]) map[SC_ORG_DEF[k]] = m[k]; });
+  if (m.a && m.a !== SC_ORG_DEF.a) map['สยามโซลาร์ฟาร์ม'] = m.a;
+  if (m.b && m.b !== SC_ORG_DEF.b) map['กรีนมาร์ท'] = m.b;
+  var keys = Object.keys(map).sort(function (x, y) { return y.length - x.length; });
+  if (!keys.length) return v;
+  var re = new RegExp(keys.map(function (k) { return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|'), 'g'); // one pass, longest first: a new name is never rewritten again
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return map[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ORG_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o; // never rewrite what the user is typing
+  };
+  return fix(v, 0);
+}
+// which org each site belongs to (DATA.md) — the page header names the org of the device's site
+var DD_SITE_ORG = { 'ฟาร์มโคราช 1': 'a', 'ฟาร์มโคราช 2': 'a', 'หลังคาโรงงานบางปู': 'a', 'ลานจอดรถลพบุรี': 'a', 'สาขารังสิต': 'b', 'สาขาบางนา': 'b', 'โรงงาน A ลำพูน': 'c', 'หลังคาอาคาร A หัวหิน': 'e' };
+var DD_ORG = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
+var DD_PROV = { 'ฟาร์มโคราช 1': 'นครราชสีมา', 'ฟาร์มโคราช 2': 'นครราชสีมา', 'หลังคาโรงงานบางปู': 'สมุทรปราการ', 'ลานจอดรถลพบุรี': 'ลพบุรี', 'สาขารังสิต': 'ปทุมธานี', 'สาขาบางนา': 'กรุงเทพฯ', 'โรงงาน A ลำพูน': 'ลำพูน', 'หลังคาอาคาร A หัวหิน': 'ประจวบคีรีขันธ์' };
+class Component extends DCLogic {
+  componentDidMount() {
+    // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
+    var self = this;
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.siteName', 'sc.device', 'sc.deviceFrom', 'sc.siteEdits', 'sc.createdWo', 'sc.woStat'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    self._snap = snap();
+    self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    window.addEventListener('storage', self._sync);
+    self._iv = setInterval(self._sync, 400);
+    self.setState({ sync: Date.now() });
+  }
+  componentWillUnmount() {
+    if (this._sync) window.removeEventListener('storage', this._sync);
+    if (this._iv) clearInterval(this._iv);
+  }
+  renderVals() { return scOrgFix(this._rv()); }
+  _rv() {
+    var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var site = DD_SITE_ORG[SS('sc.siteName')] ? SS('sc.siteName') : 'ฟาร์มโคราช 1';
+    var device = SS('sc.device') || (site === 'ฟาร์มโคราช 1' ? 'INV-C03' : site === 'สาขาบางนา' ? 'INV-04' : 'INV-01');
+    var org = DD_SITE_ORG[site];
+    var ed = {}; try { ed = (JSON.parse(SS('sc.siteEdits') || '{}') || {})[site] || {}; } catch (e) { ed = {}; }
+    var shown = ed.name || site;
+    var from = SS('sc.deviceFrom');
+    return {
+      site: site, device: device,
+      eyebrow: DD_ORG[org] + ' · ' + shown + ' · ' + (ed.prov || DD_PROV[site]),
+      siteLabel: shown,
+      subtitle: '',
+      // back follows where the device was opened from (sc.deviceFrom): Analytics · Reports · SiteDetail (default)
+      backLabel: from === 'Analytics' ? 'วิเคราะห์' : from === 'Reports' ? 'รายงาน' : shown,
+      backHref: from === 'Analytics' ? 'Analytics.dc.html' : from === 'Reports' ? 'Reports.dc.html' : 'SiteDetail.dc.html',
+      navActive: from === 'Analytics' ? 'analytics' : from === 'Reports' ? 'reports' : 'sites',
+      backKeys: from === 'Analytics' || from === 'Reports' ? 'sc.deviceFrom=' : 'sc.siteName=' + site + '|sc.siteTab=devices|sc.deviceFrom='
+    };
+  }
+}
+</script>
+</body>
+</html>
