@@ -12,9 +12,13 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
+/* hero: stats sit beside the main number; on phones they stack under it */
+@media (max-width: 599px){.kc-stats{border-left:0 !important;grid-template-columns:1fr 1fr !important}}
 </style>
 </helmet>
-<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; box-sizing: border-box; height: 100%">
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827">
+<sc-if value="{{isPlain}}" hint-placeholder-val="{{ true }}">
+<div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 18px; box-sizing: border-box; height: 100%">
   <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563"><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{icon}}" size="16" bg="{{iconBg}}" hint-size="29px,29px"></dc-import></sc-if><span>{{label}}</span></div>
   <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
     <div style="height: 28px; width: 60%; margin-top: 10px; border-radius: 6px; background: #E3E6EB"></div>
@@ -26,17 +30,56 @@ body{margin:0}
     </sc-if>
   </sc-if>
 </div>
+</sc-if>
+<sc-if value="{{isHero}}" hint-placeholder-val="{{ false }}">
+<section aria-label="{{heroAria}}" class="kc-hero" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: stretch">
+  <div class="kc-main" style="flex: 1 1 260px; min-width: 0; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #374151"><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{icon}}" size="18" bg="{{iconBg}}" hint-size="32px,32px"></dc-import></sc-if><span>{{label}}</span></div>
+    <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}"><div style="height: 40px; width: 55%; border-radius: 6px; background: #E3E6EB"></div></sc-if>
+    <sc-if value="{{ready}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap"><span style="{{heroValueStyle}}">{{value}}</span><span style="font-size: 15px; color: #4B5563">{{unit}}</span></div>
+      <sc-if value="{{hasDelta}}" hint-placeholder-val="{{ false }}"><div style="{{deltaStyle}}">{{delta}}</div></sc-if>
+      <sc-if value="{{note}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #4B5563">{{note}}</div></sc-if>
+      <sc-if value="{{hasHref}}" hint-placeholder-val="{{ false }}"><a href="{{href}}" onPointerDown="{{go}}" onKeyDown="{{go}}" onClick="{{go}}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C">{{hrefLabel}}<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a></sc-if>
+    </sc-if>
+  </div>
+  <sc-if value="{{hasStats}}" hint-placeholder-val="{{ true }}">
+    <dl class="kc-stats" style="flex: 2 1 360px; min-width: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); border-left: 1px solid #EEF0F3">
+      <sc-for list="{{stats}}" as="s" hint-placeholder-count="3">
+        <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 2px; min-width: 0; border-top: 1px solid #EEF0F3">
+          <dt style="font-size: 13px; color: #4B5563">{{s.label}}</dt>
+          <dd style="margin: 0; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap"><span style="font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums">{{s.value}}</span><span style="font-size: 13px; color: #4B5563">{{s.unit}}</span></dd>
+          <sc-if value="{{s.hasDelta}}" hint-placeholder-val="{{ false }}"><dd style="{{s.deltaStyle}}">{{s.delta}}</dd></sc-if>
+          <sc-if value="{{s.note}}" hint-placeholder-val="{{ false }}"><dd style="margin: 0; font-size: 12px; color: #4B5563">{{s.note}}</dd></sc-if>
+          <sc-if value="{{s.hasHref}}" hint-placeholder-val="{{ false }}"><dd style="margin: 0"><a href="{{s.href}}" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C">{{s.hrefLabel}}<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a></dd></sc-if>
+        </div>
+      </sc-for>
+    </dl>
+  </sc-if>
+</section>
+</sc-if>
+</div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ใบงานเปิดอยู่"},"icon":{"editor":"text","default":"workorder"},"value":{"editor":"text","default":"9"},"unit":{"editor":"text","default":""},"note":{"editor":null},"tone":{"editor":"enum","options":["default","danger"],"default":"default"},"loading":{"editor":"boolean","default":false},"$preview":{"width":280,"height":130}}'>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ใบงานเปิดอยู่"},"icon":{"editor":"text","default":"workorder"},"value":{"editor":"text","default":"9"},"unit":{"editor":"text","default":""},"note":{"editor":null},"tone":{"editor":"enum","options":["default","danger"],"default":"default"},"loading":{"editor":"boolean","default":false},"variant":{"editor":"enum","options":["plain","hero"],"default":"plain"},"stats":{"editor":null},"delta":{"editor":"text","default":""},"deltaTone":{"editor":"enum","options":["up","down","flat"],"default":"flat"},"href":{"editor":"text","default":""},"hrefLabel":{"editor":"text","default":""},"onGo":{"editor":null},"$preview":{"width":280,"height":130}}'>
 class Component extends DCLogic {
   renderVals() {
     var p = this.props;
-    var loading = !!(p.loading ?? false);
+    var loading = !!(p.loading ?? false), hero = (p.variant ?? 'plain') === 'hero';
+    var dStyle = function (tone, big) { return 'margin: 0; font-size: ' + (big ? 13 : 12) + 'px; font-weight: 600; color: ' + (tone === 'up' ? '#0F6B5C' : tone === 'down' ? '#B42318' : '#4B5563'); };
+    var stats = (Array.isArray(p.stats) ? p.stats : []).slice(0, 3).map(function (s) {
+      return { label: s.label || '', value: s.value == null ? '' : String(s.value), unit: s.unit || '', note: s.note || '', hasDelta: !!s.delta, delta: s.delta || '', deltaStyle: dStyle(s.deltaTone, false),
+        hasHref: !!s.href, href: s.href || '', hrefLabel: s.hrefLabel || 'ดูรายละเอียด', go: s.go || null };
+    });
     return {
-      hasIcon: !!(this.props.icon ?? ''), icon: this.props.icon ?? '', iconBg: (this.props.tone ?? 'default') === 'danger' ? 'danger' : 'brand',
+      isPlain: !hero, isHero: hero, heroAria: p.aria || p.label || 'ตัวเลขหลัก',
+      hasIcon: !!(p.icon ?? ''), icon: p.icon ?? '', iconBg: (p.tone ?? 'default') === 'danger' ? 'danger' : 'brand',
       label: p.label ?? 'ใบงานเปิดอยู่', value: p.value ?? '9', unit: p.unit ?? '', note: p.note ?? '',
       loading: loading, ready: !loading,
-      valueStyle: 'font-size: clamp(22px, 5vw, 28px); font-weight: 700; margin-top: 6px; white-space: nowrap; color: ' + ((p.tone ?? 'default') === 'danger' ? '#B42318' : '#111827')
+      hasDelta: !!p.delta, delta: p.delta || '', deltaStyle: dStyle(p.deltaTone, true),
+      hasHref: !!p.href, href: p.href || '', hrefLabel: p.hrefLabel || 'ดูรายละเอียด', go: p.onGo || null,
+      stats: stats, hasStats: stats.length > 0,
+      valueStyle: 'font-size: clamp(22px, 5vw, 28px); font-weight: 700; margin-top: 6px; white-space: nowrap; color: ' + ((p.tone ?? 'default') === 'danger' ? '#B42318' : '#111827'),
+      heroValueStyle: 'font-size: clamp(30px, 6vw, 40px); font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; color: ' + ((p.tone ?? 'default') === 'danger' ? '#B42318' : '#111827')
     };
   }
 }

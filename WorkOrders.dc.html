@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>ใบงาน</title>
+<title>งานล้าง · รายการใบงาน · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -16,7 +16,10 @@
 .wo-back{display:block}
 }
 .wo-back{display:none}
+@media (min-width: 768px) and (max-width: 1199px){.wo-split{flex-wrap:nowrap !important}.wo-split > section{flex:1 1 auto !important}.wo-split > aside{flex:0 0 clamp(300px, 40%, 380px) !important;position:sticky;top:16px;box-sizing:border-box}}
 .wo-fbtn,.wo-fclear{display:none}
+/* the side panel sits next to the list from 768px: it shows only what the row does not (Round 14) */
+@media (min-width: 768px){.wo-dup{display:none !important}}
 @media (max-width: 767px){.wo-search{grid-template-columns:1fr auto !important;align-items:end}.wo-fbtn{display:inline-flex}.wo-fx{grid-column:1 / -1}.wo-search[data-fopen="false"] .wo-fx{display:none !important}.wo-fclear{display:flex}}
 body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
@@ -30,7 +33,7 @@ button{cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
-    <dc-import name="PageHeader" icon="workorder" title="ใบงาน" subtitle="{{headSub}}" actions="{{headActs}}" hint-size="100%,96px"></dc-import>
+    <dc-import name="PageHeader" icon="workorder" title="งานล้าง" subtitle="{{headSub}}" actions="{{headActs}}" hub="work" hub-current="list" hint-size="100%,140px"></dc-import>
 
 
     <sc-if value="{{hasData}}" hint-placeholder-val="{{ true }}">
@@ -41,12 +44,12 @@ button{cursor:pointer}
           <input id="wo-q" type="search" value="{{q}}" onChange="{{setQ}}" placeholder="เลขที่ ชื่องาน หรือไซต์" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF; color: #111827; box-sizing: border-box; width: 100%">
         </div>
         <button type="button" class="wo-fbtn" onClick="{{toggleF}}" aria-expanded="{{fOpen}}" aria-controls="wo-site" style="align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 1px solid {{fBtnBorder}}; border-radius: 8px; background: #FFFFFF; color: #374151; font-size: 14px; font-weight: 600"><dc-import name="Icon" icon="filter" size="16" hint-size="16px,16px"></dc-import>{{fLabel}}</button>
-        <div class="wo-fx" style="display: flex; flex-direction: column; gap: 4px">
+        <sc-if value="{{multiSite}}" hint-placeholder-val="{{ true }}"><div class="wo-fx" style="display: flex; flex-direction: column; gap: 4px">
           <label for="wo-site" style="font-size: 13px; font-weight: 600; color: #374151">ไซต์</label>
           <select id="wo-site" value="{{site}}" onChange="{{setSite}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF; color: #111827; box-sizing: border-box; width: 100%">
             <sc-for list="{{siteOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}">{{o.t}}</option></sc-for>
           </select>
-        </div>
+        </div></sc-if>
         <div class="wo-fx" style="display: flex; flex-direction: column; gap: 4px">
           <label for="wo-tech" style="font-size: 13px; font-weight: 600; color: #374151">ผู้รับผิดชอบ</label>
           <select id="wo-tech" value="{{tech}}" onChange="{{setTech}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF; color: #111827; box-sizing: border-box; width: 100%">
@@ -83,7 +86,7 @@ button{cursor:pointer}
     </sc-if>
 
     <sc-if value="{{showMain}}" hint-placeholder-val="{{ true }}">
-    <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+    <div class="wo-split" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
       <section class="{{listClass}}" style="flex: 999 1 640px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
         <ul aria-label="รายการใบงาน" style="list-style: none; margin: 0; padding: 0">
           <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
@@ -91,7 +94,7 @@ button{cursor:pointer}
           </sc-for>
         </ul>
         <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
-          <div role="status" style="padding: 32px 20px; text-align: center; color: #4B5563; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px">
+          <div style="padding: 32px 20px; text-align: center; color: #4B5563; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px">
             <span>ไม่มีใบงานที่ตรงกับตัวกรองภายในขอบเขตของคุณ</span>
             <dc-import name="Button" variant="secondary" icon="x" label="ล้างตัวกรอง" on-press="{{clearAll}}" hint-size="120px,44px"></dc-import>
           </div>
@@ -102,20 +105,31 @@ button{cursor:pointer}
         <div class="wo-back">
           <dc-import name="Button" variant="ghost" icon="arrowLeft" label="กลับไปที่รายการ" on-press="{{unpick}}" hint-size="180px,44px"></dc-import>
         </div>
-        <div style="display: flex; justify-content: space-between; gap: 12px; align-items: flex-start">
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <div style="font-size: 13px; color: #4B5563">ใบงานที่เลือก <span style="font-family: ui-monospace, monospace">{{cur.no}}</span></div>
+          <div style="font-size: 14px; color: #374151">{{curMeta}}</div>
+        </div>
+        <div class="wo-dup" style="display: flex; justify-content: space-between; gap: 12px; align-items: flex-start">
           <div style="min-width: 0">
-            <div style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{cur.no}}</div>
             <h2 style="margin: 2px 0 0; font-size: 16px">{{cur.title}}</h2>
-            <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{curMeta}}</div>
           </div>
           <dc-import name="StatusPill" kind="wo" value="{{cur.st}}" hint-size="110px,26px"></dc-import>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-size: 13px">
+        <div class="wo-dup" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-size: 13px">
           <div><div style="color: #4B5563">ผู้รับผิดชอบ</div><div style="font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 8px"><sc-if value="{{cur.av}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{cur.av}}" size="28" hint-size="28px,28px"></dc-import></sc-if>{{cur.who}}</div></div>
           <div><div style="color: #4B5563">กำหนดเสร็จ</div><div style="font-weight: 600; margin-top: 4px">{{cur.due}}</div><sc-if value="{{cur.overdue}}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; font-weight: 600; color: #B42318">เลยกำหนด {{cur.overdue}}</div></sc-if></div>
         </div>
+        <div>
+          <h3 style="margin: 0 0 6px; font-size: 14px">เช็กลิสต์ · {{progText}}</h3>
+          <ol aria-label="ขั้นตอนของงาน" style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px">
+            <sc-for list="{{steps}}" as="sp" hint-placeholder-count="4">
+              <li style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: {{sp.color}}"><dc-import name="Icon" icon="{{sp.icon}}" size="16" tone="{{sp.tone}}" hint-size="16px,16px"></dc-import>{{sp.label}}<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">{{sp.sr}}</span></li>
+            </sc-for>
+          </ol>
+          <div style="display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 13px; color: #374151"><dc-import name="Icon" icon="camera" size="16" tone="muted" hint-size="16px,16px"></dc-import>{{photoText}}</div>
+        </div>
         <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FAFBFC; border: 1px solid #EEF0F3">
-          <div style="color: #4B5563; font-size: 12px">ขั้นล่าสุด</div>
+          <div style="color: #4B5563; font-size: 12px">อัปเดตล่าสุด</div>
           <div style="margin-top: 2px"><span style="font-weight: 600">{{last.who}}</span> {{last.what}} <span style="color: #4B5563">{{lastWhen}}</span></div>
         </div>
         <sc-if value="{{canAssign}}" hint-placeholder-val="{{ false }}">
@@ -262,7 +276,7 @@ class Component extends DCLogic {
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
     var OV = {
       b: { name: 'Site Manager', scope: 'เฉพาะไซต์ที่ได้รับสิทธิ์ · กรีนมาร์ท รีเทล', sites: null, canCreate: true, canApprove: true },
-      c: { name: 'Viewer', scope: 'อ่านอย่างเดียว · นิคมฯ เหนือ', sites: null, canCreate: false, canApprove: false },
+      c: { name: 'Viewer', scope: 'นิคมฯ เหนือ', sites: null, canCreate: false, canApprove: false },
       d: { name: 'Org Owner', scope: 'ทุกไซต์ในองค์กร · ไร่ทองโซลาร์', sites: null, canCreate: true, canApprove: true },
       e: { name: 'Site Manager', scope: 'เฉพาะไซต์ที่ได้รับสิทธิ์ · ริมทะเล รีสอร์ท', sites: null, canCreate: true, canApprove: true }
     };
@@ -362,7 +376,7 @@ class Component extends DCLogic {
       return (site === 'all' || w.site === site) && (tech === 'all' || techOf(w) === tech) &&
         (!q || (w.no + ' ' + w.title + ' ' + w.site).toLowerCase().indexOf(q) >= 0);
     });
-    var stDefs = [['all', 'ทั้งหมด'], ['open', 'เปิดอยู่'], ['new', 'รอมอบหมาย'], ['todo', 'มอบหมายแล้ว'], ['doing', 'กำลังดำเนินการ'], ['review', 'รออนุมัติ'], ['returned', 'ส่งกลับแก้ไข'], ['paused', 'พักงาน'], ['done', 'เสร็จสิ้น'], ['overdue', 'เลยกำหนด']];
+    var stDefs = [['all', 'ทั้งหมด']].concat(v.canApprove ? [['review', 'รอฉันอนุมัติ']] : []).concat([['open', 'เปิดอยู่'], ['new', 'รอมอบหมาย'], ['todo', 'มอบหมายแล้ว'], ['doing', 'กำลังดำเนินการ']]).concat(v.canApprove ? [] : [['review', 'รออนุมัติ']]).concat([ ['returned', 'ส่งกลับแก้ไข'], ['paused', 'พักงาน'], ['done', 'เสร็จสิ้น'], ['overdue', 'เลยกำหนด']]);
     var WSD = JS0('sc.woStat', {}); var inPeriod = function (w) { if (!period || w.st !== 'done') return true; var d = WSD[w.no] === 'done' ? SCR_TODAY : dayOf(w.due); return isNaN(d) || (d >= wrFrom && d <= wrTo); }; // closed inside the Reports range (prototype approvals close today)
     var match = function (w, id) { return inPeriod(w) && (id === 'all' || (id === 'open' ? w.st !== 'done' : (id === 'overdue' ? isOverdue(w) : w.st === id))); };
     var tab = fromReports && stDefs.some(function (d) { return d[0] === handTab; }) ? handTab : (stDefs.some(function (d) { return d[0] === self.state.tab; }) ? self.state.tab : 'all');
@@ -383,6 +397,13 @@ class Component extends DCLogic {
     var techOk = TECHS[orgId] || [];
     var canAssign = c.st === 'new' && v.canCreate && techOk.length > 0;
     var assignPick = techOk.indexOf(self.state.assignTo) >= 0 ? self.state.assignTo : '';
+    var ROLE_TH = { 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' };
+    // checklist progress (what a row can't show): เช็กอิน → รูปก่อนล้าง → ล้าง/ซ่อม → รูปหลังล้าง; [steps done, step in progress]
+    // same checklist as WorkOrderDetail (one per job type)
+    var STEP_N = /ตรวจ/.test(c.kind) ? ['ถ่ายภาพความร้อน (thermal)', 'ระบุแผงที่พบปัญหา', 'วัดค่าแรงดัน / กระแสสตริง', 'สรุปผลและข้อเสนอแนะ'] : /ซ่อม/.test(c.kind) ? ['ตัดไฟ / ล็อกเอาต์ก่อนเริ่ม', 'เปลี่ยนชิ้นส่วน', 'ทดสอบหลังซ่อม', 'ถ่ายรูปหลังซ่อม'] : ['ถ่ายรูปก่อนล้าง', 'ล้างด้วยน้ำ DI', 'ถ่ายรูปหลังล้าง', 'ตรวจรอยร้าว / ขั้วต่อ'];
+    var prog = { new: [0, false], todo: [0, false], doing: [2, true], paused: [2, false], returned: [3, true], review: [4, false], done: [4, false] }[c.st] || [0, false];
+    var PH = { 'WO-1043': 'ส่งรูปก่อน/หลังแล้ว 24 รูป', 'WO-1042': 'ถ่ายแล้ว 6 รูป · รอสัญญาณเพื่อส่ง' };
+    var photoText = PH[c.no] || (c.st === 'review' || c.st === 'done' ? 'ส่งรูปก่อน/หลังครบแล้ว' : c.st === 'doing' || c.st === 'returned' ? 'กำลังถ่ายรูป · ยังไม่ส่ง' : 'ยังไม่มีรูป · ช่างถ่ายในแอปเมื่อเริ่มงาน');
     var fCount = (site !== 'all' ? 1 : 0) + (tech !== 'all' ? 1 : 0), fOpen = !!self.state.fOpen;
     return {
       fOpen: fOpen ? 'true' : 'false', fLabel: fCount ? 'ตัวกรอง (' + fCount + ')' : 'ตัวกรอง', fBtnBorder: fCount ? '#0F6B5C' : '#D5D9E0',
@@ -393,7 +414,11 @@ class Component extends DCLogic {
       emptyOrgTitle: 'ยังไม่มีใบงานในองค์กรนี้',
       emptyOrgText: SITES.length ? 'สร้างใบงานแรก หรือตั้งรอบล้างที่หน้าไซต์เพื่อให้ระบบสร้างให้อัตโนมัติ' : 'เพิ่มไซต์ก่อน แล้วจึงสร้างใบงานให้ช่าง',
       viewer: v,
-      headSub: v.name + ' · ' + v.scope,
+      headSub: 'ใบงานล้าง ตรวจ และซ่อมบำรุง · ' + (ROLE_TH[v.name.split(' · ')[0]] || v.name) + ' · ' + v.scope,
+      multiSite: SITES.length > 1,
+      progText: 'ทำแล้ว ' + prog[0] + ' จาก 4',
+      steps: STEP_N.map(function (lb, i) { var ok = i < prog[0], now = i === prog[0] && prog[1]; return { label: lb, icon: ok ? 'checkCircle' : now ? 'sync' : 'circle', tone: ok ? 'brand' : now ? 'warn' : 'muted', color: ok || now ? '#111827' : '#4B5563', sr: ok ? '(ทำครบแล้ว)' : now ? '(กำลังทำ)' : '(ยังไม่ถึง)' }; }),
+      photoText: photoText,
       hasCtx: !!onceSite || !!period,
       ctxChips: [].concat(onceSite ? [{ label: 'ไซต์: ' + DN(onceSite), aria: 'ล้างตัวกรองไซต์ ' + DN(onceSite), clear: function () { self.setState({ onceSite: '' }); } }] : []).concat(period ? [{ label: 'ประวัติงานปิด · ' + (wr.label || ''), aria: 'ล้างช่วงเวลา ' + (wr.label || ''), clear: function () { self.setState({ wrange: null }); } }] : []),
       canOpen: !c.hist,
@@ -403,7 +428,7 @@ class Component extends DCLogic {
         style: 'min-height:44px;padding:0 14px;border:0;font-size:13px;font-weight:600;background:' + (on ? '#0F6B5C;color:#FFFFFF' : '#FFFFFF;color:#374151'),
         pick: function () { self.setState({ viewer: i, sel: 'WO-1043', pickedAt: Date.now() }); } }; }),
       tab: tab, setTab: function (id) { self.setState({ tab: id }); },
-      chipOpts: stDefs.map(function (d) { return { id: d[0], label: d[1], count: base.filter(function (w) { return match(w, d[0]); }).length }; }),
+      chipOpts: stDefs.map(function (d) { return { id: d[0], label: d[1], count: base.filter(function (w) { return match(w, d[0]); }).length }; }).filter(function (o) { return o.id === 'all' || o.id === tab || o.count > 0; }), // empty statuses are hidden (less to scan)
       q: self.state.q || '', setQ: function (e) { self.setState({ q: e.target.value }); },
       site: site, setSite: function (e) { setSiteVal(e.target.value); },
       siteOpts: [{ v: 'all', t: 'ทุกไซต์' }].concat(SITES.map(function (n) { return { v: n, t: DN(n) }; })),
@@ -437,7 +462,7 @@ class Component extends DCLogic {
       },
       assignNote: c.st === 'new' && v.canCreate && !techOk.length ? 'ยังไม่มีช่างที่มีสิทธิ์ในไซต์นี้ · เชิญช่างได้ที่หน้าสมาชิก' : '',
       noApprove: !c.hist && !(c.st === 'review' && v.canApprove) && !canAssign && !(c.st === 'new' && v.canCreate), // a new job shows only the assign box (or its note)
-      noApproveMsg: !v.canApprove ? 'บทบาท Viewer ดูได้อย่างเดียว · ผู้จัดการไซต์เป็นผู้อนุมัติ' : (c.st === 'done' ? 'ปิดงานแล้ว — แก้ไขไม่ได้ (บันทึกใน Audit log)' : 'อนุมัติได้หลังช่างส่งงานพร้อมรูปก่อน/หลัง')
+      noApproveMsg: !v.canApprove ? 'คุณเป็นผู้ดูอย่างเดียว · ผู้จัดการไซต์เป็นผู้อนุมัติ' : (c.st === 'done' ? 'ปิดงานแล้ว — แก้ไขไม่ได้ (บันทึกในประวัติการใช้งาน)' : 'อนุมัติได้หลังช่างส่งงานพร้อมรูปก่อน/หลัง')
     };
   }
 }

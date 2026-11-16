@@ -17,7 +17,7 @@
 body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 button{font-family:inherit;cursor:pointer}
-.rp-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.rp-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 16px}
 .rp-sel{display:none}
 @media (max-width: 767px){.rp-types{display:none !important}.rp-sel{display:block !important}}
 </style>
@@ -28,41 +28,64 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px">
-    <dc-import name="PageHeader" icon="report" title="รายงาน" subtitle="{{scopeText}}" actions="{{headActs}}" hint-size="100%,96px"></dc-import>
+    <dc-import name="PageHeader" eyebrow="{{orgName}}" icon="report" title="รายงาน" subtitle="เลือกแม่แบบและขอบเขต ดูตัวอย่าง แล้วส่งออกเป็นไฟล์" actions="{{headActs}}" hub="reports" hub-current="export" hint-size="100%,140px"></dc-import>
+    <sc-if value="{{exportOpen}}" hint-placeholder-val="{{ false }}">
+      <div id="rp-export" role="group" aria-label="เลือกรูปแบบไฟล์ที่จะส่งออก" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+        <span style="flex: 1 1 200px; font-size: 13px; color: #374151">ส่งออก <b>{{typeTitle}}</b> · {{rangeText}}</span>
+        <sc-for list="{{exportOpts}}" as="x" hint-placeholder-count="3"><dc-import name="Button" variant="secondary" icon="download" label="{{x.label}}" on-press="{{x.go}}" hint-size="96px,44px"></dc-import></sc-for>
+        <button type="button" onClick="{{closeExport}}" aria-label="ปิดเมนูส่งออก" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 8px; background: transparent; color: #374151"><dc-import name="Icon" icon="x" size="18" hint-size="18px,18px"></dc-import></button>
+      </div>
+    </sc-if>
+    <sc-if value="{{viewerNote}}" hint-placeholder-val="{{ false }}">
+      <p role="note" style="margin: 0; display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4B5563"><dc-import name="Icon" icon="info" size="16" tone="muted" hint-size="16px,16px"></dc-import>ผู้ดูอย่างเดียวดูตัวอย่างรายงานได้ แต่ส่งออกไฟล์ไม่ได้</p>
+    </sc-if>
 
-    <section aria-labelledby="rp-type-h" style="display: flex; flex-direction: column; gap: 8px">
-      <h2 id="rp-type-h" style="margin: 0; font-size: 14px; color: #374151">ประเภทรายงาน</h2>
+    <section aria-labelledby="rp-type-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="rp-type-h" style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="{{stepStyle}}">1</span>เลือกแม่แบบรายงาน</h2>
       <select class="rp-sel" id="rp-type-sel" aria-labelledby="rp-type-h" value="{{type}}" onChange="{{pickSel}}" style="width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600; color: #111827">
         <sc-for list="{{types}}" as="t" hint-placeholder-count="6"><option value="{{t.id}}">{{t.title}}</option></sc-for>
       </select>
-      <div class="rp-types" role="group" aria-labelledby="rp-type-h">
+      <p class="rp-sel" style="margin: 0; font-size: 13px; color: #4B5563">{{typeDesc}}</p>
+      <div class="rp-types" role="radiogroup" aria-labelledby="rp-type-h">
         <sc-for list="{{types}}" as="t" hint-placeholder-count="6">
-          <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="{{t.style}}">
-            <dc-import name="Icon" icon="{{t.icon}}" size="18" bg="{{t.iconBg}}" hint-size="32px,32px"></dc-import>
-            <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0; text-align: left"><span style="font-size: 14px; font-weight: 700; color: #111827">{{t.title}}</span><span style="font-size: 12px; color: #4B5563; line-height: 1.4">{{t.desc}}</span></span>
+          <button type="button" role="radio" onClick="{{t.pick}}" aria-checked="{{t.on}}" style="{{t.style}}">
+            <dc-import name="Icon" icon="{{t.radio}}" size="18" tone="{{t.tone}}" hint-size="18px,18px"></dc-import>
+            <span style="display: flex; flex-direction: column; min-width: 0; text-align: left"><span style="font-size: 14px; font-weight: 600; color: #111827">{{t.title}}</span><span style="font-size: 12px; color: #4B5563; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.desc}}</span></span>
           </button>
         </sc-for>
       </div>
     </section>
 
-    <dc-import name="DateRange" label="ช่วงเวลาของรายงาน" on-change="{{onRange}}" hint-size="100%,170px"></dc-import>
+    <section aria-labelledby="rp-scope-h" style="display: flex; flex-direction: column; gap: 8px">
+      <h2 id="rp-scope-h" style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="{{stepStyle}}">2</span>ไซต์และช่วงเวลา</h2>
+      <dc-import name="DateRange" label="ไซต์และช่วงเวลาของรายงาน" on-change="{{onRange}}" site-opts="{{siteOpts}}" site-value="{{siteF}}" on-site="{{setSiteF}}" hint-size="100%,170px"></dc-import>
+    </section>
 
-    <div style="min-width: 0">
-      <dc-import name="FilterChips" label="ไซต์ในรายงาน" value="{{siteF}}" options="{{siteOpts}}" on-change="{{setSiteF}}" hint-size="100%,44px"></dc-import>
-    </div>
-
-    <sc-if value="{{showState}}" hint-placeholder-val="{{ false }}">
-      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
-        <dc-import name="ListState" state="{{listState}}" unit="รายงาน" icon="report" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="รายงานจะเริ่มแสดงเมื่อมีไซต์และข้อมูลจาก inverter" on-retry="{{retry}}" hint-size="100%,260px"></dc-import>
-      </section>
-    </sc-if>
-    <sc-if value="{{showData}}" hint-placeholder-val="{{ true }}">
-      <h2 style="margin: 4px 0 0; font-size: 18px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline">{{typeTitle}}<span style="font-size: 13px; font-weight: 400; color: #4B5563">{{rangeText}}</span></h2>
-      <dc-import name="EnergyStats" view="report" report="{{type}}" org="{{org}}" site="{{siteF}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" compare="{{rCompare}}" range-label="{{rShort}}" hint-size="100%,1100px"></dc-import>
-      <sc-if value="{{isEnergy}}" hint-placeholder-val="{{ false }}">
-        <a href="EnergyValue.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none">ดูความคุ้มค่าการล้างและสมมติฐานที่หน้าพลังงานและผลตอบแทน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
+    <section aria-labelledby="rp-prev-h" style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px">
+        <h2 id="rp-prev-h" style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><span aria-hidden="true" style="{{stepStyle}}">3</span>ตัวอย่าง: {{typeTitle}}</h2>
+        <span style="font-size: 13px; color: #4B5563">{{rangeText}}</span>
+      </div>
+      <sc-if value="{{showState}}" hint-placeholder-val="{{ false }}">
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+          <dc-import name="ListState" state="{{listState}}" unit="รายงาน" icon="report" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="รายงานจะเริ่มแสดงเมื่อมีไซต์และข้อมูลจากอินเวอร์เตอร์ (inverter)" on-retry="{{retry}}" hint-size="100%,260px"></dc-import>
+        </section>
       </sc-if>
-    </sc-if>
+      <sc-if value="{{showData}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 12px; background: #EEF0F3">
+          <dc-import name="EnergyStats" view="report" report="{{type}}" org="{{org}}" site="{{siteF}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" compare="{{rCompare}}" range-label="{{rShort}}" chart="{{showChart}}" hint-size="100%,1100px"></dc-import>
+        </div>
+        <sc-if value="{{isEnergy}}" hint-placeholder-val="{{ false }}">
+          <a href="EnergyValue.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none">ดูกราฟ ความคุ้มค่าการล้าง และวิธีคำนวณที่แท็บพลังงานและผลตอบแทน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
+        </sc-if>
+        <sc-if value="{{canExport}}" hint-placeholder-val="{{ true }}">
+          <div role="group" aria-label="ส่งออกรายงานนี้" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 16px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+            <span style="flex: 1 1 200px; font-size: 14px; font-weight: 600; color: #111827; display: inline-flex; align-items: center; gap: 8px"><span aria-hidden="true" style="{{stepStyle}}">4</span>ส่งออกรายงานนี้</span>
+            <sc-for list="{{exportOpts}}" as="x" hint-placeholder-count="3"><dc-import name="Button" variant="secondary" icon="download" label="{{x.label}}" on-press="{{x.go}}" hint-size="96px,44px"></dc-import></sc-for>
+          </div>
+        </sc-if>
+      </sc-if>
+    </section>
   </div>
 </main>
   <dc-import name="Flash" page="Reports.dc.html" sample="" hint-size="100%,0px"></dc-import>
@@ -117,11 +140,11 @@ function scrRead() { try { return window.sessionStorage.getItem('sc.range') || '
 
 var RP_TYPES = [
   ['clean', 'สรุปงานล้าง', 'ใบงานที่ปิด ตรงเวลา แผงที่ล้าง', 'broom'],
-  ['energy', 'พลังงานและผลตอบแทน', 'ไฟที่ผลิต มูลค่า PR ฝุ่น', 'energy'],
-  ['carbon', 'คาร์บอนและสิ่งแวดล้อม', 'CO2 เครดิต ต้นไม้ ถ่านหิน', 'leaf'],
+  ['energy', 'พลังงานและผลตอบแทน', 'ไฟที่ผลิต มูลค่า ประสิทธิภาพระบบ (PR) ไฟที่เสียจากฝุ่น', 'energy'],
+  ['carbon', 'คาร์บอนและสิ่งแวดล้อม', 'CO2 ที่ลดได้ เครดิตคาร์บอน เทียบต้นไม้', 'leaf'],
   ['tech', 'ประสิทธิภาพทีมช่าง', 'งานต่อช่าง ตรงเวลา ส่งกลับ', 'users'],
-  ['device', 'อุปกรณ์และการแจ้งเตือน', 'ความพร้อมใช้ เหตุขัดข้อง MTTR', 'plug'],
-  ['sla', 'SLA รายไซต์', 'ล้างตรงรอบ ล่าช้า ครบรอบถัดไป', 'calendar']
+  ['device', 'อุปกรณ์และการแจ้งเตือน', 'ความพร้อมใช้ เหตุขัดข้อง เวลาแก้ไขเฉลี่ย (MTTR)', 'plug'],
+  ['sla', 'ล้างตามกำหนด (SLA) รายไซต์', 'ล้างตรงรอบ ล่าช้า ครบรอบถัดไป', 'calendar']
 ];
 var RP_SITES = { a: [['ฟาร์มโคราช 1', 'k1'], ['ฟาร์มโคราช 2', 'k2'], ['หลังคาโรงงานบางปู', 'bp'], ['ลานจอดรถลพบุรี', 'lb']], b: [['สาขารังสิต', 'rs'], ['สาขาบางนา', 'bn']], c: [['โรงงาน A ลำพูน', 'lp']], d: [], e: [['หลังคาอาคาร A หัวหิน', 'e1']] };
 class Component extends DCLogic {
@@ -129,7 +152,7 @@ class Component extends DCLogic {
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.site', 'sc.siteEdits', 'sc.woStat', 'sc.woAssign', 'sc.createdWo', 'sc.range', 'sc.reportType', 'sc.rates'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.site', 'sc.siteEdits', 'sc.woStat', 'sc.woAssign', 'sc.createdWo', 'sc.range', 'sc.reportType', 'sc.rates', 'sc.rpExport'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -159,23 +182,33 @@ class Component extends DCLogic {
     var st = self.state.retried && self._retriedFor === propState ? 'ready' : propState;
     var listState = st !== 'ready' ? st : (sites.length ? 'ready' : 'empty');
     var siteLabel = one ? DN(one[0]) : 'ทุกไซต์';
+    var viewer = org === 'c'; // นิคมฯ เหนือ: you are a Viewer
     var exportAs = function (kind, ext) { return function () {
       var fname = 'รายงาน-' + T[1].replace(/\s+/g, '') + '-' + rr.fromIso + '_' + rr.toIso + '.' + ext;
       try { var ss = window.sessionStorage; ss.setItem('sc.flash', 'กำลังเตรียมไฟล์ ' + kind + ' · ' + T[1] + ' · ' + rr.label + ' · ' + siteLabel + ' · ' + fname); ss.setItem('sc.flashAt', String(Date.now())); ss.setItem('sc.flashTo', 'Reports.dc.html'); } catch (e) {}
       self.setState({ sync: Date.now() }); }; };
-    var card = function (on) { return 'display: flex; align-items: flex-start; gap: 10px; min-height: 64px; padding: 12px 14px; border-radius: 12px; font-family: inherit; cursor: pointer; text-align: left; background: ' + (on ? '#F0F7F5; border: 2px solid #0F6B5C' : '#FFFFFF; border: 1px solid #E3E6EB'); };
+    var card = function (on) { return 'display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 6px 10px; margin: 0 -10px; border: 0; border-radius: 8px; font-family: inherit; cursor: pointer; text-align: left; min-width: 0; background: ' + (on ? '#F0F7F5' : 'transparent'); };
+    // one-shot from the energy tab's "ส่งออกเป็นรายงาน": open the file choice once
+    if (SS('sc.rpExport') === '1') { try { window.sessionStorage.removeItem('sc.rpExport'); } catch (e) {} if (!viewer) setTimeout(function () { self.setState({ exportOpen: true }); }, 0); }
+    var ORGN = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', d: SS('sc.createdName') || 'ไร่ทองโซลาร์', e: 'ริมทะเล รีสอร์ท' };
     return {
-      headActs: [{ label: 'Excel', icon: 'download', variant: 'secondary', onPress: exportAs('Excel', 'xlsx'), disabled: listState !== 'ready' }, { label: 'PDF', icon: 'download', variant: 'secondary', onPress: exportAs('PDF', 'pdf'), disabled: listState !== 'ready' }, { label: 'CSV', icon: 'download', variant: 'secondary', onPress: exportAs('CSV', 'csv'), disabled: listState !== 'ready' }],
+      // one "ส่งออก" button opens the file-type choice (fits a phone); Viewer gets no export (DATA.md round 13)
+      orgName: ORGN[org] || '', canExport: !viewer && listState === 'ready', showChart: type === 'energy' ? 'false' : 'true', typeDesc: T[2],
+      stepStyle: 'display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 999px; background: #E7F2EF; color: #0A4F44; font-size: 13px; font-weight: 700',
+      headActs: viewer ? [] : [{ label: self.state.exportOpen ? 'ปิดเมนูส่งออก' : 'ส่งออก', icon: self.state.exportOpen ? 'x' : 'download', variant: 'primary', onPress: function () { self.setState({ exportOpen: !self.state.exportOpen }); }, disabled: listState !== 'ready' }],
+      exportOpen: !viewer && !!self.state.exportOpen && listState === 'ready', viewerNote: viewer,
+      closeExport: function () { self.setState({ exportOpen: false }); },
+      exportOpts: [['Excel', 'xlsx'], ['PDF', 'pdf'], ['CSV', 'csv']].map(function (x) { var go = exportAs(x[0], x[1]); return { label: x[0], go: function () { go(); self.setState({ exportOpen: false }); } }; }),
       isEnergy: type === 'energy',
       pickSel: function (e) { var v = e.target.value; try { window.sessionStorage.setItem('sc.reportType', v); } catch (x) {} self.setState({ sync: Date.now() }); },
-      types: RP_TYPES.map(function (t) { var on = t[0] === type; return { id: t[0], title: t[1], desc: t[2], icon: t[3], iconBg: on ? 'brand' : 'gray', on: on, style: card(on),
+      types: RP_TYPES.map(function (t) { var on = t[0] === type; return { id: t[0], title: t[1], desc: t[2], icon: t[3], iconBg: on ? 'brand' : 'gray', on: on, style: card(on), radio: on ? 'checkCircle' : t[3], tone: on ? 'brand' : 'muted',
         pick: function () { try { window.sessionStorage.setItem('sc.reportType', t[0]); } catch (e) {} self.setState({ sync: Date.now() }); } }; }),
       type: type, typeTitle: T[1], rangeText: rr.label + ' · ' + siteLabel + (rr.compare ? ' · เทียบช่วงก่อนหน้า' : ''),
       onRange: function () { self.setState({ sync: Date.now() }); },
       org: org, rFrom: rr.fromIso, rTo: rr.toIso, rGroup: rr.group, rCompare: rr.compareAsked ? 'true' : 'false', rShort: rr.short,
       isLoading: st === 'loading', listState: listState, showState: listState !== 'ready', showData: listState === 'ready',
       retry: function () { self._retriedFor = propState; self.setState({ retried: true }); },
-      siteF: siteF, siteOpts: [{ id: 'all', label: 'ทุกไซต์' }].concat(sites.map(function (r) { return { id: r[1], label: DN(r[0]) }; })),
+      siteF: siteF, siteOpts: [{ id: 'all', label: 'ทุกไซต์ (' + sites.length + ')' }].concat(sites.map(function (r) { return { id: r[1], label: DN(r[0]) }; })),
       setSiteF: function (id) { var r = sites.filter(function (x) { return x[1] === id; })[0]; try { window.sessionStorage.setItem('sc.site', r ? r[0] : 'all'); } catch (e) {} self.setState({ sync: Date.now() }); },
       scopeText: (one ? DN(one[0]) : (org === 'c' ? 'ไซต์ที่คุณได้รับสิทธิ์ (ดูอย่างเดียว)' : 'ทุกไซต์')) + ' · ' + rr.label
     };

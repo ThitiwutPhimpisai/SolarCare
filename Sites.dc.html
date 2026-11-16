@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>ไซต์ทั้งหมด</title>
+<title>ไซต์ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -23,22 +23,17 @@ button{cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" title="ไซต์ทั้งหมด" icon="site" subtitle="{{subtitle}}" actions="{{phActions}}" hint-size="100%,96px"></dc-import>
-    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+    <dc-import name="PageHeader" title="ไซต์" icon="site" subtitle="{{subtitle}}" actions="{{phActions}}" hint-size="100%,96px"></dc-import>
+    <div style="display: flex; gap: 8px 12px; flex-wrap: wrap; align-items: center">
       <label for="site-q" style="position: absolute; left: -9999px">ค้นหาไซต์</label>
-      <input id="site-q" type="search" placeholder="ค้นหาชื่อไซต์หรือจังหวัด" value="{{q}}" onChange="{{setQ}}" style="min-height: 44px; flex: 1 1 240px; width: 100%; max-width: 360px; box-sizing: border-box; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
-    </div>
-
-    <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between">
-      <div style="min-width: 0; flex: 1 1 320px">
-        <dc-import name="FilterChips" label="สถานะไซต์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
-      </div>
-      <div role="group" aria-label="มุมมอง" style="display: inline-flex; border: 1px solid #D5D9E0; border-radius: 8px; overflow: hidden; background: #FFFFFF">
+      <input id="site-q" type="search" placeholder="ค้นหาชื่อไซต์หรือจังหวัด" value="{{q}}" onChange="{{setQ}}" style="min-height: 44px; flex: 1 1 240px; width: 100%; max-width: 420px; box-sizing: border-box; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+      <div role="group" aria-label="มุมมอง" style="display: inline-flex; border: 1px solid #D5D9E0; border-radius: 8px; overflow: hidden; background: #FFFFFF; margin-left: auto">
         <sc-for list="{{views}}" as="w" hint-placeholder-count="2">
           <button onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="{{w.style}}">{{w.label}}</button>
         </sc-for>
       </div>
     </div>
+    <dc-import name="FilterChips" label="สถานะไซต์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
 
     <dc-import name="ResultBar" unit="ไซต์" count="{{shownCount}}" total="{{totalCount}}" active="{{filtered}}" on-clear="{{clearAll}}" hint-size="100%,44px"></dc-import>
 
@@ -57,7 +52,7 @@ button{cursor:pointer}
     </sc-if>
 
     <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
-      <div role="status" style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
+      <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center">
         <div style="font-size: 16px; font-weight: 600">{{emptyText}}</div>
         <div style="font-size: 13px; color: #4B5563">ลองค้นด้วยชื่อจังหวัด หรือเลือกสถานะ “ทั้งหมด”</div>
         <dc-import name="Button" icon="x" label="ล้างตัวกรอง" variant="secondary" on-press="{{clearAll}}" hint-size="130px,44px"></dc-import>
@@ -74,7 +69,7 @@ button{cursor:pointer}
             <li style="border-top: 1px solid #EEF0F3">
 <sc-if value="{{s.link}}" hint-placeholder-val="{{ true }}">              <a href="SiteDetail.dc.html" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="display: flex; gap: 12px; align-items: center; padding: 12px 14px; min-height: 44px; text-decoration: none; color: #111827">
                 <dc-import name="SiteThumb" site="{{s.thumb}}" w="56px" h="40px" hint-size="56px,40px"></dc-import>
-                <span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 600; font-size: 14px">{{s.name}}</span><span style="display: block; font-size: 12px; color: #4B5563">{{s.prov}} · {{s.kwp}}</span></span>
+                <span style="flex: 1; min-width: 0"><span style="display: block; font-weight: 600; font-size: 14px">{{s.name}}</span><span style="display: block; font-size: 12px; color: #4B5563">{{s.prov}} · {{s.kwp}}</span><span style="display: block; font-size: 12px; color: #4B5563">ครบรอบถัดไป {{s.next}}</span></span>
                 <dc-import name="StatusPill" kind="site" value="{{s.st}}" hint-size="80px,24px"></dc-import>
               </a></sc-if>
             </li>
@@ -84,7 +79,7 @@ button{cursor:pointer}
     </sc-if>
 
     <sc-if value="{{showGrid}}" hint-placeholder-val="{{ true }}">
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 20px">
       <sc-for list="{{sites}}" as="s" hint-placeholder-count="4">
         <sc-if value="{{s.link}}" hint-placeholder-val="{{ true }}">
         <a href="SiteDetail.dc.html" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="{{s.cardStyle}}">
@@ -102,6 +97,7 @@ button{cursor:pointer}
               <div>ล้างล่าสุด<div style="font-size: 15px; font-weight: 700; color: #111827">{{s.last}}</div></div>
               <div>ใบงานเปิด<div style="font-size: 15px; font-weight: 700; color: #111827">{{s.open}}</div></div>
             </div>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4B5563"><dc-import name="Icon" icon="calendar" size="14" tone="muted" hint-size="14px,14px"></dc-import>ครบรอบถัดไป <span style="{{s.nextStyle}}">{{s.next}}</span></div>
             <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #EEF0F3; padding-top: 10px; font-size: 12px; color: #4B5563">
               <div style="display: flex">
                 <sc-for list="{{s.people}}" as="p" hint-placeholder-count="3">
@@ -127,7 +123,7 @@ class Component extends DCLogic {
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.site', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.new', 'sc.newsite', 'sc.woStat', 'sc.createdWo', 'sc.createdSites', 'sc.siteEdits', 'sc.siteCycle'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.site', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.new', 'sc.newsite', 'sc.woStat', 'sc.createdWo', 'sc.createdSites', 'sc.siteEdits', 'sc.siteCycle', 'sc.memberEdits', 'sc.removed', 'sc.newAccount'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -156,7 +152,7 @@ class Component extends DCLogic {
       { id: 'bn', name: 'สาขาบางนา', prov: 'กรุงเทพฯ', type: 'Carport', kwp: '380 kWp', last: '13 ก.ย. 2569', open: 1, st: 'late', thumb: 'bn', people: [A.n, A.t, A.p], peopleNote: '3 คนมีสิทธิ์' }
     ];
     DATA.c = [
-      { id: 'lp', name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', type: 'หลังคา', kwp: '2,300 kWp', last: '30 ต.ค. 2569', open: 1, st: 'ok', thumb: 'lp', people: [A.n], peopleNote: 'คุณดูได้อย่างเดียว (Viewer)' }
+      { id: 'lp', name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', type: 'หลังคา', kwp: '2,300 kWp', last: '30 ต.ค. 2569', open: 1, st: 'ok', thumb: 'lp', people: [A.n], peopleNote: 'คุณดูได้อย่างเดียว' }
     ];
     DATA.d = [];
     DATA.e = [
@@ -193,12 +189,28 @@ class Component extends DCLogic {
     var cycSt = function (last, days) { var l = thParse(last); if (!l) return 'due'; var diff = Math.round((l.getTime() + days * 864e5 - TODAY) / 864e5); return diff < 0 ? 'late' : diff <= 14 ? 'due' : 'ok'; };
     DATA[orgId] = DATA[orgId].map(function (x) { var d = Number(cycSet[x.name]) || 0; return d ? Object.assign({}, x, { st: cycSt(LAST[x.id] || x.last, d) }) : x; });
     var siteEd = JSN('sc.siteEdits', {});
+    // next due = last cleaned + cycle (sc.siteCycle overrides the default cycle, same as SiteDetail)
+    var CYC = { k1: 90, k2: 45, bp: 60, lb: 60, rs: 30, bn: 60, lp: 30, e1: 0 };
+    var thFmt = function (d) { return d.getDate() + ' ' + TH_M[d.getMonth()] + ' ' + (d.getFullYear() + 543); };
+    var nextOf = function (x) {
+      var c = Number(cycSet[x.name]) || (x.created ? Number((createdSites.filter(function (z) { return z.name === x.name; })[0] || {}).cycle) || 0 : CYC[x.id] || 0);
+      if (!c) return { t: 'ยังไม่ตั้งรอบล้าง', late: false };
+      var l = thParse(LAST[x.id] || x.last); if (!l) return { t: 'ยังไม่เคยล้าง · ล้างครั้งแรกได้เลย', late: false };
+      var n = new Date(l.getTime() + c * 864e5), diff = Math.round((n - TODAY) / 864e5);
+      return { t: thFmt(n) + (diff < 0 ? ' (เลย ' + (-diff) + ' วัน)' : diff === 0 ? ' (วันนี้)' : diff === 1 ? ' (พรุ่งนี้)' : ''), late: diff < 0, cyc: c };
+    };
+    // removed / suspended members never show as site people (DATA Round 13)
+    var EM = { natthaphat: 'natthaphat@siamsolar.example', worawut: 'worawut@siamsolar.example', somsri: 'somsri@siamsolar.example', thanakorn: 'thanakorn@cleanpro.example', pimchanok: 'pimchanok@customer.example', arunee: 'arunee@rimtalay.example' };
+    var mEd = JSN('sc.memberEdits', {}), gone = JSN('sc.removed', []);
+    var alive = function (av) { var k = orgId + '|' + (EM[av] || ''), st = (mEd[k] || {}).status; return !EM[av] || (gone.indexOf(k) < 0 && st !== 'suspended' && st !== 'removed'); };
+    var meAv = SS('sc.newAccount') === '1' ? 'me' : A.n;
     var all = DATA[orgId].map(function (x) {
-      var ppl = INH[orgId].concat(ASG[x.id] || []), n = ppl.length;
-      var note = orgId === 'c' ? 'คุณดูได้อย่างเดียว (Viewer)' : n + ' คนมีสิทธิ์' + (PENDING[x.id] ? ' + ' + PENDING[x.id] + ' รอยืนยัน' : '');
-      if (x.created) { ppl = INH[orgId].slice(); note = ppl.length + ' คนมีสิทธิ์ · ยังไม่ได้มอบสิทธิ์รายไซต์'; }
+      var ppl = INH[orgId].concat(ASG[x.id] || []).filter(alive).map(function (av) { return av === A.n ? meAv : av; }), n = ppl.length;
+      var note = orgId === 'c' ? 'คุณดูได้อย่างเดียว' : n + ' คนมีสิทธิ์' + (PENDING[x.id] ? ' + ' + PENDING[x.id] + ' รอยืนยัน' : '');
+      if (x.created) { ppl = INH[orgId].filter(alive).map(function (av) { return av === A.n ? meAv : av; }); note = ppl.length + ' คนมีสิทธิ์ · ยังไม่ได้มอบสิทธิ์รายไซต์'; }
       var ed = siteEd[x.name] || {};
-      return Object.assign({}, x, { key: x.name, name: ed.name || x.name, prov: ed.prov || x.prov, kwp: ed.kwp ? String(ed.kwp).replace(/\s*kWp$/, '') + (String(x.kwp).indexOf('kWp') >= 0 ? ' kWp' : '') : x.kwp, people: ppl.slice(0, 4), peopleNote: note, last: LAST[x.id] || x.last, link: true, isNew: x.name === fresh, open: Math.max(0, x.open + (delta[x.name] || 0)) });
+      var nx = nextOf(x);
+      return Object.assign({}, x, { next: nx.t, nextStyle: 'font-size: 13px; font-weight: 600; color: #111827', key: x.name, name: ed.name || x.name, prov: ed.prov || x.prov, kwp: ed.kwp ? String(ed.kwp).replace(/\s*kWp$/, '') + (String(x.kwp).indexOf('kWp') >= 0 ? ' kWp' : '') : x.kwp, people: ppl.slice(0, 4), peopleNote: note, last: LAST[x.id] || x.last, link: true, isNew: x.name === fresh, open: Math.max(0, x.open + (delta[x.name] || 0)) });
     });
     all.forEach(function (x) { x.go = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.siteName', x.key); window.sessionStorage.setItem('sc.siteFrom', 'Sites'); } catch (er) {} }; });
     all.forEach(function (x) { x.cardStyle = 'display: flex; flex-direction: column; background: #FFFFFF; border-radius: 12px; overflow: hidden; text-decoration: none; color: #111827; border: ' + (x.isNew ? '2px solid #0F6B5C; box-shadow: 0 0 0 4px #E7F2EF' : '1px solid #E3E6EB'); });

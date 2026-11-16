@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>ผู้ดูแลแพลตฟอร์ม</title>
+<title>องค์กรทั้งหมด · ผู้ดูแลแพลตฟอร์ม · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -19,23 +19,23 @@ button{cursor:pointer}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; position: relative">
-  <div style="background: #111827; color: #FFFFFF; padding: 10px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between">
+  <div style="background: #FFFFFF; color: #111827; border-bottom: 1px solid #E3E6EB; padding: 10px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between">
     <div style="display: flex; align-items: center; gap: 10px">
       <dc-import name="Icon" icon="support" size="18" bg="brand" hint-size="32px,32px"></dc-import>
       <span style="font-weight: 700">SolarCare · คอนโซลทีม Qleen</span>
-      <span style="white-space: nowrap; padding: 2px 10px; border-radius: 999px; background: #F5B301; color: #111827; font-size: 12px; font-weight: 700">โหมดผู้ดูแลแพลตฟอร์ม</span>
+      <span style="white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; background: #F3F4F6; color: #374151; font-size: 12px; font-weight: 600"><dc-import name="Icon" icon="shield" size="14" tone="current" hint-size="14px,14px"></dc-import>ผู้ดูแลแพลตฟอร์ม</span>
     </div>
     <div style="display: flex; align-items: center; gap: 12px">
-      <span class="pf-note" style="font-size: 13px; color: #D5D9E0">ทุกการเข้าถึงข้อมูลองค์กรถูกบันทึก</span>
+      <span class="pf-note" style="font-size: 13px; color: #4B5563">ทุกการเข้าถึงข้อมูลองค์กรถูกบันทึก</span>
       <div id="pf-menu" style="position: relative" onKeyDown="{{menuKey}}">
-        <button type="button" onClick="{{toggleMenu}}" aria-controls="pf-menu-panel" aria-expanded="{{menuExp}}" aria-label="เมนูบัญชี ทีม Qleen" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 6px; border-radius: 10px; border: 1px solid #374151; background: transparent; color: #FFFFFF; font-size: 14px; font-weight: 600">
+        <button type="button" onClick="{{toggleMenu}}" aria-controls="pf-menu-panel" aria-expanded="{{menuExp}}" aria-label="เมนูบัญชี ทีม Qleen" style="min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 6px; border-radius: 10px; border: 1px solid #D5D9E0; background: #FFFFFF; color: #111827; font-size: 14px; font-weight: 600">
           <dc-import name="Avatar" person="qleen" size="30" hint-size="30px,30px"></dc-import>
           <span class="pf-name">ทีม Qleen</span>
           <dc-import name="Icon" icon="chevronDown" size="14" hint-size="14px,14px"></dc-import>
         </button>
         <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
           <div id="pf-menu-panel" style="position: absolute; right: 0; top: calc(100% + 6px); z-index: 40; min-width: 200px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; box-shadow: 0 12px 32px rgba(17,24,39,0.18); padding: 6px; display: flex; flex-direction: column">
-            <div style="padding: 8px 10px; font-size: 12px; color: #4B5563; display: flex; flex-direction: column; gap: 2px"><b style="font-size: 13px; color: #111827">ทีม Qleen Support</b>support@qleen.example · ผู้ดูแลแพลตฟอร์ม<span>บัญชีทีมงานจัดการโดย Qleen IT</span></div>
+            <div style="padding: 8px 10px; font-size: 12px; color: #4B5563; display: flex; flex-direction: column; gap: 2px"><b style="font-size: 13px; color: #111827">ทีม Qleen</b>support@qleen.example · ผู้ดูแลแพลตฟอร์ม<span>บัญชีทีมงานจัดการโดย Qleen IT</span></div>
             <a href="Login.dc.html" onPointerDown="{{pfLogout}}" onKeyDown="{{pfLogout}}" onClick="{{pfLogout}}" style="min-height: 44px; display: flex; align-items: center; padding: 0 10px; border-radius: 8px; color: #B42318; text-decoration: none; font-size: 14px; font-weight: 600; gap: 8px"><dc-import name="Icon" icon="logout" size="18" hint-size="18px,18px"></dc-import>ออกจากระบบ</a>
           </div>
         </sc-if>
@@ -47,7 +47,7 @@ button{cursor:pointer}
     <dc-import name="PageHeader" icon="building" title="องค์กรทั้งหมด" subtitle="ทุกองค์กรลูกค้าบนแพลตฟอร์ม Qleen" primary-label="สร้างองค์กรให้ลูกค้า" primary-icon="plus" primary-href="CreateOrg.dc.html" primary-keys="sc.from=platform" hint-size="100%,96px"></dc-import>
 
     <div style="display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; justify-content: space-between">
-      <div style="flex: 0 1 280px; min-width: 0">
+      <div style="flex: 1 1 280px; max-width: 420px; min-width: 0">
         <label for="po-q" style="position: absolute; left: -9999px">ค้นหาองค์กร</label>
         <input id="po-q" type="search" value="{{q}}" onChange="{{setQ}}" placeholder="ค้นหาชื่อองค์กรหรือ slug" style="min-height: 44px; width: 100%; box-sizing: border-box; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
       </div>
@@ -57,6 +57,12 @@ button{cursor:pointer}
       <dc-import name="ResultBar" count="{{shownN}}" total="{{totalN}}" unit="องค์กร" active="{{filtered}}" on-clear="{{clearAll}}" hint-size="260px,44px"></dc-import>
     </div>
 
+    <sc-if value="{{listBusy}}" hint-placeholder-val="{{ false }}">
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+        <dc-import name="ListState" state="{{listState}}" unit="รายชื่อองค์กร" icon="building" rows="{{5}}" on-retry="{{retry}}" hint-size="100%,260px"></dc-import>
+      </section>
+    </sc-if>
+    <sc-if value="{{listReady}}" hint-placeholder-val="{{ true }}">
     <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
       <table class="po-tbl" aria-label="องค์กรทั้งหมดบนแพลตฟอร์ม" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 0">
         <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 12px 20px; font-weight: 600">องค์กร</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600">ประเภท</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600; text-align: right">ไซต์</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600; text-align: right">สมาชิก</th><th scope="col" class="po-x" style="padding: 12px; font-weight: 600">สถานะ</th><th scope="col" style="padding: 12px 20px; font-weight: 600"><span style="position: absolute; left: -9999px">การทำงาน</span></th></tr></thead>
@@ -79,7 +85,7 @@ button{cursor:pointer}
           </sc-for>
           <sc-if value="{{noMatch}}" hint-placeholder-val="{{ false }}">
             <tr><td colspan="6" style="padding: 32px 20px; text-align: center; color: #4B5563; font-size: 14px">
-              <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 12px">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
                 <span>{{emptyText}}</span>
                 <dc-import name="Button" variant="secondary" label="ล้างตัวกรอง" on-press="{{clearAll}}" hint-size="140px,44px"></dc-import>
               </div>
@@ -88,6 +94,7 @@ button{cursor:pointer}
         </tbody>
       </table>
     </section>
+    </sc-if>
   </div>
 
   <a id="po-go" href="SupportSession.dc.html" tabIndex="-1" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">เริ่มเซสชัน</a>
@@ -95,7 +102,7 @@ button{cursor:pointer}
   <dc-import name="Flash" page="PlatformOrgs.dc.html" sample="" hint-size="100%,0px"></dc-import>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading","error"],"default":"ready"},"$preview":{"width":1440,"height":980}}'>
 // org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
 var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
 var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
@@ -127,6 +134,19 @@ function scMemberCount(org, base) {
   var removed = J('sc.removed', []).filter(function (k) { k = String(k); return k.indexOf(org + '|') === 0 && gone.indexOf(k.slice(org.length + 1)) < 0; });
   return Math.max(0, base + created.length - gone.length - removed.length);
 }
+// live platform numbers (DATA Round 13): sites, kWp and open work orders follow what happened in the prototype, never frozen
+function scPlatLive(org, baseSites, baseKwp) {
+  var J = function (k, d) { try { var v = JSON.parse(window.sessionStorage.getItem(k) || 'null'); return v == null ? d : v; } catch (e) { return d; } };
+  var num = function (x) { var n = Number(String(x == null ? '' : x).replace(/[^0-9.]/g, '')); return isFinite(n) ? n : 0; };
+  var made = J('sc.createdSites', []).filter(function (c) { return c && c.org === org && c.name; });
+  var BASE = { 'WO-1043': 'a', 'WO-1042': 'a', 'WO-1041': 'a', 'WO-1039': 'a', 'WO-1035': 'a', 'WO-1031': 'a', 'GM-0211': 'b', 'GM-0209': 'b', 'GM-0204': 'b', 'NK-0102': 'c', 'NK-0097': 'c' };
+  var DONE0 = { 'WO-1035': 1, 'WO-1031': 1, 'GM-0204': 1, 'NK-0097': 1 };
+  var woStat = J('sc.woStat', {}) || {};
+  var open = Object.keys(BASE).filter(function (no) { return BASE[no] === org && (woStat[no] ? woStat[no] !== 'done' : !DONE0[no]); }).length;
+  open += J('sc.createdWo', []).filter(function (m) { return m && m.org === org && (woStat[m.no] || m.st || 'todo') !== 'done'; }).length;
+  var kwp = num(baseKwp) + made.reduce(function (a, c) { return a + num(c.kwp); }, 0);
+  return { sites: baseSites + made.length, kwp: kwp ? kwp.toLocaleString('en-US') : '0', open: open };
+}
 class Component extends DCLogic {
   constructor(p) {
     super(p);
@@ -139,7 +159,7 @@ class Component extends DCLogic {
     document.addEventListener('pointerdown', self._outside);
     // a new visit starts without the open dialog that Play restores
     // Play may pre-render this page: re-render when the created-org key changes
-    var snap = function () { try { var ss = window.sessionStorage; return ['sc.pnew', 'sc.inviteCancel', 'sc.removed', 'sc.flashAt', 'sc.created', 'sc.createdName', 'sc.createdInvites'].map(function (k) { return ss.getItem(k) || ''; }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var ss = window.sessionStorage; return ['sc.pnew', 'sc.inviteCancel', 'sc.removed', 'sc.flashAt', 'sc.created', 'sc.createdName', 'sc.createdInvites', 'sc.createdSites', 'sc.psusp'].map(function (k) { return ss.getItem(k) || ''; }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -151,11 +171,11 @@ class Component extends DCLogic {
   _rv() {
     var self = this;
     var orgs = [
-      { name: 'สยามโซลาร์ฟาร์ม จำกัด', slug: 'siamsolar', id: 'sf', type: 'เจ้าของไซต์', sites: 4, members: scMemberCount('a', 6), s: 'active' },
-      { name: 'กรีนมาร์ท รีเทล', slug: 'greenmart', id: 'gm', type: 'เจ้าของไซต์', sites: 2, members: scMemberCount('b', 4), s: 'active' },
-      { name: 'นิคมฯ เหนือ', slug: 'nikom-north', id: 'nk', type: 'เจ้าของไซต์', sites: 1, members: scMemberCount('c', 3), s: 'active' },
+      { name: 'สยามโซลาร์ฟาร์ม จำกัด', slug: 'siamsolar', id: 'sf', type: 'เจ้าของไซต์', sites: scPlatLive('a', 4, 0).sites, members: scMemberCount('a', 6), s: 'active' },
+      { name: 'กรีนมาร์ท รีเทล', slug: 'greenmart', id: 'gm', type: 'เจ้าของไซต์', sites: scPlatLive('b', 2, 0).sites, members: scMemberCount('b', 4), s: 'active' },
+      { name: 'นิคมฯ เหนือ', slug: 'nikom-north', id: 'nk', type: 'เจ้าของไซต์', sites: scPlatLive('c', 1, 0).sites, members: scMemberCount('c', 3), s: 'active' },
       { name: 'CleanPro Services', slug: 'cleanpro', id: 'cp', type: 'ผู้ให้บริการล้าง', sites: 0, members: 12, s: 'active' },
-      { name: 'ริมทะเล รีสอร์ท', slug: 'rimtalay', id: 'rr', type: 'เจ้าของไซต์', sites: 1, members: scMemberCount('e', 2), s: 'trial' },
+      { name: 'ริมทะเล รีสอร์ท', slug: 'rimtalay', id: 'rr', type: 'เจ้าของไซต์', sites: scPlatLive('e', 1, 0).sites, members: scMemberCount('e', 2), s: 'trial' },
       { name: 'บ้านสวนแพ็คกิ้ง', slug: 'bansuan', id: 'bs', type: 'เจ้าของไซต์', sites: 1, members: 2, s: 'suspended' }
     ];
     // badge id → sc.porg id (DATA.md: a,b,c,d,e; others keep their badge id)
@@ -169,13 +189,18 @@ class Component extends DCLogic {
       orgs.splice(4, 0, { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', slug: 'raithong', id: 'rt', type: 'เจ้าของไซต์', sites: rl('sc.createdSites').length, members: scMemberCount('d', 1), s: 'trial' });
     }
     if (pnew) orgs.unshift({ name: pnew, slug: 'new-org', id: 'new', type: 'เจ้าของไซต์', sites: 0, members: 1, s: 'trial' });
-    orgs.forEach(function (o) { o.isNew = o.id === 'new'; o.known = !o.isNew; });
+    // suspensions made on PlatformOrgDetail (sc.psusp {orgId: true|false}) show here too
+    var psusp = {}; try { psusp = JSON.parse(SS('sc.psusp') || '{}') || {}; } catch (e) { psusp = {}; }
+    orgs.forEach(function (o) { o.isNew = o.id === 'new'; o.known = !o.isNew; var k = P[o.id] || o.id; if (psusp[k] === true) o.s = 'suspended'; else if (psusp[k] === false && o.s === 'suspended') o.s = 'active'; });
     var q = self.state.q.trim().toLowerCase();
     var all = orgs, fSt = self.state.fSt;
     var byQ = all.filter(function (o) { return !q || (o.name + ' ' + o.slug).toLowerCase().indexOf(q) >= 0; });
     orgs = byQ.filter(function (o) { return fSt === 'all' || o.s === fSt; });
     var stDefs = [['all', 'ทั้งหมด'], ['active', 'ใช้งาน'], ['trial', 'เริ่มต้นใช้งาน'], ['suspended', 'ระงับการใช้งาน']];
+    var propState = self.props.state || 'ready';
+    var listState = self.state.retried === propState ? 'ready' : propState, busy = listState !== 'ready';
     return {
+      listBusy: busy, listReady: !busy, listState: busy ? listState : 'loading', retry: function () { self.setState({ retried: propState }); },
       // logging out clears every shared prototype key so the next sign-in starts fresh (DATA.md)
       pfLogout: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage, ks = []; for (var i = 0; i < ss.length; i++) { var k = ss.key(i); if (k && k.indexOf('sc.') === 0) ks.push(k); } ks.forEach(function (k) { ss.removeItem(k); }); } catch (x) {} },
       fSt: fSt, setSt: function (id) { self.setState({ fSt: id }); },

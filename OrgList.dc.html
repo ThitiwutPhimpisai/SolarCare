@@ -73,8 +73,23 @@ var SAMPLE = [
   { badge: 'gm', name: 'กรีนมาร์ท รีเทล', note: 'Site Manager · 2 ไซต์', href: 'Main.dc.html', saveKeys: 'sc.org=b|sc.site=all' },
   { badge: 'nk', name: 'นิคมฯ เหนือ', note: 'Viewer · 1 ไซต์', href: 'Main.dc.html', saveKeys: 'sc.org=c|sc.site=all' }
 ];
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this;
     var p = this.props, lg = (p.size ?? 'lg') !== 'sm';

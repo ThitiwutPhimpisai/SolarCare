@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>แผนที่ไซต์</title>
+<title>แผนที่ไซต์ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -18,8 +18,9 @@ body{margin:0}
   <div role="group" aria-label="{{groupLabel}}" style="{{boxStyle}}">
     <div id="{{mapId}}" style="position: absolute; inset: 0; z-index: 0; background: #F5F6F8"></div>
 
+    <span role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{statusLive}}</span>
     <sc-if value="{{showStatus}}" hint-placeholder-val="{{ false }}">
-      <div role="status" style="position: absolute; inset: 0; z-index: 900; display: flex; align-items: center; justify-content: center; padding: 16px; text-align: center; font-size: 13px; color: #4B5563; background: #F5F6F8">{{statusText}}</div>
+      <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 900; display: flex; align-items: center; justify-content: center; padding: 16px; text-align: center; font-size: 13px; color: #4B5563; background: #F5F6F8">{{statusText}}</div>
     </sc-if>
 
     <sc-if value="{{hasZoom}}" hint-placeholder-val="{{ true }}">
@@ -36,26 +37,24 @@ body{margin:0}
           <div style="font-weight: 700; font-size: 15px">{{card.name}}</div>
           <div style="font-size: 12px; color: #4B5563">{{card.prov}}</div>
           <dc-import name="StatusPill" kind="site" value="{{card.st}}" hint-size="90px,24px"></dc-import>
-          <a href="SiteDetail.dc.html" onPointerDown="{{openSite}}" onKeyDown="{{openSite}}" onClick="{{openSite}}" style="display: inline-flex; align-items: center; min-height: 32px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูไซต์ →</a>
+          <a href="SiteDetail.dc.html" onPointerDown="{{openSite}}" onKeyDown="{{openSite}}" onClick="{{openSite}}" style="display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: underline">ดูไซต์<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a>
         </div>
-        <button type="button" onClick="{{closeCard}}" aria-label="ปิด" style="width: 44px; height: 44px; flex: none; border: 0; background: transparent; font-size: 20px; color: #4B5563; cursor: pointer; border-radius: 8px">×</button>
+        <button type="button" onClick="{{closeCard}}" aria-label="ปิดการ์ดไซต์" style="width: 44px; height: 44px; flex: none; display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: #4B5563; cursor: pointer; border-radius: 8px"><dc-import name="Icon" icon="x" size="18" hint-size="18px,18px"></dc-import></button>
       </div>
     </sc-if>
   </div>
 
   <sc-if value="{{hasUnpinned}}" hint-placeholder-val="{{ false }}">
-    <div role="note" style="font-size: 13px; color: #374151; padding: 8px 12px; border-radius: 8px; background: #FFF4E5; border: 1px solid #F3D7B0">{{unpinnedText}}<sc-if value="{{canEditSites}}" hint-placeholder-val="{{ true }}"> <a href="SiteForm.dc.html" onPointerDown="{{editUnpinned}}" onKeyDown="{{editUnpinned}}" onClick="{{editUnpinned}}" style="color: #0F6B5C; font-weight: 600">ปักหมุดที่หน้าแก้ไขไซต์ →</a></sc-if></div>
+    <div role="note" style="font-size: 13px; color: #374151; padding: 8px 12px; border-radius: 8px; background: #FFF4E5; border: 1px solid #F3D7B0">{{unpinnedText}}<sc-if value="{{canEditSites}}" hint-placeholder-val="{{ true }}"> <a href="SiteForm.dc.html" onPointerDown="{{editUnpinned}}" onKeyDown="{{editUnpinned}}" onClick="{{editUnpinned}}" style="color: #0F6B5C; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; min-height: 44px">ปักหมุดที่หน้าแก้ไขไซต์ <dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a></sc-if></div>
   </sc-if>
   <sc-if value="{{showLegend}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #374151; align-items: center">
       <sc-for list="{{legend}}" as="g" hint-placeholder-count="3">
-        <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="{{g.style}}">{{g.glyph}}</span>{{g.t}}</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="{{g.style}}"><sc-if value="{{g.icon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{g.icon}}" size="10" tone="{{g.tone}}" hint-size="10px,10px"></dc-import></sc-if></span>{{g.t}}</span>
       </sc-for>
     </div>
   </sc-if>
-  <sc-if value="{{showPickText}}" hint-placeholder-val="{{ false }}">
-    <div role="status" style="{{pickTextStyle}}">{{pickText}}</div>
-  </sc-if>
+  <div role="status" aria-live="polite" style="{{pickTextStyle}}">{{pickText}}</div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","options":["sites","pick","checkin"],"default":"sites"},"sites":{"editor":"text","default":""},"selected":{"editor":"text","default":""},"height":{"editor":"int","default":480},"pinLat":{"editor":"text","default":""},"pinLon":{"editor":"text","default":""},"checkinLat":{"editor":"text","default":"14.9712"},"checkinLon":{"editor":"text","default":"102.0991"},"onPick":{"editor":null},"canEdit":{"editor":"boolean","default":false},"statuses":{"editor":"text","default":""},"extra":{"editor":"text","default":""},"$preview":{"width":520,"height":640}}'>
@@ -74,7 +73,8 @@ var SM_SITES = {
   lp: { name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', lon: 99.02, lat: 18.58, st: 'ok' },
   e1: { name: 'หลังคาอาคาร A หัวหิน', prov: 'ประจวบคีรีขันธ์', st: 'unset', nocoord: true } // no pin yet
 };
-var SM_ST = { ok: { t: 'ปกติ', c: '#0F6B5C', glyph: '' }, due: { t: 'ใกล้ครบรอบ', c: '#B54708', glyph: '' }, late: { t: 'เลยกำหนด', c: '#B42318', glyph: '!' }, unset: { t: 'ยังไม่ตั้งรอบ', c: '#4B5563', glyph: '?' } };
+// each status has its own shape + icon so the pin never relies on colour alone
+var SM_ST = { ok: { t: 'ปกติ', c: '#0F6B5C', icon: 'check', d: 'M4 12l5 5L20 6' }, due: { t: 'ใกล้ครบรอบ', c: '#B54708', icon: 'clock', d: 'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2' }, late: { t: 'เลยกำหนด', c: '#B42318', icon: 'alert', d: 'M12 4v10M12 19.5h.01' }, unset: { t: 'ยังไม่ตั้งรอบ', c: '#4B5563', icon: 'help', d: 'M9 9a3 3 0 115 2c-1 .8-2 1.4-2 3M12 18.5h.01' } };
 // sites created in the prototype: extra = "id|name|prov|lat|lon|st;…" (lat/lon from SiteForm's pin, else the province centre)
 var SM_PROV = { 'นครราชสีมา': [14.97, 102.10], 'สมุทรปราการ': [13.60, 100.60], 'ลพบุรี': [14.80, 100.65], 'ปทุมธานี': [14.02, 100.53], 'กรุงเทพฯ': [13.75, 100.50], 'กรุงเทพมหานคร': [13.75, 100.50], 'ลำพูน': [18.58, 99.01], 'ประจวบคีรีขันธ์': [11.81, 99.80], 'เชียงใหม่': [18.79, 98.98], 'ชลบุรี': [13.36, 100.98], 'ระยอง': [12.68, 101.28], 'ขอนแก่น': [16.44, 102.83], 'สระบุรี': [14.53, 100.91], 'นนทบุรี': [13.86, 100.51], 'อยุธยา': [14.35, 100.57], 'พระนครศรีอยุธยา': [14.35, 100.57] };
 // site renames (SiteForm edit → sc.siteEdits, keyed by the original name)
@@ -166,7 +166,9 @@ function smInThailand(lat, lon) {
 function smDot(st, on) {
   var s = SM_ST[st] || SM_ST.ok, size = on ? 24 : 18;
   var look = st === 'due' ? 'background:#FFFFFF;border:4px solid ' + s.c : 'background:' + s.c + ';border:2px solid #FFFFFF';
-  return '<span style="width:' + size + 'px;height:' + size + 'px;border-radius:999px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;font:700 12px/1 system-ui;color:#FFFFFF;box-shadow:0 1px 4px rgba(17,24,39,0.35);' + look + '">' + s.glyph + '</span>';
+  var ic = Math.round(size * (st === 'due' ? 0.5 : 0.62)), stroke = st === 'due' ? s.c : '#FFFFFF';
+  var svg = '<svg width="' + ic + '" height="' + ic + '" viewBox="0 0 24 24" fill="none" stroke="' + stroke + '" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + s.d + '"/></svg>';
+  return '<span style="width:' + size + 'px;height:' + size + 'px;border-radius:' + (st === 'late' ? '4px' : '999px') + ';box-sizing:border-box;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(17,24,39,0.35);' + look + '">' + svg + '</span>';
 }
 
 class Component extends DCLogic {
@@ -325,14 +327,15 @@ class Component extends DCLogic {
     var pin = this.pinNow();
     var dotBase = 'width: 14px; height: 14px; border-radius: 999px; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #FFFFFF; ';
     var legend = mode === 'checkin'
-      ? [{ t: 'ไซต์ (วงประ = ระยะ ' + SM_RADIUS + ' ม.)', glyph: '', style: dotBase + 'background: #0F6B5C; border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px #0F6B5C' },
-         { t: 'จุดเช็กอินของช่าง', glyph: '', style: dotBase + 'background: #1D4ED8; border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px #1D4ED8' }]
-      : ['ok', 'due', 'late'].map(function (k) { var s = SM_ST[k]; return { t: s.t, glyph: s.glyph, style: dotBase + (k === 'due' ? 'background: #FFFFFF; border: 3px solid ' + s.c : 'background: ' + s.c) }; });
+      ? [{ t: 'ไซต์ (วงประ = ระยะ ' + SM_RADIUS + ' ม.)', icon: '', tone: 'white', style: dotBase + 'background: #0F6B5C; border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px #0F6B5C' },
+         { t: 'จุดเช็กอินของช่าง', icon: '', tone: 'white', style: dotBase + 'background: #1D4ED8; border: 2px solid #FFFFFF; box-shadow: 0 0 0 1px #1D4ED8' }]
+      : ['ok', 'due', 'late'].map(function (k) { var s = SM_ST[k]; return { t: s.t, icon: s.icon, tone: k === 'due' ? 'warn' : 'white', style: dotBase.replace('width: 14px; height: 14px', 'width: 18px; height: 18px') + (k === 'late' ? 'border-radius: 4px; ' : '') + (k === 'due' ? 'background: #FFFFFF; border: 2px solid ' + s.c : 'background: ' + s.c) }; });
     return {
       mapId: this.mapId,
       groupLabel: mode === 'pick' ? 'แผนที่สำหรับปักหมุดตำแหน่งไซต์' : mode === 'checkin' ? 'แผนที่ตำแหน่งเช็กอิน' : 'แผนที่ไซต์',
       boxStyle: 'position: relative; width: 100%; height: ' + H + 'px; max-height: 75vh; min-height: 200px; overflow: hidden; border-radius: 12px; border: 1px solid #E3E6EB; background: #F5F6F8; box-sizing: border-box; isolation: isolate' + (mode === 'pick' ? '; cursor: crosshair' : ''),
       showStatus: !this.state.ready || this.state.failed,
+      statusLive: !this.state.ready || this.state.failed ? (this.state.failed ? 'โหลดแผนที่ไม่ได้ ลองรีเฟรชหน้า' : 'กำลังโหลดแผนที่') : '',
       statusText: this.state.failed ? 'โหลดแผนที่ไม่ได้ ลองรีเฟรชหน้า ' + (this.state.err || '') : 'กำลังโหลดแผนที่…',
       hasZoom: mode !== 'checkin',
       zoomLabel: this.isWhole() ? (mode === 'pick' ? 'กลับไปที่หมุด' : 'ซูมเข้าไซต์') : 'ดูทั้งประเทศ',
@@ -350,7 +353,7 @@ class Component extends DCLogic {
       showLegend: mode !== 'pick', legend: legend,
       showPickText: mode === 'pick',
       pickText: this.state.outside ? 'จุดที่แตะอยู่นอกประเทศไทย ลองแตะในเขตประเทศไทย' : pin ? 'ปักหมุดที่ ' + pin.lat.toFixed(4) + ', ' + pin.lon.toFixed(4) : 'แตะบนแผนที่เพื่อปักหมุดตำแหน่งไซต์ (ซูมเข้าได้ด้วยปุ่ม + −)',
-      pickTextStyle: 'font-size: 13px; ' + (this.state.outside ? 'color: #B42318' : 'color: #374151')
+      pickTextStyle: (mode === 'pick' ? '' : 'display: none; ') + 'font-size: 13px; ' + (this.state.outside ? 'color: #B42318' : 'color: #374151')
     };
   }
 }

@@ -16,6 +16,7 @@ button,select,textarea{font-family:inherit}
 button{cursor:pointer}
 </style>
 </helmet>
+<div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{live}}</div>
 <div style="width: 100%; max-width: 390px; height: 100dvh; max-height: 844px; margin: 0 auto; box-sizing: border-box; background: #F5F6F8; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; overflow: hidden">
   <div style="background: #FFFFFF; border-bottom: 1px solid #E3E6EB; padding: 48px 8px 10px; display: flex; align-items: center; gap: 4px; flex: none">
     <a href="TechMobile.dc.html" aria-label="กลับไปที่งาน" onPointerDown="{{goBack}}" onKeyDown="{{goBack}}" onClick="{{goBack}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
@@ -83,7 +84,7 @@ button{cursor:pointer}
 
         <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; font-size: 14px; cursor: pointer">
           <input type="checkbox" checked="{{stop}}" onChange="{{toggleStop}}" style="width: 22px; height: 22px; accent-color: #B42318">
-          <span style="flex: 1"><span style="display: block; font-weight: 600">หยุดงานจนกว่าจะแก้</span><span style="display: block; font-size: 12px; color: #4B5563">แจ้ง Site Manager ทันที และพักใบงานนี้</span></span>
+          <span style="flex: 1"><span style="display: block; font-weight: 600">หยุดงานจนกว่าจะแก้</span><span style="display: block; font-size: 12px; color: #4B5563">แจ้งผู้จัดการไซต์ทันที และพักใบงานนี้</span></span>
         </label>
       </div>
       <div style="background: #FFFFFF; border-top: 1px solid #E3E6EB; padding: 12px 16px 28px; flex: none">
@@ -94,7 +95,7 @@ button{cursor:pointer}
   </sc-if>
 
   <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
-    <div role="status" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 32px; text-align: center">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 32px; text-align: center">
       <div style="width: 72px; height: 72px; border-radius: 999px; background: #E7F2EF; color: #0F6B5C; display: flex; align-items: center; justify-content: center">
         <dc-import name="Icon" icon="check" size="36" hint-size="36px,36px"></dc-import>
       </div>
@@ -128,19 +129,19 @@ class Component extends DCLogic {
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
     // ธนากร ว.'s jobs (canonical data: ../DATA.md)
     var JOBS = {
-      'WO-1039': { badge: 'sf', site: 'หลังคาโรงงานบางปู', zones: ['หลังคา'], mgr: 'ณัฐภัทร ส. (Org Admin)' },
-      'GM-0209': { badge: 'gm', site: 'สาขาบางนา', zones: ['ลานจอด'], mgr: 'ณัฐภัทร ส. (Site Manager)' },
-      'WO-1042': { badge: 'sf', site: 'ฟาร์มโคราช 1', zones: ['โซน C'], mgr: 'สมศรี ป. (Site Manager)' },
-      'GM-0211': { badge: 'gm', site: 'สาขารังสิต', zones: ['หลังคา'], mgr: 'ณัฐภัทร ส. (Site Manager)' },
-      'WO-1043': { badge: 'sf', site: 'ฟาร์มโคราช 1', zones: ['โซน A', 'โซน B', 'โซน C'], mgr: 'สมศรี ป. (Site Manager)' }
+      'WO-1039': { badge: 'sf', site: 'หลังคาโรงงานบางปู', zones: ['หลังคา'], mgr: 'ณัฐภัทร ส. (ผู้ดูแลองค์กร)' },
+      'GM-0209': { badge: 'gm', site: 'สาขาบางนา', zones: ['ลานจอด'], mgr: 'ณัฐภัทร ส. (ผู้จัดการไซต์)' },
+      'WO-1042': { badge: 'sf', site: 'ฟาร์มโคราช 1', zones: ['โซน C'], mgr: 'สมศรี ป. (ผู้จัดการไซต์)' },
+      'GM-0211': { badge: 'gm', site: 'สาขารังสิต', zones: ['หลังคา'], mgr: 'ณัฐภัทร ส. (ผู้จัดการไซต์)' },
+      'WO-1043': { badge: 'sf', site: 'ฟาร์มโคราช 1', zones: ['โซน A', 'โซน B', 'โซน C'], mgr: 'สมศรี ป. (ผู้จัดการไซต์)' }
     };
     // jobs created in the prototype and assigned to ธนากร (sc.createdWo) can be reported on too
     try { (JSON.parse(SS('sc.createdWo') || 'null') || []).forEach(function (c) {
       if (c && c.who === 'ธนากร ว.' && (c.org === 'a' || c.org === 'b')) JOBS[c.no] = { badge: c.org === 'a' ? 'sf' : 'gm', site: c.site, zones: c.zones && c.zones.length ? c.zones : ['ทั้งไซต์'],
-        mgr: c.org === 'b' ? 'ณัฐภัทร ส. (Site Manager)' : (c.site === 'ฟาร์มโคราช 1' || c.site === 'ฟาร์มโคราช 2' ? 'สมศรี ป. (Site Manager)' : 'ณัฐภัทร ส. (Org Admin)') };
+        mgr: c.org === 'b' ? 'ณัฐภัทร ส. (ผู้จัดการไซต์)' : (c.site === 'ฟาร์มโคราช 1' || c.site === 'ฟาร์มโคราช 2' ? 'สมศรี ป. (ผู้จัดการไซต์)' : 'ณัฐภัทร ส. (ผู้ดูแลองค์กร)') };
     }); } catch (e) {}
     // jobs assigned in the prototype (sc.woAssign) — same source TechMobile uses
-    try { var asg = JSON.parse(SS('sc.woAssign') || '{}') || {}; if (asg['WO-1041'] === 'ธนากร ว.') JOBS['WO-1041'] = { badge: 'sf', site: 'ฟาร์มโคราช 2', zones: ['โซน A', 'โซน B', 'โซน C', 'โซน D'], mgr: 'สมศรี ป. (Site Manager)' }; } catch (e) {}
+    try { var asg = JSON.parse(SS('sc.woAssign') || '{}') || {}; if (asg['WO-1041'] === 'ธนากร ว.') JOBS['WO-1041'] = { badge: 'sf', site: 'ฟาร์มโคราช 2', zones: ['โซน A', 'โซน B', 'โซน C', 'โซน D'], mgr: 'สมศรี ป. (ผู้จัดการไซต์)' }; } catch (e) {}
     var EDITS = {}; try { EDITS = JSON.parse(SS('sc.siteEdits') || '{}') || {}; } catch (e) { EDITS = {}; }
     var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
     var no = JOBS[SS('sc.wo')] ? SS('sc.wo') : 'WO-1042';
@@ -168,6 +169,7 @@ class Component extends DCLogic {
       descBad: descBad,
       descStyle: 'padding: 10px 12px; border: 1px solid ' + (descBad ? '#B42318' : '#858D9B') + '; border-radius: 10px; font-size: 15px; resize: vertical',
       photoBad: photoBad, blocked: photoBad || descBad,
+      live: mine ? 'บันทึกรายงานปัญหาของ ' + no + ' แล้ว' : '',
       doneNote: s.stop ? 'พักใบงาน ' + no + ' แล้ว (สถานะ “พักงาน”) และแจ้ง ' + job.mgr + ' แล้ว · รายงานนี้แสดงในหน้าใบงานของผู้จัดการ' : 'แจ้ง ' + job.mgr + ' แล้ว · รายงานนี้แสดงในหน้าใบงาน คุณทำงานต่อได้ตามปกติ',
       types: types.map(function (t) { var on = t[0] === s.type; return { label: t[1], icon: t[2], on: on, pick: function () { self.setState({ type: t[0] }); },
         style: 'min-height:64px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;padding:10px 12px;border-radius:10px;text-align:left;font-size:13px;font-weight:600;border:' + (on ? '2px solid #0F6B5C;background:#F0F7F5;color:#0A4F44' : '1px solid #D5D9E0;background:#FFFFFF;color:#374151') }; }),

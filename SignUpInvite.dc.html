@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>สร้างบัญชีจากคำเชิญ</title>
+<title>สร้างบัญชีจากคำเชิญ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -26,7 +26,7 @@ button{cursor:pointer}
       <div style="flex: 1; min-width: 0">
         <div style="font-size: 13px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="Avatar" person="arunee" size="20" hint-size="20px,20px"></dc-import>คุณอรุณี ท. (Org Owner) เชิญคุณเข้าร่วม</div>
         <div style="font-size: 17px; font-weight: 700; margin-top: 2px">ริมทะเล รีสอร์ท</div>
-        <div style="font-size: 13px; color: #374151">Site Manager · 1 ไซต์ (หลังคาอาคาร A หัวหิน)</div>
+        <div style="font-size: 13px; color: #374151">ผู้จัดการไซต์ · 1 ไซต์ (หลังคาอาคาร A หัวหิน)</div>
       </div>
     </section>
 
@@ -58,7 +58,7 @@ button{cursor:pointer}
         </div>
         <ul id="su-rules" aria-live="polite" style="list-style: none; margin: 0; padding: 12px 14px; border-radius: 10px; background: #FAFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
           <sc-for list="{{rules}}" as="r" hint-placeholder-count="4">
-            <li style="{{r.style}}"><span aria-hidden="true" style="width: 18px; text-align: center; font-weight: 700">{{r.mark}}</span>{{r.label}}</li>
+            <li style="{{r.style}}"><dc-import name="Icon" icon="{{r.icon}}" size="16" tone="{{r.tone}}" hint-size="16px,16px"></dc-import><span>{{r.label}}</span><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{r.sr}}</span></li>
           </sc-for>
         </ul>
         <label style="display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: #374151; cursor: pointer; min-height: 44px">
@@ -147,7 +147,7 @@ class Component extends DCLogic {
       setPw: function (e) { self.setState({ pw: e.target.value }); },
       setPw2: function (e) { self.setState({ pw2: e.target.value }); },
       toggleAgree: function () { self.setState({ agree: !s.agree }); },
-      rules: checks.map(function (c) { return { label: c[0], mark: c[1] ? '✓' : '·', style: 'display:flex;align-items:center;gap:6px;color:' + (c[1] ? '#0A4F44;font-weight:600' : '#4B5563') }; })
+      rules: checks.map(function (c) { return { label: c[0], icon: c[1] ? 'check' : 'x', tone: c[1] ? 'brand' : 'muted', sr: c[1] ? ' (ผ่านแล้ว)' : ' (ยังไม่ผ่าน)', style: 'position:relative;display:flex;align-items:center;gap:6px;color:' + (c[1] ? '#0A4F44;font-weight:600' : '#4B5563') }; })
     });
   }
 }

@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>SolarCare แดชบอร์ด</title>
+<title>ภาพรวม · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -14,9 +14,8 @@
 body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 button{font-family:inherit;cursor:pointer}
-.mn-toggle{display:none}
-.mn-energy:empty,.mn-todo:empty{display:none}
-@media (max-width: 767px){.mn-kpi{order:10}.mn-energy{order:11}.mn-toggle{display:inline-flex}.mn-energy[data-open="false"] .mn-energy-body{display:none}}
+@media (max-width: 599px){.mn-cta-t{display:none}}
+.mn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px;align-items:start}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
@@ -25,18 +24,10 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px; box-sizing: border-box">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
-  <div style="display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; justify-content: space-between">
-    <div style="flex: 1 1 420px; min-width: 0">
-      <dc-import name="PageHeader" eyebrow="{{headEyebrow}}" icon="overview" title="ภาพรวมการดูแลแผงโซลาร์" hint-size="100%,72px"></dc-import>
-    </div>
-    <div role="note" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #FFF4E5; color: #8A3B06; font-size: 13px; font-weight: 600">
-      <dc-import name="Icon" icon="shield" size="16" tone="current" hint-size="16px,16px"></dc-import>
-      {{scopeNote}}
-    </div>
-  </div>
+  <dc-import name="PageHeader" eyebrow="{{headEyebrow}}" icon="overview" title="ภาพรวม" subtitle="{{headSub}}" hint-size="100%,96px"></dc-import>
 
   <sc-if value="{{showSetup}}" hint-placeholder-val="{{ false }}">
-  <section aria-labelledby="mn-setup" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+  <section aria-labelledby="mn-setup" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(16px, 2.5vw, 20px); display: flex; flex-direction: column; gap: 16px">
     <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
       <h2 id="mn-setup" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="checkCircle" size="18" tone="muted" hint-size="18px,18px"></dc-import>เริ่มต้นใช้งาน{{orgName}}</h2>
       <span style="display: inline-flex; align-items: center; gap: 12px; font-size: 13px; color: #4B5563">ทำแล้ว {{setupDone}} จาก 4<button type="button" onClick="{{dismissSetup}}" style="min-height: 44px; padding: 0 8px; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600">{{dismissLabel}}</button></span>
@@ -55,74 +46,122 @@ button{font-family:inherit;cursor:pointer}
       </sc-for>
     </ol>
     <sc-if value="{{cannotCreateSite}}" hint-placeholder-val="{{ false }}">
-      <div style="font-size: 13px; color: #4B5563">การเพิ่มไซต์ต้องเป็น Org Owner / Org Admin</div>
+      <div style="font-size: 13px; color: #4B5563">การเพิ่มไซต์ต้องเป็นเจ้าของหรือผู้ดูแลองค์กร</div>
     </sc-if>
   </section>
   </sc-if>
   <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
-  <section aria-label="เลือกไซต์">
-    <dc-import name="FilterChips" label="ไซต์" value="{{sel}}" options="{{siteOpts}}" on-change="{{pickSite}}" hint-size="100%,44px"></dc-import>
-  </section>
+  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
+    <sc-if value="{{showSiteSelect}}" hint-placeholder-val="{{ true }}"><label for="mn-site" style="font-size: 14px; font-weight: 600; color: #374151">ไซต์</label>
+    <select id="mn-site" onChange="{{pickSiteEv}}" style="font-family: inherit; min-height: 44px; min-width: 220px; max-width: 100%; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-size: 14px; color: #111827">
+      <sc-for list="{{siteOpts}}" as="o" hint-placeholder-count="3"><option value="{{o.id}}" selected="{{o.on}}">{{o.label}}</option></sc-for>
+    </select></sc-if>
+    <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #4B5563"><dc-import name="Icon" icon="shield" size="16" tone="muted" hint-size="16px,16px"></dc-import>{{scopeNote}}</span>
+  </div>
   </sc-if>
 
-  <div class="mn-todo"><sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
+  <sc-if value="{{showTodo}}" hint-placeholder-val="{{ true }}">
   <section aria-labelledby="mn-todo" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
     <div style="display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #E3E6EB">
-      <h2 id="mn-todo" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="clock" size="18" tone="muted" hint-size="18px,18px"></dc-import>ต้องทำวันนี้<span style="font-size: 13px; font-weight: 500; color: #4B5563">· {{todoCount}} รายการ</span></h2>
+      <h2 id="mn-todo" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="clock" size="18" tone="muted" hint-size="18px,18px"></dc-import>สิ่งที่ต้องทำ<span style="font-size: 13px; font-weight: 500; color: #4B5563">· {{todoCount}} รายการ</span></h2>
       <a href="WorkOrders.dc.html" onPointerDown="{{toAllWo}}" onKeyDown="{{toAllWo}}" onClick="{{toAllWo}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูใบงานทั้งหมด<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
     </div>
     <sc-if value="{{loading}}" hint-placeholder-val="{{ false }}">
-      <dc-import name="ListState" state="loading" unit="งานวันนี้" rows="{{3}}" hint-size="100%,180px"></dc-import>
+      <dc-import name="ListState" state="loading" unit="สิ่งที่ต้องทำ" rows="{{3}}" hint-size="100%,180px"></dc-import>
+    </sc-if>
+    <sc-if value="{{loadError}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="ListState" state="error" unit="สิ่งที่ต้องทำ" error-text="ดึงข้อมูลใบงานไม่สำเร็จ ข้อมูลเดิมยังอยู่ ลองใหม่อีกครั้ง" on-retry="{{retry}}" hint-size="100%,200px"></dc-import>
     </sc-if>
     <sc-if value="{{todoEmpty}}" hint-placeholder-val="{{ false }}">
-      <dc-import name="ListState" state="empty" unit="งานด่วน" icon="checkCircle" empty-title="ไม่มีงานด่วนวันนี้" empty-text="{{todoEmptyText}}" hint-size="100%,180px"></dc-import>
+      <dc-import name="ListState" state="empty" unit="สิ่งที่ต้องทำ" icon="checkCircle" empty-title="ไม่มีงานที่ต้องจัดการตอนนี้" empty-text="{{todoEmptyText}}" hint-size="100%,160px"></dc-import>
     </sc-if>
     <sc-if value="{{todoReady}}" hint-placeholder-val="{{ true }}">
       <ul style="list-style: none; margin: 0; padding: 0">
-        <sc-for list="{{todo}}" as="t" hint-placeholder-count="4">
+        <sc-for list="{{todo}}" as="t" hint-placeholder-count="3">
           <li style="border-top: 1px solid #EEF0F3">
-            <a href="{{t.href}}" onPointerDown="{{t.go}}" onKeyDown="{{t.go}}" onClick="{{t.go}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px; text-decoration: none; color: #111827; flex-wrap: wrap">
+            <a href="{{t.href}}" onPointerDown="{{t.go}}" onKeyDown="{{t.go}}" onClick="{{t.go}}" aria-label="{{t.aria}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px clamp(16px, 3vw, 20px); text-decoration: none; color: #111827">
               <dc-import name="Icon" icon="{{t.icon}}" size="18" bg="{{t.bg}}" hint-size="32px,32px"></dc-import>
-              <span style="flex: 1 1 240px; min-width: 0">
-                <span style="{{t.kindStyle}}">{{t.kind}}</span>
+              <span style="flex: 1 1 200px; min-width: 0">
                 <span style="display: block; font-weight: 600">{{t.title}}</span>
-                <span style="display: block; font-size: 13px; color: #4B5563">{{t.meta}}</span>
+                <span style="display: block; font-size: 13px; color: #4B5563"><span style="{{t.kindStyle}}">{{t.kind}}</span> · {{t.meta}}</span>
               </span>
-              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #0F6B5C">{{t.cta}}<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></span>
+              <span style="flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #0F6B5C"><span class="mn-cta-t">{{t.cta}}</span><dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></span>
             </a>
           </li>
         </sc-for>
       </ul>
     </sc-if>
-    <dc-import name="Insights" view="summary" place="main" site="{{energySite}}" hint-size="100%,72px"></dc-import>
   </section>
-  </sc-if></div>
+  </sc-if>
+  <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}"><dc-import name="Insights" view="row" place="main" org="{{orgId}}" site="{{energySite}}" hint-size="100%,56px"></dc-import></sc-if>
 
   <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
-  <section class="mn-kpi" aria-busy="{{loading}}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
-    <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
-      <sc-if value="{{k.link}}" hint-placeholder-val="{{ true }}">
-        <a href="{{k.href}}" onPointerDown="{{k.go}}" onKeyDown="{{k.go}}" onClick="{{k.go}}" aria-label="{{k.aria}}" title="{{k.aria}}" style="display: block; text-decoration: none; color: inherit; border-radius: 12px">
-          <dc-import name="KpiCard" icon="{{k.icon}}" label="{{k.label}}" value="{{k.value}}" unit="{{k.unit}}" tone="{{k.tone}}" note="{{k.note}}" loading="{{loading}}" hint-size="100%,100px"></dc-import>
-        </a>
-      </sc-if>
-      <sc-if value="{{k.plain}}" hint-placeholder-val="{{ false }}">
-        <dc-import name="KpiCard" icon="{{k.icon}}" label="{{k.label}}" value="{{k.value}}" unit="{{k.unit}}" tone="{{k.tone}}" note="{{k.note}}" loading="{{loading}}" hint-size="100%,100px"></dc-import>
-      </sc-if>
-    </sc-for>
+  <div class="mn-grid">
+  <section aria-labelledby="mn-attn" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+    <div style="display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #E3E6EB">
+      <h2 id="mn-attn" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="site" size="18" tone="muted" hint-size="18px,18px"></dc-import>{{attnTitle}}</h2>
+      <a href="Sites.dc.html" onPointerDown="{{toSites}}" onKeyDown="{{toSites}}" onClick="{{toSites}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูไซต์ทั้งหมด<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
+    </div>
+    <p style="margin: 0; padding: 8px 20px 0; font-size: 13px; color: #4B5563">{{attnNote}}</p>
+    <sc-if value="{{attnEmpty}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="ListState" state="empty" unit="ไซต์" icon="checkCircle" empty-title="ทุกไซต์อยู่ในรอบล้าง" empty-text="ไม่มีไซต์เลยกำหนดหรือใกล้ครบรอบใน 14 วัน" hint-size="100%,160px"></dc-import>
+    </sc-if>
+    <ul style="list-style: none; margin: 0; padding: 4px 0 0">
+      <sc-for list="{{attn}}" as="s" hint-placeholder-count="3">
+        <li style="border-top: 1px solid #EEF0F3">
+          <a href="SiteDetail.dc.html" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 20px; text-decoration: none; color: #111827">
+            <span style="flex: 1 1 160px; min-width: 0"><span style="display: block; font-weight: 600">{{s.name}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{s.meta}}</span></span>
+            <dc-import name="StatusPill" kind="site" value="{{s.st}}" label="{{s.label}}" hint-size="120px,26px"></dc-import>
+          </a>
+        </li>
+      </sc-for>
+    </ul>
+  </section>
+
+  <section aria-labelledby="mn-week" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+    <div style="display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #E3E6EB">
+      <h2 id="mn-week" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="calendar" size="18" tone="muted" hint-size="18px,18px"></dc-import>งาน 7 วันข้างหน้า</h2>
+      <a href="Schedule.dc.html" onPointerDown="{{toCal}}" onKeyDown="{{toCal}}" onClick="{{toCal}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูปฏิทิน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
+    </div>
+    <sc-if value="{{weekEmpty}}" hint-placeholder-val="{{ false }}">
+      <dc-import name="ListState" state="empty" unit="งาน" icon="calendar" empty-title="ไม่มีงานใน 7 วันข้างหน้า" empty-text="งานที่ต้องจัดการอยู่ในรายการสิ่งที่ต้องทำด้านบน" hint-size="100%,160px"></dc-import>
+    </sc-if>
+    <ul style="list-style: none; margin: 0; padding: 0">
+      <sc-for list="{{week}}" as="w" hint-placeholder-count="3">
+        <li style="border-top: 1px solid #EEF0F3">
+          <a href="WorkOrderDetail.dc.html" onPointerDown="{{w.go}}" onKeyDown="{{w.go}}" onClick="{{w.go}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 20px; text-decoration: none; color: #111827">
+            <span style="flex: none; width: 64px; text-align: center; font-size: 12px; color: #4B5563; line-height: 1.3"><span style="display: block; font-size: 18px; font-weight: 700; color: #111827">{{w.day}}</span>{{w.mon}}</span>
+            <span style="flex: 1 1 160px; min-width: 0"><span style="display: block; font-weight: 600">{{w.title}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{w.meta}}</span></span>
+            <dc-import name="StatusPill" kind="wo" value="{{w.st}}" hint-size="110px,26px"></dc-import>
+          </a>
+        </li>
+      </sc-for>
+    </ul>
+  </section>
+  </div>
+
+  <section aria-labelledby="mn-stat" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(16px, 2.5vw, 20px); display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center" aria-busy="{{loading}}">
+    <h2 id="mn-stat" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">สถานะโดยรวม</h2>
+    <a href="WorkOrders.dc.html" onPointerDown="{{toAllWo}}" onKeyDown="{{toAllWo}}" onClick="{{toAllWo}}" style="flex: 1 1 200px; text-decoration: none; color: #111827">
+      <span style="display: block; font-size: 14px; color: #4B5563">ใบงานเปิดอยู่</span>
+      <span style="display: block; font-size: 40px; font-weight: 700; line-height: 1.2">{{heroValue}}<span style="font-size: 16px; font-weight: 500; color: #4B5563"> ใบ</span></span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #0F6B5C">ดูในหน้างานล้าง<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></span>
+    </a>
+    <dl style="flex: 3 1 360px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px 24px; margin: 0">
+      <sc-for list="{{stats}}" as="k" hint-placeholder-count="3">
+        <div style="border-left: 2px solid #EEF0F3; padding-left: 12px"><dt style="font-size: 13px; color: #4B5563">{{k.label}}</dt><dd style="{{k.style}}">{{k.value}}<span style="font-size: 13px; font-weight: 500; color: #4B5563"> {{k.unit}}</span></dd></div>
+      </sc-for>
+    </dl>
+  </section>
+
+  <section aria-label="พลังงานเดือนนี้" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 12px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px">
+    <dc-import name="Icon" icon="energy" size="18" tone="muted" hint-size="18px,18px"></dc-import>
+    <span style="font-size: 14px; font-weight: 600">พลังงานเดือนนี้</span>
+    <span style="flex: 1 1 200px; min-width: 0; font-size: 14px"><dc-import name="EnergyStats" view="line" org="{{orgId}}" site="{{energySite}}" hint-size="100%,24px"></dc-import></span>
+    <a href="EnergyValue.dc.html" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูรายงานพลังงาน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
   </section>
   </sc-if>
 
-  <div class="mn-energy" data-open="{{energyOpen}}"><sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
-    <section aria-labelledby="mn-energy" style="display: flex; flex-direction: column; gap: 8px">
-      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between">
-        <h2 id="mn-energy" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="energy" size="18" tone="muted" hint-size="18px,18px"></dc-import>พลังงานและผลตอบแทน · 12 เดือน</h2>
-        <a href="EnergyValue.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูพลังงานและผลตอบแทน →</a>
-      <button type="button" class="mn-toggle" onClick="{{toggleEnergy}}" aria-expanded="{{energyOpenAria}}" aria-controls="mn-energy-body" style="align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; color: #374151; font-size: 13px; font-weight: 600">{{energyToggleLabel}}<dc-import name="Icon" icon="chevronDown" size="16" hint-size="16px,16px"></dc-import></button>
-      </div>
-      <div id="mn-energy-body" class="mn-energy-body"><dc-import name="EnergyStats" view="summary" org="{{orgId}}" site="{{energySite}}" period="12" hint-size="100%,140px"></dc-import></div>
-    </section>
-  </sc-if></div>
 
 
   </div>
@@ -130,7 +169,7 @@ button{font-family:inherit;cursor:pointer}
   <dc-import name="Flash" page="Main.dc.html" sample="" hint-size="100%,0px"></dc-import>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading"],"default":"ready"},"$preview":{"width":1440,"height":980}}'>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading","error"],"default":"ready"},"$preview":{"width":1440,"height":980}}'>
 // org renames (OrgProfile → sc.orgNames {a,b,c,e}): every page swaps the default names in what it renders
 var SC_ORG_DEF = { a: 'สยามโซลาร์ฟาร์ม จำกัด', b: 'กรีนมาร์ท รีเทล', c: 'นิคมฯ เหนือ', e: 'ริมทะเล รีสอร์ท' };
 var SC_ORG_KEEP = { val: 1, value: 1, q: 1, email: 1, draft: 1, draftFrom: 1, draftTo: 1, typed: 1, inputVal: 1, nameVal: 1 };
@@ -157,12 +196,12 @@ class Component extends DCLogic {
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.insightDismissed', 'sc.siteCycle', 'sc.site', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.new', 'sc.newsite', 'sc.woStat', 'sc.createdWo', 'sc.createdName', 'sc.createdSites', 'sc.createdInvites', 'sc.woAssign', 'sc.siteEdits', 'sc.setupDismissed'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.insightDismissed', 'sc.siteCycle', 'sc.site', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.new', 'sc.newsite', 'sc.woStat', 'sc.createdWo', 'sc.createdName', 'sc.createdSites', 'sc.createdInvites', 'sc.woAssign', 'sc.siteEdits', 'sc.setupDismissed', 'sc.inviteCancel', 'sc.memberEdits', 'sc.removed'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
     self._iv = setInterval(self._sync, 400);
-    self.setState({ sync: Date.now(), energyOpen: false }); // force one fresh render: Play may reuse a restored render
+    self.setState({ sync: Date.now() }); // force one fresh render: Play may reuse a restored render
   }
   componentWillUnmount() {
     if (this._sync) window.removeEventListener('storage', this._sync);
@@ -171,20 +210,21 @@ class Component extends DCLogic {
   renderVals() { return scOrgFix(this._rv()); }
   _rv() {
     var self = this;
-    var loading = (this.props.state ?? 'ready') === 'loading';
+    var pState = this.props.state ?? 'ready', mState = this.state.retriedFor === pState ? 'ready' : pState;
+    var loading = mState === 'loading', loadError = mState === 'error';
     // DATA.md: orgs, sites (last APPROVED cleaning, cycle, next due) and the open work orders
     var orgs = [
       { id: 'a', name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', techs: 4, sites: [
-        { id: 'a1', thumb: 'k1', name: 'ฟาร์มโคราช 1', kwp: 8400, st: 'due', next: '16 พ.ย. 2569 (พรุ่งนี้)', dueIn: 1 },
-        { id: 'a2', thumb: 'k2', name: 'ฟาร์มโคราช 2', kwp: 6200, st: 'due', next: '26 พ.ย. 2569', dueIn: 11 },
-        { id: 'a3', thumb: 'bp', name: 'หลังคาโรงงานบางปู', kwp: 1150, st: 'late', next: '27 ต.ค. 2569', dueIn: -19 },
-        { id: 'a4', thumb: 'lb', name: 'ลานจอดรถลพบุรี', kwp: 960, st: 'ok', next: '4 ม.ค. 2570', dueIn: 50 } ] },
+        { id: 'a1', thumb: 'k1', name: 'ฟาร์มโคราช 1', kwp: 8400, last: '18 ส.ค. 2569', cyc: 90, st: 'due', next: '16 พ.ย. 2569 (พรุ่งนี้)', dueIn: 1 },
+        { id: 'a2', thumb: 'k2', name: 'ฟาร์มโคราช 2', kwp: 6200, last: '12 ต.ค. 2569', cyc: 45, st: 'due', next: '26 พ.ย. 2569', dueIn: 11 },
+        { id: 'a3', thumb: 'bp', name: 'หลังคาโรงงานบางปู', kwp: 1150, last: '28 ส.ค. 2569', cyc: 60, st: 'late', next: '27 ต.ค. 2569', dueIn: -19 },
+        { id: 'a4', thumb: 'lb', name: 'ลานจอดรถลพบุรี', kwp: 960, last: '5 พ.ย. 2569', cyc: 60, st: 'ok', next: '4 ม.ค. 2570', dueIn: 50 } ] },
       { id: 'b', name: 'กรีนมาร์ท รีเทล', role: 'Site Manager', techs: 1, sites: [
-        { id: 'b1', thumb: 'rs', name: 'สาขารังสิต', kwp: 420, st: 'ok', next: '27 พ.ย. 2569', dueIn: 12 },
-        { id: 'b2', thumb: 'bn', name: 'สาขาบางนา', kwp: 380, st: 'late', next: '12 พ.ย. 2569', dueIn: -3 } ] },
+        { id: 'b1', thumb: 'rs', name: 'สาขารังสิต', kwp: 420, last: '28 ต.ค. 2569', cyc: 30, st: 'ok', next: '27 พ.ย. 2569', dueIn: 12 },
+        { id: 'b2', thumb: 'bn', name: 'สาขาบางนา', kwp: 380, last: '13 ก.ย. 2569', cyc: 60, st: 'late', next: '12 พ.ย. 2569', dueIn: -3 } ] },
       { id: 'c', name: 'นิคมฯ เหนือ', role: 'Viewer', techs: 3, sites: [
-        { id: 'c1', thumb: 'lp', name: 'โรงงาน A ลำพูน', kwp: 2300, st: 'ok', next: '29 พ.ย. 2569', dueIn: 14 } ] },
-      { id: 'd', name: 'ไร่ทองโซลาร์', role: 'Org Owner', techs: 0, invites: 1, sites: [] },
+        { id: 'c1', thumb: 'lp', name: 'โรงงาน A ลำพูน', kwp: 2300, last: '30 ต.ค. 2569', cyc: 30, st: 'ok', next: '29 พ.ย. 2569', dueIn: 14 } ] },
+      { id: 'd', name: 'ไร่ทองโซลาร์', role: 'Org Owner', techs: 0, sites: [] },
       { id: 'e', name: 'ริมทะเล รีสอร์ท', role: 'Site Manager', techs: 0, sites: [
         { id: 'e1', thumb: 'e1', name: 'หลังคาอาคาร A หัวหิน', kwp: 210, st: 'unset', next: '—', dueIn: null } ] }
     ];
@@ -208,6 +248,11 @@ class Component extends DCLogic {
     var EDITS = J('sc.siteEdits', '{}');
     var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
     var APPROVER = { 'ฟาร์มโคราช 1': 'สมศรี ป.', 'ฟาร์มโคราช 2': 'สมศรี ป.', 'สาขารังสิต': 'ณัฐภัทร ส.', 'สาขาบางนา': 'ณัฐภัทร ส.', 'โรงงาน A ลำพูน': 'ศิริพร ก.', 'หลังคาอาคาร A หัวหิน': 'ณัฐภัทร ส.', 'หลังคาโรงงานบางปู': 'ณัฐภัทร ส.', 'ลานจอดรถลพบุรี': 'ณัฐภัทร ส.' };
+    // a removed or suspended approver falls back to the org's Org Admin, then the Owner (DATA.md round 13)
+    var mEdA = J('sc.memberEdits', '{}'), rmA = J('sc.removed', '[]');
+    var APV_EM = { 'สมศรี ป.': 'somsri@siamsolar.example', 'ศิริพร ก.': 'siriporn@nikom-north.example' };
+    var apvGone = function (nm) { var em = APV_EM[nm]; if (!em) return false; var k = org.id + '|' + em, e = mEdA[k] || {}; return e.status === 'suspended' || e.status === 'removed' || rmA.indexOf(k) >= 0; };
+    var FALLBACK = { a: 'ณัฐภัทร ส.', b: 'กิตติ พ. (เจ้าขององค์กร)', c: 'สุนทร ม. (เจ้าขององค์กร)', d: 'ณัฐภัทร ส.', e: 'อรุณี ท. (เจ้าขององค์กร)' };
     var made = J('sc.createdSites', '[]').filter(function (x) { return x && x.org === org.id && x.name; });
     var sites = org.sites.concat(made.filter(function (x) { return !org.sites.some(function (s) { return s.name === x.name; }); }).map(function (x, i) {
       var kwp = parseInt(String(x.kwp || '0').replace(/,/g, ''), 10) || 0;
@@ -215,7 +260,19 @@ class Component extends DCLogic {
     }));
     // a cycle set on SiteDetail (sc.siteCycle, keyed by original site name) counts as set: no more "ยังไม่ตั้งรอบล้าง"
     var CYC = J('sc.siteCycle', '{}');
-    sites = sites.map(function (x) { return x.st === 'unset' && Number(CYC[x.name]) > 0 ? Object.assign({}, x, { st: 'due', cycle: String(CYC[x.name]), next: 'รอล้างครั้งแรก' }) : x; });
+    sites = sites.map(function (x) { return x.st === 'unset' && Number(CYC[x.name]) > 0 && !x.last ? Object.assign({}, x, { st: 'due', cycle: String(CYC[x.name]), next: 'รอล้างครั้งแรก' }) : x; });
+    // any site's cycle can be changed on SiteDetail (sc.siteCycle): next due = last approved cleaning + cycle (same rule as Sites / Schedule; ≤14 days = ใกล้ครบรอบ)
+    var TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'], TODAY = new Date(2026, 10, 15);
+    var thParse = function (t) { var m = /^(\d+) (\S+) (\d{4})/.exec(t || ''); var mi = m ? TH_M.indexOf(m[2]) : -1; return mi < 0 ? null : new Date(Number(m[3]) - 543, mi, Number(m[1])); };
+    var thFmt = function (d) { return d.getDate() + ' ' + TH_M[d.getMonth()] + ' ' + (d.getFullYear() + 543); };
+    var woStat0 = J('sc.woStat', '{}');
+    sites = sites.map(function (x) {
+      var c = Number(CYC[x.name]) || 0, last = x.name === 'ฟาร์มโคราช 1' && woStat0['WO-1043'] === 'done' ? '14 พ.ย. 2569' : x.last;
+      if (!x.last || (!c && last === x.last)) return x;
+      c = c || x.cyc; var l = thParse(last); if (!l) return x;
+      var n = new Date(l.getTime() + c * 864e5), dIn = Math.round((n - TODAY) / 864e5);
+      return Object.assign({}, x, { cyc: c, next: thFmt(n) + (dIn === 1 ? ' (พรุ่งนี้)' : ''), dueIn: dIn, st: dIn < 0 ? 'late' : dIn <= 14 ? 'due' : 'ok' });
+    });
     sites = sites.map(function (x) { var ed = EDITS[x.name]; if (!ed) return x; var k2 = parseInt(String(ed.kwp || '').replace(/,/g, ''), 10); return Object.assign({}, x, { kwp: k2 || x.kwp }); });
     // open work orders: DATA.md, then prototype changes (sc.woStat / sc.woAssign / sc.createdWo)
     var woStat = J('sc.woStat', '{}'), woAssign = J('sc.woAssign', '{}');
@@ -233,7 +290,7 @@ class Component extends DCLogic {
     var shownSites = sites.filter(function (s) { return sel === 'all' || s.id === sel; });
     var shownNames = shownSites.map(function (s) { return s.name; });
     var shownWos = wos.filter(function (w) { return shownNames.indexOf(w.site) >= 0; });
-    var siteOpts = [{ id: 'all', label: 'ทุกไซต์' }].concat(sites.map(function (s) { return { id: s.id, label: DN(s.name) }; }));
+    var siteOpts = [{ id: 'all', label: 'ทุกไซต์ (' + sites.length + ')' }].concat(sites.map(function (s) { return { id: s.id, label: DN(s.name) }; })).map(function (o) { return Object.assign({}, o, { on: o.id === sel }); });
     var sum = 0; shownSites.forEach(function (s) { sum += s.kwp; });
     var overdue = shownWos.filter(function (w) { return w.dueIn < 0; });
     var lateSites = shownSites.filter(function (s) { return s.st === 'late'; }).length;
@@ -242,33 +299,44 @@ class Component extends DCLogic {
     // "ต้องทำวันนี้": approvals, overdue jobs, unassigned jobs, jobs due within 3 days, sites late/unset without an open job
     var todo = [];
     var woRow = function (w, kind, icon, bg, cta, kindColor) {
-      return { kind: kind, icon: icon, bg: bg, title: w.no + ' · ' + w.title, meta: DN(w.site) + ' · ' + (w.who || 'ยังไม่มีผู้รับผิดชอบ') + ' · กำหนด ' + w.due, cta: cta,
-        kindStyle: 'display: block; font-size: 12px; font-weight: 700; color: ' + kindColor, href: 'WorkOrderDetail.dc.html', go: link({ 'sc.wo': w.no, 'sc.woFrom': 'Main' }) };
+      var meta = DN(w.site) + ' · ' + (w.who || 'ยังไม่มีผู้รับผิดชอบ') + ' · กำหนด ' + w.due;
+      return { no: w.no, kind: kind, icon: icon, bg: bg, title: w.no + ' · ' + w.title, meta: meta, cta: cta, aria: cta + ' ' + w.no + ' ' + w.title + ' · ' + kind + ' · ' + meta,
+        kindStyle: 'font-weight: 600; color: ' + kindColor, href: 'WorkOrderDetail.dc.html', go: link({ 'sc.wo': w.no, 'sc.woFrom': 'Main' }) };
     };
     shownWos.forEach(function (w) {
-      if (w.st === 'review') { var apv = APPROVER[w.site] || (admin ? 'ณัฐภัทร ส.' : 'Org Admin'), mine = apv === 'ณัฐภัทร ส.'; todo.push([0, woRow(w, mine ? 'รอคุณตรวจและอนุมัติ' : 'รอ ' + apv + ' อนุมัติ' + (admin ? ' · คุณอนุมัติแทนได้' : ''), 'checkCircle', 'info', (mine || admin) ? 'ตรวจงาน' : 'ดูใบงาน', '#1E3A8A')]); }
+      if (w.st === 'review') { var apv = APPROVER[w.site] || (admin ? 'ณัฐภัทร ส.' : 'ผู้ดูแลองค์กร'); if (apvGone(apv)) apv = FALLBACK[org.id] || 'ผู้ดูแลองค์กร'; var mine = apv === 'ณัฐภัทร ส.'; todo.push([0, woRow(w, mine ? 'รอคุณตรวจและอนุมัติ' : 'รอ ' + apv + ' อนุมัติ' + (admin ? ' · คุณอนุมัติแทนได้' : ''), 'checkCircle', 'info', (mine || admin) ? 'ตรวจงาน' : 'ดูใบงาน', '#1E3A8A')]); }
       else if (w.dueIn < 0) todo.push([1, woRow(w, 'เลยกำหนด ' + (-w.dueIn) + ' วัน', 'alert', 'danger', 'ดูใบงาน', '#B42318')]);
       else if (w.st === 'new' && !w.who) todo.push([2, woRow(w, 'ยังไม่มอบหมายช่าง', 'user', 'warn', admin || org.role === 'Site Manager' ? 'มอบหมาย' : 'ดูใบงาน', '#8A3B06')]);
-      else if (w.dueIn <= 3) todo.push([3, woRow(w, w.dueIn === 0 ? 'ครบกำหนดวันนี้' : (w.dueIn === 1 ? 'ครบกำหนดพรุ่งนี้' : 'ครบกำหนดใน ' + w.dueIn + ' วัน'), 'clock', 'warn', 'ดูใบงาน', '#8A3B06')]);
-    });
-    shownSites.forEach(function (s) {
-      var hasJob = wos.some(function (w) { return w.site === s.name; });
-      var row = function (kind, meta, icon, bg, color) { return { kind: kind, icon: icon, bg: bg, title: DN(s.name), meta: meta, cta: 'ดูไซต์', kindStyle: 'display: block; font-size: 12px; font-weight: 700; color: ' + color, href: 'SiteDetail.dc.html', go: link({ 'sc.siteName': s.name, 'sc.siteFrom': 'Main' }) }; };
-      if (s.st === 'unset') todo.push([4, row('ยังไม่ตั้งรอบล้าง', 'ตั้งรอบล้างเพื่อให้ระบบสร้างใบงานอัตโนมัติ', 'calendar', 'gray', '#374151')]);
-      else if (!hasJob && s.st === 'late') todo.push([1, row('เลยกำหนดล้าง ' + (-s.dueIn) + ' วัน', 'ครบรอบ ' + s.next + ' · ยังไม่มีใบงาน', 'alert', 'danger', '#B42318')]);
-      else if (!hasJob && s.next === 'รอล้างครั้งแรก') todo.push([4, row('รอล้างครั้งแรก', 'ตั้งรอบทุก ' + s.cycle + ' วันแล้ว · ยังไม่มีใบงาน', 'calendar', 'warn', '#8A3B06')]);
-      else if (!hasJob && s.dueIn != null && s.dueIn <= 14) todo.push([4, row('ครบรอบล้างใน ' + s.dueIn + ' วัน', 'ครบรอบ ' + s.next + ' · ยังไม่มีใบงาน', 'calendar', 'warn', '#8A3B06')]);
     });
     todo.sort(function (x, y) { return x[0] - y[0]; });
     todo = todo.map(function (x) { return x[1]; });
+    var inTodo = todo.map(function (t) { return t.no; });
+    // ไซต์ที่ต้องดูแล: late first (most overdue), then due soon, then not set up; bigger sites first within a tier (Round 14: ranked by impact)
+    var viewer = org.role === 'Viewer';
+    var tier = function (x) { return x.st === 'late' ? 0 : x.st === 'due' ? 1 : x.st === 'unset' ? 2 : 3; };
+    var attnSrc = viewer ? shownSites.slice() : shownSites.filter(function (x) { return tier(x) < 3; });
+    attnSrc.sort(function (a, b) { return tier(a) - tier(b) || (tier(a) === 0 ? a.dueIn - b.dueIn : tier(a) === 1 ? a.dueIn - b.dueIn : 0) || b.kwp - a.kwp; });
+    var attn = attnSrc.map(function (x) {
+      var job = wos.some(function (w) { return w.site === x.name; });
+      var label = x.st === 'late' ? 'เลยกำหนด ' + (-x.dueIn) + ' วัน' : x.st === 'due' ? (x.next === 'รอล้างครั้งแรก' ? 'รอล้างครั้งแรก' : x.dueIn === 0 ? 'ครบรอบวันนี้' : x.dueIn === 1 ? 'ครบรอบพรุ่งนี้' : 'ครบรอบใน ' + x.dueIn + ' วัน') : '';
+      var meta = (x.st === 'unset' ? 'ตั้งรอบล้างเพื่อให้ระบบสร้างใบงานอัตโนมัติ' : 'ครบรอบ ' + String(x.next).replace(' (พรุ่งนี้)', '')) + ' · ' + x.kwp.toLocaleString('en-US') + ' kWp' + (x.st === 'unset' ? '' : (job ? ' · มีใบงานแล้ว' : ' · ยังไม่มีใบงาน'));
+      return { name: DN(x.name), st: x.st, label: label || undefined, meta: meta, go: link({ 'sc.siteName': x.name, 'sc.siteFrom': 'Main' }) };
+    });
+    // งาน 7 วันข้างหน้า: open work orders due today … +7 that are not already in สิ่งที่ต้องทำ
+    var week = shownWos.filter(function (w) { return w.dueIn >= 0 && w.dueIn <= 7 && inTodo.indexOf(w.no) < 0; }).sort(function (a, b) { return a.dueIn - b.dueIn; }).map(function (w) {
+      var m = /^(\d+) (\S+)/.exec(w.due || '') || [];
+      return { day: m[1] || '—', mon: (m[2] || '') + (w.dueIn === 0 ? ' · วันนี้' : w.dueIn === 1 ? ' · พรุ่งนี้' : ''), title: w.no + ' · ' + w.title, meta: DN(w.site) + ' · ' + (w.who || 'ยังไม่มีผู้รับผิดชอบ'), st: w.st, go: link({ 'sc.wo': w.no, 'sc.woFrom': 'Main' }) };
+    });
     // setup checklist (no sites yet): computed from what was done in the prototype
-    var invites = (org.invites || 0) + J('sc.createdInvites', '[]').filter(function (x) { return x && x.org === org.id; }).length;
+    // invites actually sent in the prototype (sc.createdInvites), minus cancelled ones — org d starts with none (DATA.md)
+    var cancelledInv = J('sc.inviteCancel', '[]');
+    var invites = J('sc.createdInvites', '[]').filter(function (x) { return x && x.org === org.id && cancelledInv.indexOf(x.email) < 0; }).length;
     var hasSite = sites.length > 0, firstWo = wos.length > 0;
     var dot = function (done, active) { return 'width: 32px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box; font-weight: 700; ' + (done ? 'background: #0F6B5C; color: #FFFFFF' : (active ? 'border: 2px solid #0F6B5C; color: #0F6B5C' : 'border: 2px solid #D5D9E0; color: #4B5563')); };
     var steps = [
-      { title: 'สร้างองค์กร', note: 'คุณเป็น ' + org.role, done: true },
+      { title: 'สร้างองค์กร', note: 'คุณเป็น' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' }[org.role] || org.role), done: true },
       { title: 'เพิ่มไซต์แรก', note: 'ชื่อ จังหวัด กำลังติดตั้ง และรอบล้าง', done: hasSite, cta: 'เพิ่มไซต์', icon: 'plus', href: 'SiteForm.dc.html', keys: 'sc.editSite=|sc.from=Main|sc.siteFormFrom=Main', can: admin, why: 'ต้องเป็น Org Owner / Org Admin' },
-      { title: 'เชิญทีมและช่าง', note: invites ? 'ส่งคำเชิญแล้ว ' + invites + ' คน · เชิญเพิ่มได้ที่หน้าสมาชิก' : 'กำหนด Role และไซต์ที่แต่ละคนเข้าถึงได้', done: invites > 0, cta: 'เชิญสมาชิก', icon: 'users', href: 'Members.dc.html', keys: '', can: admin, why: 'ต้องเป็น Org Owner / Org Admin', variant: 'secondary' },
+      { title: 'เชิญทีมและช่าง', note: invites ? 'ส่งคำเชิญแล้ว ' + invites + ' คน · เชิญเพิ่มได้ที่หน้าสมาชิก' : 'กำหนดบทบาทและไซต์ที่แต่ละคนเข้าถึงได้', done: invites > 0, cta: 'เชิญสมาชิก', icon: 'users', href: 'Members.dc.html', keys: '', can: admin, why: 'ต้องเป็น Org Owner / Org Admin', variant: 'secondary' },
       { title: 'สร้างใบงานแรก', note: 'หรือรอให้ระบบสร้างตามรอบล้างอัตโนมัติ', done: firstWo, cta: 'สร้างใบงาน', icon: 'workorder', href: 'CreateWorkOrder.dc.html', keys: 'sc.from=Main', can: admin && hasSite, why: hasSite ? 'ต้องเป็น Org Owner / Org Admin' : 'เพิ่มไซต์ก่อน (ขั้นที่ 2)', variant: 'secondary' }
     ];
     var nDone = steps.filter(function (x) { return x.done; }).length;
@@ -276,37 +344,43 @@ class Component extends DCLogic {
     var setupEligible = org.id === 'd' || !hasSite; // new orgs only: established orgs never see the checklist
     var showSetup = setupEligible && !dismissed;
     var firstOpen = steps.filter(function (x) { return !x.done; })[0];
-    var tile = function (o) { return Object.assign({ link: true, plain: false, note: '' }, o); };
-    var kpis = [
-      tile({ label: 'กำลังติดตั้งรวม', value: sum.toLocaleString('en-US'), unit: 'kWp', tone: 'default', icon: 'panel', note: shownSites.length + ' ไซต์', href: 'Sites.dc.html', go: link({ 'sc.from': 'Main' }), aria: 'ดูไซต์ทั้งหมด ' + shownSites.length + ' ไซต์' }),
-      tile({ label: 'ใบงานเปิดอยู่', value: String(shownWos.length), unit: '', tone: 'default', icon: 'workorder', note: 'ดูในหน้าใบงาน', href: 'WorkOrders.dc.html', go: link({ 'sc.from': 'Main', 'sc.woTab': 'open' }), aria: 'เปิดหน้าใบงาน · ใบงานเปิดอยู่ ' + shownWos.length + ' ใบ' }),
-      tile({ label: 'ใบงานเลยกำหนด', value: String(overdue.length), unit: 'ใบ', tone: overdue.length ? 'danger' : 'default', icon: 'clock', note: lateSites ? 'ไซต์เลยรอบล้าง ' + lateSites + ' ไซต์' : 'ไม่มีไซต์เลยรอบล้าง', href: 'WorkOrders.dc.html', go: link({ 'sc.from': 'Main', 'sc.woTab': 'overdue' }), aria: 'เปิดใบงานที่เลยกำหนด ' + overdue.length + ' ใบ' }),
-      tile({ label: 'ทีมช่างที่เข้าถึงได้', value: String(org.techs), unit: 'คน', tone: 'default', icon: 'wrench', link: false, plain: true })
+        var selfE = this;
+    var statStyle = function (red) { return 'margin: 2px 0 0; font-size: 22px; font-weight: 700; color: ' + (red ? '#B42318' : '#111827'); };
+    var stats = [
+      { label: 'ใบงานเลยกำหนด', value: String(overdue.length), unit: 'ใบ', style: statStyle(overdue.length > 0) },
+      { label: 'ไซต์เลยรอบล้าง', value: String(lateSites), unit: 'ไซต์', style: statStyle(lateSites > 0) },
+      { label: 'กำลังติดตั้งรวม', value: sum.toLocaleString('en-US'), unit: 'kWp · ' + shownSites.length + ' ไซต์', style: statStyle(false) },
+      { label: 'ทีมช่างที่เข้าถึงได้', value: String(org.techs), unit: 'คน', style: statStyle(false) }
     ];
-    var eOpen = !!this.state.energyOpen, selfE = this;
     // analytics findings shown as the last row of "ต้องทำวันนี้" (same ids as Insights; forecast-only f5 is not a to-do)
     var IN_NOW = { f1: 'หลังคาโรงงานบางปู', f2: 'ฟาร์มโคราช 1', f3: 'ลานจอดรถลพบุรี', f4: 'ฟาร์มโคราช 2', f6: 'สาขาบางนา', f7: 'โรงงาน A ลำพูน', f8: 'สาขารังสิต' };
     var insDis = (function () { try { return (window.sessionStorage.getItem('sc.insightDismissed') || '').split(','); } catch (e) { return []; } })();
     var insN = Object.keys(IN_NOW).filter(function (k) { var nm = IN_NOW[k]; return insDis.indexOf(k) < 0 && sites.some(function (x) { return x.name === nm; }) && (!picked || picked.name === nm); }).length > 0 ? 1 : 0;
     return {
-      energyOpen: eOpen ? 'true' : 'false', energyOpenAria: eOpen ? 'true' : 'false', energyToggleLabel: eOpen ? 'ซ่อนพลังงาน' : 'ดูพลังงาน',
-      toggleEnergy: function () { selfE.setState({ energyOpen: !selfE.state.energyOpen }); },
-      orgId: org.id, orgName: orgName, loading: loading,
+      stats: stats, heroValue: String(shownWos.length),
+      attn: attn, attnEmpty: attn.length === 0, attnTitle: viewer ? 'สถานะไซต์' : 'ไซต์ที่ต้องดูแล',
+      attnNote: viewer ? 'สถานะรอบล้างของไซต์ที่คุณดูได้ (ดูอย่างเดียว)' : 'เรียงจากเลยกำหนดมากสุด แล้วใกล้ครบรอบ · ไซต์ใหญ่ก่อน',
+      week: week, weekEmpty: week.length === 0,
+      showTodo: hasSite && !viewer, showSiteSelect: sites.length > 1,
+      pickSiteEv: function (e) { var id = e && e.target ? e.target.value : 'all'; var s0 = sites.filter(function (x) { return x.id === id; })[0]; try { window.sessionStorage.setItem('sc.site', s0 ? s0.name : 'all'); } catch (er) {} self.setState({ tick: Date.now() }); },
+      toSites: link({ 'sc.from': 'Main' }), toCal: link({ 'sc.from': 'Main' }),
+      headSub: viewer ? 'สถานะไซต์และงานล้างที่กำลังจะมาถึง' : 'สิ่งที่ต้องทำ ไซต์ที่ต้องดูแล และงานในสัปดาห์นี้',
+      orgId: org.id, orgName: orgName, loading: loading, loadError: loadError,
+      retry: function () { selfE.setState({ retriedFor: pState }); },
       setOrg: function (id) { try { window.sessionStorage.setItem('sc.org', id); } catch (e) {} try { window.sessionStorage.setItem('sc.site', 'all'); } catch (e) {} self.setState({ tick: Date.now() }); },
       sel: sel, siteOpts: siteOpts,
       pickSite: function (id) { var s = sites.filter(function (x) { return x.id === id; })[0]; try { window.sessionStorage.setItem('sc.site', s ? s.name : 'all'); } catch (e) {} self.setState({ tick: Date.now() }); },
       headEyebrow: orgName + ' / ' + (cur ? DN(cur.name) : 'ทุกไซต์'),
       scopeNote: admin ? 'สิทธิ์: ทั้งองค์กร' : (org.role === 'Viewer' ? 'สิทธิ์: ดูอย่างเดียว' : 'สิทธิ์: เฉพาะไซต์ที่ได้รับมอบหมาย'),
       cannotCreateSite: !admin,
-      kpis: kpis,
       hasSites: hasSite, noSites: !hasSite, showSetup: showSetup,
       dismissLabel: nDone === 4 ? 'เสร็จครบแล้ว · ซ่อนเช็กลิสต์' : 'ซ่อน',
       dismissSetup: function () { try { var cur0 = (window.sessionStorage.getItem('sc.setupDismissed') || '').split(',').filter(Boolean); if (cur0.indexOf(org.id) < 0) cur0.push(org.id); window.sessionStorage.setItem('sc.setupDismissed', cur0.join(',')); } catch (e) {} self.setState({ tick: Date.now() }); },
       toAllWo: link({ 'sc.from': 'Main', 'sc.woTab': 'all' }),
       energySite: picked ? picked.name : 'all',
-      todo: todo, todoCount: todo.length + insN,
-      todoEmpty: !loading && todo.length === 0 && !insN, todoReady: !loading && todo.length > 0,
-      todoEmptyText: 'ทุกใบงานอยู่ในกำหนด และไม่มีงานรออนุมัติ · ดูทั้งหมดที่หน้าใบงาน',
+      todo: todo, todoCount: todo.length,
+      todoEmpty: !loading && !loadError && todo.length === 0, todoReady: !loading && !loadError && todo.length > 0,
+      todoEmptyText: 'ไม่มีใบงานรออนุมัติ เลยกำหนด หรือยังไม่มอบหมาย',
       setupDone: nDone, setupBar: 'width: ' + Math.round(nDone / 4 * 100) + '%; height: 8px; border-radius: 999px; background: #0F6B5C',
       setup: steps.map(function (x, i) {
         var active = x === firstOpen;

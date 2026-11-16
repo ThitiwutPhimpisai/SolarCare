@@ -16,7 +16,7 @@ body{margin:0}
 </helmet>
 <span style="{{style}}">{{text}}</span>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["wo","site","member","org","scope","role"],"default":"wo"},"value":{"editor":"text","default":"review"},"label":{"editor":null},"$preview":{"width":200,"height":40}}'>
+<script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["wo","site","member","org","scope","role","device","severity","new"],"default":"wo"},"value":{"editor":"text","default":"review"},"label":{"editor":null},"$preview":{"width":200,"height":40}}'>
 class Component extends DCLogic {
   renderVals() {
     var T = {
@@ -29,7 +29,10 @@ class Component extends DCLogic {
       member: { active: ['ใช้งาน', 'green'], invited: ['รอยืนยัน', 'amber'], suspended: ['ระงับ', 'red'], contractor: ['ผู้รับเหมา', 'gray'], customer: ['ลูกค้า', 'gray'] },
       org: { active: ['ใช้งาน', 'green'], trial: ['เริ่มต้นใช้งาน', 'amber'], suspended: ['ระงับการใช้งาน', 'red'] },
       scope: { platform: ['ทุก Org', 'greenSolid'], org: ['องค์กร', 'teal'], site: ['ไซต์', 'outlineTeal'], own: ['ของตน', 'gray'], none: ['—', 'none'] },
-      role: { 'Org Owner': ['Org Owner', 'teal'], 'Org Admin': ['Org Admin', 'teal'], 'Site Manager': ['Site Manager', 'outlineTeal'], 'Technician': ['Technician', 'gray'], 'Viewer': ['Viewer', 'outline'], 'สิทธิ์รายไซต์': ['สิทธิ์รายไซต์', 'gray'] }
+      device: { online: ['ออนไลน์', 'green'], warn: ['มีแจ้งเตือน', 'amber'], offline: ['ขาดการเชื่อมต่อ', 'red'], idle: ['ไม่ได้ผลิตไฟ', 'gray'] },
+      severity: { high: ['ด่วน', 'red'], medium: ['ควรตรวจ', 'amber'], low: ['เฝ้าดู', 'gray'], info: ['ข้อมูล', 'blue'] },
+      new: { new: ['ใหม่', 'greenSolid'], unread: ['ยังไม่อ่าน', 'greenSolid'] },
+      role: { 'Org Owner': ['เจ้าขององค์กร', 'teal'], 'Org Admin': ['ผู้ดูแลองค์กร', 'teal'], 'Site Manager': ['ผู้จัดการไซต์', 'outlineTeal'], 'Technician': ['ช่าง', 'gray'], 'Viewer': ['ผู้ดูอย่างเดียว', 'outline'], 'สิทธิ์รายไซต์': ['สิทธิ์รายไซต์', 'gray'] }
     };
     var kind = this.props.kind ?? 'wo';
     var value = this.props.value ?? 'review';

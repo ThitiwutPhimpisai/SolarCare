@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>เมนูข้าง SolarCare</title>
+<title>เมนูข้าง · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -12,9 +12,11 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
+/* phone/tablet: the sidebar is a top bar on its own flex line; stop the page min-height from stretching that line */
+@media (max-width: 799px){div:has(> div > .sc-sb-root){align-content:flex-start}}
 </style>
 </helmet>
-<div style="{{rootStyle}}">
+<div class="sc-sb-root" style="{{rootStyle}}">
   <div style="display: flex; align-items: center; gap: 10px">
     <a href="{{brandHref}}" style="flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #111827">
       <span style="width: 32px; height: 32px; border-radius: 8px; background: #0F6B5C; display: flex; align-items: center; justify-content: center; flex: none">
@@ -43,7 +45,7 @@ body{margin:0}
           <div style="font-size: 12px; color: #4B5563; padding: 6px 8px">สลับองค์กร · กด Esc เพื่อปิด</div>
           <dc-import name="OrgList" items="{{orgs}}" size="sm" label="สลับองค์กร" hint-size="100%,150px"></dc-import>
           <div style="border-top: 1px solid #E3E6EB; margin-top: 6px; padding: 4px">
-            <a href="CreateOrg.dc.html" onPointerDown="{{fromSelect}}" onKeyDown="{{fromSelect}}" onClick="{{fromSelect}}" style="display: flex; align-items: center; min-height: 40px; padding: 0 6px; font-size: 13px; font-weight: 600; text-decoration: none; color: #0F6B5C"><dc-import name="Icon" icon="plus" size="16" hint-size="16px,16px"></dc-import>สร้างองค์กรใหม่</a>
+            <a href="CreateOrg.dc.html" onPointerDown="{{fromSelect}}" onKeyDown="{{fromSelect}}" onClick="{{fromSelect}}" style="display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 6px; font-size: 13px; font-weight: 600; text-decoration: none; color: #0F6B5C"><dc-import name="Icon" icon="plus" size="16" hint-size="16px,16px"></dc-import>สร้างองค์กรใหม่</a>
           </div>
         </div>
       </sc-if>
@@ -60,8 +62,8 @@ body{margin:0}
     </nav>
 
     <sc-if value="{{hasSet}}" hint-placeholder-val="{{ true }}">
-    <nav aria-label="ตั้งค่าองค์กร" style="display: flex; flex-direction: column; gap: 2px">
-      <div style="font-size: 12px; color: #4B5563; font-weight: 600; margin: 0 10px 4px">ตั้งค่าองค์กร</div>
+    <nav aria-label="การจัดการองค์กร" style="display: flex; flex-direction: column; gap: 2px">
+      <div style="font-size: 12px; color: #4B5563; font-weight: 600; margin: 0 10px 4px">การจัดการ</div>
       <sc-for list="{{setNav}}" as="it" hint-placeholder-count="4">
         <a href="{{it.href}}" aria-current="{{it.current}}" style="{{it.style}}">
           <dc-import name="Icon" icon="{{it.d}}" size="18" hint-size="18px,18px"></dc-import>{{it.label}}</a>
@@ -73,7 +75,7 @@ body{margin:0}
     <div style="display: flex; flex-direction: column; gap: 2px; border-top: 1px solid #EEF0F3; padding-top: 10px">
       <a href="MyAccount.dc.html" aria-label="{{meLabel}}" aria-current="{{meCurrent}}" style="{{meStyle}}">
         <sc-if value="{{knownMe}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="natthaphat" size="32" hint-size="32px,32px"></dc-import></sc-if><sc-if value="{{newMe}}" hint-placeholder-val="{{ false }}"><dc-import name="Avatar" person="me" size="32" hint-size="32px,32px"></dc-import></sc-if>
-        <span style="font-size: 13px; min-width: 0"><span style="display: block; font-weight: 600">{{myName}}</span><span style="display: block; color: #4B5563; font-size: 12px; overflow-wrap: anywhere">{{myEmail}}</span></span>
+        <span style="font-size: 13px; min-width: 0; flex: 1"><span style="display: block; font-weight: 600">{{myName}}</span><span title="{{myEmail}}" style="display: block; color: #4B5563; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{myEmail}}</span></span>
       </a>
       <a href="Notifications.dc.html" aria-label="{{unreadLabel}}" aria-current="{{notifCurrent}}" style="{{notifStyle}}">
         <dc-import name="Icon" icon="bell" size="18" hint-size="18px,18px"></dc-import><span style="flex: 1">การแจ้งเตือน</span><sc-if value="{{hasUnread}}" hint-placeholder-val="{{ true }}"><span style="min-width: 22px; height: 22px; padding: 0 6px; box-sizing: border-box; border-radius: 999px; background: #B42318; color: #FFFFFF; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center">{{unread}}</span></sc-if></a>
@@ -87,7 +89,7 @@ body{margin:0}
     <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid #EEF0F3; padding-top: 10px">
       <div style="display: flex; align-items: center; gap: 10px; padding: 6px 10px">
         <dc-import name="Avatar" person="qleen" size="32" hint-size="32px,32px"></dc-import>
-        <span style="font-size: 13px"><span style="display: block; font-weight: 600">Qleen Support</span><span style="display: block; color: #8A3B06; font-size: 12px; font-weight: 600">โหมดช่วยเหลือ · อ่านอย่างเดียว</span></span>
+        <span style="font-size: 13px"><span style="display: block; font-weight: 600">ทีม Qleen</span><span style="display: block; color: #8A3B06; font-size: 12px; font-weight: 600">โหมดช่วยเหลือ · อ่านอย่างเดียว</span></span>
       </div>
       <span style="font-size: 12px; color: #4B5563; padding: 0 10px">จบเซสชันได้จากปุ่ม “จบเซสชัน” ด้านบน · ระบบบันทึกประวัติให้อัตโนมัติ</span>
     </div>
@@ -153,8 +155,8 @@ class Component extends DCLogic {
       { id: 'a', name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', badge: 'sf', siteCount: 4 },
       { id: 'b', name: 'กรีนมาร์ท รีเทล', role: 'Site Manager', badge: 'gm', siteCount: 2 },
       { id: 'c', name: 'นิคมฯ เหนือ', role: 'Viewer', badge: 'nk', siteCount: 1 },
-      { id: 'd', name: SS('sc.createdName') || 'ไร่ทองโซลาร์', role: (function () { try { return (JSON.parse(SS('sc.owner') || '{}') || {}).d ? 'Org Admin' : 'Org Owner'; } catch (e) { return 'Org Owner'; } })(), badge: 'rt', siteCount: 0 },
       { id: 'e', name: 'ริมทะเล รีสอร์ท', role: 'Site Manager', badge: 'rr', siteCount: 1 },
+      { id: 'd', name: SS('sc.createdName') || 'ไร่ทองโซลาร์', role: (function () { try { return (JSON.parse(SS('sc.owner') || '{}') || {}).d ? 'Org Admin' : 'Org Owner'; } catch (e) { return 'Org Owner'; } })(), badge: 'rt', siteCount: 0 },
       { id: 'cp', name: 'CleanPro Services', role: 'Org Owner', badge: 'cp', siteCount: 0, supportOnly: true },
       { id: 'bs', name: 'บ้านสวนแพ็คกิ้ง', role: 'Org Owner', badge: 'bs', siteCount: 1, supportOnly: true }
     ].filter(function (o) {
@@ -172,7 +174,7 @@ class Component extends DCLogic {
     var cSites = []; try { cSites = JSON.parse(SS('sc.createdSites') || '[]') || []; } catch (e) { cSites = []; }
     orgs = orgs.map(function (o) { var n = cSites.filter(function (c) { return c && c.org === o.id && c.name; }).length; return n ? Object.assign({}, o, { siteCount: o.siteCount + n }) : o; });
     var org = orgs.filter(function (o) { return o.id === orgId; })[0] || orgs[0];
-    if (support) org = Object.assign({}, org, { role: 'Qleen Support · ช่วยเหลือ (อ่านอย่างเดียว)' });
+    if (support) org = Object.assign({}, org, { role: 'ทีม Qleen · ช่วยเหลือ (อ่านอย่างเดียว)' });
     // unread = 6 minus items marked read in Notifications (sc.read: comma-separated ids n1..n6, or 'all')
     var readRaw = SS('sc.read'), readN = 0;
     if (readRaw.split(',').indexOf('all') >= 0) readN = 6;
@@ -184,7 +186,9 @@ class Component extends DCLogic {
       unread = Object.keys(NORG).filter(function (id) { var o = NORG[id]; return ((o === 'e' && SS('sc.joined') === 'e') || (o === 'd' && SS('sc.created') === 'd')) && readIds.indexOf(id) < 0 && readIds.indexOf('all') < 0; }).length;
     }
     // support mode: only the overview (SupportSession) is a link; everything else is shown disabled so staff can't leave the read-only session by accident
-    var link = function (key, href, label, d) { var on = support ? key === 'overview' : key === active; var off = support && key !== 'overview';
+    var HUB = { wo: 'work', schedule: 'work', reports: 'reports', energy: 'reports', members: 'people', roles: 'people', profile: 'settings', audit: 'settings' };
+    var activeHub = HUB[active] || active;
+    var link = function (key, href, label, d) { var on = support ? key === 'overview' : key === activeHub; var off = support && key !== 'overview';
       return { key: key, href: off ? undefined : (support ? 'SupportSession.dc.html' : href), label: label, d: d, current: on ? 'page' : 'false', disabled: off ? 'true' : undefined,
       style: 'display:flex;align-items:center;gap:10px;min-height:44px;padding:0 10px;border-radius:8px;font-size:14px;text-decoration:none;' + (on ? 'background:#E7F2EF;color:#0A4F44;font-weight:600' : off ? 'color:#9CA3AF;cursor:not-allowed' : 'color:#374151') }; };
     var role = support ? 'Org Admin' : (self.props.viewerRole ?? org.role); // support sees settings read-only
@@ -215,26 +219,22 @@ class Component extends DCLogic {
       toggleOrg: function () { if (!self.props.support) self.setState({ orgOpen: !s.orgOpen }); },
       orgKey: function (e) { if (e.key === 'Escape') close(true); },
       logout: logout, unread: unread, hasUnread: unread > 0, unreadLabel: 'การแจ้งเตือน ยังไม่อ่าน ' + unread + ' รายการ',
-      orgs: orgs.map(function (o) { var on = o.id === org.id; return { name: o.name, note: o.role + ' · ' + o.siteCount + ' ไซต์', badge: o.badge, current: on,
+      orgs: orgs.map(function (o) { var on = o.id === org.id; return { name: o.name, note: o.role + ' · ' + (o.siteCount ? o.siteCount + ' ไซต์' : 'ยังไม่มีไซต์'), badge: o.badge, current: on,
         // pages that can re-render for another org pass onOrg; everywhere else switching goes to the new org's overview (detail pages would show the old org's item)
         href: self.props.onOrg ? undefined : 'Main.dc.html', saveKeys: self.props.onOrg ? undefined : 'sc.org=' + o.id + '|sc.site=all',
         onPick: self.props.onOrg ? function () { try { window.sessionStorage.setItem('sc.org', o.id); window.sessionStorage.setItem('sc.site', 'all'); } catch (e) {} self.setState({ orgOpen: false, tick: Date.now() }); self.props.onOrg(o.id); } : undefined }; }),
       mainNav: [
         link('overview', 'Main.dc.html', 'ภาพรวม', 'overview'),
-        link('sites', 'Sites.dc.html', 'ไซต์ทั้งหมด', 'site'),
-        link('schedule', 'Schedule.dc.html', 'ตารางล้าง', 'calendar'),
-        link('wo', 'WorkOrders.dc.html', 'ใบงาน', 'workorder'),
-        link('reports', 'Reports.dc.html', 'รายงาน', 'report'),
+        link('sites', 'Sites.dc.html', 'ไซต์', 'site'),
+        link('work', 'WorkOrders.dc.html', 'งานล้าง', 'workorder'),
         link('analytics', 'Analytics.dc.html', 'วิเคราะห์', 'trend'),
-        link('energy', 'EnergyValue.dc.html', 'พลังงานและผลตอบแทน', 'energy')
+        link('reports', 'EnergyValue.dc.html', 'รายงาน', 'report')
       ],
       hasSet: allow.length > 0 && !support,
-      setNav: allowSet([
-        link('profile', 'OrgProfile.dc.html', 'โปรไฟล์องค์กร', 'building'),
-        link('members', 'Members.dc.html', 'สมาชิก', 'users'),
-        link('roles', 'Roles.dc.html', 'Role & สิทธิ์', 'shield'),
-        link('audit', 'AuditLog.dc.html', 'Audit log', 'audit')
-      ])
+      setNav: [
+        allow.indexOf('members') >= 0 || allow.indexOf('roles') >= 0 ? link('people', allow.indexOf('members') >= 0 ? 'Members.dc.html' : 'Roles.dc.html', 'สมาชิกและสิทธิ์', 'users') : null,
+        allow.indexOf('profile') >= 0 ? link('settings', 'OrgProfile.dc.html', 'ตั้งค่าองค์กร', 'building') : null
+      ].filter(Boolean)
     };
   }
 }

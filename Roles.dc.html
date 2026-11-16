@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>Role และสิทธิ์</title>
+<title>บทบาทและสิทธิ์ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -14,11 +14,10 @@
 body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 button{font-family:inherit;cursor:pointer}
-.rl-hint,.rl-fade{display:none}
+.rl-phone{display:none}
 @media (max-width: 767px){
-.rl-hint{display:block}
-.rl-fade{display:block}
-.rl-perm{width:128px !important;max-width:128px;padding-left:12px !important;padding-right:8px !important;font-size:13px !important}
+.rl-matrix{display:none !important}
+.rl-phone{display:flex}
 }
 </style>
 </helmet>
@@ -28,17 +27,17 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" title="Role &amp; สิทธิ์" icon="shield" subtitle="Role กำหนดว่าทำอะไรได้ · ขอบเขตกำหนดว่าทำได้ที่ไหน" actions="{{phActions}}" hint-size="100%,96px"></dc-import>
+    <dc-import name="PageHeader" title="สมาชิกและสิทธิ์" icon="users" hub="people" hub-current="roles" hub-hide="{{hubHide}}" subtitle="บทบาทกำหนดว่าทำอะไรได้ · ขอบเขตกำหนดว่าทำได้ที่ไหน" actions="{{phActions}}" hint-size="100%,140px"></dc-import>
 
     <sc-if value="{{readOnly}}" hint-placeholder-val="{{ false }}">
       <div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{readOnlyNote}}</div>
     </sc-if>
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
       <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>Role &amp; สิทธิ์ ดูได้เฉพาะ Org Owner, Org Admin และ Site Manager</h2>
+        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>บทบาทและสิทธิ์ ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์</h2>
         <p style="margin: 0; font-size: 14px; color: #374151">คุณเป็น {{youRole}} ใน {{orgName}}</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ Site Manager" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
-        <sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if>
+        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ผู้จัดการไซต์" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
+        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
       </section>
     </sc-if>
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
@@ -51,17 +50,36 @@ button{font-family:inherit;cursor:pointer}
 
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
       <div style="flex: 999 1 720px; min-width: 0; position: relative">
-      <p class="rl-hint" style="margin: 0 0 8px; font-size: 13px; color: #4B5563">เลื่อนดู Role อื่น →</p>
-      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
-        <table aria-label="ตารางสิทธิ์ของแต่ละ Role" style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: 700px">
+      <section aria-labelledby="rl-ph-t" class="rl-phone" style="flex-direction: column; gap: 12px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px">
+        <h2 id="rl-ph-t" style="margin: 0; font-size: 16px">สิทธิ์ของบทบาท</h2>
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <label for="rl-pick" style="font-size: 13px; font-weight: 600">เลือกบทบาท</label>
+          <select id="rl-pick" value="{{selIdx}}" onChange="{{pickSel}}" style="min-height: 44px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
+            <sc-for list="{{roles}}" as="ro" hint-placeholder-count="6"><option value="{{ro.idx}}">{{ro.label}} · {{ro.tier}}</option></sc-for>
+          </select>
+        </div>
+        <sc-for list="{{curGroups}}" as="g" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column">
+            <h3 style="margin: 8px 0 4px; font-size: 13px; font-weight: 700; color: #0A4F44">{{g.title}}</h3>
+            <sc-for list="{{g.rows}}" as="r" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; border-top: 1px solid #EEF0F3; font-size: 14px">
+                <span style="min-width: 0">{{r.label}}</span>
+                <span style="flex: none"><dc-import name="StatusPill" kind="scope" value="{{r.scope}}" hint-size="54px,22px"></dc-import></span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </section>
+      <section class="rl-matrix" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
+        <table aria-label="ตารางสิทธิ์ของแต่ละบทบาท" style="width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: 700px">
           <thead>
             <tr>
               <th class="rl-perm" scope="col" style="position: sticky; left: 0; z-index: 2; background: #FFFFFF; box-shadow: 1px 0 0 #E3E6EB, 4px 0 8px -4px rgba(17,24,39,0.12); text-align: left; padding: 14px 20px; font-size: 12px; color: #4B5563; font-weight: 600; width: 240px; min-width: 150px">สิทธิ์</th>
               <sc-for list="{{roles}}" as="ro" hint-placeholder-count="6">
                 <th scope="col" style="{{ro.thStyle}}">
                   <button onClick="{{ro.pick}}" aria-pressed="{{ro.on}}" style="width: 100%; min-height: 44px; border: 0; background: transparent; font-size: 13px; font-weight: 700; color: #111827; padding: 4px">
-                    {{ro.name}}
-                    <div style="font-size: 12px; font-weight: 500; color: #4B5563">{{ro.tier}}</div>
+                    {{ro.label}}
+                    <div style="font-size: 12px; font-weight: 500; color: #4B5563">{{ro.en}}</div>
                   </button>
                 </th>
               </sc-for>
@@ -76,7 +94,6 @@ button{font-family:inherit;cursor:pointer}
                 <tr>
                   <th class="rl-perm" scope="row" style="position: sticky; left: 0; z-index: 1; background: #FFFFFF; box-shadow: 1px 0 0 #E3E6EB, 4px 0 8px -4px rgba(17,24,39,0.12); border-top: 1px solid #EEF0F3; text-align: left; font-weight: 400; padding: 10px 20px; min-width: 150px">
                     <div style="font-weight: 500">{{r.label}}</div>
-                    <div style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{r.key}}</div>
                   </th>
                   <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="6">
                     <td style="{{c.tdStyle}}"><dc-import name="StatusPill" kind="scope" value="{{c.scope}}" hint-size="54px,22px"></dc-import></td>
@@ -87,14 +104,13 @@ button{font-family:inherit;cursor:pointer}
           </tbody>
         </table>
       </section>
-      <div class="rl-fade" aria-hidden="true" style="position: absolute; top: 30px; right: 1px; bottom: 1px; width: 28px; border-radius: 0 12px 12px 0; background: linear-gradient(to right, rgba(255,255,255,0), #FFFFFF); pointer-events: none"></div>
       </div>
 
       <aside style="flex: 1 1 340px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
-        <div style="font-size: 12px; color: #4B5563; font-weight: 600">Role ที่เลือก</div>
+        <div style="font-size: 12px; color: #4B5563; font-weight: 600">บทบาทที่เลือก</div>
         <div>
-          <div style="font-size: 20px; font-weight: 700">{{cur.name}}</div>
-          <div style="font-size: 13px; color: #4B5563; margin-top: 2px">ระดับ: {{cur.tier}}</div>
+          <h2 style="margin: 0; font-size: 20px; font-weight: 700">{{cur.label}}</h2>
+          <div style="font-size: 13px; color: #4B5563; margin-top: 2px">ระดับ: {{cur.tier}}<sc-if value="{{cur.en}}" hint-placeholder-val="{{ true }}"> · ชื่อในระบบ {{cur.en}}</sc-if></div>
         </div>
         <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #374151">{{cur.desc}}</p>
         <div style="border-top: 1px solid #E3E6EB; padding-top: 14px; display: flex; flex-direction: column; gap: 8px">
@@ -106,10 +122,10 @@ button{font-family:inherit;cursor:pointer}
           <div style="font-size: 14px; color: #374151">{{cur.example}}</div>
         </div>
         <sc-if value="{{cur.system}}" hint-placeholder-val="{{ true }}">
-          <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">Role ระบบ — แก้ไขไม่ได้ ให้ทำสำเนาเป็น Custom Role แทน</div>
+          <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">บทบาทของระบบ — แก้ไขไม่ได้ ให้ทำสำเนาเป็นบทบาทกำหนดเองแทน</div>
         </sc-if>
         <sc-if value="{{canEditCustom}}" hint-placeholder-val="{{ false }}">
-          <dc-import name="Button" icon="edit" label="แก้ไข Custom Role นี้" href="RoleEditor.dc.html" save-keys="{{editKeys}}" variant="secondary" full="{{true}}" hint-size="100%,44px"></dc-import>
+          <dc-import name="Button" icon="edit" label="แก้ไขบทบาทกำหนดเองนี้" href="RoleEditor.dc.html" save-keys="{{editKeys}}" variant="secondary" full="{{true}}" hint-size="100%,44px"></dc-import>
         </sc-if>
         <sc-if value="{{canManage}}" hint-placeholder-val="{{ true }}">
           <dc-import name="Button" icon="copy" label="{{copyLabel}}" href="RoleEditor.dc.html" save-keys="{{copyKeys}}" variant="secondary" full="{{true}}" hint-size="100%,44px"></dc-import>
@@ -149,7 +165,7 @@ class Component extends DCLogic {
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.flash', 'sc.flashAt', 'sc.createdName', 'sc.owner', 'sc.customRoles'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.flash', 'sc.flashAt', 'sc.createdName', 'sc.owner', 'sc.customRoles', 'sc.siteEdits'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -167,11 +183,13 @@ class Component extends DCLogic {
     var ORG = { a: ['สยามโซลาร์ฟาร์ม จำกัด', 'Org Admin'], b: ['กรีนมาร์ท รีเทล', 'Site Manager'], c: ['นิคมฯ เหนือ', 'Viewer'], d: [(function () { try { return window.sessionStorage.getItem('sc.createdName') || 'ไร่ทองโซลาร์'; } catch (e) { return 'ไร่ทองโซลาร์'; } })(), (function () { try { return (JSON.parse(window.sessionStorage.getItem('sc.owner') || '{}') || {}).d ? 'Org Admin' : 'Org Owner'; } catch (e) { return 'Org Owner'; } })()], e: ['ริมทะเล รีสอร์ท', 'Site Manager'] }[orgId] || ['สยามโซลาร์ฟาร์ม จำกัด', 'Org Admin'];
     // RBAC: only Owner/Admin manage roles; Site Manager reads; Viewer gets a notice
     var you = ORG[1], canManage = you === 'Org Owner' || you === 'Org Admin', blocked = you === 'Viewer';
+    // example site follows renames (sc.siteEdits)
+    var SITE1 = (function () { var d = { a: 'ฟาร์มโคราช 1', b: 'สาขารังสิต', c: 'โรงงาน A ลำพูน', e: 'หลังคาอาคาร A หัวหิน' }[orgId] || 'ฟาร์มโคราช 1'; try { var e = JSON.parse(window.sessionStorage.getItem('sc.siteEdits') || '{}') || {}; return (e[d] && e[d].name) || d; } catch (x) { return d; } })();
     var roles = [
       { name: 'Platform Admin', tier: 'แพลตฟอร์ม', scope: 'ทุกองค์กรในระบบ', example: 'ทีม Qleen ผู้ดูแลระบบ', system: true, desc: 'ดูแลแพลตฟอร์ม สร้าง/ระงับองค์กร และเข้าช่วยเหลือลูกค้า (ทุกการเข้าถึงข้ามองค์กรถูกบันทึก audit log)' },
       { name: 'Org Owner', tier: 'องค์กร', scope: 'ทั้งองค์กร (มีได้ 1–2 คน)', example: 'เจ้าของกิจการ / ผู้บริหาร', system: true, desc: 'มีสิทธิ์ทุกอย่างในองค์กร รวมถึงโอนความเป็นเจ้าของ และลบองค์กร' },
       { name: 'Org Admin', tier: 'องค์กร', scope: 'ทั้งองค์กร', example: 'ผู้จัดการฝ่ายปฏิบัติการ', system: true, desc: 'จัดการไซต์ สมาชิก และใบงานได้ทุกไซต์ แต่โอนความเป็นเจ้าของหรือลบองค์กรไม่ได้' },
-      { name: 'Site Manager', tier: 'ไซต์', scope: 'เฉพาะไซต์ที่ได้รับมอบหมาย', example: 'หัวหน้าไซต์ฟาร์มโคราช 1', system: true, desc: 'สร้างและมอบหมายใบงาน อนุมัติงานที่เสร็จ และเชิญช่างเข้าไซต์ของตน — มองไม่เห็นไซต์อื่นในองค์กร' },
+      { name: 'Site Manager', tier: 'ไซต์', scope: 'เฉพาะไซต์ที่ได้รับมอบหมาย', example: 'หัวหน้าไซต์' + SITE1, system: true, desc: 'สร้างและมอบหมายใบงาน อนุมัติงานที่เสร็จ แก้ข้อมูลไซต์และอุปกรณ์ และเชิญช่าง เฉพาะไซต์ของตน — มองไม่เห็นไซต์อื่นในองค์กร' },
       { name: 'Technician', tier: 'ไซต์', scope: 'ไซต์ที่ได้รับมอบหมาย · ใบงานของตน', example: 'ช่างล้างแผงภาคสนาม', system: true, desc: 'ดูข้อมูลไซต์ รับใบงานของตน อัปโหลดรูปก่อน/หลัง และส่งงานเพื่อรออนุมัติ (ปิดงานเองไม่ได้)' },
       { name: 'Viewer', tier: 'ไซต์ / องค์กร', scope: 'กำหนดได้ทั้งองค์กรหรือรายไซต์', example: 'ลูกค้าเจ้าของอาคาร, ผู้ตรวจสอบ', system: true, desc: 'อ่านอย่างเดียว ดูสถานะและรายงานของไซต์ที่เข้าถึงได้' }
     ];
@@ -183,8 +201,8 @@ class Component extends DCLogic {
       { title: 'ไซต์ & อุปกรณ์', rows: [
         ['ดูไซต์', 'site.read', 'P O O S S S'],
         ['สร้าง / ลบไซต์', 'site.create', 'P O O - - -'],
-        ['แก้ไขข้อมูลไซต์ / แผง / อินเวอร์เตอร์', 'asset.update', 'P O O S - -'] ] },
-      { title: 'ใบงาน (Work Orders)', rows: [
+        ['แก้ไขข้อมูลไซต์ / แผง / อินเวอร์เตอร์ (เฉพาะไซต์ที่ดูแล)', 'asset.update', 'P O O S - -'] ] },
+      { title: 'ใบงาน', rows: [
         ['ดูใบงาน', 'wo.read', 'P O O S U S'],
         ['สร้าง / มอบหมายใบงาน', 'wo.assign', 'P O O S - -'],
         ['อัปเดตผล / แนบรูป', 'wo.update', 'P O O S U -'],
@@ -194,13 +212,13 @@ class Component extends DCLogic {
         ['ส่งออก PDF / Excel', 'report.export', 'P O O S - -'] ] },
       { title: 'สมาชิก & สิทธิ์', rows: [
         ['เชิญสมาชิก', 'member.invite', 'P O O S - -'],
-        ['กำหนด Role', 'member.role', 'P O O S - -'],
-        ['สร้าง Custom Role', 'role.manage', 'P O O - - -'],
-        ['ดู Audit log', 'audit.read', 'P O O - - -'] ] }
+        ['กำหนดบทบาทให้สมาชิก', 'member.role', 'P O O S - -'],
+        ['สร้างบทบาทกำหนดเอง', 'role.manage', 'P O O - - -'],
+        ['ดูประวัติการใช้งาน', 'audit.read', 'P O O - - -'] ] }
     ];
     var scopeOf = { P: 'platform', O: 'org', S: 'site', U: 'own', '-': 'none' };
     roles = roles.slice(1);
-    roles.push({ name: 'หัวหน้าทีมช่าง', tier: 'ไซต์ · Custom', scope: 'เฉพาะไซต์ที่ได้รับมอบหมาย', example: 'หัวหน้าทีมช่างผู้รับเหมา', system: false, custom: true, desc: 'Custom Role ที่องค์กรสร้างเอง: มอบหมายและอนุมัติงานในทีมได้ แต่ไม่แก้ข้อมูลไซต์และไม่เชิญสมาชิก' });
+    roles.push({ name: 'หัวหน้าทีมช่าง', tier: 'ไซต์ · กำหนดเอง', scope: 'เฉพาะไซต์ที่ได้รับมอบหมาย', example: 'หัวหน้าทีมช่างผู้รับเหมา', system: false, custom: true, desc: 'บทบาทที่องค์กรกำหนดเอง: มอบหมายและอนุมัติงานในทีมได้ แต่ไม่แก้ข้อมูลไซต์และไม่เชิญสมาชิก' });
     var customPerm = { 'org.read': 'O', 'site.read': 'S', 'wo.read': 'S', 'wo.assign': 'S', 'wo.update': 'S', 'wo.approve': 'S', 'report.read': 'S' };
     // Custom Roles saved in RoleEditor (sc.customRoles): an entry named หัวหน้าทีมช่าง edits that column; others become new columns
     var saved = []; try { saved = (JSON.parse(window.sessionStorage.getItem('sc.customRoles') || '[]') || []).filter(function (r) { return r && r.org === orgId && r.name; }); } catch (e) { saved = []; }
@@ -209,19 +227,23 @@ class Component extends DCLogic {
     if (leadEdit && leadEdit.perms) customPerm = leadEdit.perms;
     if (leadEdit && leadEdit.name !== 'หัวหน้าทีมช่าง') roles = roles.map(function (r) { return r.name === 'หัวหน้าทีมช่าง' ? Object.assign({}, r, { name: leadEdit.name }) : r; });
     var extra = saved.filter(function (r) { return !isLeadRole(r); });
-    extra.forEach(function (r) { roles.push({ name: r.name, tier: 'ไซต์ · Custom', scope: 'เฉพาะไซต์ที่ได้รับมอบหมาย', example: 'สร้างจาก ' + (r.base || 'แม่แบบว่าง'), system: false, custom: true, desc: 'Custom Role ที่องค์กรสร้างเอง' + (r.base ? ' โดยเริ่มจาก ' + r.base : '') }); });
+    extra.forEach(function (r) { roles.push({ name: r.name, tier: 'ไซต์ · กำหนดเอง', scope: 'เฉพาะไซต์ที่ได้รับมอบหมาย', example: 'สร้างจาก ' + (r.base || 'แม่แบบว่าง'), system: false, custom: true, desc: 'บทบาทที่องค์กรกำหนดเอง' + (r.base ? ' โดยเริ่มจาก ' + r.base : '') }); });
     groups = groups.filter(function (g) { g.rows = g.rows.filter(function (r) { return r[1].indexOf('platform.') !== 0; }); g.rows.forEach(function (r) { r[2] = r[2].split(' ').slice(1).join(' ') + ' ' + (customPerm[r[1]] || '-') + extra.map(function (c) { return ' ' + ((c.perms || {})[r[1]] || '-'); }).join(''); }); return g.rows.length; });
+    var RTH = { 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' };
+    roles = roles.map(function (r) { return Object.assign({}, r, { label: RTH[r.name] || r.name, en: RTH[r.name] ? r.name : '' }); });
     var sel = Math.min(self.state.role || 0, roles.length - 1);
     var hi = function (i) { return i === sel ? 'background:#F0F7F5;' : ''; };
     return (function (R) { R.phActions = R.canManage ? [{ label: R.createLabel, icon: 'plus', href: 'RoleEditor.dc.html', saveKeys: 'sc.roleMode=new' }] : []; return R; })({
-      orgName: ORG[0], youRole: you, blocked: blocked, canSee: !blocked,
-      readOnly: !canManage && !blocked, ownerName: { a: 'วรวุฒิ ก. (Org Owner)', b: 'กิตติ พ. (Org Owner)', c: 'สุนทร ม. (Org Owner)', d: 'Org Owner', e: 'อรุณี ท. (Org Owner)' }[orgId] || 'ผู้ดูแลองค์กร',
+      orgName: ORG[0], youRole: ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Viewer': 'ผู้ดูอย่างเดียว' })[you] || you, hubHide: you === 'Viewer' ? 'members' : '', blocked: blocked, canSee: !blocked,
+      readOnly: !canManage && !blocked, ownerName: { a: 'วรวุฒิ ก. (เจ้าขององค์กร)', b: 'กิตติ พ. (เจ้าขององค์กร)', c: 'สุนทร ม. (เจ้าขององค์กร)', d: 'เจ้าขององค์กร', e: 'อรุณี ท. (เจ้าขององค์กร)' }[orgId] || 'ผู้ดูแลองค์กร',
       notRequested: !self.state.requested, requested: !!self.state.requested, requestAccess: function () { self.setState({ requested: true }); },
-      readOnlyNote: 'ดูได้อย่างเดียว · บทบาท ' + you + ' สร้างหรือแก้ Custom Role ไม่ได้ (ต้องเป็น Org Owner / Org Admin)',
-      canManage: canManage, copyLabel: canManage ? 'ทำสำเนา ' + roles[sel].name : '', createLabel: canManage ? 'สร้าง Custom Role' : '',
+      readOnlyNote: 'ดูได้อย่างเดียว · ผู้จัดการไซต์สร้างหรือแก้บทบาทกำหนดเองไม่ได้ (ต้องเป็นเจ้าขององค์กรหรือผู้ดูแลองค์กร)',
+      canManage: canManage, copyLabel: canManage ? 'ทำสำเนา ' + roles[sel].name : '', createLabel: canManage ? 'สร้างบทบาทกำหนดเอง' : '',
       canEditCustom: canManage && !!roles[sel].custom, editKeys: 'sc.roleMode=edit|sc.roleCopy=' + roles[sel].name, copyKeys: 'sc.roleMode=copy|sc.roleCopy=' + roles[sel].name,
-      cur: roles[sel],
-      roles: roles.map(function (r, i) { return { name: r.name, tier: r.tier, on: i === sel,
+      cur: roles[sel], selIdx: String(sel),
+      pickSel: function (e) { self.setState({ role: Number(e.target.value) || 0 }); },
+      curGroups: groups.map(function (g) { return { title: g.title, rows: g.rows.map(function (r) { return { label: r[0], scope: scopeOf[r[2].split(' ')[sel]] || 'none' }; }) }; }),
+      roles: roles.map(function (r, i) { return { idx: String(i), name: r.name, label: r.label, en: r.en || r.tier, tier: r.tier, on: i === sel,
         thStyle: hi(i) + 'padding:8px 4px;text-align:center;min-width:104px;border-bottom:' + (i === sel ? '3px solid #0F6B5C' : '3px solid transparent'),
         pick: function () { self.setState({ role: i }); } }; }),
       groups: groups.map(function (g) { return { title: g.title, rows: g.rows.map(function (r) {

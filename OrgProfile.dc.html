@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>โปรไฟล์องค์กร</title>
+<title>ตั้งค่าองค์กร · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -24,49 +24,40 @@ input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <sc-if value="{{fromEnergy}}" hint-placeholder-val="{{ false }}">
-      <a href="EnergyValue.dc.html" onPointerDown="{{leaveEnergy}}" onKeyDown="{{leaveEnergy}}" onClick="{{leaveEnergy}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; text-decoration: none; color: #0F6B5C; align-self: flex-start"><dc-import name="Icon" icon="arrowLeft" size="16" hint-size="16px,16px"></dc-import>กลับไปหน้าพลังงานและผลตอบแทน</a>
-    </sc-if>
+    <dc-import name="PageHeader" title="ตั้งค่าองค์กร" icon="building" hub="settings" hub-current="profile" hub-hide="{{hubHide}}" back-label="{{backLabel}}" back-href="EnergyValue.dc.html" back-keys="sc.rateFrom=" subtitle="ข้อมูลองค์กร โลโก้ และอัตราที่ใช้คำนวณผลตอบแทน" hint-size="100%,140px"></dc-import>
 
-    <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
-      <div style="position: relative; height: 200px">
-        <dc-import name="SiteThumb" site="{{org.cover}}" w="100%" h="100%" radius="{{0}}" hint-size="100%,200px"></dc-import>
+    <section aria-label="ข้อมูลประจำตัวองค์กร" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
+      <div style="position: relative; flex: none">
+        <dc-import name="OrgBadge" org="{{org.badge}}" size="{{88}}" with-name="{{false}}" hint-size="88px,88px"></dc-import>
+      </div>
+      <div style="flex: 1 1 260px; min-width: 0">
+        <div style="font-size: 20px; font-weight: 700; line-height: 1.3">{{org.name}}</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 6px; font-size: 13px; color: #4B5563; align-items: center">
+          <span style="font-family: ui-monospace, monospace">solarcare.app/o/{{org.slug}}</span>
+          <span>{{org.sites}} ไซต์ · {{org.members}} สมาชิก</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px">บทบาทของคุณ <dc-import name="StatusPill" kind="role" value="{{org.role}}" hint-size="100px,24px"></dc-import></span>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <dc-import name="SiteThumb" site="{{org.cover}}" w="96px" h="56px" radius="{{8}}" hint-size="96px,56px"></dc-import>
         <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+          <input id="op-logo" type="file" accept="image/*" onChange="{{pickedLogo}}" aria-label="เลือกโลโก้" style="display: none">
           <input id="op-cover" type="file" accept="image/*" onChange="{{pickedCover}}" aria-label="เลือกภาพปก" style="display: none">
-          <button type="button" onClick="{{chooseCover}}" style="position: absolute; right: 16px; top: 16px; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 0; background: rgba(17,24,39,0.75); color: #FFFFFF; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px">
-            <dc-import name="Icon" icon="camera" size="16" hint-size="16px,16px"></dc-import>เปลี่ยนภาพปก</button>
+          <button type="button" onClick="{{chooseLogo}}" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; color: #374151; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="camera" size="16" hint-size="16px,16px"></dc-import>เปลี่ยนโลโก้</button>
+          <button type="button" onClick="{{chooseCover}}" style="min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; color: #374151; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="camera" size="16" hint-size="16px,16px"></dc-import>เปลี่ยนภาพปก</button>
         </sc-if>
       </div>
-      <sc-if value="{{picked}}" hint-placeholder-val="{{ false }}">
-        <div role="status" style="margin: 12px 28px 0; font-size: 13px; padding: 8px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{picked}}</div>
-      </sc-if>
-      <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; padding: 0 28px 24px">
-        <div style="position: relative; margin-top: -56px; flex: none">
-          <div style="display: flex; padding: 4px; border-radius: 31px; background: #FFFFFF; box-shadow: 0 4px 16px rgba(17,24,39,0.15)"><dc-import name="OrgBadge" org="{{org.badge}}" size="{{112}}" with-name="{{false}}" hint-size="112px,112px"></dc-import></div>
-          <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
-            <input id="op-logo" type="file" accept="image/*" onChange="{{pickedLogo}}" aria-label="เลือกโลโก้" style="display: none">
-            <button type="button" onClick="{{chooseLogo}}" aria-label="เปลี่ยนโลโก้องค์กร" style="position: absolute; right: -6px; bottom: -6px; width: 44px; height: 44px; border-radius: 999px; border: 3px solid #FFFFFF; background: #0F6B5C; color: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0">
-              <dc-import name="Icon" icon="camera" size="18" hint-size="18px,18px"></dc-import>
-            </button>
-          </sc-if>
-        </div>
-        <div style="flex: 1 1 320px; min-width: 0; padding-top: 12px">
-          <h1 style="margin: 0; font-size: 26px; font-weight: 700; line-height: 1.3">{{org.name}}</h1>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 6px; font-size: 13px; color: #4B5563; align-items: center">
-            <span style="font-family: ui-monospace, monospace">solarcare.app/o/{{org.slug}}</span>
-            <span>{{org.sites}} ไซต์ · {{org.members}} สมาชิก</span>
-          </div>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563">บทบาทของคุณ <dc-import name="StatusPill" kind="role" value="{{org.role}}" hint-size="100px,24px"></dc-import></div>
-      </div>
+      <div role="status" aria-live="polite" style="flex: 1 0 100%"><sc-if value="{{picked}}" hint-placeholder-val="{{ false }}">
+        <div style="font-size: 13px; padding: 8px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{picked}}</div>
+      </sc-if></div>
     </section>
 
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
-      <section style="flex: 999 1 600px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+      <section style="flex: 999 1 600px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px">
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
           <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="building" size="18" tone="brand" hint-size="18px,18px"></dc-import>ข้อมูลองค์กร</h2>
           <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
-            <span style="font-size: 13px; padding: 6px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ดูอย่างเดียว — ต้องมีสิทธิ์ org.update (Org Owner / Org Admin)</span>
+            <span style="font-size: 13px; padding: 6px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ดูอย่างเดียว — แก้ไขได้เฉพาะ เจ้าขององค์กร / ผู้ดูแลองค์กร</span>
           </sc-if>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px">
@@ -74,15 +65,13 @@ input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label for="{{f.id}}" style="font-size: 13px; font-weight: 600">{{f.label}}</label>
               <input id="{{f.id}}" value="{{f.val}}" onChange="{{f.change}}" disabled="{{locked}}" aria-invalid="{{f.invalid}}" aria-describedby="{{f.errId}}" style="{{f.style}}">
-              <sc-if value="{{f.hasErr}}" hint-placeholder-val="{{ false }}"><span id="{{f.errId}}" role="alert" style="font-size: 13px; color: #B42318">{{f.err}}</span></sc-if>
+              <span id="{{f.errId}}" role="alert" style="font-size: 13px; color: #B42318"><sc-if value="{{f.hasErr}}" hint-placeholder-val="{{ false }}">{{f.err}}</sc-if></span>
             </div>
           </sc-for>
         </div>
         <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
           <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
-            <sc-if value="{{saved}}" hint-placeholder-val="{{ false }}">
-              <span role="status" style="align-self: center; margin-right: auto; font-size: 14px; font-weight: 600; color: #0A4F44">บันทึกแล้ว · บันทึกใน Audit log</span>
-            </sc-if>
+            <span role="status" aria-live="polite" style="align-self: center; margin-right: auto; font-size: 14px; font-weight: 600; color: #0A4F44">{{savedMsg}}</span>
             <dc-import name="Button" label="ยกเลิก" variant="secondary" on-press="{{cancel}}" hint-size="90px,44px"></dc-import>
             <dc-import name="Button" label="บันทึก" on-press="{{save}}" hint-size="90px,44px"></dc-import>
           </div>
@@ -103,14 +92,14 @@ input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
       </div>
     </div>
 
-    <section aria-labelledby="op-rates" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+    <section aria-labelledby="op-rates" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
       <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center">
         <div>
           <h2 id="op-rates" style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="coin" size="18" tone="brand" hint-size="18px,18px"></dc-import>อัตราและค่าคำนวณ</h2>
           <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563">ใช้คำนวณผลตอบแทน คาร์บอนเครดิต และการขายไฟคืนในหน้า “พลังงานและผลตอบแทน” ของ {{org.name}}</p>
         </div>
         <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
-          <span style="font-size: 13px; padding: 6px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ดูอย่างเดียว — แก้ไขได้เฉพาะ Org Owner / Org Admin</span>
+          <span style="font-size: 13px; padding: 6px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">ดูอย่างเดียว — แก้ไขได้เฉพาะ เจ้าขององค์กร / ผู้ดูแลองค์กร</span>
         </sc-if>
       </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
@@ -124,12 +113,10 @@ input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
       </div>
       <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
         <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
-          <sc-if value="{{rateBad}}" hint-placeholder-val="{{ false }}">
-            <span role="alert" style="align-self: center; margin-right: auto; font-size: 13px; color: #B42318">ใส่ตัวเลขที่มากกว่าหรือเท่ากับ 0 ให้ครบทุกช่อง</span>
-          </sc-if>
-          <sc-if value="{{ratesSaved}}" hint-placeholder-val="{{ false }}">
-            <span role="status" style="align-self: center; margin-right: auto; font-size: 13px; font-weight: 600; color: #0A4F44">{{ratesSaved}} · <a href="EnergyValue.dc.html" onPointerDown="{{leaveEnergy}}" onKeyDown="{{leaveEnergy}}" onClick="{{leaveEnergy}}" style="color: #0F6B5C">ดูผลที่หน้าพลังงาน</a></span>
-          </sc-if>
+          <div style="align-self: center; margin-right: auto; display: flex; flex-direction: column">
+            <span role="alert" style="font-size: 13px; color: #B42318"><sc-if value="{{rateBad}}" hint-placeholder-val="{{ false }}">ใส่ตัวเลขที่มากกว่าหรือเท่ากับ 0 ให้ครบทุกช่อง</sc-if></span>
+            <span role="status" aria-live="polite" style="font-size: 13px; font-weight: 600; color: #0A4F44"><sc-if value="{{ratesSaved}}" hint-placeholder-val="{{ false }}">{{ratesSaved}} · <a href="EnergyValue.dc.html" onPointerDown="{{leaveEnergy}}" onKeyDown="{{leaveEnergy}}" onClick="{{leaveEnergy}}" style="color: #0F6B5C; display: inline-flex; align-items: center; gap: 4px; min-height: 44px">ดูผลที่หน้าพลังงาน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a></sc-if></span>
+          </div>
           <dc-import name="Button" label="คืนค่าเริ่มต้น" variant="secondary" on-press="{{resetRates}}" hint-size="130px,44px"></dc-import>
           <dc-import name="Button" label="บันทึกอัตรา" on-press="{{saveRates}}" disabled="{{rateBad}}" hint-size="120px,44px"></dc-import>
         </div>
@@ -172,6 +159,21 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { edits: {}, picked: '', rateEdits: {} }; }
   componentDidMount() {
@@ -189,7 +191,7 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -249,6 +251,7 @@ class Component extends DCLogic {
     var defs = [['name', 'ชื่อองค์กร (ไทย)'], ['en', 'ชื่อองค์กร (อังกฤษ)'], ['tax', 'เลขประจำตัวผู้เสียภาษี'], ['email', 'อีเมลติดต่อ'], ['phone', 'เบอร์โทร'], ['addr', 'จังหวัดที่ตั้งสำนักงาน']];
     return {
       org: org, canEdit: org.edit, locked: !org.edit, orgId: org.id,
+      hubHide: org.role === 'Org Owner' || org.role === 'Org Admin' ? '' : 'audit', backLabel: fromEnergy ? 'กลับไปหน้าพลังงานและผลตอบแทน' : '',
       fromEnergy: fromEnergy, ratesSaved: self.state.ratesSaved || '', nameErr: !!self.state.nameErr,
       leaveEnergy: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.removeItem('sc.rateFrom'); } catch (x) {} if (e && e.type === 'click') self.setState({ fromEnergy: false }); },
       rateBad: rateBad,
@@ -277,7 +280,7 @@ class Component extends DCLogic {
         self.setState({ rateEdits: re, sync: Date.now(), ratesSaved: 'คืนค่าเริ่มต้นแล้ว' });
       },
       chooseCover: choose('op-cover'), chooseLogo: choose('op-logo'), pickedCover: picked('ภาพปก'), pickedLogo: picked('โลโก้'), picked: self.state.picked,
-      saved: !!self.state.saved,
+      saved: !!self.state.saved, savedMsg: self.state.saved ? 'บันทึกแล้ว · บันทึกใน Audit log' : '',
       save: function () {
         if (!org.edit) return;
         var val = function (k) { return String(ed[k] != null ? ed[k] : org[k]).trim(); };

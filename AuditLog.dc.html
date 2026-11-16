@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>Audit log</title>
+<title>ประวัติการใช้งาน · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -25,33 +25,33 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" title="Audit log" icon="audit" subtitle="ทุกการเปลี่ยนแปลงในองค์กร · เก็บ 1 ปี · แก้ไขไม่ได้" actions="{{phActions}}" hint-size="100%,96px"></dc-import>
+    <dc-import name="PageHeader" title="ตั้งค่าองค์กร" icon="building" hub="settings" hub-current="audit" subtitle="ทุกการเปลี่ยนแปลงในองค์กร · เก็บ 1 ปี · แก้ไขไม่ได้" actions="{{phActions}}" hint-size="100%,140px"></dc-import>
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
-      <section role="status" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; max-width: 560px">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>Audit log ดูได้เฉพาะ Org Owner และ Org Admin</h2>
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; max-width: 560px">
+        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>ประวัติการใช้งาน ดูได้เฉพาะ เจ้าขององค์กร และ ผู้ดูแลองค์กร</h2>
         <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.6">คุณเป็น {{myRole}} ใน {{orgName}} ถ้าต้องการตรวจประวัติการเปลี่ยนแปลง ขอให้ผู้ดูแลองค์กรส่งออกให้ หรือขอสิทธิ์เพิ่ม</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" icon="mail" label="ขอสิทธิ์ดู Audit log" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
-        <sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if>
+        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" icon="mail" label="ขอสิทธิ์ดู ประวัติการใช้งาน" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
+        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
       </section>
     </sc-if>
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
-    <dc-import name="FilterChips" label="ประเภทเหตุการณ์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
-    <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center">
-      <div style="display: flex; align-items: center; gap: 8px">
-        <label for="al-who" style="font-size: 13px; font-weight: 600; color: #374151">ผู้กระทำ</label>
-        <select id="al-who" value="{{who}}" onChange="{{setWho}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center">
+        <label for="al-q" style="position: absolute; left: -9999px">ค้นหาเหตุการณ์</label>
+        <input id="al-q" type="search" value="{{q}}" onChange="{{setQ}}" placeholder="ค้นหาชื่อ การกระทำ หรือรายละเอียด" style="min-height: 44px; flex: 1 1 240px; width: 100%; max-width: 420px; box-sizing: border-box; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
+        <label for="al-who" style="position: absolute; left: -9999px">ผู้กระทำ</label>
+        <select id="al-who" value="{{who}}" onChange="{{setWho}}" style="min-height: 44px; flex: 0 1 200px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
           <sc-for list="{{whoOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}">{{o.t}}</option></sc-for>
         </select>
-      </div>
-      <div style="display: flex; align-items: center; gap: 8px">
-        <label for="al-range" style="font-size: 13px; font-weight: 600; color: #374151">ช่วงเวลา</label>
-        <select id="al-range" value="{{range}}" onChange="{{setRange}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
-          <option value="1">วันนี้</option><option value="7">7 วันล่าสุด</option><option value="30">30 วันล่าสุด</option><option value="90">90 วันล่าสุด</option><option value="all">ทั้งหมด</option>
+        <label for="al-range" style="position: absolute; left: -9999px">ช่วงเวลา</label>
+        <select id="al-range" value="{{range}}" onChange="{{setRange}}" style="min-height: 44px; flex: 0 1 180px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
+          <option value="1">วันนี้</option><option value="7">7 วันล่าสุด</option><option value="30">30 วันล่าสุด</option><option value="90">90 วันล่าสุด</option><option value="all">ทั้งหมด (1 ปี)</option>
         </select>
       </div>
-      <dc-import name="ResultBar" count="{{shownN}}" total="{{totalN}}" unit="เหตุการณ์" active="{{filtered}}" on-clear="{{showAll}}" hint-size="260px,44px"></dc-import>
+      <dc-import name="FilterChips" label="ประเภทเหตุการณ์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
     </div>
+    <dc-import name="ResultBar" count="{{shownN}}" total="{{totalN}}" unit="เหตุการณ์" active="{{filtered}}" on-clear="{{showAll}}" hint-size="100%,44px"></dc-import>
 
     <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
       <sc-if value="{{showState}}" hint-placeholder-val="{{ false }}">
@@ -65,14 +65,14 @@ button{font-family:inherit;cursor:pointer}
             <tr style="{{r.tr}}">
               <td data-label="เวลา" style="padding: 12px 20px; font-size: 13px; color: #374151; white-space: nowrap">{{r.when}}</td>
               <td class="rt-main" style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><dc-import name="Avatar" person="{{r.av}}" size="{{28}}" hint-size="28px,28px"></dc-import><span style="font-weight: 600">{{r.who}}</span></div></td>
-              <td data-label="การกระทำ" style="padding: 12px"><code style="{{r.tag}}">{{r.action}}</code></td>
+              <td data-label="การกระทำ" style="padding: 12px"><span title="{{r.codeTitle}}" style="{{r.tag}}">{{r.action}}</span></td>
               <td data-label="รายละเอียด" style="padding: 12px; color: #374151">{{r.detail}}</td>
               <td data-label="ไซต์" style="padding: 12px 20px; color: #374151">{{r.site}}</td>
             </tr>
           </sc-for>
           <sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
             <tr><td colspan="5" style="padding: 32px 20px; text-align: center; color: #4B5563; font-size: 14px">
-              <div role="status" style="display: flex; flex-direction: column; align-items: center; gap: 12px">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
                 <span>ไม่มีเหตุการณ์ในตัวกรองนี้</span>
                 <dc-import name="Button" variant="secondary" label="ดูทั้งหมด" on-press="{{showAll}}" hint-size="120px,44px"></dc-import>
               </div>
@@ -110,23 +110,38 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
-  constructor(p) { super(p); this.state = { f: 'all', who: 'all', range: '90', requested: false }; }
+  constructor(p) { super(p); this.state = { f: 'all', who: 'all', range: '90', requested: false, q: '' }; }
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.supportLog', 'sc.newAccount', 'sc.myName', 'sc.site', 'sc.createdName', 'sc.createdInvites', 'sc.inviteCancel', 'sc.owner', 'sc.auditExtra', 'sc.flash', 'sc.memberEdits', 'sc.removed', 'sc.customRoles'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.supportLog', 'sc.newAccount', 'sc.myName', 'sc.site', 'sc.createdName', 'sc.createdInvites', 'sc.inviteCancel', 'sc.owner', 'sc.auditExtra', 'sc.flash', 'sc.memberEdits', 'sc.removed', 'sc.customRoles', 'sc.woStat', 'sc.woAssign', 'sc.createdWo', 'sc.createdSites', 'sc.siteEdits', 'sc.siteCycle', 'sc.autoCycle'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
     self._iv = setInterval(self._sync, 400);
-    self.setState({ sync: Date.now(), f: 'all', who: 'all', range: '90', requested: false }); // fresh render + default filters on a new visit: Play may reuse a restored render
+    self.setState({ sync: Date.now(), f: 'all', who: 'all', range: '90', requested: false, q: '' }); // fresh render + default filters on a new visit: Play may reuse a restored render
   }
   componentWillUnmount() {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this, f = self.state.f;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -139,7 +154,7 @@ class Component extends DCLogic {
     var O = ORGS[org] || ORGS.a, canSee = O[1] === 'Org Admin' || O[1] === 'Org Owner';
     var A = { n: 'natthaphat', w: 'worawut', s: 'somsri', t: 'thanakorn', q: 'qleen' };
     var all = [
-      ['15 พ.ย. 10:34', A.q, 'Qleen Support', 'platform.access', 'platform', 'เข้าดูองค์กรเพื่อช่วยแก้ปัญหา — เหตุผล: เลขเรื่อง (ticket) #4821' + (function () { try { var L = (JSON.parse(window.sessionStorage.getItem('sc.supportLog') || '[]') || []).filter(function (x) { return x && x.org === 'a'; }); var last = L[L.length - 1]; return last ? ' · จบเซสชัน ' + String(last.end || '').replace('วันนี้ ', '') : ' · กำลังเปิดอยู่'; } catch (e) { return ''; } })(), '—'],
+      ['15 พ.ย. 10:34', A.q, 'ทีม Qleen', 'platform.access', 'platform', 'เข้าดูองค์กรเพื่อช่วยแก้ปัญหา — เหตุผล: เลขเรื่อง (ticket) #4821' + (function () { try { var L = (JSON.parse(window.sessionStorage.getItem('sc.supportLog') || '[]') || []).filter(function (x) { return x && x.org === 'a'; }); var last = L[L.length - 1]; return last ? ' · จบเซสชัน ' + String(last.end || '').replace('วันนี้ ', '') : ' · กำลังเปิดอยู่'; } catch (e) { return ''; } })(), '—'],
       ['14 พ.ย. 16:20', A.t, 'ธนากร ว.', 'wo.submit', 'wo', 'ส่ง WO-1043 พร้อมรูป 24 รูป', 'ฟาร์มโคราช 1'],
       ['14 พ.ย. 15:50', A.t, 'ธนากร ว.', 'wo.start', 'wo', 'เริ่ม WO-1042 (GPS ตรงกับไซต์)', 'ฟาร์มโคราช 1'],
       ['14 พ.ย. 15:30', A.n, 'ณัฐภัทร ส.', 'wo.create', 'wo', 'สร้าง WO-1042 ตรวจจุดร้อน (hotspot) โซน C', 'ฟาร์มโคราช 1'],
@@ -149,9 +164,9 @@ class Component extends DCLogic {
       ['5 พ.ย. 17:40', A.w, 'วรวุฒิ ก.', 'wo.approve', 'wo', 'อนุมัติปิด WO-1035', 'ลานจอดรถลพบุรี'],
       ['3 พ.ย. 09:00', A.s, 'สมศรี ป.', 'wo.assign', 'wo', 'มอบหมาย WO-1043 ให้ ธนากร ว.', 'ฟาร์มโคราช 1'],
       ['2 พ.ย. 16:45', A.s, 'สมศรี ป.', 'wo.approve', 'wo', 'อนุมัติปิด WO-1031', 'ฟาร์มโคราช 1'],
-      ['20 ต.ค. 13:10', A.n, 'ณัฐภัทร ส.', 'site.update', 'member', 'แก้ไขรอบล้างของฟาร์มโคราช 2 เป็นทุก 45 วัน', 'ฟาร์มโคราช 2'],
-      ['2 ต.ค. 08:45', A.w, 'วรวุฒิ ก.', 'role.update', 'role', 'เพิ่มสิทธิ์ report.read ให้ Custom Role “หัวหน้าทีมช่าง”', '—'],
-      ['1 ต.ค. 16:05', A.n, 'ณัฐภัทร ส.', 'role.create', 'role', 'สร้าง Custom Role “หัวหน้าทีมช่าง”', '—']
+      ['20 ต.ค. 13:10', A.n, 'ณัฐภัทร ส.', 'cycle.update', 'site', 'เปลี่ยนรอบล้างของฟาร์มโคราช 2 เป็นทุก 45 วัน', 'ฟาร์มโคราช 2'],
+      ['2 ต.ค. 08:45', A.w, 'วรวุฒิ ก.', 'role.update', 'role', 'เพิ่มสิทธิ์ “ดูรายงาน” ให้บทบาทกำหนดเอง “หัวหน้าทีมช่าง”', '—'],
+      ['1 ต.ค. 16:05', A.n, 'ณัฐภัทร ส.', 'role.create', 'role', 'สร้างบทบาทกำหนดเอง “หัวหน้าทีมช่าง”', '—']
     ];
     if (org === 'd') all = [
       ['15 พ.ย. 10:05', A.n, 'ณัฐภัทร ส.', 'org.create', 'org', 'สร้างองค์กร ' + dName + ' · คุณเป็น Org Owner', '—']
@@ -172,9 +187,32 @@ class Component extends DCLogic {
       if (e.status === 'suspended') extra.push([at(), A.n, 'ณัฐภัทร ส.', 'member.suspend', 'member', 'ระงับการใช้งานของ ' + p[1], '—']);
       if (e.edited) extra.push([at(), A.n, 'ณัฐภัทร ส.', 'member.role', 'member', 'แก้สิทธิ์ของ ' + p[1] + (e.orgRole && e.orgRole !== 'none' ? ' · ' + RL[e.orgRole] : ''), '—']); });
     J('sc.removed', []).forEach(function (k) { var p = String(k).split('|'); if (p[0] === org) extra.push([at(), A.n, 'ณัฐภัทร ส.', 'member.remove', 'member', 'นำ ' + p[1] + ' ออกจากองค์กร', '—']); });
-    J('sc.customRoles', []).forEach(function (r) { if (r && r.org === org) extra.push([at(), A.n, 'ณัฐภัทร ส.', r.created ? 'role.create' : 'role.update', 'role', (r.created ? 'สร้าง' : 'แก้ไข') + ' Custom Role “' + r.name + '”', '—']); });
+    J('sc.customRoles', []).forEach(function (r) { if (r && r.org === org) extra.push([at(), A.n, 'ณัฐภัทร ส.', r.created ? 'role.create' : 'role.update', 'role', (r.created ? 'สร้าง' : 'แก้ไข') + 'บทบาทกำหนดเอง “' + r.name + '”', '—']); });
     // support sessions that ended in the prototype (sc.supportLog) are recorded for the org they opened
-    J('sc.supportLog', []).forEach(function (x) { if (x && x.org === org) extra.push([at(strip(x.start)), A.q, 'Qleen Support', 'platform.access', 'platform', 'เข้าดูองค์กรแบบอ่านอย่างเดียว ' + strip(x.start) + '–' + strip(x.end) + (x.reason ? ' — เหตุผล: ' + x.reason : ''), '—']); });
+    J('sc.supportLog', []).forEach(function (x) { if (x && x.org === org) extra.push([at(strip(x.start)), A.q, 'ทีม Qleen', 'platform.access', 'platform', 'เข้าดูองค์กรแบบอ่านอย่างเดียว ' + strip(x.start) + '–' + strip(x.end) + (x.reason ? ' — เหตุผล: ' + x.reason : ''), '—']); });
+    // work-order, site and cleaning-cycle actions done in the prototype this session
+    var ORG_SITES = { a: ['ฟาร์มโคราช 1', 'ฟาร์มโคราช 2', 'หลังคาโรงงานบางปู', 'ลานจอดรถลพบุรี'], b: ['สาขารังสิต', 'สาขาบางนา'], c: ['โรงงาน A ลำพูน'], d: [], e: ['หลังคาอาคาร A หัวหิน'] };
+    var SID = { k1: 'ฟาร์มโคราช 1', k2: 'ฟาร์มโคราช 2', bp: 'หลังคาโรงงานบางปู', lb: 'ลานจอดรถลพบุรี', rs: 'สาขารังสิต', bn: 'สาขาบางนา', lp: 'โรงงาน A ลำพูน', e1: 'หลังคาอาคาร A หัวหิน' };
+    var createdS = J('sc.createdSites', []).filter(function (c) { return c && c.org === org && c.name; });
+    var mySites = (ORG_SITES[org] || []).concat(createdS.map(function (c) { return c.name; }));
+    var WO_PRE = { a: 'WO-', b: 'GM-', c: 'NK-', e: 'RR-' }[org] || '#';
+    var WO_SITE = { 'WO-1043': 'ฟาร์มโคราช 1', 'WO-1042': 'ฟาร์มโคราช 1', 'WO-1041': 'ฟาร์มโคราช 2', 'WO-1040': 'หลังคาโรงงานบางปู' };
+    var cWo = J('sc.createdWo', []).filter(function (c) { return c && c.org === org && c.no; });
+    cWo.forEach(function (c) { WO_SITE[c.no] = c.site; extra.push([at(), A.n, 'ณัฐภัทร ส.', 'wo.create', 'wo', 'สร้าง ' + c.no + (c.title ? ' ' + c.title : '') + (c.who ? ' · มอบหมายให้ ' + c.who : ''), c.site || '—']); });
+    var woSt = J('sc.woStat', {}) || {};
+    Object.keys(woSt).forEach(function (no) { if (no.indexOf(WO_PRE) !== 0) return; var v = woSt[no];
+      if (v === 'done') extra.push([at(), A.n, 'ณัฐภัทร ส.', 'wo.approve', 'wo', 'อนุมัติปิด ' + no, WO_SITE[no] || '—']);
+      else if (v === 'returned') extra.push([at(), A.n, 'ณัฐภัทร ส.', 'wo.return', 'wo', 'ส่ง ' + no + ' กลับให้ช่างแก้ไข', WO_SITE[no] || '—']);
+      else if (v === 'paused') extra.push([at(), A.t, 'ธนากร ว.', 'wo.pause', 'wo', 'พักงาน ' + no + ' เพราะพบปัญหาหน้างาน', WO_SITE[no] || '—']); });
+    var woA = J('sc.woAssign', {}) || {};
+    Object.keys(woA).forEach(function (no) { if (no.indexOf(WO_PRE) === 0 && woA[no]) extra.push([at(), A.n, 'ณัฐภัทร ส.', 'wo.assign', 'wo', 'มอบหมาย ' + no + ' ให้ ' + woA[no], WO_SITE[no] || '—']); });
+    createdS.forEach(function (c) { extra.push([at(), A.n, 'ณัฐภัทร ส.', 'site.create', 'site', 'เพิ่มไซต์ ' + c.name + (c.kwp ? ' · ' + c.kwp + ' kWp' : ''), c.name]); });
+    var sEd = J('sc.siteEdits', {}) || {};
+    Object.keys(sEd).forEach(function (n) { if (mySites.indexOf(n) < 0 || !sEd[n]) return; extra.push([at(), A.n, 'ณัฐภัทร ส.', 'site.update', 'site', 'แก้ไขข้อมูลไซต์' + (sEd[n].name && sEd[n].name !== n ? ' · เปลี่ยนชื่อจาก ' + n : ''), n]); });
+    var sCyc = J('sc.siteCycle', {}) || {};
+    Object.keys(sCyc).forEach(function (k) { var n = SID[k] || k; if (mySites.indexOf(n) < 0 || !sCyc[k]) return; extra.push([at(), A.n, 'ณัฐภัทร ส.', 'cycle.update', 'site', 'ตั้งรอบล้างของ' + n + ' เป็นทุก ' + sCyc[k] + ' วัน', n]); });
+    var aCyc = J('sc.autoCycle', {}) || {};
+    Object.keys(aCyc).forEach(function (k) { var n = SID[k] || k; if (mySites.indexOf(n) < 0) return; extra.push([at(), A.n, 'ณัฐภัทร ส.', 'cycle.auto', 'site', (aCyc[k] ? 'เปิด' : 'ปิด') + 'การสร้างใบงานล้างอัตโนมัติของ' + n, n]); });
     all = extra.reverse().concat(all);
     // newest first by day + HH:MM (stable for equal times)
     var MONS = { 'ส.ค.': 8, 'ก.ย.': 9, 'ต.ค.': 10, 'พ.ย.': 11 };
@@ -186,29 +224,42 @@ class Component extends DCLogic {
     var age = function (when) { var p = String(when).split(' '); return Math.round((new Date(2026, 10, 15) - new Date(2026, (MON[p[1]] || 11) - 1, Number(p[0]))) / 86400000); };
     var who = self.state.who, range = self.state.range;
     var base = all.filter(function (r) { return (who === 'all' || r[2] === who) && (range === 'all' || age(r[0]) < Number(range)); });
-    var defs = [['all', 'ทั้งหมด'], ['member', 'สมาชิก & สิทธิ์'], ['role', 'Role'], ['org', 'ข้อมูลองค์กร'], ['wo', 'ใบงาน'], ['platform', 'เข้าถึงข้ามองค์กร']];
+    var defs = [['all', 'ทั้งหมด'], ['member', 'สมาชิก & สิทธิ์'], ['role', 'บทบาท'], ['org', 'ข้อมูลองค์กร'], ['site', 'ไซต์ & รอบล้าง'], ['wo', 'ใบงาน'], ['platform', 'เข้าถึงข้ามองค์กร']];
     var shown = base.filter(function (r) { return f === 'all' || r[4] === f; });
     var people = [];
     all.forEach(function (r) { if (people.indexOf(r[2]) < 0) people.push(r[2]); });
     var stt = self.state.retried ? 'ready' : (self.props.state ?? 'ready');
+    // event codes stay internal: people read a Thai label (the code is in the tooltip)
+    var EV = { 'platform.access': 'ทีม Qleen เข้าดูองค์กร', 'wo.submit': 'ส่งงานรออนุมัติ', 'wo.start': 'เริ่มงาน', 'wo.create': 'สร้างใบงาน', 'wo.assign': 'มอบหมายใบงาน', 'wo.approve': 'อนุมัติปิดงาน', 'wo.return': 'ส่งกลับแก้ไข', 'wo.pause': 'พักงาน',
+      'member.invite': 'เชิญ / ยกเลิกคำเชิญ', 'member.join': 'เข้าร่วมองค์กร', 'member.role': 'เปลี่ยนบทบาท', 'member.suspend': 'ระงับการใช้งาน', 'member.remove': 'นำออกจากองค์กร', 'site.assign': 'มอบสิทธิ์รายไซต์',
+      'role.create': 'สร้างบทบาท', 'role.update': 'แก้ไขบทบาท', 'org.create': 'สร้างองค์กร', 'org.update': 'แก้ไขข้อมูลองค์กร', 'org.leave': 'ออกจากองค์กร',
+      'site.create': 'เพิ่มไซต์', 'site.update': 'แก้ไขข้อมูลไซต์', 'cycle.update': 'เปลี่ยนรอบล้าง', 'cycle.auto': 'ตั้งค่าใบงานอัตโนมัติ' };
+    // search across who / action label / detail / site
+    var qq = String(self.state.q || '').trim().toLowerCase();
+    if (qq) { var hit = function (r) { return (r.join(' ') + ' ' + (EV[r[3]] || '')).toLowerCase().indexOf(qq) >= 0; }; base = base.filter(hit); shown = shown.filter(hit); }
+    var siteEdN = J('sc.siteEdits', {}) || {};
+    var DN = function (n) { return (siteEdN[n] && siteEdN[n].name) || n; };
+    var SFX = (function () { var ks = Object.keys(siteEdN).filter(function (k) { return siteEdN[k] && siteEdN[k].name && siteEdN[k].name !== k; }).sort(function (a, b) { return b.length - a.length; }); return function (t) { t = String(t == null ? '' : t); ks.forEach(function (k) { t = t.split(k).join(siteEdN[k].name); }); return t; }; })();
     return (function (R) { R.phActions = R.canSee ? [{ label: 'ส่งออก CSV', icon: 'download', variant: 'secondary', onPress: R.exportCsv }] : []; return R; })({
       // prototype stub: no real file yet, show the shared success toast
       exportCsv: function () { try { var ss = window.sessionStorage; ss.setItem('sc.flash', 'กำลังเตรียมไฟล์ CSV · ' + shown.length + ' เหตุการณ์ตามตัวกรอง'); ss.setItem('sc.flashAt', String(Date.now())); ss.setItem('sc.flashTo', 'AuditLog.dc.html'); } catch (e) {} self.setState({ sync: Date.now() }); },
       blocked: !canSee, canSee: canSee, orgName: O[0], myRole: O[1],
-      ownerName: { a: 'วรวุฒิ ก. (Org Owner)', b: 'กิตติ พ. (Org Owner)', c: 'สุนทร ม. (Org Owner)', e: 'อรุณี ท. (Org Owner)' }[org] || 'ผู้ดูแลองค์กร',
+      ownerName: { a: 'วรวุฒิ ก. (เจ้าขององค์กร)', b: 'กิตติ พ. (เจ้าขององค์กร)', c: 'สุนทร ม. (เจ้าขององค์กร)', e: 'อรุณี ท. (เจ้าขององค์กร)' }[org] || 'ผู้ดูแลองค์กร',
       notRequested: !self.state.requested, requested: !!self.state.requested, requestAccess: function () { self.setState({ requested: true }); },
       listState: stt, showState: stt !== 'ready', showTable: stt === 'ready',
       retry: function () { self.setState({ retried: true }); },
-      noRows: shown.length === 0, showAll: function () { self.setState({ f: 'all', who: 'all', range: '90' }); },
+      noRows: shown.length === 0, showAll: function () { self.setState({ f: 'all', who: 'all', range: '90', q: '' }); },
+      q: self.state.q || '', setQ: function (e) { self.setState({ q: e.target.value }); },
       f: f, setF: function (id) { self.setState({ f: id }); },
       chipOpts: defs.map(function (d) { return { id: d[0], label: d[1], count: base.filter(function (r) { return d[0] === 'all' || r[4] === d[0]; }).length }; }),
       who: who, setWho: function (e) { self.setState({ who: e.target.value }); },
       whoOpts: [{ v: 'all', t: 'ทุกคน' }].concat(people.map(function (p) { return { v: p, t: p }; })),
       range: range, setRange: function (e) { self.setState({ range: e.target.value }); },
-      shownN: shown.length, totalN: range === 'all' ? all.length : all.filter(function (r) { return age(r[0]) < 90; }).length, filtered: f !== 'all' || who !== 'all' || range !== '90',
-      rows: shown.map(function (r) { var pf = r[4] === 'platform'; return { when: r[0], av: r[1], who: r[2], action: r[3], detail: r[5], site: r[6],
-        tr: 'border-top:1px solid #EEF0F3;background:' + (pf ? '#FFF4E5' : '#FFFFFF'),
-        tag: 'font-size:12px;padding:2px 8px;border-radius:6px;background:' + (pf ? '#FFF4E5;color:#8A3B06' : '#F3F4F6;color:#374151') }; })
+      shownN: shown.length, totalN: range === 'all' ? all.length : all.filter(function (r) { return age(r[0]) < 90; }).length, filtered: f !== 'all' || who !== 'all' || range !== '90' || !!qq,
+      rows: shown.map(function (r) { var pf = r[4] === 'platform'; return { when: r[0], av: r[1], who: r[2], action: EV[r[3]] || r[3], code: r[3], codeTitle: 'รหัสเหตุการณ์: ' + r[3], detail: r[5].indexOf('เปลี่ยนชื่อจาก') >= 0 ? r[5] : SFX(r[5]), site: r[6] === '—' ? '—' : DN(r[6]),
+        tr: 'border-top:1px solid #EEF0F3;background:' + (pf ? '#F0F7F5' : '#FFFFFF'),
+        // colour = meaning (Round 14): red removed/stopped, green added/approved, brand-light cross-org access, gray changes
+        tag: 'display:inline-block;font-size:12px;font-weight:600;white-space:nowrap;padding:2px 8px;border-radius:6px;background:' + (pf ? '#F0F7F5;color:#0A4F44;box-shadow:inset 0 0 0 1px #B9DACF' : /remove|suspend|cancel|leave|reject|return/.test(r[3]) ? '#FDECEA;color:#B42318' : /approve|join|create/.test(r[3]) ? '#E7F2EF;color:#0A4F44' : '#F3F4F6;color:#374151') }; })
     });
   }
 }

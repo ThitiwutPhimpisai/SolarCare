@@ -22,7 +22,7 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" back-keys="{{backKeys}}" eyebrow="{{eyebrow}}" icon="plug" title="{{device}}" subtitle="{{subtitle}}" hint-size="100%,120px"></dc-import>
+    <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" back-keys="{{backKeys}}" eyebrow="{{eyebrow}}" icon="plug" title="{{device}}" subtitle="{{subtitle}}" status-kind="device" status-value="{{devStatus}}" hint-size="100%,120px"></dc-import>
     <dc-import name="Devices" mode="detail" site="{{site}}" device="{{device}}" hint-size="100%,1200px"></dc-import>
   </div>
 </main>
@@ -84,6 +84,8 @@ class Component extends DCLogic {
       eyebrow: DD_ORG[org] + ' · ' + shown + ' · ' + (ed.prov || DD_PROV[site]),
       siteLabel: shown,
       subtitle: '',
+      // same status as the Devices list (Devices dvFleet: k1 INV-C03 alarm · บางนา INV-04 disconnected)
+      devStatus: site === 'ฟาร์มโคราช 1' && device === 'INV-C03' ? 'warn' : site === 'สาขาบางนา' && device === 'INV-04' ? 'offline' : 'online',
       // back follows where the device was opened from (sc.deviceFrom): Analytics · Reports · SiteDetail (default)
       backLabel: from === 'Analytics' ? 'วิเคราะห์' : from === 'Reports' ? 'รายงาน' : shown,
       backHref: from === 'Analytics' ? 'Analytics.dc.html' : from === 'Reports' ? 'Reports.dc.html' : 'SiteDetail.dc.html',

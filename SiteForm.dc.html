@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>เพิ่ม / แก้ไขไซต์</title>
+<title>เพิ่ม / แก้ไขไซต์ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -40,7 +40,7 @@ button{cursor:pointer}
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="sf-name" style="font-size: 13px; font-weight: 600">ชื่อไซต์</label>
             <input id="sf-name" value="{{name}}" onChange="{{setName}}" aria-required="true" aria-invalid="{{nameBad}}" aria-describedby="sf-name-err" placeholder="เช่น ฟาร์มโคราช 3" style="{{nameStyle}}">
-            <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><div id="sf-name-err" role="alert" style="font-size: 12px; color: #B42318">ใส่ชื่อไซต์อย่างน้อย 2 ตัวอักษร</div></sc-if>
+            <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><div id="sf-name-err" style="font-size: 12px; color: #B42318">ใส่ชื่อไซต์อย่างน้อย 2 ตัวอักษร</div></sc-if>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="sf-prov" style="font-size: 13px; font-weight: 600">จังหวัด</label>
@@ -59,7 +59,7 @@ button{cursor:pointer}
           <sc-if value="{{editingCyc}}" hint-placeholder-val="{{ false }}">
           <div style="display: flex; flex-direction: column; gap: 6px">
             <span style="font-size: 13px; font-weight: 600">รอบล้าง</span>
-            <span style="min-height: 44px; display: flex; align-items: center; font-size: 14px; color: #374151">{{cycNow}} · เปลี่ยนได้ที่หน้าไซต์ (ปุ่ม “เปลี่ยนรอบล้าง”)</span>
+            <span style="min-height: 44px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; color: #374151">{{cycNow}}<a href="SiteDetail.dc.html" onPointerDown="{{goCyc}}" onKeyDown="{{goCyc}}" onClick="{{goCyc}}" style="display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-weight: 600; color: #0F6B5C">เปลี่ยนที่การ์ดรอบล้างของไซต์<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a></span>
           </div>
           </sc-if>
         </div>
@@ -90,7 +90,7 @@ button{cursor:pointer}
               <input id="sf-lon" inputmode="decimal" aria-describedby="sf-geo-help sf-geo-err" aria-invalid="{{locBad}}" placeholder="เช่น 102.1000" value="{{lon}}" onChange="{{setLon}}" style="{{locStyle}}">
             </div>
           </div>
-          <sc-if value="{{locBad}}" hint-placeholder-val="{{ false }}"><div id="sf-geo-err" role="alert" style="font-size: 12px; color: #B42318">ปักหมุดบนแผนที่ หรือใส่ละติจูด 5.5–20.6 และลองจิจูด 97.3–105.7 (ในประเทศไทย)</div></sc-if>
+          <sc-if value="{{locBad}}" hint-placeholder-val="{{ false }}"><div id="sf-geo-err" style="font-size: 12px; color: #B42318">ปักหมุดบนแผนที่ หรือใส่ละติจูด 5.5–20.6 และลองจิจูด 97.3–105.7 (ในประเทศไทย)</div></sc-if>
         </fieldset>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
@@ -115,7 +115,7 @@ button{cursor:pointer}
               </li>
             </sc-for>
           </ul>
-          <p style="margin: 0; font-size: 13px; color: #374151">Org Owner และ Org Admin ของ {{orgName}} เห็นทุกไซต์อัตโนมัติ</p>
+          <p style="margin: 0; font-size: 13px; color: #374151">เจ้าของและผู้ดูแลองค์กรของ {{orgName}} เห็นทุกไซต์อัตโนมัติ</p>
           <p style="margin: 0; font-size: 13px; color: #4B5563; line-height: 1.6">คนอื่นต้องได้รับมอบสิทธิ์รายไซต์ก่อนถึงจะเห็น — ทำได้หลังบันทึก ที่หน้ารายละเอียดไซต์ หรือหน้าสมาชิก</p>
         </section>
         <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
@@ -123,7 +123,7 @@ button{cursor:pointer}
           <input id="sf-cover" type="file" accept="image/*" onChange="{{pickedCover}}" aria-label="เลือกภาพปกไซต์" style="display: none">
           <button type="button" onClick="{{chooseCover}}" aria-label="{{coverAria}}" style="cursor: pointer; min-height: 120px; border-radius: 10px; border: 2px dashed #9CA3AF; background: #FAFBFC; color: #4B5563; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 13px">
             <dc-import name="Icon" icon="upload" size="22" tone="current" hint-size="22px,22px"></dc-import>ลากรูปมาวาง หรือกดเพื่อเลือก</button>
-          <sc-if value="{{hasCoverNote}}" hint-placeholder-val="{{ false }}"><span role="status" style="font-size: 12px; color: #0F6B5C">{{coverNote}}</span></sc-if>
+          <span role="status" aria-live="polite" style="font-size: 12px; color: #0F6B5C">{{coverNote}}</span>
           <span style="font-size: 12px; color: #4B5563">ข้ามได้ ระบบใช้รูปตามประเภทการติดตั้งแทน</span>
         </section>
       </aside>
@@ -200,7 +200,7 @@ class Component extends DCLogic {
     var orgId = SF_ORGS[SS('sc.org')] ? SS('sc.org') : 'a';
     var org = Object.assign({}, SF_ORGS[orgId]);
     if (orgId === 'd' && SS('sc.createdName')) org.name = SS('sc.createdName');
-    var canEdit = org.role === 'Org Owner' || org.role === 'Org Admin';
+    var isAdmin = org.role === 'Org Owner' || org.role === 'Org Admin';
     var JSN = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
     var prevSites = JSN('sc.createdSites', []);
     // built-in sites + sites created in the prototype (sc.createdSites) are both editable
@@ -208,6 +208,8 @@ class Component extends DCLogic {
     var editRow = rows.filter(function (r) { return r[0] === SS('sc.editSite'); })[0] || null;
     var edits = JSN('sc.siteEdits', {}), cycSet = JSN('sc.siteCycle', {});
     if (editRow && !editRow[7] && edits[editRow[0]]) { var E = edits[editRow[0]]; editRow = [editRow[0], E.prov != null ? E.prov : editRow[1], E.kwp != null ? E.kwp : editRow[2], editRow[3], E.type || editRow[4], E.lat != null ? E.lat : editRow[5], E.lon != null ? E.lon : editRow[6], false, E.name || editRow[0]]; }
+    // asset.update: Owner/Admin on any site; a Site Manager only on the sites they manage (every site listed for them here) — same as Roles
+    var canEdit = isAdmin || (org.role === 'Site Manager' && !!editRow);
     var editKey = orgId + '|' + (editRow ? editRow[0] : '');
     if (this._editKey !== undefined && this._editKey !== editKey) {
       // switched between add and edit, or to another site: drop typed overrides
@@ -225,7 +227,7 @@ class Component extends DCLogic {
     var nameBad = !nameOk && (st.tried || st.touchedName), locBad = !locOk && (st.tried || st.touchedLoc);
     var editing = !!editRow, n = String(name).trim() || 'ไซต์ใหม่';
     // back goes to the page that opened the form (sc.siteFormFrom); editing always returns to the site
-    var FROM = { Sites: ['ไซต์ทั้งหมด', 'Sites.dc.html'], Main: ['ภาพรวม', 'Main.dc.html'], EnergyValue: ['พลังงานและผลตอบแทน', 'EnergyValue.dc.html'], Members: ['สมาชิกองค์กร', 'Members.dc.html'], CreateWorkOrder: ['สร้างใบงาน', 'CreateWorkOrder.dc.html'], SiteDetail: ['ไซต์ทั้งหมด', 'Sites.dc.html'] };
+    var FROM = { Sites: ['ไซต์', 'Sites.dc.html'], Main: ['ภาพรวม', 'Main.dc.html'], EnergyValue: ['พลังงานและผลตอบแทน', 'EnergyValue.dc.html'], Members: ['สมาชิกองค์กร', 'Members.dc.html'], CreateWorkOrder: ['สร้างใบงาน', 'CreateWorkOrder.dc.html'], SiteDetail: ['ไซต์ทั้งหมด', 'Sites.dc.html'] };
     var fromKey = FROM[SS('sc.siteFormFrom')] ? SS('sc.siteFormFrom') : 'Sites';
     var from = FROM[fromKey];
     var backHref = editing ? 'SiteDetail.dc.html' : from[1];
@@ -264,12 +266,13 @@ class Component extends DCLogic {
       pickedCover: function (e) { var f = e.target.files && e.target.files[0]; if (f) self.setState({ coverFile: f.name }); },
       coverAria: self.state.coverFile ? 'ภาพปกไซต์: ' + self.state.coverFile + ' · กดเพื่อเปลี่ยน' : 'อัปโหลดภาพปกไซต์', coverNote: self.state.coverFile ? 'เลือก ' + self.state.coverFile + ' แล้ว · อัปโหลดเมื่อบันทึก' : '', hasCoverNote: !!self.state.coverFile,
       allowed: canEdit, blocked: !canEdit,
-      blockTitle: editing ? 'แก้ไขไซต์ได้เฉพาะ Org Owner และ Org Admin' : 'เพิ่มไซต์ได้เฉพาะ Org Owner และ Org Admin',
-      blockText: 'คุณเป็น ' + org.role + ' ใน ' + org.name + ' จึง' + (editing ? 'ดูข้อมูลไซต์ได้แต่แก้ไขไม่ได้' : 'เพิ่มไซต์ใหม่ไม่ได้') + ' ขอให้ Org Owner หรือ Org Admin ขององค์กรทำแทน',
+      blockTitle: editing ? 'แก้ไขไซต์ได้เฉพาะเจ้าของ ผู้ดูแลองค์กร และผู้จัดการไซต์นี้' : 'เพิ่มไซต์ได้เฉพาะเจ้าของและผู้ดูแลองค์กร',
+      blockText: 'คุณเป็น' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' }[org.role] || org.role) + ' ใน ' + org.name + ' จึง' + (editing ? 'ดูข้อมูลไซต์ได้แต่แก้ไขไม่ได้' : 'เพิ่มไซต์ใหม่ไม่ได้') + (editing ? ' ขอให้ Org Owner, Org Admin หรือ Site Manager ของไซต์นี้ทำแทน' : ' ขอให้ Org Owner หรือ Org Admin ขององค์กรทำแทน'),
       pageTitle: editing ? 'แก้ไขไซต์' : 'เพิ่มไซต์',
       subtitle: editing ? (editRow[8] || editRow[0]) + ' · ' + org.name : 'ไซต์ใหม่จะอยู่ในองค์กร ' + org.name,
       backHref: backHref, backLabel: editing ? (editRow[8] || editRow[0]) : from[0], backLabelLong: editing ? 'กลับไปที่ ' + (editRow[8] || editRow[0]) : 'กลับไปที่' + from[0],
-      adding: !editing, editingCyc: editing, cycNow: cycCur ? 'ทุก ' + cycCur + ' วัน' : 'ยังไม่ตั้ง',
+      adding: !editing, editingCyc: editing,
+      goCyc: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.siteName', editRow ? editRow[0] : ''); ss.setItem('sc.siteTab', 'cycle'); } catch (x) {} }, cycNow: cycCur ? 'ทุก ' + cycCur + ' วัน' : 'ยังไม่ตั้ง',
       orgName: org.name, viewers: org.viewers,
       saveLabel: editing ? 'บันทึกการแก้ไข' : 'บันทึกไซต์',
       saveHref: editing ? 'SiteDetail.dc.html' : newHref,
@@ -278,7 +281,7 @@ class Component extends DCLogic {
         : 'sc.flash=' + newFlash + '|sc.newsite=' + nn + '|sc.newsitetype=' + type + '|sc.siteName=' + nn + '|sc.siteFrom=' + (fromKey === 'SiteDetail' ? 'Sites' : fromKey) + '|sc.editSite=|sc.createdSites=' + JSON.stringify(nextSites),
       nameBad: nameBad, locBad: locBad, nameStyle: field(nameBad), locStyle: field(locBad),
       valid: nameOk && locOk, invalid: !(nameOk && locOk),
-      tryAgain: function () { self.setState({ tried: true }); },
+      tryAgain: function () { self.setState({ tried: true }); setTimeout(function () { var el = document.querySelector('[aria-invalid="true"]'); if (el) el.focus(); }, 60); },
       name: name, prov: prov, kwp: kwp, cyc: cyc, lat: lat, lon: lon,
       setName: function (e) { self.setState({ name: e.target.value, touchedName: true }); },
       setProv: function (e) { self.setState({ prov: e.target.value }); },

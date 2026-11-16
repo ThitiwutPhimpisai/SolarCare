@@ -22,12 +22,13 @@ body{margin:0}
       <sc-if value="{{hasReason}}" hint-placeholder-val="{{ true }}">
         <div style="display: flex; flex-direction: column; gap: 6px">
           <label for="cd-reason" style="font-size: 13px; font-weight: 600">{{reasonLabel}}</label>
-          <textarea id="cd-reason" autoFocus="{{true}}" rows="3" value="{{reason}}" onChange="{{setReason}}" placeholder="{{reasonPlaceholder}}" style="padding: 10px 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical"></textarea>
+          <textarea id="cd-reason" autoFocus="{{true}}" rows="3" value="{{reason}}" onChange="{{setReason}}" placeholder="{{reasonPlaceholder}}" aria-describedby="{{hintId}}" style="padding: 10px 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; resize: vertical"></textarea>
+          <p id="{{hintId}}" aria-live="polite" style="margin: 0; font-size: 12px; color: #4B5563; display: flex; align-items: center; gap: 6px">{{hintText}}</p>
         </div>
       </sc-if>
       <div style="display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px">
         <button type="button" onClick="{{cancel}}" autoFocus="{{noReason}}" style="font-family: inherit; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; font-size: 14px; font-weight: 600; color: #374151; cursor: pointer">{{cancelLabel}}</button>
-        <button type="button" onClick="{{confirm}}" disabled="{{blocked}}" style="{{confirmStyle}}">{{confirmLabel}}</button>
+        <button type="button" onClick="{{confirm}}" disabled="{{blocked}}" aria-describedby="{{hintId}}" style="{{confirmStyle}}">{{confirmLabel}}</button>
       </div>
     </div>
   </div>
@@ -83,7 +84,8 @@ class Component extends DCLogic {
       toneIcon: v('tone', 'danger') === 'danger' ? 'alert' : 'info', toneBg: v('tone', 'danger') === 'danger' ? 'danger' : (v('tone', 'danger') === 'dark' ? 'gray' : 'brand'),
       confirmStyle: 'font-family: inherit; min-height: 44px; padding: 0 16px; border-radius: 8px; border: 0; font-size: 14px; font-weight: 600; color: #FFFFFF; cursor: pointer; background: ' + (tones[v('tone', 'danger')] || tones.danger) + (blocked ? '; opacity: 0.45; cursor: not-allowed' : ''),
       cancel: close,
-      dlgId: this.dlgId,
+      dlgId: this.dlgId, hintId: this.dlgId + '-hint',
+      hintText: blocked ? 'กรอก' + v('reasonLabel', 'เหตุผล').replace(/\s*\(บังคับ\)/, '') + 'ก่อน จึงจะกด “' + v('confirmLabel', 'ยืนยัน') + '” ได้' : 'พร้อมแล้ว กด “' + v('confirmLabel', 'ยืนยัน') + '” เพื่อยืนยัน',
       confirm: function () { if (blocked) return; var r = self.state.reason; self.setState({ reason: '' }); self.release(true); if (p.onConfirm) p.onConfirm(r); }
     };
   }

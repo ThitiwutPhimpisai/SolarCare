@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>เซสชันช่วยเหลือ · สยามโซลาร์ฟาร์ม</title>
+<title>เซสชันช่วยเหลือ (อ่านอย่างเดียว) · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -33,23 +33,23 @@ button{font-family:inherit}
     </div>
     <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
       <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between">
-        <div style="flex: 1 1 320px; min-width: 0">
-          <dc-import name="PageHeader" icon="overview" eyebrow="{{eyebrow}}" title="ภาพรวมการดูแลแผงโซลาร์" hint-size="100%,72px"></dc-import>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: #F3F4F6; color: #374151; font-size: 13px; font-weight: 600">
-          <dc-import name="Icon" icon="lock" size="14" hint-size="14px,14px"></dc-import>แก้ไขไม่ได้ในโหมดช่วยเหลือ</div>
-      </div>
+      <dc-import name="PageHeader" icon="overview" eyebrow="{{eyebrow}}" title="ภาพรวม" subtitle="โหมดช่วยเหลือ · ดูได้อย่างเดียว แก้ไขไม่ได้" hint-size="100%,96px"></dc-import>
 
-      <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
-        <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
-          <dc-import name="KpiCard" label="{{k.label}}" icon="{{k.icon}}" value="{{k.value}}" unit="{{k.unit}}" hint-size="100%,104px"></dc-import>
-        </sc-for>
+      <section aria-label="สถานะโดยรวม" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(16px, 2.5vw, 20px); display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center">
+        <div style="flex: 1 1 200px">
+          <span style="display: block; font-size: 14px; color: #4B5563">ใบงานเปิดอยู่</span>
+          <span style="display: block; font-size: 40px; font-weight: 700; line-height: 1.2">{{heroValue}}<span style="font-size: 16px; font-weight: 500; color: #4B5563"> ใบ</span></span>
+        </div>
+        <dl style="flex: 3 1 360px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px 24px; margin: 0">
+          <sc-for list="{{kpis}}" as="k" hint-placeholder-count="3">
+            <div style="border-left: 2px solid #EEF0F3; padding-left: 12px"><dt style="font-size: 13px; color: #4B5563">{{k.label}}</dt><dd style="margin: 2px 0 0; font-size: 22px; font-weight: 700">{{k.value}}<span style="font-size: 13px; font-weight: 500; color: #4B5563"> {{k.unit}}</span></dd></div>
+          </sc-for>
+        </dl>
       </section>
 
       <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
         <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
-          <h2 style="margin: 0; font-size: 16px">ไซต์ทั้งหมด</h2>
+          <h2 style="margin: 0; font-size: 16px">ไซต์</h2>
           <span title="แก้ไขไม่ได้ในโหมดช่วยเหลือ"><dc-import name="Button" variant="primary" label="เพิ่มไซต์" icon="plus" disabled="{{true}}" hint-size="120px,44px"></dc-import></span>
         </div>
         <div style="overflow-x: auto">
@@ -69,7 +69,7 @@ button{font-family:inherit}
             </tbody>
           </table>
         </div>
-        <div style="padding: 12px 20px; border-top: 1px solid #EEF0F3; font-size: 13px; color: #4B5563">ทุกหน้าที่เปิดในเซสชันนี้ถูกบันทึกใน Audit log ขององค์กรและของแพลตฟอร์ม</div>
+        <div style="padding: 12px 20px; border-top: 1px solid #EEF0F3; font-size: 13px; color: #4B5563">ทุกหน้าที่เปิดในเซสชันนี้ถูกบันทึกในประวัติการใช้งานขององค์กรและของแพลตฟอร์ม</div>
       </section>
       </div>
     </main>
@@ -173,9 +173,9 @@ class Component extends DCLogic {
       endKeys: 'sc.from=|sc.pdTab=access|sc.flash=จบเซสชันช่วยเหลือแล้ว · บันทึกในประวัติการเข้าถึงขององค์กรแล้ว',
       eyebrow: o.name + ' / ทุกไซต์',
       o: o, noRows: o.rows.length === 0, reason: SS('sc.supportReason') || 'ไม่ได้ระบุเหตุผล',
+      heroValue: o.open,
       kpis: [
         { label: 'กำลังติดตั้งรวม', icon: 'panel', value: o.kwp, unit: 'kWp' },
-        { label: 'ใบงานเปิดอยู่', icon: 'workorder', value: o.open, unit: '' },
         { label: 'เลยกำหนดล้าง', icon: 'clock', value: o.late, unit: 'ไซต์' },
         { label: 'สมาชิก', icon: 'users', value: o.members, unit: 'คน' }
       ],

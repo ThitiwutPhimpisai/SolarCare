@@ -21,21 +21,24 @@ body{margin:0}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827">
+  <sc-if value="{{stLoading}}" hint-placeholder-val="{{ false }}">
+    <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px"><dc-import name="ListState" state="loading" unit="ผลวิเคราะห์" rows="3" hint-size="100%,200px"></dc-import></div>
+  </sc-if>
+  <sc-if value="{{stError}}" hint-placeholder-val="{{ false }}">
+    <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px"><dc-import name="ListState" state="error" unit="ผลวิเคราะห์" icon="trend" error-text="{{stErrorText}}" on-retry="{{retry}}" hint-size="100%,220px"></dc-import></div>
+  </sc-if>
 
   <sc-if value="{{vKpis}}" hint-placeholder-val="{{ false }}">
-    <div role="group" aria-label="สรุปการวิเคราะห์" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px">
-      <sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
-        <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; min-width: 0">
-          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4B5563"><dc-import name="Icon" icon="{{k.icon}}" size="16" bg="{{k.bg}}" hint-size="28px,28px"></dc-import>{{k.label}}</div>
-          <div style="font-size: 22px; font-weight: 700; line-height: 1.3">{{k.value}}<span style="font-size: 13px; font-weight: 500; color: #4B5563"> {{k.unit}}</span></div>
-          <div style="font-size: 12px; color: #4B5563">{{k.note}}</div>
-        </div>
-      </sc-for>
-    </div>
+    <p role="group" aria-label="สรุปการวิเคราะห์" style="margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 14px; color: #374151">
+      <span style="display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="alert" size="16" tone="{{kTone}}" hint-size="16px,16px"></dc-import><b style="color: #111827">ข้อสังเกตที่เปิดอยู่ {{kCount}} รายการ</b></span>
+      <span style="color: #4B5563">{{kSplit}}</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="coin" size="16" tone="muted" hint-size="16px,16px"></dc-import>ไฟที่เสียและควรแก้ <b style="{{kLossStyle}}">{{kLoss}}</b></span>
+    </p>
   </sc-if>
 
   <sc-if value="{{vFindings}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0">{{fHeading}}</h2>
       <sc-if value="{{fOrderNote}}" hint-placeholder-val="{{ true }}">
         <div style="font-size: 13px; color: #4B5563">{{fOrderText}}</div>
       </sc-if>
@@ -46,32 +49,39 @@ body{margin:0}
         </div>
       </sc-if>
       <sc-for list="{{findings}}" as="f" hint-placeholder-count="3">
-        <article aria-labelledby="{{f.hid}}" style="{{f.cardStyle}}">
+        <article id="{{f.aid}}" aria-labelledby="{{f.hid}}" style="{{f.cardStyle}}">
           <div style="display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center">
-            <span style="{{f.sevStyle}}">{{f.sevLabel}}</span>
+            <dc-import name="StatusPill" kind="severity" value="{{f.sevKey}}" label="{{f.sevLabel}}" hint-size="96px,24px"></dc-import>
             <span style="{{f.tagStyle}}">{{f.tag}}</span>
-            <span style="font-size: 12px; color: #374151; font-weight: 600">ความเชื่อมั่น {{f.conf}}%</span>
-            <span style="font-size: 12px; color: #4B5563">· ตั้งแต่ {{f.since}}</span>
           </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: flex-start; justify-content: space-between">
             <div style="flex: 1 1 320px; min-width: 0">
               <h3 id="{{f.hid}}" style="margin: 0; font-size: 16px; line-height: 1.4">{{f.title}}</h3>
               <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{f.where}}</div>
               <p style="margin: 8px 0 0; font-size: 14px; line-height: 1.6">{{f.text}}</p>
-              <sc-if value="{{f.showEv}}" hint-placeholder-val="{{ true }}">
-                <ul style="margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: #374151; line-height: 1.7">
-                  <sc-for list="{{f.ev}}" as="e" hint-placeholder-count="3"><li>{{e.t}}</li></sc-for>
-                </ul>
-              </sc-if>
             </div>
-            <div style="flex: 0 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
-              <div style="font-size: 12px; color: #4B5563">{{f.sparkLabel}}</div>
-              <svg width="220" height="48" viewBox="0 0 220 48" role="img" aria-label="{{f.sparkAria}}" style="display: block; max-width: 100%; height: auto"><line x1="0" y1="{{f.zeroY}}" x2="220" y2="{{f.zeroY}}" stroke="#E3E6EB" stroke-width="1"></line><polyline points="{{f.spark}}" fill="none" stroke="{{f.sparkColor}}" stroke-width="2" stroke-linejoin="round"></polyline></svg>
-              <div style="font-size: 13px; color: #4B5563"><b style="font-size: 16px; color: #111827">{{f.lossText}}</b> {{f.lossSub}}</div>
+            <div style="flex: 0 0 auto; text-align: right; display: flex; flex-direction: column; gap: 2px; align-items: flex-end">
+              <span style="font-size: 18px; font-weight: 700; color: {{f.lossColor}}">{{f.lossText}}</span>
+              <span style="font-size: 12px; color: #4B5563">{{f.lossSub}}</span>
+              <span style="font-size: 12px; color: #374151">ความเชื่อมั่น {{f.conf}}% · ตั้งแต่ {{f.since}}</span>
             </div>
           </div>
+          <sc-if value="{{f.showEvBtn}}" hint-placeholder-val="{{ true }}">
+            <button type="button" class="in-btn" onClick="{{f.toggleEv}}" aria-expanded="{{f.evOpen}}" aria-controls="{{f.evId}}" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 4px; border: 0; background: transparent; font-size: 13px; font-weight: 600; color: #0F6B5C"><dc-import name="Icon" icon="{{f.evIcon}}" size="16" hint-size="16px,16px"></dc-import>{{f.evLabel}}</button>
+          </sc-if>
+          <sc-if value="{{f.showEv}}" hint-placeholder-val="{{ false }}">
+            <div id="{{f.evId}}" style="display: flex; flex-wrap: wrap; gap: 12px 24px; padding: 12px 14px; border-radius: 8px; background: #F7F8FA">
+              <ul style="flex: 1 1 300px; margin: 0; padding-left: 18px; font-size: 13px; color: #374151; line-height: 1.7">
+                <sc-for list="{{f.ev}}" as="e" hint-placeholder-count="3"><li>{{e.t}}</li></sc-for>
+              </ul>
+              <div style="flex: 0 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+                <div style="font-size: 12px; color: #4B5563">{{f.sparkLabel}}</div>
+                <svg width="220" height="48" viewBox="0 0 220 48" role="img" aria-label="{{f.sparkAria}}" style="display: block; max-width: 100%; height: auto"><line x1="0" y1="{{f.zeroY}}" x2="220" y2="{{f.zeroY}}" stroke="#E3E6EB" stroke-width="1"></line><polyline points="{{f.spark}}" fill="none" stroke="{{f.sparkColor}}" stroke-width="2" stroke-linejoin="round"></polyline></svg>
+              </div>
+            </div>
+          </sc-if>
           <sc-if value="{{f.hasActions}}" hint-placeholder-val="{{ true }}">
-            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border-top: 1px solid #EEF0F3; padding-top: 12px">
               <sc-if value="{{f.hasPrimary}}" hint-placeholder-val="{{ true }}">
                 <dc-import name="Button" variant="primary" icon="{{f.pIcon}}" label="{{f.pLabel}}" href="{{f.pHref}}" save-keys="{{f.pKeys}}" hint-size="180px,44px"></dc-import>
               </sc-if>
@@ -99,14 +109,14 @@ body{margin:0}
       <sc-if value="{{cReady}}" hint-placeholder-val="{{ true }}">
         <section aria-labelledby="in-cmp-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
           <div>
-            <h3 id="in-cmp-h" style="margin: 0; font-size: 16px">พลังงานจริงเทียบที่ควรได้ · {{cGroupLabel}}</h3>
+            <h2 id="in-cmp-h" style="margin: 0; font-size: 16px">พลังงานจริงเทียบที่ควรได้ · {{cGroupLabel}}</h2>
             <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{cCaption}}</div>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #374151">
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B42318"></span>ต่ำกว่าคาดเกิน 5%</span>
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B54708"></span>ต่ำกว่าคาด 2–5%</span>
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #858D9B"></span>ใกล้เคียงที่คาด</span>
-            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3730A3"></span>PM2.5</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #6B7280"></span>PM2.5</span>
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1D4ED8"></span>ฝน</span>
           </div>
           <div role="img" aria-label="{{cAria}}" style="display: flex; flex-direction: column; gap: 6px; overflow-x: auto">
@@ -139,7 +149,7 @@ body{margin:0}
 
         <section aria-labelledby="in-lg-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
           <div style="padding: 16px 20px 8px">
-            <h3 id="in-lg-h" style="margin: 0; font-size: 16px">เปรียบเทียบรายไซต์</h3>
+            <h2 id="in-lg-h" style="margin: 0; font-size: 16px">เปรียบเทียบรายไซต์</h2>
             <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{lgCaption}}</div>
           </div>
           <table class="rt" aria-label="เปรียบเทียบรายไซต์" style="width: 100%; border-collapse: collapse; font-size: 14px">
@@ -154,7 +164,7 @@ body{margin:0}
 
         <section aria-labelledby="in-peer-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
           <div>
-            <h3 id="in-peer-h" style="margin: 0; font-size: 16px">อินเวอร์เตอร์เทียบกลุ่ม · {{peerSite}}</h3>
+            <h2 id="in-peer-h" style="margin: 0; font-size: 16px">อินเวอร์เตอร์เทียบกลุ่ม · {{peerSite}}</h2>
             <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{peerCaption}}</div>
           </div>
           <sc-for list="{{peerZones}}" as="z" hint-placeholder-count="2">
@@ -188,14 +198,14 @@ body{margin:0}
         </div>
         <section aria-labelledby="in-fc-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
           <div>
-            <h3 id="in-fc-h" style="margin: 0; font-size: 16px">พยากรณ์พลังงาน 14 วัน · {{fcSite}}</h3>
+            <h2 id="in-fc-h" style="margin: 0; font-size: 16px">พยากรณ์พลังงาน 14 วัน · {{fcSite}}</h2>
             <div style="font-size: 13px; color: #4B5563; margin-top: 2px">{{fcCaption}}</div>
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #374151">
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #B9DACF"></span>ช่วงที่น่าจะเป็น</span>
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 3px; background: #0F6B5C"></span>ค่าคาดการณ์</span>
             <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #1D4ED8"></span>ฝน</span>
-            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3730A3"></span>PM2.5</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #6B7280"></span>PM2.5</span>
           </div>
           <div role="img" aria-label="{{fcAria}}" style="display: flex; flex-direction: column; gap: 6px">
             <div class="in-track" style="grid-template-columns: repeat(14, minmax(0, 1fr)); height: 120px; border-bottom: 1px solid #D5D9E0">
@@ -223,7 +233,7 @@ body{margin:0}
         </section>
         <section aria-labelledby="in-soil-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
           <div style="padding: 16px 20px 8px">
-            <h3 id="in-soil-h" style="margin: 0; font-size: 16px">ฝุ่นสะสมและวันที่ควรล้าง</h3>
+            <h2 id="in-soil-h" style="margin: 0; font-size: 16px">ฝุ่นสะสมและวันที่ควรล้าง</h2>
             <div style="font-size: 13px; color: #4B5563; margin-top: 2px">จุดคุ้มทุน = วันที่ไฟที่เสียจากฝุ่นสะสมรวมแล้วเท่ากับค่าล้าง (รวมผลฝน และ PM2.5 ที่พยากรณ์)</div>
           </div>
           <table class="rt" aria-label="ฝุ่นสะสมและวันที่ควรล้าง" style="width: 100%; border-collapse: collapse; font-size: 14px">
@@ -253,7 +263,7 @@ body{margin:0}
       </div>
       <section aria-labelledby="in-src-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
         <div style="padding: 16px 20px 8px">
-          <h3 id="in-src-h" style="margin: 0; font-size: 16px">ข้อมูลภายนอกของแต่ละไซต์ · ล่าสุด</h3>
+          <h2 id="in-src-h" style="margin: 0; font-size: 16px">ข้อมูลภายนอกของแต่ละไซต์ · ล่าสุด</h2>
           <div style="font-size: 13px; color: #4B5563; margin-top: 2px">สถานี PM2.5 ที่ใกล้ที่สุดและจุดพิกัดพยากรณ์อากาศ</div>
         </div>
         <table class="rt" aria-label="ข้อมูลภายนอกของแต่ละไซต์" style="width: 100%; border-collapse: collapse; font-size: 14px">
@@ -266,7 +276,7 @@ body{margin:0}
         </table>
       </section>
       <section aria-labelledby="in-mth-h" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px 20px">
-        <h3 id="in-mth-h" style="margin: 0 0 8px; font-size: 16px">วิธีวิเคราะห์</h3>
+        <h2 id="in-mth-h" style="margin: 0 0 8px; font-size: 16px">วิธีวิเคราะห์</h2>
         <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #374151; line-height: 1.8">
           <sc-for list="{{methods}}" as="m" hint-placeholder-count="4"><li>{{m.t}}</li></sc-for>
         </ul>
@@ -276,9 +286,9 @@ body{margin:0}
 
   <sc-if value="{{vSumMain}}" hint-placeholder-val="{{ false }}">
     <a href="Analytics.dc.html" onPointerDown="{{sumGo}}" onKeyDown="{{sumGo}}" onClick="{{sumGo}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 8px 20px; text-decoration: none; color: #111827; flex-wrap: wrap; border-top: 1px solid #EEF0F3">
-      <dc-import name="Icon" icon="trend" size="18" bg="info" hint-size="32px,32px"></dc-import>
+      <dc-import name="Icon" icon="trend" size="18" bg="brand" hint-size="32px,32px"></dc-import>
       <span style="flex: 1 1 240px; min-width: 0">
-        <span style="display: block; font-size: 12px; font-weight: 700; color: #1E3A8A">{{sumKind}}</span>
+        <span style="display: block; font-size: 12px; font-weight: 700; color: #0A4F44">{{sumKind}}</span>
         <span style="display: block; font-weight: 600">{{sumTitle}}</span>
         <span style="display: block; font-size: 13px; color: #4B5563">{{sumMeta}}</span>
       </span>
@@ -287,26 +297,37 @@ body{margin:0}
   </sc-if>
 
   <sc-if value="{{vSumSite}}" hint-placeholder-val="{{ false }}">
-    <div role="note" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border-radius: 12px; background: #DCE7FB; border: 1px solid #DCE7FB; font-size: 14px; color: #1E3A8A">
-      <dc-import name="Icon" icon="trend" size="18" tone="info" hint-size="18px,18px"></dc-import>
+    <div role="note" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 16px; border-radius: 12px; background: #F0F7F5; border: 1px solid #B9DACF; font-size: 14px; color: #0A4F44">
+      <dc-import name="Icon" icon="trend" size="18" tone="brand" hint-size="18px,18px"></dc-import>
       <span style="flex: 1 1 220px; min-width: 0"><b>ข้อสังเกต: {{sumTitle}}</b> · {{sumMeta}}</span>
-      <a href="Analytics.dc.html" onPointerDown="{{sumGo}}" onKeyDown="{{sumGo}}" onClick="{{sumGo}}" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; color: #1E3A8A">ดูการวิเคราะห์ →</a>
+      <a href="Analytics.dc.html" onPointerDown="{{sumGo}}" onKeyDown="{{sumGo}}" onClick="{{sumGo}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600; color: #0F6B5C">ดูการวิเคราะห์<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
     </div>
   </sc-if>
 
+  <sc-if value="{{vRow}}" hint-placeholder-val="{{ false }}">
+    <a href="Analytics.dc.html" onPointerDown="{{rowGo}}" onKeyDown="{{rowGo}}" onClick="{{rowGo}}" style="{{rowBox}}">
+      <dc-import name="Icon" icon="trend" size="18" bg="{{rowTone}}" hint-size="32px,32px"></dc-import>
+      <span style="flex: 1 1 auto; min-width: 0">
+        <span style="display: block; font-weight: 600">{{rowText}}</span>
+        <span style="display: block; font-size: 13px; color: #4B5563; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{rowSub}}</span>
+      </span>
+      <span style="flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #0F6B5C">ดูการวิเคราะห์<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></span>
+    </a>
+  </sc-if>
+
   <sc-if value="{{vDevice}}" hint-placeholder-val="{{ false }}">
-    <div role="note" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; padding: 14px 16px; border-radius: 12px; background: #DCE7FB; color: #1E3A8A">
-      <dc-import name="Icon" icon="trend" size="20" tone="info" hint-size="20px,20px"></dc-import>
+    <div role="note" style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; padding: 14px 16px; border-radius: 12px; background: #F0F7F5; border: 1px solid #B9DACF; color: #0A4F44">
+      <dc-import name="Icon" icon="trend" size="20" tone="brand" hint-size="20px,20px"></dc-import>
       <div style="flex: 1 1 260px; min-width: 0">
         <div style="font-weight: 600">จากการวิเคราะห์ · {{devTitle}}</div>
-        <div style="font-size: 13px; margin-top: 2px; color: #1E3A8A">{{devText}}</div>
+        <div style="font-size: 13px; margin-top: 2px; color: #0A4F44">{{devText}}</div>
       </div>
-      <a href="Analytics.dc.html" onPointerDown="{{devGo}}" onKeyDown="{{devGo}}" onClick="{{devGo}}" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; color: #1E3A8A">ดูการวิเคราะห์ →</a>
+      <a href="Analytics.dc.html" onPointerDown="{{devGo}}" onKeyDown="{{devGo}}" onClick="{{devGo}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600; color: #0F6B5C">ดูการวิเคราะห์<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
     </div>
   </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"view":{"editor":"enum","options":["findings","kpis","compare","forecast","sources","summary","device"],"default":"findings"},"site":{"editor":"text","default":"all"},"limit":{"editor":"int","default":0},"compact":{"editor":"boolean","default":false},"place":{"editor":"enum","options":["main","site"],"default":"main"},"device":{"editor":"text","default":""},"focus":{"editor":"text","default":""},"$preview":{"width":1100,"height":900}}'>
+<script type="text/x-dc" data-dc-script data-props='{"view":{"editor":"enum","options":["findings","kpis","compare","forecast","sources","summary","device","row"],"default":"findings"},"state":{"editor":"enum","options":["ready","loading","error"],"default":"ready"},"site":{"editor":"text","default":"all"},"limit":{"editor":"int","default":0},"compact":{"editor":"boolean","default":false},"place":{"editor":"enum","options":["main","site","device"],"default":"main"},"device":{"editor":"text","default":""},"bare":{"editor":"boolean","default":false},"focus":{"editor":"text","default":""},"$preview":{"width":1100,"height":900}}'>
 // ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
 var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
 var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
@@ -370,18 +391,18 @@ var IN_SITES = {
   lp: { name: 'โรงงาน A ลำพูน', org: 'c', prov: 'ลำพูน', kwp: 2300, panels: 4180, rate: 20, tariff: 4.18, cycle: 30, last: inD(2026, 10, 30), pr: 0.81, soil: 1.4, pm: 40, gf: 0.97, cur: 1.4, due: '29 พ.ย. 69', tip: 'คงรอบ 30 วัน · ห้ามขยายช่วง ธ.ค.–มี.ค.', station: 'สถานีตรวจวัด อ.เมืองลำพูน · 7 กม.', lat: 18.58, lon: 99.02, temp: 30, zones: [['', 13]] },
   e1: { name: 'หลังคาอาคาร A หัวหิน', org: 'e', prov: 'ประจวบคีรีขันธ์', kwp: 210, panels: 380, rate: 20, tariff: 4.18, cycle: 0, last: null, pr: 0.80, soil: 1.7, pm: 24, gf: 1.0, cur: null, due: 'ยังไม่ตั้งรอบ', tip: 'ตั้งรอบล้างที่หน้าไซต์ · ต้องมีข้อมูล 14 วันก่อนวิเคราะห์', station: 'สถานีตรวจวัด อ.หัวหิน · 3 กม.', lat: 12.57, lon: 99.96, temp: 30, zones: [['', 4]] }
 };
-// ---- energy truth (DATA.md Round 12): monthly energy e (kWh) and irradiation h (kWh/kWp) per site, ธ.ค. 68 – พ.ย. 69 (พ.ย. 69 = 1–15 พ.ย.),
+// ---- energy truth (DATA.md Round 12): monthly energy e (kWh) and irradiation h (kWh/kWp) per site, ธ.ค. 68 – พ.ย. 69 (พ.ย. 69 = 1–14 พ.ย. + วันนี้ถึง 10:40),
 // copied from EnergyStats ES_DATA after its month-to-date step; daily split and the 2568 reuse follow EnergyStats esSlot/esW exactly
-var IN_ES = {"k1":{"kwp":8400,"e":[1030378,1067136,1122744,1220184,1167180,1102080,982926,947083,964320,935474,967092,492030],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"k2":{"kwp":6200,"e":[749208,803520,803427,903960,862575,803520,714705,713124,703080,680202,728190,369675],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"bp":{"kwp":1150,"e":[138092,141864,140962,151731,158988,141864,131732,125904,127190,122358,125396,63221],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"lb":{"kwp":960,"e":[114693,122880,122993,138240,132048,118426,105374,109056,105638,105984,109411,57600],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"rs":{"kwp":420,"e":[51072,53760,54768,60480,58800,53760,48720,47712,47040,46368,48720,24822],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"bn":{"kwp":380,"e":[44129,47424,47322,53352,50806,47424,42096,42089,40645,40903,42096,21346],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"lp":{"kwp":2300,"e":[283176,298080,303669,335340,326025,298080,270135,264546,260820,257094,270135,137828],"h":[152,160,163,180,175,160,145,142,140,138,145,75]},"e1":{"kwp":210,"e":[24227,25066,25056,27140,25909,23654,21437,20993,20698,20402,21437,11088],"h":[152,160,163,180,175,160,145,142,140,138,145,75]}};
+var IN_ES = {"k1":{"kwp":8400,"e":[1030378,1067136,1122744,1220184,1167180,1102080,982926,947083,964320,935474,967092,469725],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"k2":{"kwp":6200,"e":[749208,803520,803427,903960,862575,803520,714705,713124,703080,680202,728190,352916],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"bp":{"kwp":1150,"e":[138092,141864,140962,151731,158988,141864,131732,125904,127190,122358,125396,60355],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"lb":{"kwp":960,"e":[114693,122880,122993,138240,132048,118426,105374,109056,105638,105984,109411,54989],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"rs":{"kwp":420,"e":[51072,53760,54768,60480,58800,53760,48720,47712,47040,46368,48720,23697],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"bn":{"kwp":380,"e":[44129,47424,47322,53352,50806,47424,42096,42089,40645,40903,42096,20379],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"lp":{"kwp":2300,"e":[283176,298080,303669,335340,326025,298080,270135,264546,260820,257094,270135,131579],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]},"e1":{"kwp":210,"e":[24930,25771,25809,27972,26864,25469,23477,22932,22491,22546,23751,11532],"h":[152,160,163,180,175,160,145,142,140,138,145,71.6]}};
 // current soiling (%) on 15 พ.ย. 2569 — identical to EnergyStats ES_SOIL_NOW
 var IN_SOIL_NOW = { k1: 1.1, k2: 2.9, bp: 6.2, lb: 0.5, rs: 1.4, bn: 3.6, lp: 0.8, e1: 4.1 };
-function inW(d) { return 1 + 0.18 * Math.sin(d * 2.3) + 0.08 * Math.cos(d * 0.7); }
+function inW(d) { return (1 + 0.18 * Math.sin(d * 2.3) + 0.08 * Math.cos(d * 0.7)) * (d === SCR_TODAY ? 0.32 : 1); } // today counts only up to 10:40 (EnergyStats ES_TODAY_FRAC)
 var IN_SLOT = {};
 function inEsSlot(d) {
   var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), key = y + '-' + m;
   if (IN_SLOT[key] !== undefined) return IN_SLOT[key];
   var i = null, scale = 1, hs = 1;
-  if (y === 2025 && m <= 10) { i = m + 1; hs = m === 10 ? 2 : 1; scale = 0.985 * hs; } else if (y === 2025 && m === 11) { i = 0; } else if (y === 2026 && m <= 10) { i = m + 1; }
+  if (y === 2025 && m <= 10) { i = m + 1; hs = m === 10 ? 30 / 14.32 : 1; scale = 0.985 * hs; } else if (y === 2025 && m === 11) { i = 0; } else if (y === 2026 && m <= 10) { i = m + 1; }
   if (i === null) { IN_SLOT[key] = null; return null; }
   var s0 = Math.round(Date.UTC(y, m, 1) / 864e5), e0 = Math.round(Date.UTC(y, m + 1, 0) / 864e5);
   if (y === 2026 && m === 10) e0 = SCR_TODAY;
@@ -504,9 +525,9 @@ function inFindings(ctx) {
       ev: ['ไฟที่ไม่ได้บันทึกถึงตอนนี้ ≈ 96 kWh (ประเมินจาก INV-01–03, 05–06)', 'เครื่องที่เหลือผลิตปกติ (±1.2% จากค่ากลาง)', 'ถ้ายังไม่แก้ ≈ ' + inFmt(bnDay) + ' kWh/วัน'],
       spark: off, sparkLabel: 'ผลผลิตเทียบเครื่องอื่นในไซต์ 14 วัน (%)',
       p: ['สร้างใบงานซ่อม', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=สาขาบางนา|sc.woType=repair|sc.device=INV-04', 'wrench'], s: ['ดูอุปกรณ์ INV-04', 'DeviceDetail.dc.html', 'sc.device=INV-04|sc.siteName=สาขาบางนา|sc.deviceFrom=Analytics', 'plug'], repairDevice: 'INV-04' },
-    { id: 'f2', site: 'k1', sev: 'med', notAlarm: true, conf: 78, since: '6 พ.ย. 2569', title: 'INV-B04 ผลิตต่ำกว่ากลุ่ม 5.8% · ไม่มี alarm', device: 'INV-B04', lossKwh: 93, lossBaht: 93 * 2.20,
+    { id: 'f2', site: 'k1', sev: 'med', notAlarm: true, conf: 78, since: '6 พ.ย. 2569', title: 'INV-B04 ผลิตต่ำกว่ากลุ่ม 5.8% · อินเวอร์เตอร์ไม่แจ้งเตือน', device: 'INV-B04', lossKwh: 93, lossBaht: 93 * 2.20,
       text: 'ผลผลิตจำเพาะต่ำกว่าค่ากลางของอินเวอร์เตอร์โซน B ต่อเนื่อง 9 วัน ต่ำเท่ากันทั้งวันจึงไม่ใช่เงาบัง และยังต่ำหลังล้างโซน B เมื่อ 14 พ.ย. น่าจะเป็นมูลนกจุดที่ล้างไม่ถึงหรือขั้วต่อสตริง 3–4',
-      ev: ['ผลผลิตจำเพาะ −5.8% เทียบค่ากลางโซน B (6 เครื่อง)', 'สตริง 3–4 ต่ำสุด (−9%)', 'ไม่มี alarm จาก inverter ตลอดช่วง'],
+      ev: ['ผลผลิตจำเพาะ −5.8% เทียบค่ากลางโซน B (6 เครื่อง)', 'สตริง 3–4 ต่ำสุด (−9%)', 'ไม่มีการแจ้งเตือนจากอินเวอร์เตอร์ ตลอดช่วง'],
       spark: b04, sparkLabel: 'ส่วนต่างจากค่ากลางกลุ่ม 14 วัน (%)',
       p: ['สร้างใบงานตรวจ', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=ฟาร์มโคราช 1|sc.woType=inspect|sc.device=INV-B04', 'plus'], s: ['ดูอุปกรณ์ INV-B04', 'DeviceDetail.dc.html', 'sc.device=INV-B04|sc.siteName=ฟาร์มโคราช 1|sc.deviceFrom=Analytics', 'plug'] },
     { id: 'f3', site: 'lb', sev: 'med', notAlarm: true, conf: 70, since: '9 พ.ย. 2569', title: 'มิเตอร์อ่านต่ำกว่าผลรวมอินเวอร์เตอร์ 3.4%', device: 'Meter', lossKwh: null, lossBaht: null,
@@ -520,7 +541,7 @@ function inFindings(ctx) {
       spark: lpPm, sparkLabel: 'PM2.5 พยากรณ์ 14 วัน (µg/m³)',
       p: ['ดูรอบล้างของไซต์', 'SiteDetail.dc.html', 'sc.siteName=โรงงาน A ลำพูน|sc.siteFrom=Analytics', 'calendar'], s: null },
     { id: 'f7', site: 'lp', sev: 'low', notAlarm: true, conf: 66, since: '20 ต.ค. 2569', title: 'กำลังถูกจำกัดจากความร้อนช่วงบ่าย 3.1%', device: 'INV-07', lossKwh: lpKwh, lossBaht: lpKwh * 4.18,
-      text: 'INV-07, INV-09 และ INV-12 ที่ติดผนังด้านตะวันตกร้อน 61–64 °C ช่วง 12:00–15:00 และลดกำลังเองโดยไม่แจ้ง alarm ควรตรวจการระบายอากาศหรือติดตั้งหลังคากันแดด',
+      text: 'INV-07, INV-09 และ INV-12 ที่ติดผนังด้านตะวันตกร้อน 61–64 °C ช่วง 12:00–15:00 และลดกำลังเองโดยไม่แจ้งเตือน ควรตรวจการระบายอากาศหรือติดตั้งหลังคากันแดด',
       ev: ['อุณหภูมิภายใน 61–64 °C ช่วง 12:00–15:00', 'กำลังช่วงบ่ายต่ำกว่าเครื่องอื่น 3.1%', 'เครื่องอื่น 10 เครื่องไม่เกิน 52 °C'],
       spark: der, sparkLabel: 'ส่วนต่างช่วงบ่ายเทียบกลุ่ม 14 วัน (%)',
       p: ['สร้างใบงานตรวจ', 'CreateWorkOrder.dc.html', 'sc.from=Analytics|sc.siteName=โรงงาน A ลำพูน|sc.woType=inspect|sc.device=INV-07', 'plus'], s: null },
@@ -550,7 +571,9 @@ function inCtx() {
 function inSiteId(v, ctx) { if (!v || v === 'all') return 'all'; if (IN_SITES[v]) return ctx.sites.indexOf(v) >= 0 ? v : 'all'; var id = IN_BYNAME[v]; return id && ctx.sites.indexOf(id) >= 0 ? id : 'all'; }
 function inRanked(ctx, site) {
   var all = inFindings(ctx).filter(function (f) { return ctx.sites.indexOf(f.site) >= 0 && (site === 'all' || f.site === site); });
-  all.sort(function (x, y) { var a = IN_SEV[x.sev][0], b = IN_SEV[y.sev][0]; return a !== b ? a - b : (y.lossBaht || 0) - (x.lossBaht || 0); });
+  // DATA.md round 14: rank by impact — findings to act on (high/medium) by ฿/day, then ones with no ฿ estimate, then low/info, forecasts last
+  var grp = function (f) { return f.forecast ? 3 : (f.sev === 'low' || f.sev === 'info') ? 2 : f.lossBaht == null ? 1 : 0; };
+  all.sort(function (x, y) { var gx = grp(x), gy = grp(y); if (gx !== gy) return gx - gy; var d = (y.lossBaht || 0) - (x.lossBaht || 0); return d !== 0 ? d : IN_SEV[x.sev][0] - IN_SEV[y.sev][0]; });
   return all;
 }
 function inSpark(vals) {
@@ -558,7 +581,7 @@ function inSpark(vals) {
   var y = function (v) { return Math.round((4 + (mx - v) / (mx - mn) * 40) * 10) / 10; };
   return { pts: vals.map(function (v, i) { return Math.round(i * 220 / (vals.length - 1)) + ',' + y(v); }).join(' '), zero: y(0) };
 }
-var IN_BLANK = {"vKpis": false, "kpis": [], "vFindings": false, "fOrderNote": false, "fOrderText": "", "fEmpty": false, "fEmptyIcon": "", "fEmptyTitle": "", "fEmptyText": "", "findings": [], "hasDismissed": false, "toggleDismissed": null, "showDismissedAria": "", "dismissedLabel": "", "vCompare": false, "cEmpty": false, "cEmptyText": "", "cReady": false, "cGroupLabel": "", "cCaption": "", "cAria": "", "cMinDev": "", "cGrid": "", "cCols": [], "cMaxPm": "", "cRainSum": "", "lgCaption": "", "league": [], "peerSite": "", "peerCaption": "", "peerZones": [], "vForecast": false, "fcEmpty": false, "fcEmptyText": "", "fcReady": false, "fcHighlights": [], "fcSite": "", "fcCaption": "", "fcAria": "", "fcDays": [], "soilRows": [], "vSources": false, "sources": [], "srcRows": [], "methods": [], "vSumMain": false, "sumGo": null, "sumKind": "", "sumTitle": "", "sumMeta": "", "vSumSite": false, "vDevice": false, "devTitle": "", "devText": "", "devGo": null};
+var IN_BLANK = {"rowBox": "", "vRow": false, "rowCount": 0, "rowText": "", "rowSub": "", "rowTone": "warn", "rowGo": null, "kCount": "0", "kTone": "muted", "kSplit": "", "kLoss": "", "kLossStyle": "", "stLoading": false, "stError": false, "stErrorText": "", "retry": null, "fHeading": "", "vKpis": false, "kpis": [], "vFindings": false, "fOrderNote": false, "fOrderText": "", "fEmpty": false, "fEmptyIcon": "", "fEmptyTitle": "", "fEmptyText": "", "findings": [], "hasDismissed": false, "toggleDismissed": null, "showDismissedAria": "", "dismissedLabel": "", "vCompare": false, "cEmpty": false, "cEmptyText": "", "cReady": false, "cGroupLabel": "", "cCaption": "", "cAria": "", "cMinDev": "", "cGrid": "", "cCols": [], "cMaxPm": "", "cRainSum": "", "lgCaption": "", "league": [], "peerSite": "", "peerCaption": "", "peerZones": [], "vForecast": false, "fcEmpty": false, "fcEmptyText": "", "fcReady": false, "fcHighlights": [], "fcSite": "", "fcCaption": "", "fcAria": "", "fcDays": [], "soilRows": [], "vSources": false, "sources": [], "srcRows": [], "methods": [], "vSumMain": false, "sumGo": null, "sumKind": "", "sumTitle": "", "sumMeta": "", "vSumSite": false, "vDevice": false, "devTitle": "", "devText": "", "devGo": null};
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { showDismissed: false }; }
   componentDidMount() {
@@ -576,6 +599,13 @@ class Component extends DCLogic {
     var site = inSiteId(p.site ?? 'all', ctx);
     var out = Object.assign({}, IN_BLANK);
     var write = function (keys) { return function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { String(keys).split('|').forEach(function (kv) { var i = kv.indexOf('='); if (i > 0) window.sessionStorage.setItem(kv.slice(0, i), kv.slice(i + 1)); }); } catch (x) {} }; };
+    var lstate = p.state ?? 'ready';
+    if (lstate === 'loading' || lstate === 'error') {
+      var blank = Object.assign({}, IN_BLANK, { stLoading: lstate === 'loading', stError: lstate === 'error',
+        stErrorText: 'ดึงข้อมูลจาก SmartLogger หรือแหล่งข้อมูลอากาศไม่สำเร็จ ผลวิเคราะห์เดิมยังอยู่ ลองใหม่อีกครั้ง',
+        retry: function () { if (p.onRetry) p.onRetry(); else self.setState({ sync: Date.now() }); } });
+      return blank;
+    }
     var ranked = inRanked(ctx, site);
     var active = ranked.filter(function (f) { return ctx.dismissed.indexOf(f.id) < 0; });
     var money = function (f) { return f.lossBaht == null ? (f.forecast ? 'พยากรณ์' : 'ประเมินไม่ได้') : '≈ ฿' + inFmt(f.lossBaht) + '/วัน'; };
@@ -587,6 +617,10 @@ class Component extends DCLogic {
       var hl = { a: ['ฝน 19 พ.ย. ที่โคราช', '~6 มม. ช่วยลดฝุ่นฟาร์มโคราช ~40%'], b: ['PM2.5 สูงที่บางนา', '48 µg/m³ เกินค่ามาตรฐาน 37.5'], c: ['หมอกควันเริ่ม ธ.ค.', 'PM2.5 ลำพูนคาด 80–120 µg/m³'], e: ['ฝน 19–20 พ.ย. ที่หัวหิน', '~13 มม. ช่วยล้างฝุ่นตามธรรมชาติ'], d: ['ยังไม่มีไซต์', 'เพิ่มไซต์เพื่อเริ่มพยากรณ์'] }[ctx.org];
       out.vKpis = true;
       var actB = 0, actK = 0; active.forEach(function (f) { if (f.lossBaht != null && (f.sev === 'high' || f.sev === 'med') && !f.forecast) { actB += f.lossBaht; actK += f.lossKwh; } });
+      out.kCount = String(active.length); out.kTone = cnt.high ? 'danger' : 'muted';
+      out.kSplit = '(' + ['สูง ' + cnt.high, 'กลาง ' + cnt.med, 'ต่ำ ' + cnt.low].join(' · ') + (cnt.info ? ' · ข้อมูล ' + cnt.info : '') + ')';
+      out.kLoss = '≈ ฿' + inFmt(actB) + '/วัน';
+      out.kLossStyle = 'color: ' + (actB > 0 ? '#B42318' : '#111827');
       out.kpis = [
         { icon: 'alert', bg: cnt.high ? 'danger' : 'gray', label: 'ข้อสังเกตที่เปิดอยู่', value: String(active.length), unit: 'รายการ', note: 'สูง ' + cnt.high + ' · กลาง ' + cnt.med + ' · ต่ำ ' + cnt.low + ' · ข้อมูล ' + cnt.info },
         { icon: 'coin', bg: 'warn', label: 'ไฟที่เสียและควรแก้', value: '฿' + inFmt(actB), unit: '/วัน', note: '≈ ' + inFmt(actK) + ' kWh/วัน · เฉพาะความรุนแรงสูงและกลาง' }
@@ -600,11 +634,13 @@ class Component extends DCLogic {
       var list = showDis ? ranked : active; if (limit) list = list.slice(0, limit);
       var toggleDis = function (id) { return function () { var cur = ctx.SS('sc.insightDismissed').split(',').filter(Boolean); var i = cur.indexOf(id); if (i >= 0) cur.splice(i, 1); else cur.push(id); try { window.sessionStorage.setItem('sc.insightDismissed', cur.join(',')); } catch (e) {} self.setState({ sync: Date.now() }); }; };
       out.vFindings = true;
-      out.fOrderNote = list.length > 1; out.fOrderText = 'เรียงตามความรุนแรง แล้วตามไฟที่เสียต่อวัน';
-      out.fEmpty = list.length === 0;
-      out.fEmptyIcon = ctx.sites.length ? 'checkCircle' : 'site';
-      out.fEmptyTitle = !ctx.sites.length ? 'ยังไม่มีไซต์ให้วิเคราะห์' : (ctx.org === 'e' ? 'ต้องตั้งรอบล้างก่อน' : 'ไม่มีข้อสังเกตที่ต้องติดตาม');
-      out.fEmptyText = !ctx.sites.length ? 'เพิ่มไซต์และเชื่อม SmartLogger แล้วระบบจะเริ่มวิเคราะห์หลังมีข้อมูล 14 วัน' : (ctx.org === 'e' ? ctx.DN('หลังคาอาคาร A หัวหิน') + ' ยังไม่ได้ตั้งรอบล้าง ระบบจึงยังประเมินฝุ่นสะสมและวันที่ควรล้างไม่ได้ · พลังงานจริงเทียบที่ควรได้ดูได้ที่แท็บเปรียบเทียบ' : 'ทุกไซต์ผลิตใกล้เคียงที่ควรได้');
+      out.fOrderNote = list.length > 1; out.fOrderText = 'ข้อที่ควรแก้เรียงตามไฟที่เสียต่อวัน (มากไปน้อย) · ข้อที่เฝ้าดูและพยากรณ์อยู่ท้าย';
+      var evOpen = self.state.evOpen || {};
+      out.fEmpty = list.length === 0; var allDone = !showDis && ranked.length > 0 && active.length === 0;
+      out.fHeading = 'ข้อสังเกต ' + list.length + ' รายการ';
+      out.fEmptyIcon = allDone ? 'checkCircle' : ctx.sites.length ? 'checkCircle' : 'site';
+      out.fEmptyTitle = allDone ? 'รับทราบครบทุกข้อแล้ว' : !ctx.sites.length ? 'ยังไม่มีไซต์ให้วิเคราะห์' : (ctx.org === 'e' ? 'ต้องตั้งรอบล้างก่อน' : 'ไม่มีข้อสังเกตที่ต้องติดตาม');
+      out.fEmptyText = allDone ? 'ไม่มีข้อสังเกตที่ยังเปิดอยู่ · กด "แสดงที่รับทราบแล้ว" เพื่อดูย้อนหลัง ระบบจะแจ้งเมื่อพบสิ่งใหม่' : !ctx.sites.length ? 'เพิ่มไซต์และเชื่อม SmartLogger แล้วระบบจะเริ่มวิเคราะห์หลังมีข้อมูล 14 วัน' : (ctx.org === 'e' ? ctx.DN('หลังคาอาคาร A หัวหิน') + ' ฝุ่นตอนนี้ ~' + inFmt(IN_SOIL_NOW.e1, 1) + '% และยังไม่เคยล้าง · ตั้งรอบล้างที่หน้าไซต์ แล้วระบบจะคาดวันที่ควรล้างให้ · พลังงานจริงเทียบที่ควรได้ดูได้ที่แท็บเปรียบเทียบ' : 'ทุกไซต์ผลิตใกล้เคียงที่ควรได้');
       out.hasDismissed = dismissedList.length > 0; out.showDismissedAria = showDis ? 'true' : 'false';
       out.dismissedLabel = showDis ? 'ซ่อนที่รับทราบแล้ว' : 'แสดงที่รับทราบแล้ว (' + dismissedList.length + ')';
       out.toggleDismissed = function () { self.setState({ showDismissed: !self.state.showDismissed }); };
@@ -615,10 +651,14 @@ class Component extends DCLogic {
         if (dv) { var sName = IN_SITES[f.site].name, open = (ctx.createdWo || []).filter(function (w) { return w && w.st !== 'done' && (!w.org || w.org === ctx.org) && (w.site === sName || w.site === ctx.DN(sName)) && (w.device === dv || String(w.title || '').indexOf(dv) >= 0); })[0]; if (open) prim = ['เปิดใบงาน ' + open.no, 'WorkOrderDetail.dc.html', 'sc.wo=' + open.no + '|sc.woFrom=Analytics', 'workorder']; }
         var can = ctx.canAct;
         return {
-          hid: 'in-f-' + f.id, title: f.title, where: whereOf(f), text: f.text, ev: f.ev.map(function (t) { return { t: t }; }), showEv: !p.compact,
-          sevLabel: 'ความรุนแรง' + sv[1], sevStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 700; color: ' + sv[2] + '; background: ' + sv[3],
-          tag: f.forecast ? 'พยากรณ์' : (f.notAlarm ? 'ไม่ใช่ alarm จาก inverter' : 'เสริม alarm: ประเมินไฟที่หาย'),
-          tagStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #3730A3; background: #EEF2FF',
+          hid: 'in-f-' + f.id, aid: 'in-a-' + f.id, title: f.title, where: whereOf(f), text: f.text, ev: f.ev.map(function (t) { return { t: t }; }),
+          showEvBtn: !p.compact, showEv: !p.compact && !!(evOpen[f.id] || on), evOpen: (evOpen[f.id] || on) ? 'true' : 'false', evId: 'in-ev-' + f.id,
+          evLabel: (evOpen[f.id] || on) ? 'ซ่อนหลักฐาน' : 'ดูหลักฐาน (' + f.ev.length + ' ข้อ และกราฟ)', evIcon: 'chevronDown',
+          toggleEv: function () { var m = Object.assign({}, self.state.evOpen || {}); m[f.id] = !(m[f.id] || on); self.setState({ evOpen: m }); },
+          lossColor: f.lossBaht != null && !f.forecast && (f.sev === 'high' || f.sev === 'med') ? '#B42318' : '#111827',
+          sevKey: f.sev === 'med' ? 'medium' : f.sev, sevLabel: 'ความรุนแรง' + sv[1], sevStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 700; color: ' + sv[2] + '; background: ' + sv[3],
+          tag: f.forecast ? 'พยากรณ์' : (f.notAlarm ? 'ไม่ใช่การแจ้งเตือนจากอินเวอร์เตอร์' : 'เสริมการแจ้งเตือน: ประเมินไฟที่หาย'),
+          tagStyle: 'display: inline-flex; align-items: center; min-height: 24px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 600; color: #0A4F44; background: #F0F7F5; box-shadow: inset 0 0 0 1px #B9DACF',
           conf: f.conf, since: f.since,
           spark: sp.pts, zeroY: sp.zero, sparkColor: f.sev === 'high' ? '#B42318' : f.sev === 'med' ? '#B54708' : '#1D4ED8', sparkLabel: f.sparkLabel,
           sparkAria: f.sparkLabel + ': ' + f.spark.join(', '),
@@ -649,7 +689,7 @@ class Component extends DCLogic {
         var tip = c.b.label + ' · ต่างจากคาด ' + inSign(dv) + '% · PM2.5 ' + inFmt(c.g.pmAvg) + ' · ฝน ' + inFmt(c.g.rain, 1) + ' มม.';
         var shortLab = rr.group === 'month' ? c.b.label.replace(/ \d\d$/, '') : c.b.label; // month labels drop the year; on phones every other label hides
         return { tip: tip, lab: i % every === 0 ? shortLab : '', labCls: (i / every) % 2 === 1 ? 'in-lab-alt' : '', full: c.b.label, devText: inSign(dv) + '%', pmText: inFmt(c.g.pmAvg) + ' µg/m³', rainText: inFmt(c.g.rain, 1) + ' มม.',
-          devStyle: 'height: ' + h + 'px; background: ' + col + '; border-radius: 0 0 3px 3px', pmStyle: 'height: ' + ph + 'px; background: #3730A3; border-radius: 3px 3px 0 0', rainStyle: 'height: ' + rh + 'px; background: #1D4ED8; border-radius: 3px 3px 0 0' };
+          devStyle: 'height: ' + h + 'px; background: ' + col + '; border-radius: 0 0 3px 3px', pmStyle: 'height: ' + ph + 'px; background: #6B7280; border-radius: 3px 3px 0 0', rainStyle: 'height: ' + rh + 'px; background: #1D4ED8; border-radius: 3px 3px 0 0' };
       });
       var tot = inAgg(ids, rr.from, rr.to);
       out.cGroupLabel = rr.groupLabel; out.cMinDev = inSign(minDev) + '%'; out.cMaxPm = inFmt(maxPm) + ' µg/m³'; out.cRainSum = inFmt(rainSum, 1) + ' มม.';
@@ -707,7 +747,7 @@ class Component extends DCLogic {
           bandStyle: 'position: absolute; left: 15%; right: 15%; bottom: ' + lo.toFixed(1) + '%; height: ' + Math.max(2, hi - lo).toFixed(1) + '%; background: #B9DACF; border-radius: 4px',
           midStyle: 'position: absolute; left: 8%; right: 8%; bottom: ' + md.toFixed(1) + '%; height: 3px; background: #0F6B5C; border-radius: 2px',
           rainStyle: 'height: ' + (d.rain > 0.4 ? Math.max(4, Math.round(d.rain / 8 * 26)) : 0) + 'px; background: #1D4ED8; border-radius: 3px 3px 0 0',
-          pmStyle: 'height: ' + Math.max(2, Math.round(d.pm / 80 * 34)) + 'px; background: #3730A3; border-radius: 3px 3px 0 0',
+          pmStyle: 'height: ' + Math.max(2, Math.round(d.pm / 80 * 34)) + 'px; background: #6B7280; border-radius: 3px 3px 0 0',
           eText: inFmt(d.mid / div, dp) + ' ' + unit + ' (' + inFmt(d.low / div, dp) + '–' + inFmt(d.high / div, dp) + ')', ghiText: inFmt(d.ghi, 1) + ' kWh/m²', rainText: inFmt(d.rain, 1) + ' มม.', pmText: inFmt(d.pm) + ' µg/m³' };
       });
       var hlF = [];
@@ -752,6 +792,23 @@ class Component extends DCLogic {
       return out;
     }
 
+    if (view === 'row') {
+      // DATA.md round 14: outside Analytics findings are one row with a count and the ฿ impact, never full cards
+      var rDev = p.device ?? '', rPlace = p.place ?? 'main';
+      var rSite = site; if (rDev && p.site && p.site !== 'all') rSite = inSiteId(p.site, ctx);
+      var rList = active.filter(function (f) { return !f.forecast && (rSite === 'all' || f.site === rSite) && (!rDev || f.device === rDev || (rDev.indexOf('Meter') === 0 && f.device === 'Meter')); });
+      if (!rList.length) return out;
+      var rB = 0; rList.forEach(function (f) { if (f.lossBaht != null && (f.sev === 'high' || f.sev === 'med')) rB += f.lossBaht; }); // same rule as "ไฟที่เสียและควรแก้" on Analytics
+      out.vRow = true; out.rowCount = rList.length;
+      out.rowBox = 'display: flex; align-items: center; gap: 12px; min-height: 56px; text-decoration: none; color: #111827; ' + (p.bare ? 'padding: 10px 0 0; border-top: 1px solid #EEF0F3' : 'padding: 8px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E6EB');
+      out.rowText = 'ข้อสังเกตจากการวิเคราะห์ ' + rList.length + ' รายการ' + (rB ? ' · เสียโอกาส ≈ ฿' + inFmt(rB) + '/วัน' : '');
+      out.rowSub = rList[0].title + (rList.length > 1 ? ' และอีก ' + (rList.length - 1) + ' รายการ' : '');
+      out.rowTone = rList.some(function (f) { return f.sev === 'high'; }) ? 'danger' : 'warn';
+      var from = { main: 'Main', site: 'SiteDetail', device: 'DeviceDetail' }[rPlace] || 'Main';
+      out.rowGo = write('sc.finding=' + rList[0].id + '|sc.insightSite=' + rSite + '|sc.findingFrom=' + from);
+      return out;
+    }
+
     if (view === 'summary') {
       var place = p.place ?? 'main';
       if (place === 'site') {
@@ -764,7 +821,7 @@ class Component extends DCLogic {
       }
       var now = active.filter(function (f) { return !f.forecast; }), top2 = now[0]; if (!top2) return out;
       out.vSumMain = true; out.sumKind = 'ข้อสังเกตจากการวิเคราะห์ · ' + now.length + ' รายการ';
-      out.sumTitle = ctx.DN(IN_SITES[top2.site].name) + ' · ' + top2.title; out.sumMeta = money(top2) + ' · ' + (top2.notAlarm ? 'ไม่ใช่ alarm จาก inverter · ' : '') + 'ความเชื่อมั่น ' + top2.conf + '%';
+      out.sumTitle = ctx.DN(IN_SITES[top2.site].name) + ' · ' + top2.title; out.sumMeta = money(top2) + ' · ' + (top2.notAlarm ? 'ไม่ใช่การแจ้งเตือนจากอินเวอร์เตอร์ · ' : '') + 'ความเชื่อมั่น ' + top2.conf + '%';
       out.sumGo = write('sc.finding=' + top2.id + '|sc.insightSite=' + (site === 'all' ? 'all' : site) + '|sc.findingFrom=Main');
       return out;
     }
@@ -772,8 +829,8 @@ class Component extends DCLogic {
     if (view === 'device') {
       var dsite = IN_BYNAME[p.site] || p.site, dev = p.device ?? '';
       var NOTES = {
-        'k1|INV-B04': ['f2', 'ผลิตต่ำกว่ากลุ่ม 5.8% · ไม่มี alarm', 'ต่อเนื่อง 9 วัน (ตั้งแต่ 6 พ.ย.) และยังต่ำหลังล้างโซน B เมื่อ 14 พ.ย. น่าจะเป็นมูลนกจุดที่ล้างไม่ถึงหรือขั้วต่อสตริง 3–4 · ความเชื่อมั่น 78%'],
-        'k1|INV-C03': ['', 'สอดคล้องกับ alarm', 'สตริง 4 ต่ำ 18% ตรงกับจุดร้อน 2 แผงที่พบ · ทั้งเครื่องต่ำกว่ากลุ่ม 3.0% · ติดตามผลหลังแก้ใน WO-1042'],
+        'k1|INV-B04': ['f2', 'ผลิตต่ำกว่ากลุ่ม 5.8% · อินเวอร์เตอร์ไม่แจ้งเตือน', 'ต่อเนื่อง 9 วัน (ตั้งแต่ 6 พ.ย.) และยังต่ำหลังล้างโซน B เมื่อ 14 พ.ย. น่าจะเป็นมูลนกจุดที่ล้างไม่ถึงหรือขั้วต่อสตริง 3–4 · ความเชื่อมั่น 78%'],
+        'k1|INV-C03': ['', 'สอดคล้องกับการแจ้งเตือน', 'สตริง 4 ต่ำ 18% ตรงกับจุดร้อน 2 แผงที่พบ · ทั้งเครื่องต่ำกว่ากลุ่ม 3.0% · ติดตามผลหลังแก้ใน WO-1042'],
         'bn|INV-04': ['f6', 'ประเมินไฟที่ไม่ได้บันทึก', 'ขาดข้อมูลตั้งแต่ 14 พ.ย. 22:10 · ประเมินจากเครื่องอื่นในไซต์ ≈ 96 kWh ถึงตอนนี้ (≈ ' + inFmt(IN_SITES.bn.kwp / 6 * IN_YIELD) + ' kWh/วัน)'],
         'lb|Meter': ['f3', 'มิเตอร์อ่านต่ำกว่าผลรวมอินเวอร์เตอร์ 3.4%', 'ตั้งแต่ 9 พ.ย. (ปกติไม่เกิน 1.5%) · ตรวจ CT ratio หรือสายสัญญาณ · เสี่ยงยอดไฟคลาดเคลื่อน'],
         'lp|INV-07': ['f7', 'กำลังถูกจำกัดจากความร้อนช่วงบ่าย', '12:00–15:00 อุณหภูมิภายใน 61–64 °C · กำลังลด 3.1% ช่วงบ่าย · ตรวจการระบายอากาศ'],

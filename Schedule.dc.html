@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>ตารางล้าง</title>
+<title>งานล้าง · ปฏิทินรอบล้าง · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -28,28 +28,37 @@ button{cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
-    <dc-import name="PageHeader" icon="calendar" title="ตารางล้าง" subtitle="{{headSub}}" actions="{{headActs}}" hint-size="100%,96px"></dc-import>
+    <dc-import name="PageHeader" icon="workorder" title="งานล้าง" subtitle="{{headSub}}" actions="{{headActs}}" hub="work" hub-current="calendar" hint-size="100%,140px"></dc-import>
 
     <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
       <div class="sch-month" role="group" aria-label="เดือน" style="display: flex; gap: 8px; align-items: center">
-          <button aria-label="เดือนก่อนหน้า (มีข้อมูลถึง พ.ย. 2569)" title="มีข้อมูลถึง พ.ย. 2569" disabled="{{true}}" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0; opacity: 0.45; cursor: not-allowed">
+          <button type="button" onClick="{{monNav.prev}}" aria-label="{{monNav.prevLabel}}" title="{{monNav.prevLabel}}" disabled="{{monNav.prevOff}}" style="{{monNav.prevStyle}}">
             <dc-import name="Icon" icon="arrowLeft" size="18" hint-size="18px,18px"></dc-import>
           </button>
-          <span style="font-weight: 700; min-width: 120px; text-align: center">พ.ย. 2569</span>
-          <button aria-label="เดือนถัดไป (มีข้อมูลถึง พ.ย. 2569)" title="มีข้อมูลถึง พ.ย. 2569" disabled="{{true}}" style="width: 44px; height: 44px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0; opacity: 0.45; cursor: not-allowed">
+          <span aria-live="polite" style="font-weight: 700; min-width: 120px; text-align: center">{{monNav.label}}</span>
+          <button type="button" onClick="{{monNav.next}}" aria-label="{{monNav.nextLabel}}" title="{{monNav.nextLabel}}" disabled="{{monNav.nextOff}}" style="{{monNav.nextStyle}}">
             <dc-import name="Icon" icon="arrowRight" size="18" hint-size="18px,18px"></dc-import>
           </button>
+          <sc-if value="{{monNav.notThis}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{monNav.toToday}}" style="min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600">กลับไปเดือนนี้</button></sc-if>
       </div>
-      <div style="min-width: 0; flex: 1 1 360px">
-        <dc-import name="FilterChips" label="ไซต์" value="{{siteF}}" options="{{chipOpts}}" on-change="{{setSiteF}}" hint-size="100%,44px"></dc-import>
-      </div>
+      <sc-if value="{{multiSite}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; align-items: center; gap: 8px; flex: 0 1 280px; min-width: 200px">
+          <label for="sch-site" style="font-size: 13px; font-weight: 600; color: #374151; flex: none">ไซต์</label>
+          <select id="sch-site" value="{{siteF}}" onChange="{{pickSite}}" style="flex: 1; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF; color: #111827">
+            <sc-for list="{{chipOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.id}}">{{o.text}}</option></sc-for>
+          </select>
+        </div>
+      </sc-if>
       <span style="flex: 1"></span>
-      <div aria-label="คำอธิบายสี" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 12px; color: #374151">
+      <button type="button" onClick="{{toggleLegend}}" aria-expanded="{{legendOpen}}" aria-controls="sch-legend" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600"><dc-import name="Icon" icon="info" size="16" hint-size="16px,16px"></dc-import>สีและสัญลักษณ์</button>
+    </div>
+    <sc-if value="{{showLegend}}" hint-placeholder-val="{{ false }}">
+      <div id="sch-legend" role="group" aria-label="คำอธิบายสัญลักษณ์" style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; padding: 10px 14px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; font-size: 13px; color: #374151">
         <sc-for list="{{legend}}" as="l" hint-placeholder-count="8">
           <span style="display: inline-flex; align-items: center; gap: 6px"><span aria-hidden="true" style="{{l.dot}}"></span>{{l.text}}</span>
         </sc-for>
       </div>
-    </div>
+    </sc-if>
 
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
       <sc-if value="{{listBusy}}" hint-placeholder-val="{{ false }}">
@@ -63,7 +72,7 @@ button{cursor:pointer}
         </section>
       </sc-if>
       <sc-if value="{{showCal}}" hint-placeholder-val="{{ true }}">
-      <section class="sch-agenda" aria-label="ตารางล้างรายสัปดาห์" style="display: none; flex: 1 1 100%; flex-direction: column; gap: 10px">
+      <section class="sch-agenda" aria-label="ปฏิทินรอบล้างรายสัปดาห์" style="display: none; flex: 1 1 100%; flex-direction: column; gap: 10px">
         <div role="group" aria-label="สัปดาห์" style="display: flex; align-items: center; gap: 8px">
           <button type="button" onClick="{{weekNav.prev}}" disabled="{{weekNav.prevOff}}" aria-label="สัปดาห์ก่อนหน้า" style="flex: none; width: 44px; height: 44px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer"><dc-import name="Icon" icon="arrowLeft" size="18" hint-size="18px,18px"></dc-import></button>
           <span style="flex: 1; text-align: center; font-weight: 700">{{weekNav.label}}</span>
@@ -78,7 +87,7 @@ button{cursor:pointer}
           </sc-if>
           <sc-if value="{{r.full}}" hint-placeholder-val="{{ true }}">
             <div style="display: flex; flex-direction: column; gap: 8px">
-              <h3 style="margin: 4px 2px 0; font-size: 14px; font-weight: 700; color: #111827">{{r.head}}</h3>
+              <h2 style="margin: 4px 2px 0; font-size: 14px; font-weight: 700; color: #111827">{{r.head}}</h2>
               <sc-for list="{{r.items}}" as="a" hint-placeholder-count="2">
                 <sc-if value="{{a.isWo}}" hint-placeholder-val="{{ true }}">
                   <dc-import name="WorkOrderRow" variant="card" compact="{{true}}" no="{{a.no}}" title="{{a.title}}" site="{{a.siteName}}" assignee="{{a.who}}" due="{{a.due}}" status="{{a.st}}" overdue="{{a.overdue}}" href="WorkOrderDetail.dc.html" save-keys="{{a.woKeys}}" hint-size="100%,64px"></dc-import>
@@ -96,7 +105,7 @@ button{cursor:pointer}
           </sc-if>
         </sc-for>
       </section>
-      <section class="sch-cal" aria-label="ปฏิทินเดือนพฤศจิกายน 2569" style="flex: 999 1 640px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
+      <section class="sch-cal" aria-label="{{calLabel}}" style="flex: 999 1 640px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
         <div style="min-width: 700px">
           <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-bottom: 1px solid #E3E6EB">
             <sc-for list="{{weekdays}}" as="w" hint-placeholder-count="7">
@@ -106,9 +115,9 @@ button{cursor:pointer}
           <div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr))">
             <sc-for list="{{cells}}" as="d" hint-placeholder-count="35">
               <div style="{{d.style}}">
-                <div style="{{d.numStyle}}">{{d.num}}</div>
+                <div style="display: flex; align-items: center; gap: 6px"><span style="{{d.numStyle}}">{{d.num}}</span><sc-if value="{{d.today}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 700; color: #0A4F44">วันนี้</span></sc-if></div>
                 <sc-for list="{{d.events}}" as="e" hint-placeholder-count="1">
-                  <button onClick="{{e.pick}}" aria-pressed="{{e.on}}" aria-label="{{e.aria}}" title="{{e.aria}}" style="{{e.style}}">{{e.label}}</button>
+                  <button onClick="{{e.pick}}" aria-pressed="{{e.on}}" aria-label="{{e.aria}}" title="{{e.aria}}" style="{{e.style}}"><span style="display: block">{{e.label}}</span><span style="display: flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 500"><sc-if value="{{e.late}}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" icon="alert" size="12" tone="danger" hint-size="12px,12px"></dc-import></sc-if>{{e.sub}}</span></button>
                 </sc-for>
               </div>
             </sc-for>
@@ -119,7 +128,7 @@ button{cursor:pointer}
 
       <aside style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px">
         <sc-if value="{{selCyc}}" hint-placeholder-val="{{ false }}">
-          <section aria-live="polite" style="background: #FFFFFF; border: 1px dashed #0F6B5C; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+          <section aria-label="วันครบรอบที่เลือก" style="background: #FFFFFF; border: 1px dashed #0F6B5C; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
             <div style="font-size: 12px; color: #4B5563">วันครบรอบล้าง · {{selG.date}}</div>
             <h2 style="margin: 0; font-size: 16px">{{selG.siteName}}</h2>
             <div style="font-size: 13px; color: #374151">{{selG.note}}</div>
@@ -128,7 +137,7 @@ button{cursor:pointer}
           </section>
         </sc-if>
         <sc-if value="{{sel}}" hint-placeholder-val="{{ true }}">
-          <section class="sch-sel" aria-live="polite" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+          <section class="sch-sel" aria-label="ใบงานที่เลือก" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
             <div style="display: flex; justify-content: space-between; gap: 8px; align-items: flex-start">
               <div>
                 <div style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{selEv.no}} · {{selEv.date}}</div>
@@ -145,30 +154,23 @@ button{cursor:pointer}
         </sc-if>
 
         <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 6px 0">
-          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 12px 16px 6px"><dc-import name="Icon" icon="broom" size="18" tone="muted" hint-size="18px,18px"></dc-import>รอบล้างของแต่ละไซต์</h2>
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 12px 16px 2px"><dc-import name="Icon" icon="broom" size="18" tone="muted" hint-size="18px,18px"></dc-import>รอบล้างของแต่ละไซต์</h2>
+          <p style="margin: 0; padding: 0 16px 8px; font-size: 13px; color: #4B5563">เปลี่ยนรอบล้างได้ที่หน้าไซต์</p>
           <sc-for list="{{cycles}}" as="s" hint-placeholder-count="4">
-            <div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-top: 1px solid #EEF0F3">
-              <div style="display: flex; align-items: center; gap: 10px">
-                <dc-import name="SiteThumb" site="{{s.site}}" w="48px" h="32px" radius="{{5}}" hint-size="48px,32px"></dc-import>
-                <div style="flex: 1; min-width: 0">
-                  <div style="font-weight: 600; font-size: 14px">{{s.name}}</div>
-                  <div style="font-size: 12px; color: #4B5563">{{s.note}}</div>
-                </div>
-              </div>
-              <sc-if value="{{s.hasJob}}" hint-placeholder-val="{{ false }}">
-                <dc-import name="Button" variant="secondary" icon="arrowRight" label="{{s.jobLabel}}" href="WorkOrderDetail.dc.html" save-keys="{{s.jobKeys}}" full="{{true}}" hint-size="100%,44px"></dc-import>
-              </sc-if>
-              <sc-if value="{{s.canCreate}}" hint-placeholder-val="{{ true }}">
-                <dc-import name="Button" variant="secondary" icon="plus" label="สร้างใบงานจากรอบนี้" href="CreateWorkOrder.dc.html" save-keys="{{s.createKeys}}" full="{{true}}" hint-size="100%,44px"></dc-import>
-              </sc-if>
-              <sc-if value="{{s.canSetCycle}}" hint-placeholder-val="{{ false }}">
-                <dc-import name="Button" variant="secondary" icon="calendar" label="ตั้งรอบล้างที่หน้าไซต์" href="SiteDetail.dc.html" save-keys="{{s.siteKeys}}" full="{{true}}" hint-size="100%,44px"></dc-import>
-              </sc-if>
+            <div style="border-top: 1px solid #EEF0F3">
+              <a href="SiteDetail.dc.html" onPointerDown="{{s.goSite}}" onKeyDown="{{s.goSite}}" onClick="{{s.goSite}}" aria-label="{{s.aria}}" style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 16px; text-decoration: none; color: #111827">
+                <dc-import name="SiteThumb" site="{{s.site}}" w="40px" h="28px" radius="{{5}}" hint-size="40px,28px"></dc-import>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+                  <span style="font-weight: 600; font-size: 14px">{{s.name}}</span>
+                  <span style="font-size: 13px; color: {{s.noteColor}}">{{s.short}}</span>
+                </span>
+                <dc-import name="Icon" icon="arrowRight" size="16" tone="brand" hint-size="16px,16px"></dc-import>
+              </a>
               <sc-if value="{{s.canToggle}}" hint-placeholder-val="{{ true }}">
-              <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 13px; cursor: pointer">
-                <input type="checkbox" checked="{{s.auto}}" onChange="{{s.toggle}}" style="width: 20px; height: 20px; accent-color: #0F6B5C">
-                สร้างใบงานอัตโนมัติก่อนครบรอบ 14 วัน
-              </label>
+                <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px 6px 66px; font-size: 13px; color: #374151; cursor: pointer">
+                  <input type="checkbox" checked="{{s.auto}}" onChange="{{s.toggle}}" style="width: 20px; height: 20px; accent-color: #0F6B5C">
+                  สร้างใบงานให้อัตโนมัติ 14 วันก่อนครบรอบ
+                </label>
               </sc-if>
             </div>
           </sc-for>
@@ -176,7 +178,6 @@ button{cursor:pointer}
             <div style="padding: 12px 16px; border-top: 1px solid #EEF0F3; font-size: 13px; color: #4B5563">ยังไม่มีไซต์ เพิ่มไซต์ก่อนแล้วจึงตั้งรอบล้าง</div>
           </sc-if>
         </section>
-        <a href="WorkOrders.dc.html" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; text-decoration: none">ดูเป็นรายการ กรอง และอนุมัติที่หน้าใบงาน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
       </aside>
     </div>
   </div>
@@ -186,11 +187,11 @@ button{cursor:pointer}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","options":["ready","loading","error"],"default":"ready"},"$preview":{"width":1440,"height":1040}}'>
 class Component extends DCLogic {
-  constructor(p) { super(p); this.state = { sel: '', auto: { k1: true, k2: true, bp: true, lb: false, rs: true, bn: true, lp: true }, retriedFor: '' }; }
+  constructor(p) { super(p); this.state = { sel: '', mo: 0, retriedFor: '' }; }
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.createdWo', 'sc.woStat', 'sc.site', 'sc.createdSites', 'sc.siteCycle', 'sc.woAssign', 'sc.flash', 'sc.flashAt', 'sc.siteEdits'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.createdWo', 'sc.woStat', 'sc.site', 'sc.createdSites', 'sc.siteCycle', 'sc.woAssign', 'sc.flash', 'sc.flashAt', 'sc.siteEdits', 'sc.autoCycle'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -265,10 +266,12 @@ class Component extends DCLogic {
     // a job created from a cycle (sc.createdWo) becomes that cycle's job, so "สร้างใบงาน" is not offered twice
     var madeSt = {};
     JS('sc.createdWo', []).forEach(function (c) { if (c && c.org === orgId && c.no) madeSt[c.no] = woStat[c.no] || c.st || 'todo'; });
+    // a created cleaning job answers this round only when its date is inside the round window (due −7 … +7; overdue rounds stay open)
+    var near = function (txt, r) { var w = thParse(txt), l = thParse(r[4]), du = l && r[3] ? new Date(l.getTime() + r[3] * 864e5) : null; if (!w || !du) return true; var dd = (w - du) / 864e5; return dd >= -7 && (dd <= 7 || du < TODAY); };
     CY[orgId] = CY[orgId].map(function (r) {
       var cur0 = r[7] && (woStat[r[7]] || 'open') !== 'done' ? r[7] : '';
       if (cur0) return r;
-      var made = JS('sc.createdWo', []).filter(function (c) { return c && c.org === orgId && c.site === r[1] && (c.type || 'ล้างตามรอบ') === 'ล้างตามรอบ' && madeSt[c.no] !== 'done'; }).pop(); // only a cleaning job answers the cycle (a repair does not)
+      var made = JS('sc.createdWo', []).filter(function (c) { return c && c.org === orgId && c.site === r[1] && (c.type || 'ล้างตามรอบ') === 'ล้างตามรอบ' && madeSt[c.no] !== 'done' && near(c.due, r); }).pop(); // only a cleaning job answers the cycle (a repair does not)
       if (!made) return r;
       r = r.slice(); r[7] = made.no; r[6] = (r[6] ? r[6] + ' · ' : '') + 'สร้างใบงานแล้ว'; return r;
     });
@@ -283,11 +286,11 @@ class Component extends DCLogic {
     var SHORTN = { 'ฟาร์มโคราช 1': 'โคราช 1', 'ฟาร์มโคราช 2': 'โคราช 2', 'หลังคาโรงงานบางปู': 'บางปู', 'ลานจอดรถลพบุรี': 'ลพบุรี', 'สาขารังสิต': 'รังสิต', 'สาขาบางนา': 'บางนา', 'โรงงาน A ลำพูน': 'ลำพูน', 'หลังคาอาคาร A หัวหิน': 'หัวหิน' };
     // short site label for chips: an edited name wins (sc.siteEdits), else the built-in short form
     var SL = function (n) { var e = DN(n); return e !== n ? e : (SHORTN[n] || n); };
-    var createdEv = JS('sc.createdWo', []).filter(function (c) { return c && c.org === orgId && / พ.ย. 2569$/.test(c.due || ''); }).map(function (c) {
-      return { no: c.no, day: parseInt(c.due, 10), site: KEY[c.site] || '', siteName: c.site, title: c.title, short: SL(c.site) + ' · ' + (c.type === 'ตรวจสภาพ' ? 'ตรวจ' : c.type === 'ซ่อมบำรุง' ? 'ซ่อม' : 'ล้าง'), who: c.who, st: c.st || 'todo' };
+    var createdEv = JS('sc.createdWo', []).filter(function (c) { return c && c.org === orgId && thParse(c.due); }).map(function (c) {
+      return { no: c.no, date: thParse(c.due), site: KEY[c.site] || '', siteName: c.site, title: c.title, short: SL(c.site) + ' · ' + (c.type === 'ตรวจสภาพ' ? 'ตรวจ' : c.type === 'ซ่อมบำรุง' ? 'ซ่อม' : 'ล้าง'), who: c.who, st: c.st || 'todo' };
     });
-    var events = EV[orgId].concat(createdEv).map(function (e) {
-      var o = Object.assign({}, e);
+    var events = EV[orgId].map(function (e) { return Object.assign({ date: new Date(2026, 10, e.day) }, e); }).concat(createdEv).map(function (e) {
+      var o = Object.assign({}, e); o.day = o.date.getDate();
       if (o.short && o.siteName && o.short.indexOf(' · ') > 0) o.short = SL(o.siteName) + o.short.slice(o.short.indexOf(' · '));
       if (woAssign[e.no]) { o.who = woAssign[e.no]; if (o.st === 'new') o.st = 'todo'; }
       var st = woStat[e.no]; if (st) { o.st = st; if (st === 'done') o.overdue = ''; }
@@ -299,29 +302,46 @@ class Component extends DCLogic {
     var stored = ''; try { stored = window.sessionStorage.getItem('sc.site') || ''; } catch (e) {}
     var siteF = 'all'; Object.keys(SN).forEach(function (k) { if (SN[k] === stored) siteF = k; });
     var setSiteF = function (id) { try { window.sessionStorage.setItem('sc.site', id === 'all' ? 'all' : SN[id]); } catch (e) {} self.setState({ sync: Date.now() }); };
-    var shown = events.filter(function (e) { return siteF === 'all' || e.site === siteF; });
+    // the month on screen: พ.ย. 2569 (this month) up to 3 months ahead; later rounds are projected from each site's cycle
+    var MO = Math.max(0, Math.min(3, s.mo || 0)), mStart = new Date(2026, 10 + MO, 1), mEnd = new Date(2026, 11 + MO, 0), nDays = mEnd.getDate();
+    var MON_FULL = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+    var monShort = TH_M[mStart.getMonth()] + ' ' + (mStart.getFullYear() + 543), monFull = MON_FULL[mStart.getMonth()] + ' ' + (mStart.getFullYear() + 543);
+    var inMonth = function (d) { return d && d >= mStart && d <= mEnd; };
+    var shown = events.filter(function (e) { return (siteF === 'all' || e.site === siteF) && inMonth(e.date); });
+    // a work order answers a cleaning round only when its date is inside the round window (due −7 … due +7 days; an overdue round stays open until cleaned)
+    var woDate = {}; events.forEach(function (e) { woDate[e.no] = e.date; });
+    var inWindow = function (no, due) { var w = woDate[no]; if (!w || !due) return !!no && !w; var dd = (w - due) / 864e5; return dd >= -7 && (dd <= 7 || due < TODAY); };
+    var dueOf = function (r) { var l = thParse(r[4]); return l && r[3] ? new Date(l.getTime() + r[3] * 864e5) : (r[5] ? new Date(2026, 10, r[5]) : null); };
     // cycle due dates drawn as ghost chips; each opens its job, or offers "สร้างใบงาน" when there is none
-    var ghosts = CY[orgId].filter(function (r) { return r[5] && (siteF === 'all' || r[0] === siteF); }).map(function (r) {
-      var job = r[7] && ((stOf[r[7]] || madeSt[r[7]]) && (stOf[r[7]] || madeSt[r[7]]) !== 'done') ? r[7] : '';
-      return { id: 'cyc:' + r[0], day: r[5], site: r[0], siteName: DN(r[1]), date: r[5] + ' พ.ย. 2569', note: r[6] + (job ? ' · ใบงาน ' + job : ''),
-        hasJob: !!job, jobLabel: 'เปิดใบงาน ' + job, jobKeys: 'sc.wo=' + job + '|sc.woFrom=Schedule',
-        canNew: !job && canEdit, createKeys: 'sc.from=Schedule|sc.siteName=' + r[1] + '|sc.cycleDue=' + isoDue(r) };
+    var ghosts = [];
+    CY[orgId].filter(function (r) { return r[3] && (siteF === 'all' || r[0] === siteF); }).forEach(function (r) {
+      var n0 = dueOf(r); if (!n0) return;
+      for (var k = 0; k < 12; k++) {
+        var g = new Date(n0.getTime() + k * r[3] * 864e5); if (g > mEnd) break; if (!inMonth(g)) continue;
+        var j0 = r[7] && ((stOf[r[7]] || madeSt[r[7]]) && (stOf[r[7]] || madeSt[r[7]]) !== 'done') ? r[7] : '';
+        var job = j0 && inWindow(j0, g) ? j0 : '';
+        var p2 = function (x) { return (x < 10 ? '0' : '') + x; }, iso = (g < TODAY ? TODAY : g); iso = iso.getFullYear() + '-' + p2(iso.getMonth() + 1) + '-' + p2(iso.getDate());
+        ghosts.push({ id: 'cyc:' + r[0] + ':' + k, day: g.getDate(), site: r[0], siteName: DN(r[1]), date: thFmt(g), note: (k ? 'รอบถัดไป (ประมาณการจากรอบล้างทุก ' + r[3] + ' วัน)' : r[6]) + (job ? ' · ใบงาน ' + job : ''),
+          hasJob: !!job, jobLabel: 'เปิดใบงาน ' + job, jobKeys: 'sc.wo=' + job + '|sc.woFrom=Schedule',
+          canNew: !job && canEdit, createKeys: 'sc.from=Schedule|sc.siteName=' + r[1] + '|sc.cycleDue=' + (k ? iso : isoDue(r)) });
+      }
     });
     var selG = ghosts.filter(function (g) { return g.id === s.sel; })[0] || null;
-    var cur = selG ? null : (events.filter(function (e) { return e.no === s.sel; })[0] || (orgId === 'a' ? events.filter(function (e) { return e.no === 'WO-1043'; })[0] : shown[0]));
+    var cur = selG ? null : (shown.filter(function (e) { return e.no === s.sel; })[0] || (orgId === 'a' && MO === 0 ? events.filter(function (e) { return e.no === 'WO-1043'; })[0] : shown[0]));
     var selNo = selG ? selG.id : (cur ? cur.no : '');
     var STL = { new: 'รอมอบหมาย', todo: 'มอบหมายแล้ว', doing: 'กำลังดำเนินการ', review: 'รออนุมัติ', returned: 'ส่งกลับแก้ไข', paused: 'พักงาน', done: 'เสร็จสิ้น' };
-    var ariaOf = function (e) { return e.no + ' · ' + e.siteName + ' · ' + e.title + ' · ' + (STL[e.st] || e.st) + (e.overdue ? ' · เลยกำหนด ' + e.overdue : ''); };
-    var evStyle = function (e, on) { var m = woTone[e.st] || woTone.new; return 'display:block;width:100%;min-height:32px;margin-top:4px;padding:4px 6px;border-radius:6px;text-align:left;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;background:' + m[0] + ';color:' + m[1] + ';border:' + (on ? '2px solid ' + m[1] : (e.overdue ? '1px solid #B42318' : '1px solid transparent')); };
-    var ghostStyle = function (on) { return 'display:block;width:100%;min-height:32px;margin-top:4px;padding:4px 6px;border-radius:6px;text-align:left;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;background:#FFFFFF;color:#0A4F44;border:' + (on ? '2px solid #0F6B5C' : '1px dashed #0F6B5C'); };
+    var ariaOf = function (e) { return e.no + ' · ' + DN(e.siteName) + ' · ' + e.title + ' · ' + (STL[e.st] || e.st) + (e.overdue ? ' · เลยกำหนด ' + e.overdue : ''); };
+    var evStyle = function (e, on) { var m = woTone[e.st] || woTone.new; return 'display:block;width:100%;min-height:44px;margin-top:4px;padding:4px 6px;border-radius:6px;text-align:left;font-size:12px;font-weight:600;line-height:1.35;font-family:inherit;cursor:pointer;background:' + m[0] + ';color:' + m[1] + ';border:' + (on ? '2px solid ' + m[1] : (e.overdue ? '1px solid #B42318' : '1px solid transparent')); };
+    var ghostStyle = function (on) { return 'display:block;width:100%;min-height:44px;margin-top:4px;padding:4px 6px;border-radius:6px;text-align:left;font-size:12px;font-weight:600;line-height:1.35;font-family:inherit;cursor:pointer;background:#FFFFFF;color:#0A4F44;border:' + (on ? '2px solid #0F6B5C' : '1px dashed #0F6B5C'); };
     var cells = [];
-    // Nov 2026 starts on Sunday; Monday-first grid → 6 leading blanks
-    for (var i = 0; i < 6; i++) cells.push({ num: '', events: [], style: 'min-height:96px;border-right:1px solid #EEF0F3;border-bottom:1px solid #EEF0F3;background:#FAFBFC', numStyle: 'font-size:12px' });
-    for (var d = 1; d <= 30; d++) {
-      var today = d === 15;
-      var dayEv = shown.filter(function (e) { return e.day === d; }).map(function (e) { var on = e.no === selNo; return { label: e.short, on: on, aria: ariaOf(e), style: evStyle(e, on), pick: function () { self.setState({ sel: e.no }); } }; });
-      ghosts.filter(function (g) { return g.day === d; }).forEach(function (g) { var on = g.id === selNo; dayEv.push({ label: 'ครบรอบ · ' + SL(g.siteName), on: on, aria: 'วันครบรอบล้าง ' + g.siteName + ' · ' + g.note, style: ghostStyle(on), pick: function () { self.setState({ sel: g.id }); } }); });
-      cells.push({ num: d,
+    // Monday-first grid → leading blanks before the 1st
+    var lead = (mStart.getDay() + 6) % 7, isNov = MO === 0;
+    for (var i = 0; i < lead; i++) cells.push({ num: '', events: [], style: 'min-height:96px;border-right:1px solid #EEF0F3;border-bottom:1px solid #EEF0F3;background:#FAFBFC', numStyle: 'font-size:12px' });
+    for (var d = 1; d <= nDays; d++) {
+      var today = isNov && d === 15;
+      var dayEv = shown.filter(function (e) { return e.day === d; }).map(function (e) { var on = e.no === selNo; return { label: e.short, sub: e.overdue ? 'เลยกำหนด ' + e.overdue : (STL[e.st] || e.st), late: !!e.overdue, on: on, aria: ariaOf(e), style: evStyle(e, on), pick: function () { self.setState({ sel: e.no }); } }; });
+      ghosts.filter(function (g) { return g.day === d; }).forEach(function (g) { var on = g.id === selNo; dayEv.push({ label: 'ครบรอบ · ' + SL(g.siteName), sub: g.hasJob ? 'มีใบงานแล้ว' : 'วันครบรอบล้าง', late: false, on: on, aria: 'วันครบรอบล้าง ' + g.siteName + ' ' + g.date + ' · ' + g.note, style: ghostStyle(on), pick: function () { self.setState({ sel: g.id }); } }); });
+      cells.push({ num: d, today: today,
         style: 'min-height:96px;padding:6px;box-sizing:border-box;border-right:1px solid #EEF0F3;border-bottom:1px solid #EEF0F3;background:#FFFFFF',
         numStyle: 'font-size:12px;font-weight:600;width:24px;height:24px;border-radius:999px;display:flex;align-items:center;justify-content:center;' + (today ? 'background:#0F6B5C;color:#FFFFFF' : 'color:#374151'),
         events: dayEv });
@@ -333,51 +353,72 @@ class Component extends DCLogic {
     var propState = self.props.state || 'ready';
     var listState = s.retriedFor === propState ? 'ready' : propState, busy = listState !== 'ready';
     // phone: one week at a time (weeks start Monday, like the desktop grid); today 15 พ.ย. 2569 is in week 2 (9–15)
-    var WEEKS = [[1, 1], [2, 8], [9, 15], [16, 22], [23, 29], [30, 30]];
+    var WEEKS = [], w0 = 1, firstEnd = 7 - lead;
+    WEEKS.push([1, Math.min(firstEnd, nDays)]); for (w0 = firstEnd + 1; w0 <= nDays; w0 += 7) WEEKS.push([w0, Math.min(w0 + 6, nDays)]);
     var DOW = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์', 'อาทิตย์'];
-    var wk = s.wk == null ? 2 : s.wk, W = WEEKS[wk];
+    var thisWk = isNov ? 2 : 0;
+    var wk = s.wk == null || s.wkMo !== MO ? thisWk : Math.min(s.wk, WEEKS.length - 1), W = WEEKS[wk];
+    var mAb = TH_M[mStart.getMonth()];
     var weekRows = [], emptyRun = [];
-    var flushEmpty = function () { if (!emptyRun.length) return; var a = emptyRun[0], b = emptyRun[emptyRun.length - 1]; weekRows.push({ empty: true, full: false, text: (a === b ? a : a + '–' + b) + ' พ.ย. · ไม่มีงานหรือวันครบรอบ' }); emptyRun = []; };
+    var flushEmpty = function () { if (!emptyRun.length) return; var a = emptyRun[0], b = emptyRun[emptyRun.length - 1]; weekRows.push({ empty: true, full: false, text: (a === b ? a : a + '–' + b) + ' ' + mAb + ' · ไม่มีงานหรือวันครบรอบ' }); emptyRun = []; };
     for (var dd = W[0]; dd <= W[1]; dd++) {
-      var items = shown.filter(function (e) { return e.day === dd; }).map(function (e) { return { isWo: true, isGhost: false, no: e.no, title: e.title, siteName: DN(e.siteName), who: e.who, st: e.st, due: e.day + ' พ.ย. 2569', overdue: e.overdue || '', woKeys: 'sc.wo=' + e.no + '|sc.woFrom=Schedule' }; })
+      var items = shown.filter(function (e) { return e.day === dd; }).map(function (e) { return { isWo: true, isGhost: false, no: e.no, title: e.title, siteName: DN(e.siteName), who: e.who, st: e.st, due: thFmt(e.date), overdue: e.overdue || '', woKeys: 'sc.wo=' + e.no + '|sc.woFrom=Schedule' }; })
         .concat(ghosts.filter(function (g) { return g.day === dd; }).map(function (g) { return Object.assign({ isWo: false, isGhost: true }, g); }));
-      if (!items.length && dd === 15) { flushEmpty(); weekRows.push({ empty: true, full: false, text: 'วันอาทิตย์ 15 พ.ย. · วันนี้ · ไม่มีงานหรือวันครบรอบ' }); continue; }
+      if (!items.length && isNov && dd === 15) { flushEmpty(); weekRows.push({ empty: true, full: false, text: 'วันอาทิตย์ 15 พ.ย. · วันนี้ · ไม่มีงานหรือวันครบรอบ' }); continue; }
       if (!items.length) { emptyRun.push(dd); continue; }
       flushEmpty();
-      weekRows.push({ empty: false, full: true, head: 'วัน' + DOW[(dd + 5) % 7] + ' ' + dd + ' พ.ย.' + (dd === 15 ? ' · วันนี้' : ''), items: items });
+      weekRows.push({ empty: false, full: true, head: 'วัน' + DOW[(new Date(mStart.getFullYear(), mStart.getMonth(), dd).getDay() + 6) % 7] + ' ' + dd + ' ' + mAb + (isNov && dd === 15 ? ' · วันนี้' : ''), items: items });
     }
     flushEmpty();
-    var weekNav = { label: (W[0] === W[1] ? W[0] : W[0] + '–' + W[1]) + ' พ.ย. 2569', prevOff: wk === 0, nextOff: wk === WEEKS.length - 1,
-      prev: function () { if (wk > 0) self.setState({ wk: wk - 1 }); }, next: function () { if (wk < WEEKS.length - 1) self.setState({ wk: wk + 1 }); },
-      toToday: function () { self.setState({ wk: 2 }); }, notThis: wk !== 2 };
-    var autoOf = function (r) { return s.auto[r[0]] != null ? !!s.auto[r[0]] : !!r[3]; };
+    // stepping past the last/first week moves to the next/previous month
+    var weekNav = { label: (W[0] === W[1] ? W[0] : W[0] + '–' + W[1]) + ' ' + monShort, prevOff: wk === 0 && MO === 0, nextOff: wk === WEEKS.length - 1 && MO === 3,
+      prev: function () { if (wk > 0) self.setState({ wk: wk - 1, wkMo: MO }); else if (MO > 0) self.setState({ mo: MO - 1, wk: 99, wkMo: MO - 1, sel: '' }); },
+      next: function () { if (wk < WEEKS.length - 1) self.setState({ wk: wk + 1, wkMo: MO }); else if (MO < 3) self.setState({ mo: MO + 1, wk: 0, wkMo: MO + 1, sel: '' }); },
+      toToday: function () { self.setState({ mo: 0, wk: 2, wkMo: 0, sel: '' }); }, notThis: !(isNov && wk === 2) };
+    var navBtn = function (off) { return 'width: 44px; height: 44px; border-radius: 8px; border: 1px solid #D5D9E0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; padding: 0; cursor: ' + (off ? 'not-allowed; opacity: 0.45' : 'pointer'); };
+    var prevM = new Date(2026, 9 + MO, 1), nextM = new Date(2026, 11 + MO, 1);
+    var monNav = { label: monShort, notThis: MO !== 0, prevOff: MO === 0, nextOff: MO === 3, prevStyle: navBtn(MO === 0), nextStyle: navBtn(MO === 3),
+      prevLabel: MO === 0 ? 'เดือนก่อนหน้า (ข้อมูลเริ่มที่ พ.ย. 2569)' : 'เดือนก่อนหน้า ' + TH_M[prevM.getMonth()] + ' ' + (prevM.getFullYear() + 543),
+      nextLabel: MO === 3 ? 'เดือนถัดไป (ดูล่วงหน้าได้ 3 เดือน)' : 'เดือนถัดไป ' + TH_M[nextM.getMonth()] + ' ' + (nextM.getFullYear() + 543),
+      prev: function () { if (MO > 0) self.setState({ mo: MO - 1, sel: '', wk: null }); }, next: function () { if (MO < 3) self.setState({ mo: MO + 1, sel: '', wk: null }); },
+      toToday: function () { self.setState({ mo: 0, sel: '', wk: null }); } };
+    // auto-create toggles persist per site in sc.autoCycle (DATA.md round 13)
+    var AUTO = JS('sc.autoCycle', {}), AUTO_DEF = { lb: false };
+    var autoOf = function (r) { return AUTO[r[0]] != null ? !!AUTO[r[0]] : (AUTO_DEF[r[0]] != null ? AUTO_DEF[r[0]] : !!r[3]); };
     return {
-      headSub: 'วางแผนรอบล้างตามวันที่ · เฉพาะไซต์ในขอบเขตของคุณ' + (canEdit ? '' : ' · ดูอย่างเดียว (Viewer)'),
+      headSub: 'ดูรอบล้างและใบงานรายเดือน · เฉพาะไซต์ในขอบเขตของคุณ' + (canEdit ? '' : ' · คุณเป็นผู้ดูอย่างเดียว'),
       headActs: canEdit ? [{ label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=Schedule|sc.siteName=|sc.cycleDue=' }] : [],
       canCreate: canEdit,
       listBusy: busy, listState: busy ? listState : 'loading', showCal: !busy,
       retry: function () { self.setState({ retriedFor: propState }); },
-      noEvents: !busy && events.length === 0 && ghosts.length === 0,
-      noEventsText: cyc.length ? 'ตั้งรอบล้างให้ไซต์ แล้ววันครบรอบจะแสดงในปฏิทินนี้' : 'องค์กรนี้ยังไม่มีไซต์',
+      noEvents: !busy && shown.length === 0 && ghosts.length === 0,
+      monNav: monNav, calLabel: 'ปฏิทินเดือน' + monFull,
+      noEventsText: cyc.length ? (MO ? 'ยังไม่มีใบงานหรือวันครบรอบใน' + monFull + ' · ตั้งรอบล้างให้ไซต์ แล้ววันครบรอบจะแสดงที่นี่' : 'ตั้งรอบล้างให้ไซต์ แล้ววันครบรอบจะแสดงในปฏิทินนี้') : 'องค์กรนี้ยังไม่มีไซต์',
       noCycles: cyc.length === 0,
       weekdays: ['จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.', 'อา.'],
-      agenda: shown.map(function (e) { return { no: e.no, title: e.title, siteName: DN(e.siteName), who: e.who, st: e.st, due: e.day + ' พ.ย. 2569', overdue: e.overdue || '', woKeys: 'sc.wo=' + e.no + '|sc.woFrom=Schedule' }; }),
+      agenda: shown.map(function (e) { return { no: e.no, title: e.title, siteName: DN(e.siteName), who: e.who, st: e.st, due: thFmt(e.date), overdue: e.overdue || '', woKeys: 'sc.wo=' + e.no + '|sc.woFrom=Schedule' }; }),
       legend: ['new', 'todo', 'doing', 'review', 'returned', 'paused', 'done'].map(function (k) { return { text: STL[k], dot: 'flex: none; width: 10px; height: 10px; border-radius: 3px; background: ' + woTone[k][0] + '; border: 1px solid ' + woTone[k][1] }; }).concat([{ text: 'เลยกำหนด', dot: 'flex: none; width: 10px; height: 10px; border-radius: 3px; background: #FFFFFF; border: 1px solid #B42318' }, { text: 'วันครบรอบล้าง', dot: 'flex: none; width: 10px; height: 10px; border-radius: 3px; background: #FFFFFF; border: 1px dashed #0F6B5C' }]),
       ghostList: ghosts, weekRows: weekRows, weekNav: weekNav,
       cells: cells,
-      siteF: siteF, setSiteF: setSiteF,
-      chipOpts: chipDefs.map(function (c) { return { id: c[0], label: c[1], count: events.filter(function (e) { return c[0] === 'all' || e.site === c[0]; }).length }; }),
+      siteF: siteF, setSiteF: setSiteF, pickSite: function (e) { setSiteF(e.target.value); },
+      multiSite: Object.keys(SN).length > 1,
+      legendOpen: s.legend ? 'true' : 'false', showLegend: !!s.legend, toggleLegend: function () { self.setState({ legend: !self.state.legend }); },
+      chipOpts: chipDefs.map(function (c) { var n = events.filter(function (e) { return c[0] === 'all' || e.site === c[0]; }).length; return { id: c[0], label: c[1], count: n, text: (c[0] === 'all' ? 'ทุกไซต์' : DN(SN[c[0]])) + ' (' + n + ' งาน)' }; }),
       selCyc: !!selG, selG: selG || { date: '', siteName: '', note: '', hasJob: false, jobLabel: '', jobKeys: '', canNew: false, createKeys: '' },
       sel: !!cur,
-      selEv: cur ? { woKeys: 'sc.wo=' + cur.no + '|sc.woFrom=Schedule', no: cur.no, date: cur.day + ' พ.ย. 2569', title: cur.title, site: DN(cur.siteName), who: cur.who, st: cur.st, overdue: cur.overdue || '',
+      selEv: cur ? { woKeys: 'sc.wo=' + cur.no + '|sc.woFrom=Schedule', no: cur.no, date: thFmt(cur.date), title: cur.title, site: DN(cur.siteName), who: cur.who, st: cur.st, overdue: cur.overdue || '',
         goSite: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.siteName', cur.siteName); window.sessionStorage.setItem('sc.siteFrom', 'Schedule'); } catch (x) {} } } : {},
       cycles: cyc.map(function (r) {
-        var job = r[7] && ((stOf[r[7]] || madeSt[r[7]]) && (stOf[r[7]] || madeSt[r[7]]) !== 'done') ? r[7] : '';
+        var job = r[7] && ((stOf[r[7]] || madeSt[r[7]]) && (stOf[r[7]] || madeSt[r[7]]) !== 'done') && inWindow(r[7], dueOf(r)) ? r[7] : '';
+        var late = /เลยกำหนด/.test(r[6]);
         return { name: DN(r[1]), site: r[2], note: r[6], auto: autoOf(r), canToggle: canEdit && !!r[3],
+          short: r[3] ? String(r[6]).split(' · ').filter(function (x) { return /ครบรอบ|เลยกำหนด|ทุก/.test(x); }).slice(0, 2).join(' · ') || r[6] : 'ยังไม่ตั้งรอบล้าง · ตั้งได้ที่หน้าไซต์',
+          noteColor: late ? '#B42318' : '#4B5563', aria: DN(r[1]) + ' · ดูและเปลี่ยนรอบล้างที่หน้าไซต์',
+          goSite: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.siteName', r[1]); ss.setItem('sc.siteFrom', 'Schedule'); ss.setItem('sc.siteTab', 'work'); } catch (x) {} },
           hasJob: !!job, jobLabel: 'เปิดใบงาน ' + job + ' ของรอบนี้', jobKeys: 'sc.wo=' + job + '|sc.woFrom=Schedule',
           canCreate: canEdit && !!r[3] && !job, createKeys: 'sc.from=Schedule|sc.siteName=' + r[1] + '|sc.cycleDue=' + isoDue(r),
           canSetCycle: canEdit && !r[3], siteKeys: 'sc.siteName=' + r[1] + '|sc.siteFrom=Schedule',
-          toggle: function () { var a = Object.assign({}, s.auto); a[r[0]] = !autoOf(r); self.setState({ auto: a }); } };
+          toggle: function () { var a = JS('sc.autoCycle', {}); a[r[0]] = !autoOf(r); try { window.sessionStorage.setItem('sc.autoCycle', JSON.stringify(a)); } catch (e) {} self.setState({ sync: Date.now() }); } };
       })
     };
   }

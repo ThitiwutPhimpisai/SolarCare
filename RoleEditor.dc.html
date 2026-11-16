@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>สร้าง Custom Role</title>
+<title>บทบาทกำหนดเอง · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -23,13 +23,13 @@ button{cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" back-label="Role &amp; สิทธิ์" back-href="Roles.dc.html" icon="shield" title="{{pageTitle}}" hint-size="100%,76px"></dc-import>
+    <dc-import name="PageHeader" back-label="บทบาทและสิทธิ์" back-href="Roles.dc.html" icon="shield" title="{{pageTitle}}" hint-size="100%,76px"></dc-import>
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
       <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>สร้างหรือแก้ Custom Role ได้เฉพาะ Org Owner และ Org Admin</h2>
-        <p style="margin: 0; font-size: 14px; color: #374151">คุณเป็น {{youRole}} ใน {{orgName}} · ดูสิทธิ์ของแต่ละ Role ได้ที่หน้า Role &amp; สิทธิ์</p>
-        <dc-import name="Button" icon="arrowLeft" label="กลับไปหน้า Role &amp; สิทธิ์" variant="secondary" href="Roles.dc.html" hint-size="200px,44px"></dc-import>
+        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>สร้างหรือแก้บทบาทกำหนดเองได้เฉพาะ เจ้าขององค์กร และ ผู้ดูแลองค์กร</h2>
+        <p style="margin: 0; font-size: 14px; color: #374151">คุณเป็น {{youRole}} ใน {{orgName}} · ดูสิทธิ์ของแต่ละบทบาทได้ที่หน้าบทบาทและสิทธิ์</p>
+        <dc-import name="Button" icon="arrowLeft" label="กลับไปหน้าบทบาทและสิทธิ์" variant="secondary" href="Roles.dc.html" hint-size="200px,44px"></dc-import>
       </section>
     </sc-if>
     <sc-if value="{{canManage}}" hint-placeholder-val="{{ true }}">
@@ -37,9 +37,9 @@ button{cursor:pointer}
       <section style="flex: 999 1 600px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
           <div style="display: flex; flex-direction: column; gap: 6px">
-            <label for="re-name" style="font-size: 13px; font-weight: 600">ชื่อ Role</label>
+            <label for="re-name" style="font-size: 13px; font-weight: 600">ชื่อบทบาท</label>
             <input id="re-name" value="{{roleName}}" onChange="{{setName}}" placeholder="เช่น หัวหน้าทีมช่าง" aria-invalid="{{nameBad}}" aria-describedby="re-name-err" style="{{nameStyle}}">
-            <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><div id="re-name-err" role="alert" style="font-size: 12px; color: #B42318">{{nameErr}}</div></sc-if>
+            <div id="re-name-err" role="alert" style="font-size: 12px; color: #B42318"><sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}">{{nameErr}}</sc-if></div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="re-base" style="font-size: 13px; font-weight: 600">เริ่มจากแม่แบบ</label>
@@ -48,7 +48,7 @@ button{cursor:pointer}
           </div>
         </div>
         <fieldset style="border: 0; margin: 0; padding: 0">
-          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 8px">ระดับของ Role</legend>
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 8px">ระดับของบทบาท</legend>
           <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
             <sc-for list="{{levels}}" as="l" hint-placeholder-count="2">
               <button onClick="{{l.pick}}" aria-pressed="{{l.on}}" style="{{l.style}}"><span style="font-weight: 700">{{l.label}}</span><span style="font-size: 12px; color: #4B5563">{{l.desc}}</span></button>
@@ -63,7 +63,6 @@ button{cursor:pointer}
               <label style="{{it.rowStyle}}">
                 <input type="checkbox" checked="{{it.on}}" disabled="{{it.off}}" onChange="{{it.toggle}}" style="width: 20px; height: 20px; accent-color: #0F6B5C; flex: none">
                 <span style="flex: 1">{{it.label}}</span>
-                <code style="font-size: 12px; color: #4B5563">{{it.key}}</code>
               </label>
             </sc-for>
           </fieldset>
@@ -76,13 +75,13 @@ button{cursor:pointer}
           <div style="font-size: 32px; font-weight: 700">{{count}} <span style="font-size: 14px; font-weight: 500; color: #4B5563">สิทธิ์</span></div>
           <div style="font-size: 13px; color: #374151; line-height: 1.6">{{levelNote}}</div>
           <sc-if value="{{warnSelf}}" hint-placeholder-val="{{ false }}">
-            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FFF4E5; color: #8A3B06; line-height: 1.5">มีทั้ง wo.update และ wo.approve — คนเดียวกันจะอนุมัติงานที่ตัวเองทำได้ ระบบจะบล็อกการอนุมัติงานของตนเองอัตโนมัติ</div>
+            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FFF4E5; color: #8A3B06; line-height: 1.5">มีทั้ง “อัปเดตผล / แนบรูป” และ “อนุมัติปิดงาน” — คนเดียวกันจะอนุมัติงานที่ตัวเองทำได้ ระบบจะบล็อกการอนุมัติงานของตนเองอัตโนมัติ</div>
           </sc-if>
-          <div style="font-size: 12px; color: #4B5563">สิทธิ์โอนความเป็นเจ้าของและลบองค์กร ให้ Custom Role ไม่ได้</div>
+          <div style="font-size: 12px; color: #4B5563">สิทธิ์โอนความเป็นเจ้าของและลบองค์กร ให้บทบาทกำหนดเองไม่ได้</div>
         </section>
         <div style="display: flex; gap: 8px">
           <div style="flex: 1"><dc-import name="Button" label="ยกเลิก" href="Roles.dc.html" variant="secondary" full="{{true}}" hint-size="100%,44px"></dc-import></div>
-          <div style="flex: 1"><sc-if value="{{canSave}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" label="บันทึก Role" href="Roles.dc.html" save-keys="{{saveStore}}" on-press="{{saveRole}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if><sc-if value="{{cantSave}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" label="บันทึก Role" on-press="{{trySave}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if></div>
+          <div style="flex: 1"><sc-if value="{{canSave}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" label="บันทึกบทบาท" href="Roles.dc.html" save-keys="{{saveStore}}" on-press="{{saveRole}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if><sc-if value="{{cantSave}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" label="บันทึกบทบาท" on-press="{{trySave}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if></div>
         </div>
       </aside>
     </div>
@@ -113,6 +112,21 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { forKey: '', roleName: '', level: 'site', on: {}, base: 'none', tried: false }; }
   componentDidMount() {
@@ -129,7 +143,7 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this, st = self.state;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -171,20 +185,20 @@ class Component extends DCLogic {
       ['ไซต์ & อุปกรณ์', [['ดูไซต์', 'site.read'], ['สร้าง / ลบไซต์', 'site.create'], ['แก้ไขข้อมูลไซต์ / แผง / อินเวอร์เตอร์', 'asset.update']]],
       ['ใบงาน', [['ดูใบงาน', 'wo.read'], ['สร้าง / มอบหมายใบงาน', 'wo.assign'], ['อัปเดตผล / แนบรูป', 'wo.update'], ['อนุมัติปิดงาน', 'wo.approve']]],
       ['รายงาน', [['ดูรายงาน', 'report.read'], ['ส่งออก PDF / Excel', 'report.export']]],
-      ['สมาชิก & สิทธิ์', [['เชิญสมาชิก', 'member.invite'], ['กำหนด Role', 'member.role'], ['สร้าง Custom Role', 'role.manage'], ['ดู Audit log', 'audit.read']]]
+      ['สมาชิก & สิทธิ์', [['เชิญสมาชิก', 'member.invite'], ['กำหนดบทบาทให้สมาชิก', 'member.role'], ['สร้างบทบาทกำหนดเอง', 'role.manage'], ['ดู Audit log', 'audit.read']]]
     ];
     var isSite = s.level === 'site';
     var count = Object.keys(s.on).filter(function (k) { return s.on[k] && !(isSite && orgOnly[k]); }).length;
     var lv = [['site', 'ระดับไซต์', 'มอบให้รายไซต์ผ่าน SiteAssignment'], ['org', 'ระดับองค์กร', 'มีผลทุกไซต์ในองค์กร']];
     // edit mode changes a role people already hold; new/copy starts with nobody on it
-    var modeNote = roleMode === 'edit' ? 'มีผลกับสมาชิกที่ถือ Role นี้' : 'ยังไม่มีสมาชิกได้รับ Role นี้';
+    var modeNote = roleMode === 'edit' ? 'มีผลกับสมาชิกที่มีบทบาทนี้' : 'ยังไม่มีสมาชิกได้รับบทบาทนี้';
     var nm = String(s.roleName || '').trim();
     var taken = ['Org Owner', 'Org Admin', 'Site Manager', 'Technician', 'Viewer'].concat(roleMode === 'edit' || leadSaved ? [] : ['หัวหน้าทีมช่าง']).concat(savedRoles.map(function (r) { return r.name; }).filter(function (n) { return roleMode !== 'edit' || n !== editName; })).indexOf(nm) >= 0;
     var nameOk = !!nm && !taken && count > 0;
     var nameBad = s.tried && !nameOk;
-    var saveStore = 'sc.flash=บันทึก Role “' + nm + '” แล้ว · ' + modeNote + (roleMode === 'edit' ? '' : ' มอบได้ที่หน้าสมาชิก');
+    var saveStore = 'sc.flash=บันทึกบทบาท “' + nm + '” แล้ว · ' + modeNote + (roleMode === 'edit' ? '' : ' มอบได้ที่หน้าสมาชิก');
     return {
-      pageTitle: ({ edit: 'แก้ไข ' + editName, copy: 'ทำสำเนา ' + src })[roleMode] || 'สร้าง Custom Role',
+      pageTitle: ({ edit: 'แก้ไข ' + editName, copy: 'ทำสำเนา ' + src })[roleMode] || 'สร้างบทบาทกำหนดเอง',
       blocked: !canManage, canManage: canManage, youRole: ORG[1], orgName: ORG[0],
       saveStore: saveStore,
       saveRole: function () {
@@ -202,14 +216,14 @@ class Component extends DCLogic {
         if (roleMode === 'edit' && !isLead && oldName !== nm) { try { var me = JSON.parse(SS('sc.memberEdits') || '{}') || {}; Object.keys(me).forEach(function (k) { if (k.split('|')[0] !== orgId) return; var rr = (me[k] || {}).roles || {}; Object.keys(rr).forEach(function (sid) { if (rr[sid] === 'cr:' + oldName) rr[sid] = 'cr:' + nm; }); }); window.sessionStorage.setItem('sc.memberEdits', JSON.stringify(me)); } catch (e) {} }
       },
       roleName: s.roleName, setName: function (e) { setS({ roleName: e.target.value }); },
-      nameBad: nameBad, nameErr: !nm ? 'ตั้งชื่อ Role ก่อนบันทึก' : taken ? 'มี Role ชื่อนี้อยู่แล้ว ตั้งชื่ออื่น' : 'เลือกอย่างน้อย 1 สิทธิ์',
+      nameBad: nameBad, nameErr: !nm ? 'ตั้งชื่อบทบาทก่อนบันทึก' : taken ? 'มีบทบาทชื่อนี้อยู่แล้ว ตั้งชื่ออื่น' : 'เลือกอย่างน้อย 1 สิทธิ์',
       nameStyle: 'min-height: 44px; padding: 0 12px; border-radius: 8px; font-size: 14px; border: 1px solid ' + (nameBad ? '#B42318' : '#858D9B'),
       canSave: nameOk, cantSave: !nameOk, trySave: function () { setS({ tried: true }); },
       base: s.base, baseOpts: [{ v: 'none', t: 'เริ่มจากศูนย์ (ไม่มีสิทธิ์)' }, { v: 'Technician', t: 'Technician' }, { v: 'Site Manager', t: 'Site Manager' }, { v: 'Viewer', t: 'Viewer' }, { v: 'Org Admin', t: 'Org Admin' }].concat(roleMode === 'edit' ? [{ v: editName, t: editName + ' (ค่าปัจจุบัน)' }] : []).concat(savedRoles.filter(function (r) { return roleMode !== 'edit' || r.name !== editName; }).map(function (r) { return { v: r.name, t: r.name + ' (Custom)' }; })),
       baseNote: s.base === 'none' ? 'ติ๊กสิทธิ์เองด้านล่าง' : 'คัดลอกสิทธิ์จาก ' + s.base + ' แล้ว ปรับเพิ่ม/ลดได้',
       setBase: function (e) { var b = e.target.value; setS({ base: b, on: toOn(TPL[b] || []), level: (b === 'Org Admin' || b === 'Org Owner') ? 'org' : s.level }); },
       count: count, warnSelf: !!(s.on['wo.update'] && s.on['wo.approve']),
-      levelNote: isSite ? 'ผู้ได้รับ Role นี้จะมีสิทธิ์เฉพาะไซต์ที่ถูกมอบหมาย สิทธิ์ที่เป็นระดับองค์กรถูกปิดไว้' : 'ผู้ได้รับ Role นี้จะมีสิทธิ์ในทุกไซต์ขององค์กร รวมไซต์ที่เพิ่มในอนาคต',
+      levelNote: isSite ? 'ผู้ได้รับบทบาทนี้จะมีสิทธิ์เฉพาะไซต์ที่ถูกมอบหมาย สิทธิ์ที่เป็นระดับองค์กรถูกปิดไว้' : 'ผู้ได้รับบทบาทนี้จะมีสิทธิ์ในทุกไซต์ขององค์กร รวมไซต์ที่เพิ่มในอนาคต',
       levels: lv.map(function (l) { var on = l[0] === s.level; return { label: l[1], desc: l[2], on: on, pick: function () { setS({ level: l[0] }); },
         style: 'min-height:68px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 14px;border-radius:10px;text-align:left;color:#111827;border:' + (on ? '2px solid #0F6B5C;background:#F0F7F5' : '1px solid #D5D9E0;background:#FFFFFF') }; }),
       groups: groups.map(function (g) { return { title: g[0], items: g[1].map(function (it) { var off = isSite && !!orgOnly[it[1]];

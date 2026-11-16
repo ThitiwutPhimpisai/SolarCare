@@ -17,7 +17,7 @@ body{margin:0}
 <div role="group" aria-label="{{label}}" style="{{rowStyle}}">
   <sc-for list="{{items}}" as="c" hint-placeholder-count="5">
     <button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="{{c.style}}">
-      <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="font-size: 12px">✓</span></sc-if>
+      <sc-if value="{{c.on}}" hint-placeholder-val="{{ false }}"><dc-import name="Icon" icon="check" size="14" tone="current" hint-size="14px,14px"></dc-import></sc-if>
       <span>{{c.label}}</span>
       <sc-if value="{{c.hasCount}}" hint-placeholder-val="{{ true }}"><span style="{{c.countStyle}}">{{c.count}}</span></sc-if>
     </button>
@@ -50,7 +50,7 @@ class Component extends DCLogic {
     var shown = opts.filter(function (o) { return o.id === 'all' || o.id === value || o.count == null || o.count > 0; });
     return {
       label: p.label ?? 'ตัวกรอง',
-      rowStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: flex; gap: 8px; " + (this.state.mobile ? 'flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin' : 'flex-wrap: wrap'),
+      rowStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: flex; gap: 8px; " + (this.state.mobile ? 'flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none' : 'flex-wrap: wrap'),
       items: shown.map(function (o) {
         var on = o.id === value;
         return {

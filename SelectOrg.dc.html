@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>เลือกองค์กร</title>
+<title>เลือกองค์กร · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -37,7 +37,7 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
       <dc-import name="OrgBadge" org="rr" size="48" with-name="{{false}}" hint-size="48px,48px"></dc-import>
       <div style="flex: 1 1 240px; min-width: 0">
         <div style="font-size: 12px; font-weight: 700; color: #8A3B06">คำเชิญรอตอบรับ</div>
-        <div style="font-weight: 600">ริมทะเล รีสอร์ท เชิญคุณเป็น Site Manager</div>
+        <div style="font-weight: 600">ริมทะเล รีสอร์ท เชิญคุณเป็น ผู้จัดการไซต์</div>
       </div>
       <dc-import name="Button" variant="secondary" label="ดูคำเชิญ" href="AcceptInvite.dc.html" save-keys="sc.authed=admin|sc.inviteFrom=SelectOrg" hint-size="100px,44px"></dc-import>
     </section>
@@ -72,6 +72,21 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
@@ -87,7 +102,7 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };

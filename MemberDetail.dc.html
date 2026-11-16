@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>สมาชิก สมศรี ป.</title>
+<title>รายละเอียดสมาชิก · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -30,74 +30,66 @@ button{cursor:pointer}
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
       <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" icon="lock" icon-bg="gray" title="ดูข้อมูลสมาชิกไม่ได้" hint-size="100%,96px"></dc-import>
       <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-        <p style="margin: 0; font-size: 14px; color: #374151">บทบาท Viewer ใน {{orgName}} ดูรายชื่อและสิทธิ์ของสมาชิกไม่ได้</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ Site Manager" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
-        <sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if>
+        <p style="margin: 0; font-size: 14px; color: #374151">บทบาท ผู้ดูอย่างเดียว ใน {{orgName}} ดูรายชื่อและสิทธิ์ของสมาชิกไม่ได้</p>
+        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ ผู้จัดการไซต์" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
+        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
       </section>
     </sc-if>
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
     <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" eyebrow="{{orgName}}" status-kind="member" status-value="{{statusValue}}" person="{{m.person}}" icon="user" title="{{m.name}}" subtitle="{{headSub}}" hint-size="100%,140px"></dc-import>
     <sc-if value="{{readOnly}}" hint-placeholder-val="{{ false }}"><div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{readOnlyNote}}</div></sc-if>
-    <sc-if value="{{smNote}}" hint-placeholder-val="{{ false }}"><div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">คุณเป็น Site Manager · เปลี่ยน Role รายไซต์ได้เฉพาะ Technician / Viewer · Role ระดับองค์กรเปลี่ยนได้โดย Org Admin</div></sc-if>
+    <sc-if value="{{smNote}}" hint-placeholder-val="{{ false }}"><div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">คุณเป็น ผู้จัดการไซต์ · เปลี่ยนบทบาทรายไซต์ได้เฉพาะ ช่าง / ผู้ดูอย่างเดียว · บทบาทระดับองค์กรเปลี่ยนได้โดย ผู้ดูแลองค์กร</div></sc-if>
 
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
       <div style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
         <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
-          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="shield" size="18" tone="brand" hint-size="18px,18px"></dc-import>Role ระดับองค์กร</h2>
+          <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="shield" size="18" tone="brand" hint-size="18px,18px"></dc-import>บทบาทในองค์กร</h2>
           <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
-            <label for="md-org" style="position: absolute; left: -9999px">Role ระดับองค์กร</label>
+            <label for="md-org" style="position: absolute; left: -9999px">บทบาทระดับองค์กร</label>
             <select id="md-org" value="{{orgRole}}" onChange="{{setOrgRole}}" disabled="{{orgLocked}}" style="min-height: 44px; min-width: 240px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
               <option value="none">ไม่มี · ใช้สิทธิ์รายไซต์</option>
-              <option value="admin">Org Admin · ทุกไซต์</option>
+              <option value="admin">ผู้ดูแลองค์กร · ทุกไซต์</option>
               <option value="owner" disabled>{{ownerOptText}}</option>
             </select>
             <span style="font-size: 13px; color: #4B5563">{{orgHint}}</span>
           </div>
           <sc-if value="{{canTransfer}}" hint-placeholder-val="{{ false }}">
             <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-top: 1px solid #EEF0F3; padding-top: 12px">
-              <div style="flex: 1 1 280px"><div style="font-weight: 600">โอนความเป็นเจ้าของ (Org Owner)</div><div style="font-size: 13px; color: #4B5563">{{m.name}} จะเป็น Org Owner และคุณจะเป็น Org Admin แทน</div></div>
+              <div style="flex: 1 1 280px"><div style="font-weight: 600">โอนความเป็นเจ้าของ (เจ้าขององค์กร)</div><div style="font-size: 13px; color: #4B5563">{{m.name}} จะเป็น เจ้าขององค์กร และคุณจะเป็น ผู้ดูแลองค์กร แทน</div></div>
               <dc-import name="Button" icon="key" label="{{transferLabel}}" variant="secondary" on-press="{{openTransfer}}" hint-size="180px,44px"></dc-import>
             </div>
           </sc-if>
-          <sc-if value="{{transferred}}" hint-placeholder-val="{{ false }}">
-            <div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">{{m.name}} เป็น Org Owner แล้ว · คุณเป็น Org Admin · บันทึกใน Audit log</div>
-          </sc-if>
+          <div role="status" aria-live="polite"><sc-if value="{{transferred}}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">{{m.name}} เป็น เจ้าขององค์กร แล้ว · คุณเป็น ผู้ดูแลองค์กร · บันทึกใน ประวัติการใช้งาน</div>
+          </sc-if></div>
         </section>
 
         <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
           <div style="padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
-            <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="site" size="18" tone="brand" hint-size="18px,18px"></dc-import>สิทธิ์รายไซต์</h2>
+            <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="site" size="18" tone="brand" hint-size="18px,18px"></dc-import>การเข้าถึงไซต์</h2>
             <sc-if value="{{isAdmin}}" hint-placeholder-val="{{ false }}">
-              <p style="margin: 4px 0 0; font-size: 13px; color: #8A3B06">Org Admin เข้าถึงทุกไซต์อยู่แล้ว สิทธิ์รายไซต์ด้านล่างจะไม่มีผล</p>
+              <p style="margin: 8px 0 0; font-size: 13px; padding: 8px 12px; border-radius: 8px; background: #F0F7F5; border: 1px solid #B9DACF; color: #0A4F44">ผู้ดูแลองค์กร เข้าถึงทุกไซต์อยู่แล้ว สิทธิ์รายไซต์ด้านล่างจะไม่มีผล</p>
             </sc-if>
           </div>
-          <table class="rt" aria-label="สิทธิ์รายไซต์ของสมาชิก" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px">
-            <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">ไซต์</th><th scope="col" style="padding: 10px 12px; font-weight: 600">Role</th><th scope="col" style="padding: 10px 20px; font-weight: 600">ทำอะไรได้บ้าง</th></tr></thead>
+          <table class="rt" aria-label="สิทธิ์รายไซต์ของสมาชิก" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px">
+            <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">ไซต์</th><th scope="col" style="padding: 10px 20px 10px 12px; font-weight: 600">บทบาทและสิ่งที่ทำได้</th></tr></thead>
             <tbody>
               <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
                 <tr style="border-top: 1px solid #EEF0F3">
                   <td class="rt-main" style="padding: 12px 20px"><div style="display: flex; align-items: center; gap: 10px"><dc-import name="SiteThumb" site="{{r.key}}" w="48px" h="32px" radius="{{5}}" hint-size="48px,32px"></dc-import>{{r.name}}</div></td>
-                  <td data-label="Role" style="padding: 8px 12px">
-                    <label for="{{r.id}}" style="position: absolute; left: -9999px">Role ที่ {{r.name}}</label>
+                  <td data-label="บทบาท" style="padding: 8px 20px 8px 12px">
+                    <label for="{{r.id}}" style="position: absolute; left: -9999px">บทบาทที่ {{r.name}}</label>
                     <select id="{{r.id}}" value="{{r.role}}" onChange="{{r.change}}" disabled="{{siteLocked}}" style="min-height: 44px; min-width: 190px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; background: #FFFFFF">
                       <sc-for list="{{r.opts}}" as="op" hint-placeholder-count="5"><option value="{{op.v}}">{{op.t}}</option></sc-for>
                     </select>
-                  </td>
-                  <td data-label="ทำอะไรได้บ้าง" style="padding: 8px 20px">
-                    <div style="display: flex; flex-wrap: wrap; gap: 4px">
-                      <sc-for list="{{r.caps}}" as="c" hint-placeholder-count="3">
-                        <span style="padding: 2px 8px; border-radius: 6px; background: #F3F4F6; font-size: 12px; color: #374151">{{c}}</span>
-                      </sc-for>
-                    </div>
+                    <div style="font-size: 12px; color: #4B5563; margin-top: 4px; max-width: 420px">{{r.capsLine}}</div>
                   </td>
                 </tr>
               </sc-for>
             </tbody>
           </table>
           <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 8px; padding: 14px 20px; border-top: 1px solid #E3E6EB">
-            <sc-if value="{{saved}}" hint-placeholder-val="{{ false }}">
-              <span role="status" style="margin-right: auto; font-size: 14px; font-weight: 600; color: #0A4F44">บันทึกแล้ว · แจ้ง {{m.name}} และบันทึกใน Audit log</span>
-            </sc-if>
+            <span role="status" aria-live="polite" style="margin-right: auto; font-size: 14px; font-weight: 600; color: #0A4F44">{{savedMsg}}</span>
             <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
             <dc-import name="Button" label="ยกเลิก" variant="secondary" on-press="{{cancel}}" hint-size="90px,44px"></dc-import>
             <dc-import name="Button" label="บันทึกการเปลี่ยนแปลง" on-press="{{save}}" hint-size="190px,44px"></dc-import>
@@ -118,9 +110,9 @@ button{cursor:pointer}
             <dc-import name="Button" icon="trash" label="นำออกจากองค์กร" variant="danger" on-press="{{openRemove}}" hint-size="160px,44px"></dc-import>
           </div>
           </sc-if>
-          <sc-if value="{{removed}}" hint-placeholder-val="{{ false }}">
-            <div role="status" style="font-size: 14px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">นำ {{m.name}} ออกจากองค์กรแล้ว · <a href="{{backHref}}" style="font-weight: 600">{{backLong}}</a></div>
-          </sc-if>
+          <div role="status" aria-live="polite"><sc-if value="{{removed}}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 14px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">นำ {{m.name}} ออกจากองค์กรแล้ว · <a href="{{backHref}}" style="font-weight: 600; display: inline-flex; align-items: center; min-height: 44px">{{backLong}}</a></div>
+          </sc-if></div>
         </section>
         </sc-if>
         <sc-if value="{{canInvite}}" hint-placeholder-val="{{ false }}">
@@ -139,9 +131,9 @@ button{cursor:pointer}
               </div>
             </sc-if>
           </sc-if>
-          <sc-if value="{{inviteMsg}}" hint-placeholder-val="{{ false }}">
-            <div role="status" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">{{inviteMsg}} · <a href="{{backHref}}" style="font-weight: 600">{{backLong}}</a></div>
-          </sc-if>
+          <div role="status" aria-live="polite"><sc-if value="{{inviteMsg}}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">{{inviteMsg}} · <a href="{{backHref}}" style="font-weight: 600; display: inline-flex; align-items: center; min-height: 44px">{{backLong}}</a></div>
+          </sc-if></div>
         </section>
         </sc-if>
         <sc-if value="{{cantManage}}" hint-placeholder-val="{{ false }}">
@@ -149,7 +141,7 @@ button{cursor:pointer}
         </sc-if>
       </div>
 
-      <aside style="flex: 1 1 340px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+      <aside style="flex: 1 1 340px; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
         <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="clock" size="18" tone="muted" hint-size="18px,18px"></dc-import>กิจกรรมล่าสุด</h2>
         <sc-for list="{{activity}}" as="a" hint-placeholder-count="4">
           <div style="display: flex; gap: 10px; font-size: 13px; padding-top: 8px; border-top: 1px solid #EEF0F3">
@@ -157,7 +149,7 @@ button{cursor:pointer}
             <div>{{a.what}}<div style="font-size: 12px; color: #4B5563">{{a.when}}</div></div>
           </div>
         </sc-for>
-        <sc-if value="{{canAudit}}" hint-placeholder-val="{{ true }}"><a href="AuditLog.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; min-height: 40px; display: flex; align-items: center">ดูทั้งหมดใน Audit log</a></sc-if>
+        <sc-if value="{{canAudit}}" hint-placeholder-val="{{ true }}"><a href="AuditLog.dc.html" style="font-size: 13px; font-weight: 600; min-height: 44px; display: flex; align-items: center; gap: 6px">ดูทั้งหมดใน ประวัติการใช้งาน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a></sc-if>
       </aside>
     </div>
     </sc-if>
@@ -191,6 +183,21 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { edits: {}, orgRoleEdit: null, saved: false, suspended: false, dlg: false, removed: false, forKey: '', tDlg: false, transferred: '', requested: false, inviteMsg: '', inviteFor: '' }; }
   componentDidMount() {
@@ -207,7 +214,7 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this, s = self.state;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -275,7 +282,9 @@ class Component extends DCLogic {
     }
     // a new account (sc.newAccount=1) shows its own name / email
     var newAcct = SS('sc.newAccount') === '1';
-    if (newAcct) people = people.map(function (p) { return p.self ? Object.assign({}, p, { person: 'me', name: SS('sc.myName') || p.name, email: SS('sc.myEmail') || p.email }) : p; });
+    if (newAcct) people = people.map(function (p) { return p.self ? Object.assign({}, p, { person: 'me', name: SS('sc.myName') || 'ผู้ใช้ใหม่', email: SS('sc.myEmail') || 'newuser@gmail.example' }) : p; });
+    // site names inside prose (activity, since) follow renames (sc.siteEdits), longest name first
+    var SFX = (function () { var ks = Object.keys(siteEd).filter(function (k) { return siteEd[k] && siteEd[k].name && siteEd[k].name !== k; }).sort(function (a, b) { return b.length - a.length; }); return function (t) { t = String(t == null ? '' : t); ks.forEach(function (k) { t = t.split(k).join(siteEd[k].name); }); return t; }; })();
     var ownerP = people.filter(function (p) { return p.org === 'owner'; })[0];
     var email = SS('sc.member');
     var M = people.filter(function (p) { return p.email === email; })[0] || people[0] || { person: 'invited', name: '—', email: '', org: 'none', roles: {}, since: '', open: 0, act: [] };
@@ -339,18 +348,18 @@ class Component extends DCLogic {
       cDlg: !!s.cDlg, cTitle: 'ยกเลิกคำเชิญของ ' + M.email + '?', cBody: '• ลิงก์ในอีเมลจะใช้ไม่ได้ทันที\n• เชิญใหม่ได้ภายหลังที่หน้าสมาชิก',
       closeCancel: function () { self.setState({ cDlg: false }); },
       confirmCancelInvite: function () { var c = J('sc.inviteCancel', []); if (c.indexOf(M.email) < 0) c.push(M.email); setJ('sc.inviteCancel', c); self.setState({ cDlg: false, inviteFor: key + '|cancel', inviteMsg: 'ยกเลิกคำเชิญของ ' + M.email + ' แล้ว' }); },
-      m: { person: M.person, name: M.name, email: M.email, since: M.since }, headSub: M.email + ' · ' + M.since,
+      m: { person: M.person, name: M.name, email: M.email, since: SFX(M.since) }, headSub: M.email + ' · ' + SFX(M.since),
       readOnly: !siteEdit, smNote: smEdit && !canEdit, readOnlyNote: M.self ? 'นี่คือบัญชีของคุณ · แก้สิทธิ์ของตัวเองไม่ได้' : M.org === 'owner' ? 'Org Owner · โอนความเป็นเจ้าของได้โดย Owner เท่านั้น' : 'ดูได้อย่างเดียว · บทบาท ' + O.you + ' แก้สิทธิ์สมาชิกไม่ได้',
       orgRole: orgRole, isAdmin: isOrgWide, orgLocked: !canEdit, siteLocked: !siteEdit || isOrgWide,
       orgHint: isOrgWide ? 'เข้าถึงและจัดการได้ทุกไซต์ รวมไซต์ใหม่ในอนาคต' : (O.sites.length ? 'เห็นเฉพาะไซต์ที่มอบสิทธิ์ด้านล่าง' : 'องค์กรนี้ยังไม่มีไซต์'),
       setOrgRole: function (e) { setEdit({ orgRoleEdit: e.target.value }); },
       statusValue: M.invited ? 'invited' : (isSuspended ? 'suspended' : 'active'),
-      rows: O.sites.map(function (x) { var r = isOrgWide ? 'sm' : roleOf(x[0]); return { id: 'md-' + x[0], key: x[2], name: x[1], role: roleOf(x[0]), caps: isOrgWide ? ['ทุกสิทธิ์ผ่าน ' + (orgRole === 'owner' ? 'Org Owner' : 'Org Admin')] : caps[r],
+      rows: O.sites.map(function (x) { var r = isOrgWide ? 'sm' : roleOf(x[0]); return { id: 'md-' + x[0], key: x[2], name: x[1], role: roleOf(x[0]), caps: isOrgWide ? ['ทุกสิทธิ์ผ่าน ' + (orgRole === 'owner' ? 'Org Owner' : 'Org Admin')] : caps[r], capsLine: (isOrgWide ? ['ทุกสิทธิ์ผ่าน ' + (orgRole === 'owner' ? 'Org Owner' : 'Org Admin')] : (caps[r] || [])).join(' · '),
         opts: OPTS.filter(function (o) { return canEdit || !smEdit || ['none', 'viewer', 'tech'].indexOf(o[0]) >= 0 || o[0] === roleOf(x[0]); }).map(function (o) { return { v: o[0], t: o[1] }; }),
         change: function (e) { var o = Object.assign({}, edits); o[x[0]] = e.target.value; setEdit({ edits: o }); } }; }),
       canEdit: siteEdit && !isRemoved, canManage: canManage, notRemoved: !isRemoved, cantManage: !canManage && !(M.invited && canInvite),
       manageNote: M.invited ? (canInvite ? 'จัดการสิทธิ์ได้หลังผู้รับตอบรับคำเชิญ' : 'คำเชิญยังไม่ถูกตอบรับ · Org Owner / Org Admin จัดการคำเชิญได้') : M.self ? 'ออกจากองค์กรได้ที่ “บัญชีของฉัน”' : M.org === 'owner' ? 'นำ Org Owner ออกไม่ได้' : 'เฉพาะ Org Owner / Org Admin จัดการบัญชีสมาชิกได้',
-      saved: s.forKey === key && s.saved,
+      saved: s.forKey === key && s.saved, savedMsg: s.forKey === key && s.saved ? 'บันทึกแล้ว · แจ้ง ' + M.name + ' และบันทึกใน Audit log' : '',
       save: function () { var roles = Object.assign({}, M.roles, edits); persist({ orgRole: orgRole, roles: roles, edited: true }); self.setState({ forKey: key, edits: {}, orgRoleEdit: null, saved: true }); },
       cancel: function () { self.setState({ forKey: key, edits: {}, orgRoleEdit: null, saved: false }); },
       suspendLabel: isSuspended ? 'เปิดใช้งานอีกครั้ง' : 'ระงับการใช้งาน',
@@ -361,7 +370,7 @@ class Component extends DCLogic {
       removed: isRemoved,
       confirmRemove: function () { var rl = J('sc.removed', []); if (rl.indexOf(key) < 0) rl.push(key); setJ('sc.removed', rl); self.setState({ dlg: false, forKey: key, edits: edits }); },
       dlgBody: (M.open ? '• ใบงานที่ค้าง ' + M.open + ' งาน จะต้องมอบหมายใหม่\n' : '') + (granted.length ? '• สิทธิ์ ' + granted.join(' และ ') + ' จะถูกลบ\n' : '') + '• ประวัติใน Audit log ยังอยู่ครบ',
-      activity: (M.act.length ? M.act : [['ยังไม่มีกิจกรรม', '—']]).map(function (a) { return { what: a[0], when: a[1] }; })
+      activity: (M.act.length ? M.act.slice(0, 3) : [['ยังไม่มีกิจกรรม', '—']]).map(function (a) { return { what: SFX(a[0]), when: a[1] }; })
     };
   }
 }

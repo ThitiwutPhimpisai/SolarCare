@@ -22,9 +22,9 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" eyebrow="{{orgName}}" title="พลังงานและผลตอบแทน" icon="energy" subtitle="{{headSub}}" actions="{{headActs}}" hint-size="100%,96px"></dc-import>
+    <dc-import name="PageHeader" eyebrow="{{orgName}}" title="รายงาน" icon="report" subtitle="{{headSub}}" actions="{{headActs}}" hub="reports" hub-current="energy" hint-size="100%,140px"></dc-import>
     <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
-      <dc-import name="DateRange" label="ช่วงเวลาพลังงาน" on-change="{{onRange}}" hint-size="100%,170px"></dc-import>
+      <dc-import name="DateRange" label="ช่วงเวลาและไซต์ของพลังงาน" on-change="{{onRange}}" site-opts="{{siteOpts}}" site-value="{{siteF}}" on-site="{{setSiteF}}" hint-size="100%,170px"></dc-import>
     </sc-if>
 
     <sc-if value="{{pendingData}}" hint-placeholder-val="{{ false }}">
@@ -35,7 +35,7 @@ button{font-family:inherit;cursor:pointer}
     </sc-if>
     <sc-if value="{{noSites}}" hint-placeholder-val="{{ false }}">
       <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding-bottom: 24px">
-        <dc-import name="ListState" state="empty" unit="ข้อมูลพลังงาน" icon="energy" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="เพิ่มไซต์และเชื่อมต่อ inverter เพื่อเริ่มคำนวณพลังงาน ผลตอบแทน และคาร์บอนเครดิต" hint-size="100%,140px"></dc-import>
+        <dc-import name="ListState" state="empty" unit="ข้อมูลพลังงาน" icon="energy" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="เพิ่มไซต์และเชื่อมต่ออินเวอร์เตอร์ เพื่อเริ่มคำนวณพลังงาน ผลตอบแทน และคาร์บอนเครดิต" hint-size="100%,140px"></dc-import>
         <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
           <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=EnergyValue" hint-size="150px,44px"></dc-import>
         </sc-if>
@@ -45,21 +45,22 @@ button{font-family:inherit;cursor:pointer}
     <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
       <div style="display: flex; flex-direction: column; gap: 20px">
 
-        <dc-import name="FilterChips" label="ไซต์" value="{{siteF}}" options="{{siteOpts}}" on-change="{{setSiteF}}" hint-size="100%,44px"></dc-import>
-        <sc-if value="{{hasOnce}}" hint-placeholder-val="{{ false }}">
-          <div role="status" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #374151">
-            <span style="display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 4px 0 12px; border-radius: 999px; background: #E7F2EF; color: #0F6B5C; font-weight: 600">กรองจากหน้าไซต์: {{onceLabel}}
-              <button type="button" onClick="{{clearOnce}}" aria-label="ล้างตัวกรองไซต์" style="width: 32px; height: 32px; border: 0; border-radius: 999px; background: transparent; color: #0F6B5C; cursor: pointer; display: inline-flex; align-items: center; justify-content: center"><dc-import name="Icon" icon="x" size="16" hint-size="16px,16px"></dc-import></button>
-            </span>
-          </div>
-        </sc-if>
+        <div role="status" aria-live="polite" style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #374151">
+          <sc-if value="{{hasOnce}}" hint-placeholder-val="{{ false }}">
+            <button type="button" onClick="{{clearOnce}}" aria-label="{{onceAria}}" style="font-family: inherit; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #0F6B5C; border-radius: 999px; background: #E7F2EF; color: #0A4F44; font-size: 13px; font-weight: 600; cursor: pointer">กรองจากหน้าไซต์: {{onceLabel}}<dc-import name="Icon" icon="x" size="14" hint-size="14px,14px"></dc-import></button>
+          </sc-if>
+        </div>
 
         <dc-import name="EnergyStats" view="full" org="{{org}}" site="{{siteF}}" period="{{period}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" compare="{{rCompare}}" range-label="{{rShort}}" hint-size="100%,1400px"></dc-import>
 
         <details style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 0 16px">
-          <summary style="cursor: pointer; min-height: 52px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #111827"><dc-import name="Icon" icon="info" size="18" tone="muted" hint-size="18px,18px"></dc-import>วิธีคำนวณและสมมติฐาน</summary>
+          <summary style="cursor: pointer; min-height: 52px; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: #111827"><dc-import name="Icon" icon="info" size="18" tone="muted" hint-size="18px,18px"></dc-import>อัตราและวิธีคำนวณ (ดูอย่างเดียว)</summary>
           <div style="padding-bottom: 16px">
             <div style="display: flex; flex-direction: column; gap: 12px">
+              <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}">
+                <p style="margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 13px; color: #374151">อัตราเหล่านี้ตั้งไว้ที่หน้าตั้งค่าองค์กร ที่เดียว
+                  <a href="OrgProfile.dc.html" onPointerDown="{{rateGo}}" onKeyDown="{{rateGo}}" onClick="{{rateGo}}" style="display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-weight: 600; color: #0F6B5C">แก้อัตรา<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a></p>
+              </sc-if>
               <dc-import name="EnergyStats" view="assumptions" org="{{org}}" site="{{siteF}}" period="{{period}}" from="{{rFrom}}" to="{{rTo}}" group="{{rGroup}}" range-label="{{rShort}}" hint-size="100%,700px"></dc-import>
               <sc-if value="{{cantEdit}}" hint-placeholder-val="{{ false }}">
                 <p style="margin: 0; font-size: 13px; color: #4B5563">{{readOnlyNote}}</p>
@@ -191,18 +192,20 @@ class Component extends DCLogic {
       org: org, orgName: orgName, inverters: siteF === 'all' ? O.inv : ({ 'ฟาร์มโคราช 1': 22, 'ฟาร์มโคราช 2': 18, 'หลังคาโรงงานบางปู': 7, 'ลานจอดรถลพบุรี': 6, 'สาขารังสิต': 7, 'สาขาบางนา': 6, 'โรงงาน A ลำพูน': 13, 'หลังคาอาคาร A หัวหิน': 4 })[siteF] || 0, // per site when one site is chosen (DATA Round 7)
       hasSites: O.sites.length > 0, noSites: O.sites.length === 0 && !created.length, pendingData: O.sites.length === 0 && created.length > 0,
       pendingTitle: created.length ? 'ยังไม่มีข้อมูลพลังงานของ ' + created.map(function (c) { return shown(c.name); }).join(', ') : '',
-      hasOnce: !!once, onceLabel: shown(once),
+      hasOnce: !!once, onceLabel: shown(once), onceAria: 'ลบตัวกรอง ' + shown(once),
       clearOnce: function () { self.setState({ once: '' }); },
       canEdit: canEdit, cantEdit: !canEdit,
-      readOnlyNote: 'อัตราและค่าคำนวณปรับได้โดย Org Owner / Org Admin ของ ' + orgName + ' (คุณเป็น ' + O.role + ')',
+      readOnlyNote: 'อัตราและค่าคำนวณปรับได้โดยเจ้าขององค์กรหรือผู้ดูแลองค์กรของ ' + orgName + ' (คุณเป็น' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Viewer': 'ผู้ดูอย่างเดียว' }[O.role] || O.role) + ')',
+      rateGo: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.rateFrom', 'EnergyValue'); window.sessionStorage.setItem('sc.from', 'EnergyValue'); } catch (x) {} },
       period: '12', rFrom: rr.fromIso, rTo: rr.toIso, rGroup: rr.group, rShort: rr.short, rCompare: !!rr.compare,
       onRange: function () { self.setState({ sync: Date.now() }); },
       siteF: siteF,
-      siteOpts: [{ id: 'all', label: 'ทุกไซต์' }].concat(O.sites.map(function (n) { return { id: n, label: shown(n) }; })),
+      siteOpts: [{ id: 'all', label: 'ทุกไซต์ (' + O.sites.length + ')' }].concat(O.sites.map(function (n) { return { id: n, label: shown(n) }; })),
       setSiteF: function (id) { try { window.sessionStorage.setItem('sc.site', id); } catch (e) {} self.setState({ once: '', sync: Date.now() }); }
     };
-    R0.headSub = R0.hasSites ? 'ข้อมูลจาก FusionSolar · ซิงก์ล่าสุด 15 พ.ย. 2569 10:15 · อินเวอร์เตอร์ ' + R0.inverters + ' เครื่อง' : 'พลังงานที่ผลิต ผลตอบแทน และผลของการล้างแผง';
-    R0.headActs = R0.hasSites && canEdit ? [{ label: 'ปรับอัตรา', icon: 'coin', variant: 'secondary', href: 'OrgProfile.dc.html', saveKeys: 'sc.rateFrom=EnergyValue|sc.from=EnergyValue' }] : [];
+    R0.headSub = R0.hasSites ? 'พลังงาน มูลค่า และคาร์บอนตามช่วงเวลา · ข้อมูลจาก FusionSolar ซิงก์ 15 พ.ย. 2569 10:15' : 'พลังงาน มูลค่า และคาร์บอนจะแสดงเมื่อไซต์เริ่มส่งข้อมูล';
+    // the reports hub shares one primary action: export (Viewer cannot export — DATA.md round 13)
+    R0.headActs = R0.hasSites && O.role !== 'Viewer' ? [{ label: 'ส่งออกเป็นรายงาน', icon: 'download', variant: 'primary', href: 'Reports.dc.html', saveKeys: 'sc.reportType=energy|sc.rpExport=1' }] : [];
     return R0;
   }
 }

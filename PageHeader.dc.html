@@ -12,6 +12,8 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 body{margin:0}
+.ph-short{display:none}
+@media (max-width: 599px){.ph-long{display:none}.ph-short{display:inline}}
 </style>
 </helmet>
 <header style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between">
@@ -29,7 +31,7 @@ body{margin:0}
         <sc-if value="{{hasAlert}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 600; color: #B42318">{{alert}}</span></sc-if>
       </div>
     </sc-if>
-    <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px"><sc-if value="{{hasPerson}}" hint-placeholder-val="{{ false }}"><dc-import name="Avatar" person="{{person}}" size="{{48}}" hint-size="48px,48px"></dc-import></sc-if><sc-if value="{{hasOrg}}" hint-placeholder-val="{{ false }}"><dc-import name="OrgBadge" org="{{org}}" size="48" with-name="{{false}}" hint-size="48px,48px"></dc-import></sc-if><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{icon}}" size="22" bg="{{iconBg}}" hint-size="40px,40px"></dc-import></sc-if><h1 style="margin: 0; font-size: 26px; font-weight: 700; line-height: 1.3; min-width: 0; overflow-wrap: anywhere">{{title}}</h1></div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-top: 4px"><sc-if value="{{hasPerson}}" hint-placeholder-val="{{ false }}"><dc-import name="Avatar" person="{{person}}" size="{{48}}" hint-size="48px,48px"></dc-import></sc-if><sc-if value="{{hasOrg}}" hint-placeholder-val="{{ false }}"><dc-import name="OrgBadge" org="{{org}}" size="48" with-name="{{false}}" hint-size="48px,48px"></dc-import></sc-if><sc-if value="{{hasIcon}}" hint-placeholder-val="{{ true }}"><dc-import name="Icon" icon="{{icon}}" size="22" bg="{{iconBg}}" hint-size="40px,40px"></dc-import></sc-if><h1 style="margin: 0; font-size: 26px; font-weight: 700; line-height: 1.3; min-width: 0; overflow-wrap: break-word; word-break: keep-all; line-break: strict">{{title}}</h1></div>
     <sc-if value="{{hasSubtitle}}" hint-placeholder-val="{{ true }}">
       <p style="margin: 6px 0 0; font-size: 14px; color: #4B5563; max-width: 720px">{{subtitle}}</p>
     </sc-if>
@@ -41,9 +43,16 @@ body{margin:0}
       </sc-for>
     </div>
   </sc-if>
+  <sc-if value="{{hasHub}}" hint-placeholder-val="{{ false }}">
+    <nav aria-label="{{hubLabel}}" style="flex: 1 0 100%; display: flex; gap: 4px; border-bottom: 1px solid #E3E6EB; overflow-x: auto; scrollbar-width: none">
+      <sc-for list="{{hubTabs}}" as="t" hint-placeholder-count="2">
+        <a href="{{t.href}}" aria-current="{{t.current}}" style="{{t.style}}"><dc-import name="Icon" icon="{{t.icon}}" size="16" hint-size="16px,16px"></dc-import><span class="ph-long">{{t.label}}</span><span class="ph-short">{{t.short}}</span></a>
+      </sc-for>
+    </nav>
+  </sc-if>
 </header>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"title":{"editor":"text","default":"ไซต์ทั้งหมด"},"icon":{"editor":"text","default":""},"person":{"editor":"text","default":""},"org":{"editor":"text","default":""},"iconBg":{"editor":"enum","options":["brand","gray","danger","warn","info"],"default":"brand"},"subtitle":{"editor":"text","default":""},"eyebrow":{"editor":"text","default":""},"eyebrowOrg":{"editor":"text","default":""},"code":{"editor":"text","default":""},"statusKind":{"editor":"text","default":"wo"},"statusValue":{"editor":"text","default":""},"alert":{"editor":"text","default":""},"backLabel":{"editor":"text","default":""},"backHref":{"editor":"text","default":""},"backKeys":{"editor":"text","default":""},"primaryLabel":{"editor":"text","default":""},"primaryHref":{"editor":"text","default":""},"primaryIcon":{"editor":"text","default":""},"primaryKeys":{"editor":"text","default":""},"secondaryLabel":{"editor":"text","default":""},"secondaryHref":{"editor":"text","default":""},"secondaryIcon":{"editor":"text","default":""},"actions":{"editor":null},"$preview":{"width":1100,"height":140}}'>
+<script type="text/x-dc" data-dc-script data-props='{"title":{"editor":"text","default":"ไซต์ทั้งหมด"},"hub":{"editor":"enum","options":["","work","reports","people","settings"],"default":""},"hubCurrent":{"editor":"text","default":""},"hubHide":{"editor":"text","default":""},"icon":{"editor":"text","default":""},"person":{"editor":"text","default":""},"org":{"editor":"text","default":""},"iconBg":{"editor":"enum","options":["brand","gray","danger","warn","info"],"default":"brand"},"subtitle":{"editor":"text","default":""},"eyebrow":{"editor":"text","default":""},"eyebrowOrg":{"editor":"text","default":""},"code":{"editor":"text","default":""},"statusKind":{"editor":"text","default":"wo"},"statusValue":{"editor":"text","default":""},"alert":{"editor":"text","default":""},"backLabel":{"editor":"text","default":""},"backHref":{"editor":"text","default":""},"backKeys":{"editor":"text","default":""},"primaryLabel":{"editor":"text","default":""},"primaryHref":{"editor":"text","default":""},"primaryIcon":{"editor":"text","default":""},"primaryKeys":{"editor":"text","default":""},"secondaryLabel":{"editor":"text","default":""},"secondaryHref":{"editor":"text","default":""},"secondaryIcon":{"editor":"text","default":""},"actions":{"editor":null},"$preview":{"width":1100,"height":140}}'>
 // The one page header for every console page: back link, eyebrow, code + status row, icon tile + h1, subtitle, actions.
 // actions: [{label, href?, icon?, variant?, saveKeys?, onPress?, disabled?}] (first = rightmost primary is up to the page order).
 // Shortcut props primary*/secondary* build the same list when a page only needs links.
@@ -58,9 +67,19 @@ class Component extends DCLogic {
     }
     acts = acts.map(function (a) { return { label: a.label, href: a.href || '', icon: a.icon || '', variant: a.variant || 'primary', saveKeys: a.saveKeys || '', onPress: a.onPress || null, disabled: !!a.disabled }; });
     var self = this;
+    // Round 14: pages merged into one menu item share a header with switcher tabs (links, aria-current)
+    var HUBS = {
+      work: { label: 'มุมมองงานล้าง', tabs: [{ key: 'list', label: 'รายการใบงาน', href: 'WorkOrders.dc.html', icon: 'workorder' }, { key: 'calendar', label: 'ปฏิทินรอบล้าง', href: 'Schedule.dc.html', icon: 'calendar' }] },
+      reports: { label: 'หมวดรายงาน', tabs: [{ key: 'energy', label: 'พลังงานและผลตอบแทน', short: 'พลังงาน', href: 'EnergyValue.dc.html', icon: 'energy' }, { key: 'export', label: 'สร้างรายงานและส่งออก', short: 'สร้างรายงาน', href: 'Reports.dc.html', icon: 'report' }] },
+      people: { label: 'สมาชิกและสิทธิ์', tabs: [{ key: 'members', label: 'สมาชิก', href: 'Members.dc.html', icon: 'users' }, { key: 'roles', label: 'บทบาทและสิทธิ์', href: 'Roles.dc.html', icon: 'shield' }] },
+      settings: { label: 'ตั้งค่าองค์กร', tabs: [{ key: 'profile', label: 'ข้อมูลองค์กร', href: 'OrgProfile.dc.html', icon: 'building' }, { key: 'audit', label: 'ประวัติการใช้งาน', href: 'AuditLog.dc.html', icon: 'audit' }] }
+    };
     return {
       hasPerson: !!v('person'), person: v('person'), hasOrg: !v('person') && !!v('org'), org: v('org'), hasIcon: !v('person') && !v('org') && !!v('icon'), icon: v('icon'), iconBg: v('iconBg', 'brand'),
-      title: v('title', 'ไซต์ทั้งหมด'), subtitle: v('subtitle'), eyebrow: v('eyebrow'), eyebrowOrg: v('eyebrowOrg'), hasEyebrowOrg: !!v('eyebrowOrg'),
+      hasHub: !!HUBS[v('hub')], hubLabel: (HUBS[v('hub')] || {}).label || '',
+      hubTabs: ((HUBS[v('hub')] || {}).tabs || []).filter(function (t) { return String(v('hubHide') || '').split(',').indexOf(t.key) < 0; }).map(function (t) { var on = t.key === v('hubCurrent');
+        return { label: t.label, short: t.short || t.label, href: t.href, icon: t.icon, current: on ? 'page' : 'false', style: 'display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; margin-bottom: -1px; white-space: nowrap; font-size: 14px; text-decoration: none; border-bottom: 2px solid ' + (on ? '#0F6B5C; color: #0A4F44; font-weight: 600' : 'transparent; color: #4B5563') }; }),
+      title: String(v('title', 'ไซต์ทั้งหมด')).replace(/(โซ)(ลาร์)/g, '$1\u2060$2').replace(/(อิน)(เวอร์)(เตอร์)/g, '$1\u2060$2\u2060$3'), // word joiner: Chrome's Thai dictionary splits these loan words subtitle: v('subtitle'), eyebrow: v('eyebrow'), eyebrowOrg: v('eyebrowOrg'), hasEyebrowOrg: !!v('eyebrowOrg'),
       code: v('code'), statusKind: v('statusKind', 'wo'), statusValue: v('statusValue'), alert: v('alert'),
       hasCode: !!v('code'), hasStatus: !!v('statusValue'), hasAlert: !!v('alert'), hasMeta: !!(v('code') || v('statusValue') || v('alert')),
       backLabel: v('backLabel'), backHref: v('backHref'), hasBack: !!v('backLabel'), hasEyebrow: !!v('eyebrow'), hasSubtitle: !!v('subtitle'),

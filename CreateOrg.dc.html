@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>สร้างองค์กรใหม่</title>
+<title>สร้างองค์กรใหม่ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -38,7 +38,7 @@ button{cursor:pointer}
         <div style="display: flex; flex-direction: column; gap: 16px">
           <div>
             <h2 style="margin: 0; font-size: 18px">บัญชีของคุณ</h2>
-            <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563">ใช้บัญชีนี้เข้าสู่ระบบทุกองค์กร · คุณจะเป็น Org Owner ขององค์กรที่สร้าง</p>
+            <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563">ใช้บัญชีนี้เข้าสู่ระบบทุกองค์กร · คุณจะเป็นเจ้าของ (Org Owner) ขององค์กรที่สร้าง</p>
           </div>
           <div style="display: flex; flex-direction: column; gap: 10px">
             <dc-import name="Button" variant="secondary" full="{{true}}" label="สมัครด้วย Google" on-press="{{ssoGoogle}}" hint-size="100%,44px"></dc-import>
@@ -49,19 +49,22 @@ button{cursor:pointer}
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="ca-name" style="font-size: 13px; font-weight: 600">ชื่อ-นามสกุล <span style="color: #B42318">*</span></label>
-            <input id="ca-name" autocomplete="name" placeholder="เช่น สมชาย ใจดี" value="{{name}}" onChange="{{setName}}" required="{{true}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+            <input id="ca-name" autocomplete="name" placeholder="เช่น สมชาย ใจดี" value="{{name}}" onChange="{{setName}}" required="{{true}}" aria-invalid="{{nameBad}}" aria-describedby="ca-name-err" style="{{nameStyle}}">
+            <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><span id="ca-name-err" style="font-size: 12px; color: #B42318">{{nameErr}}</span></sc-if>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="ca-email" style="font-size: 13px; font-weight: 600">อีเมลงาน <span style="color: #B42318">*</span></label>
-            <input id="ca-email" type="email" autocomplete="email" inputmode="email" placeholder="name@company.co.th" value="{{email}}" onChange="{{setEmail}}" required="{{true}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+            <input id="ca-email" type="email" autocomplete="email" inputmode="email" placeholder="name@company.co.th" value="{{email}}" onChange="{{setEmail}}" required="{{true}}" aria-invalid="{{emailBad}}" aria-describedby="ca-email-err" style="{{emailStyle}}">
+            <sc-if value="{{emailBad}}" hint-placeholder-val="{{ false }}"><span id="ca-email-err" style="font-size: 12px; color: #B42318">{{emailErr}}</span></sc-if>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="ca-pw" style="font-size: 13px; font-weight: 600">รหัสผ่าน</label>
-            <input id="ca-pw" type="password" autocomplete="new-password" value="{{pw}}" onChange="{{setPw}}" aria-describedby="ca-rules" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+            <input id="ca-pw" type="password" autocomplete="new-password" value="{{pw}}" onChange="{{setPw}}" aria-invalid="{{pwBad}}" aria-describedby="ca-rules ca-pw-err" style="{{pwStyle}}">
+            <sc-if value="{{pwBad}}" hint-placeholder-val="{{ false }}"><span id="ca-pw-err" style="font-size: 12px; color: #B42318">{{pwErr}}</span></sc-if>
           </div>
           <ul id="ca-rules" aria-live="polite" style="list-style: none; margin: 0; padding: 12px 14px; border-radius: 10px; background: #FAFBFC; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
             <sc-for list="{{rules}}" as="r" hint-placeholder-count="3">
-              <li style="{{r.style}}"><span aria-hidden="true" style="width: 18px; text-align: center; font-weight: 700">{{r.mark}}</span>{{r.label}}</li>
+              <li style="{{r.style}}"><dc-import name="Icon" icon="{{r.icon}}" size="16" tone="{{r.tone}}" hint-size="16px,16px"></dc-import><span>{{r.label}}</span><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{r.sr}}</span></li>
             </sc-for>
           </ul>
           <p style="margin: 0; font-size: 13px; color: #4B5563">มีบัญชีอยู่แล้ว? <a href="Login.dc.html">เข้าสู่ระบบ</a> แล้วเลือก “+ สร้างองค์กรใหม่”</p>
@@ -75,35 +78,38 @@ button{cursor:pointer}
             <input id="co-logo" type="file" accept="image/*" onChange="{{pickedLogo}}" aria-label="เลือกโลโก้องค์กร" style="display: none">
             <button type="button" onClick="{{chooseLogo}}" aria-label="{{logoAria}}" style="cursor: pointer; width: 96px; height: 96px; border-radius: 20px; border: 2px dashed #9CA3AF; background: #FAFBFC; color: #4B5563; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px">
               <dc-import name="Icon" icon="upload" size="22" hint-size="22px,22px"></dc-import>โลโก้</button>
-            <sc-if value="{{hasLogoNote}}" hint-placeholder-val="{{ false }}"><span role="status" style="font-size: 12px; color: #0F6B5C">{{logoNote}}</span></sc-if>
+            <span role="status" aria-live="polite" style="font-size: 12px; color: #0F6B5C">{{logoNote}}</span>
             <div style="font-size: 13px; color: #4B5563; flex: 1 1 260px">PNG / SVG สี่เหลี่ยมจัตุรัส ≥ 256 px · ข้ามได้ ระบบจะใช้อักษรย่อแทน</div>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
             <label for="co-name" style="font-size: 13px; font-weight: 600">ชื่อองค์กร <span style="color: #B42318">*</span></label>
-            <input id="co-name" autocomplete="organization" placeholder="เช่น ไร่ทองโซลาร์" value="{{orgName}}" onChange="{{setOrgName}}" required="{{true}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+            <input id="co-name" autocomplete="organization" placeholder="เช่น ไร่ทองโซลาร์" value="{{orgName}}" onChange="{{setOrgName}}" required="{{true}}" aria-invalid="{{orgBad}}" aria-describedby="co-name-err" style="{{orgStyle}}">
+            <sc-if value="{{orgBad}}" hint-placeholder-val="{{ false }}"><span id="co-name-err" style="font-size: 12px; color: #B42318">{{orgErr}}</span></sc-if>
           </div>
           <sc-if value="{{forCustomer}}" hint-placeholder-val="{{ false }}">
             <div style="display: flex; flex-direction: column; gap: 6px">
-              <label for="co-owner" style="font-size: 13px; font-weight: 600">อีเมล Org Owner ของลูกค้า <span style="color: #B42318">*</span></label>
-              <input id="co-owner" type="email" inputmode="email" placeholder="owner@customer.co.th" value="{{ownerEmail}}" onChange="{{setOwner}}" required="{{true}}" aria-describedby="co-owner-hint" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+              <label for="co-owner" style="font-size: 13px; font-weight: 600">อีเมลเจ้าขององค์กรของลูกค้า <span style="color: #B42318">*</span></label>
+              <input id="co-owner" type="email" inputmode="email" placeholder="owner@customer.co.th" value="{{ownerEmail}}" onChange="{{setOwner}}" required="{{true}}" aria-invalid="{{ownerBad}}" aria-describedby="co-owner-hint co-owner-err" style="{{ownerStyle}}">
+              <sc-if value="{{ownerBad}}" hint-placeholder-val="{{ false }}"><span id="co-owner-err" style="font-size: 12px; color: #B42318">{{ownerErr}}</span></sc-if>
               <span id="co-owner-hint" style="font-size: 12px; color: #4B5563">ทีม Qleen ไม่ได้เป็นสมาชิกขององค์กรลูกค้า · ระบบส่งคำเชิญให้ Owner ตั้งค่าต่อเอง</span>
             </div>
           </sc-if>
           <sc-if value="{{selfOwner}}" hint-placeholder-val="{{ true }}">
-            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">คุณจะเป็น Org Owner · เพิ่มไซต์ เชิญทีม และสร้างใบงานแรกได้จากเช็กลิสต์ในหน้าภาพรวมหลังสร้างองค์กร</div>
+            <div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">คุณจะเป็นเจ้าขององค์กร · เพิ่มไซต์ เชิญทีม และสร้างใบงานแรกได้จากเช็กลิสต์ในหน้าภาพรวมหลังสร้างองค์กร</div>
           </sc-if>
         </div>
       </sc-if>
 
       <div style="display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
-        <dc-import name="Button" variant="secondary" label="ย้อนกลับ" on-press="{{prev}}" disabled="{{isFirst}}" hint-size="100px,44px"></dc-import>
-        <sc-if value="{{blockedHint}}" hint-placeholder-val="{{ false }}"><span role="status" style="align-self: center; font-size: 12px; color: #4B5563; text-align: right">{{blockedHint}}</span></sc-if>
+        <sc-if value="{{isFirst}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" label="ย้อนกลับ" href="{{backHref}}" hint-size="100px,44px"></dc-import></sc-if>
+        <sc-if value="{{notFirst}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" variant="secondary" label="ย้อนกลับ" on-press="{{prev}}" hint-size="100px,44px"></dc-import></sc-if>
+        <span role="status" aria-live="polite" style="flex: 1; align-self: center; font-size: 12px; color: #4B5563; text-align: right">{{blockedHint}}</span>
         <sc-if value="{{notLast}}" hint-placeholder-val="{{ true }}">
-          <dc-import name="Button" variant="primary" label="ถัดไป" on-press="{{next}}" disabled="{{nextBlocked}}" hint-size="90px,44px"></dc-import>
+          <dc-import name="Button" variant="primary" label="ถัดไป" on-press="{{next}}" hint-size="90px,44px"></dc-import>
         </sc-if>
         <sc-if value="{{isLast}}" hint-placeholder-val="{{ false }}">
           <sc-if value="{{finalOk}}" hint-placeholder-val="{{ true }}"><span id="co-primary" style="display: contents"><dc-import name="Button" variant="primary" label="สร้างองค์กร" href="{{finalHref}}" save-keys="{{finalKeys}}" hint-size="120px,44px"></dc-import></span></sc-if>
-          <sc-if value="{{finalBlocked}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" variant="primary" label="สร้างองค์กร" disabled="{{true}}" hint-size="120px,44px"></dc-import></sc-if>
+          <sc-if value="{{finalBlocked}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" variant="primary" label="สร้างองค์กร" on-press="{{tryFinal}}" hint-size="120px,44px"></dc-import></sc-if>
         </sc-if>
       </div>
     </form>
@@ -125,7 +131,7 @@ class Component extends DCLogic {
     window.addEventListener('storage', self._sync);
     self._iv = setInterval(self._sync, 400);
     // a new visit starts the wizard from the beginning (Play restores the old step and typed values otherwise)
-    self.setState({ sync: Date.now(), step: 0, invites: 2, pw: '', name: '', email: '', orgName: '', ownerEmail: '', siteName: '', siteProv: '', siteKwp: '', siteCyc: '', invEmails: {}, invRoles: {}, logoFile: '' });
+    self.setState({ sync: Date.now(), step: 0, invites: 2, pw: '', name: '', email: '', orgName: '', ownerEmail: '', siteName: '', siteProv: '', siteKwp: '', siteCyc: '', invEmails: {}, invRoles: {}, logoFile: '', tried: false });
   }
   componentWillUnmount() {
     if (this._sync) window.removeEventListener('storage', this._sync);
@@ -151,6 +157,16 @@ class Component extends DCLogic {
     var orgLabel = (S.orgName || '').trim() || 'องค์กรใหม่';
     var blocked = (st === 1 && !(S.name.trim() && mailOk(S.email) && pwOk)) || (st === 2 && !S.orgName.trim());
     var finalOk = !!S.orgName.trim() && (!forCustomer || mailOk(S.ownerEmail));
+    var tried = !!S.tried;
+    var fe = {
+      name: tried && st === 1 && !S.name.trim() ? 'กรอกชื่อ-นามสกุล' : '',
+      email: tried && st === 1 && !mailOk(S.email) ? (S.email.trim() ? 'รูปแบบอีเมลไม่ถูกต้อง เช่น name@company.co.th' : 'กรอกอีเมลงาน') : '',
+      pw: tried && st === 1 && !pwOk ? 'รหัสผ่านยังไม่ครบเงื่อนไขด้านล่าง' : '',
+      org: tried && st === 2 && !S.orgName.trim() ? 'กรอกชื่อองค์กร' : '',
+      owner: tried && st === 2 && forCustomer && !mailOk(S.ownerEmail) ? 'กรอกอีเมลเจ้าขององค์กรให้ถูกต้อง' : ''
+    };
+    var fStyle = function (bad) { return 'min-height: 44px; padding: 0 12px; border: 1px solid ' + (bad ? '#B42318; box-shadow: inset 0 0 0 1px #B42318' : '#858D9B') + '; border-radius: 8px; font-size: 14px'; };
+    var focusFirst = function () { setTimeout(function () { var el = document.querySelector('form [aria-invalid="true"]'); if (el) el.focus(); }, 60); };
     var clean = function (x) { return String(x || '').replace(/[|]/g, ' ').trim(); };
     var newAcct = from === 'login';
     var finalHref = forCustomer ? 'PlatformOrgs.dc.html' : 'Main.dc.html';
@@ -165,8 +181,11 @@ class Component extends DCLogic {
       formEnter: function (e) { if (e.key !== 'Enter' || !e.target || e.target.tagName !== 'INPUT' || e.target.type === 'checkbox') return; e.preventDefault(); var name = e.currentTarget && e.currentTarget.getAttribute('data-submit'); var fn = self._v && self._v[name]; if (fn) fn(e); },
       s1: st === 1, s2: st === 2, hasSteps: first < LAST,
       isFirst: st === first, backHref: back[0], backLabel: back[1], isLast: st === LAST, notLast: st !== LAST,
-      nextBlocked: blocked,
-      blockedHint: blocked ? (st === 1 ? 'กรอกชื่อ อีเมล และรหัสผ่านตามเงื่อนไขให้ครบ' : 'กรอกชื่อองค์กร') : (st === LAST && !finalOk ? 'กรอกอีเมล Org Owner ของลูกค้า' : ''),
+      nextBlocked: blocked, notFirst: st !== first,
+      nameBad: !!fe.name, nameErr: fe.name, nameStyle: fStyle(fe.name), emailBad: !!fe.email, emailErr: fe.email, emailStyle: fStyle(fe.email),
+      pwBad: !!fe.pw, pwErr: fe.pw, pwStyle: fStyle(fe.pw), orgBad: !!fe.org, orgErr: fe.org, orgStyle: fStyle(fe.org), ownerBad: !!fe.owner, ownerErr: fe.owner, ownerStyle: fStyle(fe.owner),
+      tryFinal: function () { self.setState({ tried: true }); focusFirst(); },
+      blockedHint: !tried ? '' : blocked ? (st === 1 ? 'กรอกชื่อ อีเมล และรหัสผ่านตามเงื่อนไขให้ครบ' : 'กรอกชื่อองค์กร') : (st === LAST && !finalOk ? 'กรอกอีเมลเจ้าขององค์กรของลูกค้า' : ''),
       name: S.name, email: S.email, orgName: S.orgName, ownerEmail: S.ownerEmail,
       setName: function (e) { self.setState({ name: e.target.value }); },
       setEmail: function (e) { self.setState({ email: e.target.value }); },
@@ -177,19 +196,19 @@ class Component extends DCLogic {
       // Enter: next step, or create on the last step
       submit: function (e) {
         if (e && e.preventDefault) e.preventDefault();
-        if (st < LAST) { if (!blocked) self.setState({ step: Math.min(LAST, st + 1) }); return; }
-        if (!finalOk) return;
+        if (st < LAST) { if (!blocked) self.setState({ step: Math.min(LAST, st + 1), tried: false }); else { self.setState({ tried: true }); focusFirst(); } return; }
+        if (!finalOk) { self.setState({ tried: true }); focusFirst(); return; }
         try { finalKeys.split('|').forEach(function (kv) { var i = kv.indexOf('='); window.sessionStorage.setItem(kv.slice(0, i), kv.slice(i + 1)); }); window.sessionStorage.setItem('sc.flashAt', String(Date.now())); window.sessionStorage.setItem('sc.flashTo', finalHref); } catch (x) {}
         // click the same visible link the user would click; the hidden link is only a fallback
         var a = document.querySelector('#co-primary a') || document.getElementById('co-go'); if (a) (function (el) { ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function (t) { var E = t.indexOf('pointer') === 0 && window.PointerEvent ? window.PointerEvent : window.MouseEvent; el.dispatchEvent(new E(t, { bubbles: true, cancelable: true, view: window, button: 0 })); }); })(a);
       },
       pw: pw, setPw: function (e) { self.setState({ pw: e.target.value }); },
-      rules: checks.map(function (c) { return { label: c[0], mark: c[1] ? '✓' : '·', style: 'display:flex;align-items:center;gap:6px;color:' + (c[1] ? '#0A4F44;font-weight:600' : '#4B5563') }; }),
-      next: function () { self.setState({ step: Math.min(LAST, st + 1) }); },
+      rules: checks.map(function (c) { return { label: c[0], icon: c[1] ? 'check' : 'x', tone: c[1] ? 'brand' : 'muted', sr: c[1] ? ' (ผ่านแล้ว)' : ' (ยังไม่ผ่าน)', style: 'position:relative;display:flex;align-items:center;gap:6px;color:' + (c[1] ? '#0A4F44;font-weight:600' : '#4B5563') }; }),
+      next: function () { if (blocked) { self.setState({ tried: true }); focusFirst(); return; } self.setState({ step: Math.min(LAST, st + 1), tried: false }); },
       // SSO fills the account from the provider (DATA round 12), so a new account never ends up nameless
       ssoGoogle: function () { self.setState({ name: S.name.trim() || 'ผู้ใช้ใหม่', email: mailOk(S.email) ? S.email : 'newuser@gmail.example', pw: pwOk ? pw : 'Sso-provider-1', step: Math.min(LAST, st + 1) }); },
       ssoMs: function () { self.setState({ name: S.name.trim() || 'ผู้ใช้ใหม่', email: mailOk(S.email) ? S.email : 'newuser@outlook.example', pw: pwOk ? pw : 'Sso-provider-1', step: Math.min(LAST, st + 1) }); },
-      prev: function () { self.setState({ step: Math.max(first, st - 1) }); },
+      prev: function () { self.setState({ step: Math.max(first, st - 1), tried: false }); },
       steps: labels.map(function (l, i) { return { l: l, n: i + 1 }; }).filter(function (x) { return x.n >= first; }).map(function (x, j) { var l = x.l, n = x.n, on = n === st, done = n < st; return { n: j + 1, icon: done ? 'check' : ['user', 'building'][n - 1], label: l, current: on ? 'step' : 'false',
         style: 'display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;font-size:14px;font-weight:600;background:' + (on ? '#FFFFFF;border:1px solid #0F6B5C;color:#111827' : '#F3F4F6;border:1px solid transparent;color:#4B5563'),
         dot: 'width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none;background:' + (on || done ? '#0F6B5C;color:#FFFFFF' : '#D5D9E0;color:#374151') }; })

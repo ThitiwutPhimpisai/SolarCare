@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>บัญชีของฉัน</title>
+<title>บัญชีของฉัน · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -23,11 +23,11 @@ button{cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" title="บัญชีของฉัน" hint-size="100%,40px"></dc-import>
+    <dc-import name="PageHeader" title="บัญชีของฉัน" icon="user" subtitle="ข้อมูลส่วนตัว ความปลอดภัย และองค์กรที่คุณเป็นสมาชิก" hint-size="100%,96px"></dc-import>
 
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
       <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
-        <section aria-labelledby="ma-profile" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px">
+        <section aria-labelledby="ma-profile" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 18px">
           <h2 id="ma-profile" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="user" size="18" tone="brand" hint-size="18px,18px"></dc-import>ข้อมูลส่วนตัว</h2>
           <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
             <dc-import name="Avatar" person="{{meAvatar}}" size="{{88}}" label="{{true}}" hint-size="88px,88px"></dc-import>
@@ -35,7 +35,7 @@ button{cursor:pointer}
               <dc-import name="Button" label="เปลี่ยนรูป" variant="secondary" on-press="{{photoStub}}" hint-size="100px,44px"></dc-import>
               <dc-import name="Button" label="ลบรูป" variant="ghost" on-press="{{photoRemove}}" hint-size="80px,44px"></dc-import>
             </div>
-            <sc-if value="{{photoNote}}" hint-placeholder-val="{{ false }}"><span role="status" style="font-size: 13px; color: #4B5563">{{photoNote}}</span></sc-if>
+            <span role="status" aria-live="polite" style="font-size: 13px; color: #4B5563">{{photoNote}}</span>
           </div>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
             <div style="display: flex; flex-direction: column; gap: 6px">
@@ -64,14 +64,12 @@ button{cursor:pointer}
             </div>
           </div>
           <div style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; border-top: 1px solid #E3E6EB; padding-top: 16px">
-            <sc-if value="{{saved}}" hint-placeholder-val="{{ false }}">
-              <span role="status" style="font-size: 14px; font-weight: 600; color: #0A4F44">บันทึกแล้ว</span>
-            </sc-if>
+            <span role="status" aria-live="polite" style="font-size: 14px; font-weight: 600; color: #0A4F44">{{savedMsg}}</span>
             <dc-import name="Button" label="บันทึก" on-press="{{save}}" hint-size="90px,44px"></dc-import>
           </div>
         </section>
 
-        <section aria-labelledby="ma-sec" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <section aria-labelledby="ma-sec" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px">
           <h2 id="ma-sec" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="lock" size="18" tone="brand" hint-size="18px,18px"></dc-import>ความปลอดภัย</h2>
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap">
             <div><div style="font-weight: 600; font-size: 14px">รหัสผ่าน</div><div style="font-size: 13px; color: #4B5563">เปลี่ยนล่าสุด 3 เดือนก่อน</div></div>
@@ -106,16 +104,16 @@ button{cursor:pointer}
           <h2 id="ma-orgs" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 12px 20px 4px"><dc-import name="Icon" icon="building" size="18" tone="brand" hint-size="18px,18px"></dc-import>องค์กรของฉัน</h2>
           <div style="padding: 4px 8px"><dc-import name="OrgList" items="{{orgs}}" size="lg" label="องค์กรของฉัน" hint-size="100%,232px"></dc-import></div>
           <p style="margin: 0; padding: 0 20px 6px; font-size: 12px; color: #4B5563">กดชื่อองค์กรเพื่อเปิดทำงาน · ปุ่ม “ออก” ใช้เมื่อไม่ต้องการเป็นสมาชิกแล้ว</p>
-          <sc-if value="{{leftNote}}" hint-placeholder-val="{{ false }}"><p role="status" style="margin: 0; padding: 6px 20px 10px; font-size: 13px; color: #0A4F44">{{leftNote}}</p></sc-if>
-          <sc-if value="{{transferHint}}" hint-placeholder-val="{{ false }}">
-            <div role="status" style="margin: 4px 20px 10px; font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FFF4E5; color: #8A3B06">{{transferHint}} · <a href="Members.dc.html" onPointerDown="{{goTransfer}}" onKeyDown="{{goTransfer}}" onClick="{{goTransfer}}" style="font-weight: 600; color: #8A3B06">ไปหน้าสมาชิกเพื่อโอน</a></div>
-          </sc-if>
+          <div role="status" aria-live="polite"><sc-if value="{{leftNote}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; padding: 6px 20px 10px; font-size: 13px; color: #0A4F44">{{leftNote}}</p></sc-if></div>
+          <div role="status" aria-live="polite"><sc-if value="{{transferHint}}" hint-placeholder-val="{{ false }}">
+            <div style="margin: 4px 20px 10px; font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FFF4E5; color: #8A3B06">{{transferHint}} · <a href="Members.dc.html" onPointerDown="{{goTransfer}}" onKeyDown="{{goTransfer}}" onClick="{{goTransfer}}" style="font-weight: 600; color: #8A3B06; display: inline-flex; align-items: center; min-height: 44px">ไปหน้าสมาชิกเพื่อโอน</a></div>
+          </sc-if></div>
         </section>
         <section aria-labelledby="ma-danger" style="background: #FFFFFF; border: 1px solid #F3C4BF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
           <h2 id="ma-danger" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; color: #B42318"><dc-import name="Icon" icon="trash" size="18" hint-size="18px,18px"></dc-import>ลบบัญชี</h2>
-          <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6">ลบข้อมูลส่วนตัวและออกจากทุกองค์กร ใบงานและ Audit log ที่คุณเคยทำจะยังอยู่ในองค์กรนั้น ถ้าคุณเป็น Org Owner ต้องโอนความเป็นเจ้าของก่อน</p>
+          <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6">ลบข้อมูลส่วนตัวและออกจากทุกองค์กร ใบงานและ ประวัติการใช้งาน ที่คุณเคยทำจะยังอยู่ในองค์กรนั้น ถ้าคุณเป็น เจ้าขององค์กร ต้องโอนความเป็นเจ้าของก่อน</p>
           <dc-import name="Button" label="ลบบัญชีของฉัน" icon="trash" variant="danger" full="{{true}}" on-press="{{openDelete}}" hint-size="100%,44px"></dc-import>
-          <sc-if value="{{delNote}}" hint-placeholder-val="{{ false }}"><p role="status" style="margin: 0; font-size: 13px; color: #B42318">{{delNote}}</p></sc-if>
+          <p role="status" aria-live="polite" style="margin: 0; font-size: 13px; color: #B42318">{{delNote}}</p>
         </section>
       </div>
     </div>
@@ -123,7 +121,7 @@ button{cursor:pointer}
 </main>
   <dc-import name="Flash" page="MyAccount.dc.html" sample="" hint-size="100%,0px"></dc-import>
   <dc-import name="ConfirmDialog" open="{{leaveOpen}}" title="{{leaveTitle}}" body="{{leaveBody}}" reason-label="" confirm-label="{{leaveConfirm}}" tone="{{leaveTone}}" on-confirm="{{doLeave}}" on-close="{{closeLeave}}" hint-size="100%,0px"></dc-import>
-  <dc-import name="ConfirmDialog" open="{{delOpen}}" title="ลบบัญชีของฉัน" body="{{delBody}}" reason-label="พิมพ์อีเมลของคุณเพื่อยืนยัน" reason-placeholder="natthaphat@siamsolar.example" confirm-label="ลบบัญชีถาวร" tone="danger" on-confirm="{{doDelete}}" on-close="{{closeDelete}}" hint-size="100%,0px"></dc-import>
+  <dc-import name="ConfirmDialog" open="{{delOpen}}" title="ลบบัญชีของฉัน" body="{{delBody}}" reason-label="พิมพ์อีเมลของคุณเพื่อยืนยัน" reason-placeholder="{{myEmail}}" confirm-label="ลบบัญชีถาวร" tone="danger" on-confirm="{{doDelete}}" on-close="{{closeDelete}}" hint-size="100%,0px"></dc-import>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
@@ -148,6 +146,21 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { name: null, saved: false, twoFa: false, signedOut: {}, left: {}, leaving: '', delOpen: false, delErr: false, deleted: false, photo: '' }; }
   componentDidMount() {
@@ -165,7 +178,7 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this, s = self.state;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -188,12 +201,13 @@ class Component extends DCLogic {
     // a new account (sc.newAccount=1) only has the orgs it created or joined in this session
     var newAcct = SS('sc.newAccount') === '1';
     if (newAcct) all = all.filter(function (o) { return (o.id === 'd' && SS('sc.created') === 'd') || (o.id === SS('sc.joined')); });
-    var myEmailV = newAcct && SS('sc.myEmail') ? SS('sc.myEmail') : 'natthaphat@siamsolar.example';
+    var myEmailV = newAcct ? (SS('sc.myEmail') || 'newuser@gmail.example') : 'natthaphat@siamsolar.example';
     var orgs = all.filter(function (o) { return !isLeft(o.id); });
     var leftNames = all.filter(function (o) { return isLeft(o.id); }).map(function (o) { return o.name; });
     var lv = all.filter(function (o) { return o.id === s.leaving; })[0] || null;
     var soleOwner = !!(lv && lv.owner);
-    var myName = s.name != null ? s.name : (SS('sc.myName') || 'ณัฐภัทร ส.');
+    var defName = newAcct ? 'ผู้ใช้ใหม่' : 'ณัฐภัทร ส.';
+    var myName = s.name != null ? s.name : (SS('sc.myName') || defName);
     var ownedOrgs = orgs.filter(function (o) { return o.owner; }).map(function (o) { return o.name; });
     var devices = [
       { id: 'mac', name: 'MacBook · Chrome', meta: 'กรุงเทพฯ · ใช้งานอยู่ตอนนี้', current: true, icon: 'overview' },
@@ -202,9 +216,9 @@ class Component extends DCLogic {
     var meAvatar = newAcct ? 'me' : 'natthaphat';
     return {
       meAvatar: meAvatar, myEmail: myEmailV,
-      name: myName, saved: s.saved, twoFa: s.twoFa,
+      name: myName, saved: s.saved, savedMsg: s.saved ? 'บันทึกแล้ว' : '', twoFa: s.twoFa,
       setName: function (e) { self.setState({ name: e.target.value, saved: false }); },
-      save: function () { var v = String(myName || '').trim() || 'ณัฐภัทร ส.'; try { window.sessionStorage.setItem('sc.myName', v); } catch (e) {} self.setState({ saved: true, name: v }); },
+      save: function () { var v = String(myName || '').trim() || defName; try { window.sessionStorage.setItem('sc.myName', v); } catch (e) {} self.setState({ saved: true, name: v }); },
       toggle2fa: function () { self.setState({ twoFa: !s.twoFa }); },
       twoFaNote: s.twoFa ? 'เปิดอยู่ · ใช้แอปยืนยันตัวตนทุกครั้งที่เข้าสู่ระบบจากอุปกรณ์ใหม่' : 'ปิดอยู่ · แนะนำให้เปิดสำหรับบัญชีที่มีสิทธิ์ Org Admin',
       twoFaNoteStyle: 'display:block;font-size:13px;color:' + (s.twoFa ? '#0A4F44' : '#8A3B06'),

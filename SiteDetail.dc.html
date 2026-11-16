@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>ฟาร์มโคราช 1</title>
+<title>รายละเอียดไซต์ · SolarCare</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -39,9 +39,77 @@ button{font-family:inherit;cursor:pointer}
       </section>
     </sc-if>
 
-    <sc-if value="{{cycOpen}}" hint-placeholder-val="{{ false }}">
-      <section aria-labelledby="sd-cyc" style="background: #FFFFFF; border: 2px solid #0F6B5C; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px">
-        <h2 id="sd-cyc" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="calendar" size="18" tone="brand" hint-size="18px,18px"></dc-import>{{cycTitle}}</h2>
+
+    <sc-if value="{{hasSite}}" hint-placeholder-val="{{ true }}">
+    <section aria-label="สรุปไซต์" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden; display: flex; flex-wrap: wrap">
+      <div style="flex: 1 1 200px; max-width: 100%; min-height: 120px; max-height: 120px; overflow: hidden">
+        <dc-import name="SiteThumb" site="{{site.thumb}}" label="{{true}}" w="100%" h="120px" radius="{{0}}" hint-size="100%,120px"></dc-import>
+      </div>
+      <div style="flex: 999 1 480px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items: center">
+        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">กำลังติดตั้ง</div><div style="font-size: 20px; font-weight: 700">{{site.kwp}} kWp</div></div>
+        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">จำนวนแผง</div><div style="font-size: 20px; font-weight: 700">{{site.panels}}</div></div>
+        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">ครบรอบถัดไป</div><div style="{{site.nextStyle}}">{{site.next}}</div></div>
+      </div>
+    </section>
+
+    <sc-if value="{{showAlerts}}" hint-placeholder-val="{{ true }}">
+      <section aria-label="ต้องดูแล" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-radius: 12px; background: #FFF4E5; border: 1px solid #F3D7B0">
+        <h2 style="margin: 0; font-size: 14px; color: #8A3B06">ต้องดูแล · {{alertCount}} รายการ</h2>
+        <sc-for list="{{alerts}}" as="al" hint-placeholder-count="2">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; color: #8A3B06">
+            <dc-import name="Icon" icon="{{al.icon}}" size="18" tone="warn" hint-size="18px,18px"></dc-import>
+            <span style="flex: 1 1 220px; min-width: 0"><b>{{al.title}}</b> · {{al.text}}</span>
+            <a href="{{al.href}}" onPointerDown="{{al.go}}" onKeyDown="{{al.go}}" onClick="{{al.go}}" style="display: inline-flex; align-items: center; min-height: 44px; gap: 4px; font-weight: 600; text-decoration: none">{{al.cta}}<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a>
+          </div>
+        </sc-for>
+      </section>
+    </sc-if>
+
+    <div role="tablist" aria-label="ข้อมูลไซต์" style="display: flex; gap: 4px; border-bottom: 1px solid #E3E6EB; overflow-x: auto; overflow-y: hidden; scrollbar-width: none">
+      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+        <button type="button" role="tab" id="{{t.id}}" aria-selected="{{t.on}}" aria-controls="sd-panel" tabIndex="{{t.ti}}" onClick="{{t.pick}}" onKeyDown="{{tabKey}}" style="{{t.style}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{tOverview}}" hint-placeholder-val="{{ true }}">
+      <div role="tabpanel" id="sd-panel" aria-labelledby="{{tabId}}" tabIndex="0" style="display: flex; flex-direction: column; gap: 20px">
+        <sc-if value="{{showInsight}}" hint-placeholder-val="{{ true }}"><div onPointerDown="{{markFinding}}" onKeyDown="{{markFinding}}" onClick="{{markFinding}}"><dc-import name="Insights" view="row" place="site" org="{{orgId}}" site="{{site.key}}" hint-size="100%,56px"></dc-import></div></sc-if>
+
+        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
+          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 16px 20px; border-bottom: 1px solid #E3E6EB"><dc-import name="Icon" icon="panel" size="18" tone="muted" hint-size="18px,18px"></dc-import>{{zoneTitle}}</h2>
+          <table class="rt" aria-label="โซนในไซต์นี้" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px">
+            <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">พื้นที่</th><th scope="col" style="padding: 10px 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums">แผง</th><th scope="col" style="padding: 10px 12px; font-weight: 600">ล้างล่าสุด (อนุมัติแล้ว)</th><th scope="col" style="padding: 10px 12px; font-weight: 600">สภาพ</th><th scope="col" style="padding: 10px 20px; font-weight: 600">อุปกรณ์</th></tr></thead>
+            <tbody>
+              <sc-for list="{{zones}}" as="z" hint-placeholder-count="4">
+                <tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 12px 20px; font-weight: 600">{{z.name}}</td><td data-label="แผง" style="padding: 12px; text-align: right; font-variant-numeric: tabular-nums">{{z.panels}}</td><td class="rt-stack" data-label="ล้างล่าสุด (อนุมัติแล้ว)" style="padding: 12px"><span style="display: inline-flex; flex-direction: column; gap: 2px">{{z.last}}<sc-if value="{{z.hasPending}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #4B5563">{{z.pending}}</span></sc-if></span></td><td class="rt-stack" data-label="สภาพ" style="padding: 12px"><span style="display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; max-width: 100%"><dc-import name="StatusPill" kind="site" value="{{z.st}}" label="{{z.short}}" hint-size="120px,24px"></dc-import><sc-if value="{{z.hasDetail}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #4B5563; white-space: normal; overflow-wrap: anywhere">{{z.detail}}</span></sc-if></span></td><td data-label="อุปกรณ์" style="padding: 12px 20px"><button type="button" onClick="{{z.openDev}}" style="min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-size: 14px; font-weight: 600; text-align: left; display: inline-flex; align-items: center; gap: 4px">{{z.devLabel}} <dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></button></td></tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{tFindings}}" hint-placeholder-val="{{ false }}">
+      <div role="tabpanel" id="sd-panel" aria-labelledby="{{tabId}}" tabIndex="0" onPointerDown="{{markFinding}}" onKeyDown="{{markFinding}}" onClick="{{markFinding}}" style="display: flex; flex-direction: column; gap: 12px">
+        <dc-import name="Insights" view="findings" place="site" org="{{orgId}}" site="{{site.key}}" hint-size="100%,400px"></dc-import>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{tWork}}" hint-placeholder-val="{{ false }}">
+      <div role="tabpanel" id="sd-panel" aria-labelledby="{{tabId}}" tabIndex="0" style="display: flex; flex-direction: column; gap: 20px">
+        <section id="sd-cycle" aria-labelledby="sd-cyc" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(16px, 2.5vw, 20px); display: flex; flex-direction: column; gap: 12px">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+            <h2 id="sd-cyc" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="calendar" size="18" tone="muted" hint-size="18px,18px"></dc-import>รอบล้างของไซต์นี้</h2>
+            <sc-if value="{{showCycBtn}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" icon="edit" label="{{cycBtnLabel}}" on-press="{{openCyc}}" hint-size="150px,44px"></dc-import></sc-if>
+          </div>
+          <dl style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px 24px; margin: 0">
+            <div><dt style="font-size: 13px; color: #4B5563">ล้างทุก</dt><dd style="margin: 2px 0 0; font-size: 18px; font-weight: 700">{{site.cycleText}}</dd></div>
+            <div><dt style="font-size: 13px; color: #4B5563">ล้างล่าสุด (อนุมัติแล้ว)</dt><dd style="margin: 2px 0 0; font-size: 18px; font-weight: 700">{{site.last}}</dd></div>
+          </dl>
+          <p style="margin: 0; font-size: 13px; color: #4B5563">ตั้งรอบล้างของไซต์ได้ที่นี่ที่เดียว ระบบใช้รอบนี้คำนวณวันครบรอบถัดไป (ด้านบน) ในภาพรวม ปฏิทิน และรายงาน</p>
+          <sc-if value="{{cycOpen}}" hint-placeholder-val="{{ false }}">
+      <section aria-labelledby="sd-cyc-edit" style="background: #FFFFFF; border-top: 1px solid #EEF0F3; padding-top: 12px; display: flex; flex-direction: column; gap: 12px">
+        <h3 id="sd-cyc-edit" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px"><dc-import name="Icon" icon="calendar" size="18" tone="brand" hint-size="18px,18px"></dc-import>{{cycTitle}}</h3>
         <dc-import name="FilterChips" label="ล้างทุกกี่วัน" value="{{cycPick}}" options="{{cycOpts}}" on-change="{{setCycPick}}" hint-size="100%,44px"></dc-import>
         <label style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px">หรือกำหนดเอง
           <input type="number" inputmode="numeric" min="7" max="365" value="{{cycDraft}}" onChange="{{setCycDraft}}" aria-label="จำนวนวันต่อรอบ" style="width: 96px; min-height: 44px; padding: 0 10px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit"> วัน</label>
@@ -52,45 +120,11 @@ button{font-family:inherit;cursor:pointer}
         </div>
       </section>
     </sc-if>
-
-    <sc-if value="{{hasSite}}" hint-placeholder-val="{{ true }}">
-    <section aria-label="สรุปไซต์" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden; display: flex; flex-wrap: wrap">
-      <div style="flex: 1 1 200px; max-width: 100%; min-height: 120px; max-height: 120px; overflow: hidden">
-        <dc-import name="SiteThumb" site="{{site.thumb}}" label="{{true}}" w="100%" h="120px" radius="{{0}}" hint-size="100%,120px"></dc-import>
-      </div>
-      <div style="flex: 999 1 480px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); align-items: center">
-        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">กำลังติดตั้ง</div><div style="font-size: 20px; font-weight: 700">{{site.kwp}} kWp</div></div>
-        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">จำนวนแผง</div><div style="font-size: 20px; font-weight: 700">{{site.panels}}</div></div>
-        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">รอบล้าง</div><div style="font-size: 20px; font-weight: 700">{{site.cycleText}}</div></div>
-        <div style="padding: 14px 20px"><div style="font-size: 12px; color: #4B5563">ครบรอบถัดไป</div><div style="{{site.nextStyle}}">{{site.next}}</div></div>
-      </div>
-    </section>
-
-    <sc-if value="{{hasAlerts}}" hint-placeholder-val="{{ true }}">
-      <div role="note" style="display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-radius: 12px; background: #FFF4E5; border: 1px solid #F3D7B0">
-        <sc-for list="{{alerts}}" as="al" hint-placeholder-count="2">
-          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 14px; color: #8A3B06">
-            <dc-import name="Icon" icon="{{al.icon}}" size="18" tone="warn" hint-size="18px,18px"></dc-import>
-            <span style="flex: 1 1 220px; min-width: 0"><b>{{al.title}}</b> · {{al.text}}</span>
-            <a href="{{al.href}}" onPointerDown="{{al.go}}" onKeyDown="{{al.go}}" onClick="{{al.go}}" style="display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none">{{al.cta}} →</a>
-          </div>
-        </sc-for>
-      </div>
-    </sc-if>
-    <sc-if value="{{showInsight}}" hint-placeholder-val="{{ true }}"><div onPointerDown="{{markFinding}}" onKeyDown="{{markFinding}}" onClick="{{markFinding}}"><dc-import name="Insights" view="summary" place="site" site="{{site.key}}" hint-size="100%,0px"></dc-import></div></sc-if>
-
-    <div role="tablist" aria-label="ข้อมูลไซต์" style="display: flex; gap: 4px; border-bottom: 1px solid #E3E6EB; overflow-x: auto">
-      <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
-        <button type="button" role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
-      </sc-for>
-    </div>
-
-    <sc-if value="{{tOverview}}" hint-placeholder-val="{{ true }}">
-      <div role="tabpanel" aria-label="ภาพรวม" style="display: flex; flex-direction: column; gap: 20px">
+        </section>
         <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
           <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 20px; border-bottom: 1px solid #E3E6EB">
             <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="workorder" size="18" tone="muted" hint-size="18px,18px"></dc-import>ใบงานของไซต์นี้</h2>
-            <a href="WorkOrders.dc.html" onPointerDown="{{filterWos}}" onKeyDown="{{filterWos}}" onClick="{{filterWos}}" style="font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; min-height: 44px">ดูทั้งหมดในหน้าใบงาน →</a>
+            <a href="WorkOrders.dc.html" onPointerDown="{{filterWos}}" onKeyDown="{{filterWos}}" onClick="{{filterWos}}" style="font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px">ดูทั้งหมดในหน้าใบงาน<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a>
           </div>
           <sc-if value="{{noWos}}" hint-placeholder-val="{{ false }}">
             <div style="padding: 20px; font-size: 14px; color: #4B5563">ยังไม่มีใบงานของไซต์นี้</div>
@@ -101,42 +135,30 @@ button{font-family:inherit;cursor:pointer}
             </sc-for>
           </div>
         </section>
-
-        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
-          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 16px 20px; border-bottom: 1px solid #E3E6EB"><dc-import name="Icon" icon="panel" size="18" tone="muted" hint-size="18px,18px"></dc-import>{{zoneTitle}}</h2>
-          <table class="rt" aria-label="โซนในไซต์นี้" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px">
-            <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">พื้นที่</th><th scope="col" style="padding: 10px 12px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums">แผง</th><th scope="col" style="padding: 10px 12px; font-weight: 600">ล้างล่าสุด (อนุมัติแล้ว)</th><th scope="col" style="padding: 10px 12px; font-weight: 600">สภาพ</th><th scope="col" style="padding: 10px 20px; font-weight: 600">อุปกรณ์</th></tr></thead>
-            <tbody>
-              <sc-for list="{{zones}}" as="z" hint-placeholder-count="4">
-                <tr style="border-top: 1px solid #EEF0F3"><td class="rt-main" style="padding: 12px 20px; font-weight: 600">{{z.name}}</td><td data-label="แผง" style="padding: 12px; text-align: right; font-variant-numeric: tabular-nums">{{z.panels}}</td><td class="rt-stack" data-label="ล้างล่าสุด (อนุมัติแล้ว)" style="padding: 12px"><span style="display: inline-flex; flex-direction: column; gap: 2px">{{z.last}}<sc-if value="{{z.hasPending}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #4B5563">{{z.pending}}</span></sc-if></span></td><td class="rt-stack" data-label="สภาพ" style="padding: 12px"><span style="display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; max-width: 100%"><dc-import name="StatusPill" kind="site" value="{{z.st}}" label="{{z.short}}" hint-size="120px,24px"></dc-import><sc-if value="{{z.hasDetail}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; color: #4B5563; white-space: normal; overflow-wrap: anywhere">{{z.detail}}</span></sc-if></span></td><td data-label="อุปกรณ์" style="padding: 12px 20px"><button type="button" onClick="{{z.openDev}}" style="min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-size: 14px; font-weight: 600; text-align: left">{{z.devLabel}} →</button></td></tr>
-              </sc-for>
-            </tbody>
-          </table>
-        </section>
       </div>
     </sc-if>
 
     <sc-if value="{{tDevices}}" hint-placeholder-val="{{ false }}">
-      <section role="tabpanel" aria-label="อุปกรณ์" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto; padding: 16px 0 8px">
+      <section role="tabpanel" id="sd-panel" aria-labelledby="{{tabId}}" tabIndex="0" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto; padding: 16px 0 8px">
         <dc-import name="Devices" mode="list" site="{{site.key}}" zone="{{devZone}}" on-clear-zone="{{clearZone}}" hint-size="100%,520px"></dc-import>
       </section>
     </sc-if>
 
     <sc-if value="{{tEnergy}}" hint-placeholder-val="{{ false }}">
-      <div role="tabpanel" aria-label="พลังงาน" style="display: flex; flex-direction: column; gap: 8px">
+      <div role="tabpanel" id="sd-panel" aria-labelledby="{{tabId}}" tabIndex="0" style="display: flex; flex-direction: column; gap: 8px">
         <div style="display: flex; justify-content: flex-end">
-          <a href="EnergyValue.dc.html" onPointerDown="{{goEnergy}}" onKeyDown="{{goEnergy}}" onClick="{{goEnergy}}" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูรายละเอียดที่หน้าพลังงาน →</a>
+          <a href="EnergyValue.dc.html" onPointerDown="{{goEnergy}}" onKeyDown="{{goEnergy}}" onClick="{{goEnergy}}" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none; gap: 4px">ดูรายละเอียดที่หน้าพลังงาน<dc-import name="Icon" icon="arrowRight" size="14" hint-size="14px,14px"></dc-import></a>
         </div>
         <dc-import name="EnergyStats" view="site" org="{{orgId}}" site="{{site.key}}" period="12" hint-size="100%,180px"></dc-import>
       </div>
     </sc-if>
 
     <sc-if value="{{tPeople}}" hint-placeholder-val="{{ false }}">
-      <section role="tabpanel" aria-label="ผู้มีสิทธิ์" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 8px 0; max-width: 760px">
+      <section role="tabpanel" id="sd-panel" aria-labelledby="{{tabId}}" tabIndex="0" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 8px 0; max-width: 760px">
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px">
           <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="users" size="18" tone="muted" hint-size="18px,18px"></dc-import>ผู้มีสิทธิ์ในไซต์นี้</h2>
           <sc-if value="{{canInvite}}" hint-placeholder-val="{{ true }}">
-            <a href="Members.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; min-height: 32px"><dc-import name="Icon" icon="plus" size="16" hint-size="16px,16px"></dc-import>มอบสิทธิ์</a>
+            <a href="Members.dc.html" style="font-size: 13px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 8px; margin-right: -8px">จัดการสิทธิ์ที่หน้าสมาชิก<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
           </sc-if>
         </div>
         <sc-if value="{{hasInherited}}" hint-placeholder-val="{{ true }}">
@@ -160,7 +182,7 @@ button{font-family:inherit;cursor:pointer}
           </div>
         </sc-for>
         <sc-if value="{{viewerNote}}" hint-placeholder-val="{{ false }}">
-          <div style="padding: 8px 20px 12px; font-size: 12px; color: #4B5563">Viewer เห็นเฉพาะตัวเองในรายชื่อนี้</div>
+          <div style="padding: 8px 20px 12px; font-size: 12px; color: #4B5563">ผู้ดูอย่างเดียวเห็นเฉพาะตัวเองในรายชื่อนี้</div>
         </sc-if>
       </section>
     </sc-if>
@@ -200,16 +222,16 @@ class Component extends DCLogic {
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.siteName', 'sc.site', 'sc.woStat', 'sc.createdWo', 'sc.flashAt', 'sc.createdName', 'sc.siteFrom', 'sc.createdSites', 'sc.siteCycle', 'sc.woAssign', 'sc.siteEdits', 'sc.siteTab'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.siteName', 'sc.site', 'sc.woStat', 'sc.createdWo', 'sc.flashAt', 'sc.createdName', 'sc.siteFrom', 'sc.createdSites', 'sc.siteCycle', 'sc.woAssign', 'sc.siteEdits', 'sc.siteTab', 'sc.memberEdits', 'sc.removed', 'sc.newAccount', 'sc.myName', 'sc.myEmail'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     // a one-shot sc.siteTab can arrive after mount (Play keeps this page rendered), so the poll also picks it up and removes it
-    self._tabOnce = function () { try { var t = window.sessionStorage.getItem('sc.siteTab'); if (t) { window.sessionStorage.removeItem('sc.siteTab'); self.setState({ tab: t, devZone: '' }); } } catch (e) {} };
+    self._tabOnce = function () { try { var t = window.sessionStorage.getItem('sc.siteTab'); if (t) { window.sessionStorage.removeItem('sc.siteTab'); self.setState({ tab: t, devZone: '', cycOpen: t === 'cycle' }); } } catch (e) {} };
     self._sync = function () { self._tabOnce(); var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
     self._iv = setInterval(self._sync, 400);
     // one-shot tab (sc.siteTab, e.g. back from DeviceDetail → อุปกรณ์): read once here and removed
     var tabOnce = ''; try { tabOnce = window.sessionStorage.getItem('sc.siteTab') || ''; window.sessionStorage.removeItem('sc.siteTab'); } catch (e) {}
-    self.setState({ sync: Date.now(), cycOpen: false, cycDraft: '', tab: tabOnce || 'overview', devZone: '' }); // force one fresh render: Play may reuse a restored render
+    self.setState({ sync: Date.now(), cycOpen: tabOnce === 'cycle', cycDraft: '', tab: tabOnce || 'overview', devZone: '' }); // force one fresh render: Play may reuse a restored render
   }
   componentWillUnmount() {
     if (this._sync) window.removeEventListener('storage', this._sync);
@@ -305,6 +327,13 @@ class Component extends DCLogic {
       var d0 = Number(cycSet[site.name]), inf = cycInfo(site.last, d0);
       site = Object.assign({}, site, { cycle: d0, st: inf.st, next: inf.next, zones: site.zones ? site.zones.map(function (z) { return Object.assign({}, z, { st: inf.st }); }) : site.zones });
     }
+    // removed / suspended members never show as site people (DATA Round 13); a new account shows its own name, not the sample owner
+    var mEdP = JSN('sc.memberEdits', {}), goneP = JSN('sc.removed', []);
+    var alive = function (p) { if (!p.email) return true; var k = orgId + '|' + p.email, st = (mEdP[k] || {}).status; return goneP.indexOf(k) < 0 && st !== 'suspended' && st !== 'removed'; };
+    var newAcctP = SS('sc.newAccount') === '1';
+    var selfFix = function (p) { return newAcctP && /\(คุณ\)/.test(p.name || '') ? Object.assign({}, p, { av: 'me', name: (SS('sc.myName') || 'ผู้ใช้ใหม่') + ' (คุณ)', email: SS('sc.myEmail') || p.email }) : p; };
+    org = Object.assign({}, org, { inherited: org.inherited.filter(alive).map(selfFix) });
+    if (site) site = Object.assign({}, site, { people: (site.people || []).filter(alive).map(selfFix) });
     var role = org.role, admin = role === 'Org Admin' || role === 'Org Owner';
     var seeMembers = admin || role === 'Site Manager';
     var person = function (p) { var link = seeMembers && !!p.email; return Object.assign({}, p, { link: link, plain: !link, go: key(function () { set('sc.member', p.email); set('sc.memberFrom', 'SiteDetail'); }) }); };
@@ -313,7 +342,7 @@ class Component extends DCLogic {
     var zones = !site ? [] : (site.zones || [{ name: 'ทั้งไซต์', panels: site.panels, inv: '(' + (INVN[site.thumb] || 0) + ')', last: site.last, cond: site.last === '—' && site.cycle ? 'ยังไม่เคยล้าง' : cond[site.st], st: site.st, whole: true }]);
     // pill = the panel condition (or the approval step); approved cleaning date stays in "ล้างล่าสุด", a pending clean is a muted line under it
     zones = zones.map(function (z) {
-      var seg = String(z.cond || '').split(' · ').filter(Boolean), pend = [], rest = [], pill = '', st = z.st;
+      var seg = String(z.cond || '').replace(/\s*→\s*WO-\d+/g, '').replace(/\s*\(WO-\d+\)/g, '').replace(/\s+WO-\d+/g, '').split(' · ').filter(Boolean), pend = [], rest = [], pill = '', st = z.st;
       seg.forEach(function (x) {
         if (/^ล้างแล้ว/.test(x)) pend.push(x);
         else if (!pill && /รออนุมัติ|ส่งกลับแก้ไข/.test(x)) { pill = x; st = /ส่งกลับ/.test(x) ? 'late' : 'due'; }
@@ -336,7 +365,7 @@ class Component extends DCLogic {
     var RANK = { review: 0, returned: 1, paused: 2, doing: 3, todo: 4, new: 5, done: 9 };
     wos.sort(function (x, y) { return (RANK[x.st] ?? 6) - (RANK[y.st] ?? 6); }); // open work first, finished last
     // back link follows where the user came from (sc.siteFrom)
-    var FROM = { EnergyValue: ['พลังงานและผลตอบแทน', 'EnergyValue.dc.html'], Members: ['สมาชิกองค์กร', 'Members.dc.html'], Main: ['ภาพรวม', 'Main.dc.html'], Sites: ['ไซต์ทั้งหมด', 'Sites.dc.html'], Schedule: ['ตารางล้าง', 'Schedule.dc.html'], Reports: ['รายงาน', 'Reports.dc.html'],
+    var FROM = { EnergyValue: ['รายงานพลังงาน', 'EnergyValue.dc.html'], Members: ['สมาชิกและสิทธิ์', 'Members.dc.html'], Main: ['ภาพรวม', 'Main.dc.html'], Sites: ['ไซต์', 'Sites.dc.html'], Schedule: ['ปฏิทินรอบล้าง', 'Schedule.dc.html'], Reports: ['รายงาน', 'Reports.dc.html'],
       WorkOrderDetail: ['ใบงาน', 'WorkOrderDetail.dc.html'], WorkOrders: ['ใบงาน', 'WorkOrders.dc.html'], Notifications: ['การแจ้งเตือน', 'Notifications.dc.html'], Analytics: ['วิเคราะห์', 'Analytics.dc.html'] };
     var from = FROM[SS('sc.siteFrom')] || FROM.Sites;
     // cleaning cycle: Org Owner/Admin for any site, Site Manager for the sites they manage (every site they can see here)
@@ -352,11 +381,12 @@ class Component extends DCLogic {
     };
     // one-shot tab (e.g. back from DeviceDetail → อุปกรณ์)
     var tab = self.state.tab || 'overview';
-    if (['overview', 'devices', 'energy', 'people'].indexOf(tab) < 0) tab = 'overview';
+    if (tab === 'cycle') tab = 'work';
+    if (['overview', 'energy', 'findings', 'work', 'devices', 'people'].indexOf(tab) < 0) tab = 'overview';
     var DEVN = { k1: 24, k2: 20, bp: 9, lb: 8, rs: 9, bn: 8, lp: 15, e1: 6 };
     var nPeople = site ? org.inherited.length + site.people.length : 0;
     var devCount = site ? DEVN[site.thumb] : 0;
-    var tabDefs = [['overview', 'ภาพรวม'], ['devices', 'อุปกรณ์' + (devCount ? ' (' + devCount + ')' : '')], ['energy', 'พลังงาน'], ['people', 'ผู้มีสิทธิ์ (' + nPeople + ')']];
+    var tabDefs = [['overview', 'ภาพรวม'], ['energy', 'ประสิทธิภาพ'], ['findings', 'ข้อสังเกต'], ['work', 'งานล้างและรอบล้าง'], ['devices', 'อุปกรณ์' + (devCount ? ' (' + devCount + ')' : '')], ['people', 'ผู้มีสิทธิ์ (' + nPeople + ')']];
     // things that need attention on this site: a job waiting approval, a device alarm or an offline device
     var DEV_ALERT = { 'ฟาร์มโคราช 1': ['INV-C03', 'อินเวอร์เตอร์แจ้งเตือน', 'กระแสสตริง 4 ต่ำ (จุดร้อน 2 แผง)', 'alert'], 'สาขาบางนา': ['INV-04', 'อินเวอร์เตอร์ขาดการเชื่อมต่อ', 'ไม่ส่งข้อมูลตั้งแต่ 14 พ.ย. 22:10 · ไฟที่ไม่ได้บันทึก ≈ 96 kWh (ประเมินจากเครื่องข้างเคียง)', 'wifiOff'] };
     var alerts = [];
@@ -375,11 +405,14 @@ class Component extends DCLogic {
     var showInsight = !(site && da && INS_DEVICE[site.name] === da[0]);
     var shownName = site ? (siteEd.name || site.name) : '';
     return {
-      tabs: tabDefs.map(function (d) { var on = d[0] === tab; return { label: d[1], on: on, pick: function () { self.setState({ tab: d[0], devZone: d[0] === 'devices' ? self.state.devZone : '' }); },
+      tabId: 'sd-tab-' + tab,
+      // tabs pattern (DATA Round 13): arrows / Home / End move and activate, focus follows
+      tabKey: function (e) { var ids = tabDefs.map(function (d) { return d[0]; }), i = ids.indexOf(tab), k = e.key, j = k === 'ArrowRight' ? (i + 1) % ids.length : k === 'ArrowLeft' ? (i - 1 + ids.length) % ids.length : k === 'Home' ? 0 : k === 'End' ? ids.length - 1 : -1; if (j < 0) return; e.preventDefault(); self.setState({ tab: ids[j], devZone: '' }); setTimeout(function () { var b = document.getElementById('sd-tab-' + ids[j]); if (b) b.focus(); }, 30); },
+      tabs: tabDefs.map(function (d) { var on = d[0] === tab; return { id: 'sd-tab-' + d[0], ti: on ? 0 : -1, label: d[1], on: on, pick: function () { self.setState({ tab: d[0], devZone: d[0] === 'devices' ? self.state.devZone : '' }); },
         style: 'flex: none; min-height: 44px; padding: 0 14px; border: 0; background: transparent; font-size: 14px; font-weight: 600; white-space: nowrap; margin-bottom: -1px; border-bottom: ' + (on ? '3px solid #0F6B5C; color: #111827' : '3px solid transparent; color: #4B5563') }; }),
-      tOverview: tab === 'overview', tDevices: tab === 'devices', tEnergy: tab === 'energy', tPeople: tab === 'people',
+      tOverview: tab === 'overview', tDevices: tab === 'devices', tEnergy: tab === 'energy', tPeople: tab === 'people', tFindings: tab === 'findings', tWork: tab === 'work',
       devZone: tab === 'devices' ? (self.state.devZone || '') : '', clearZone: function () { self.setState({ devZone: '' }); },
-      alerts: alerts, hasAlerts: alerts.length > 0, showInsight: showInsight,
+      alerts: alerts, hasAlerts: alerts.length > 0, alertCount: alerts.length, showAlerts: alerts.length > 0 && tab === 'overview', showInsight: showInsight,
       markFinding: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; var t = e && e.target && e.target.closest ? e.target.closest('a') : null; if (!t) return; try { window.sessionStorage.setItem('sc.findingFrom', 'SiteDetail'); window.sessionStorage.setItem('sc.siteName', site ? site.name : ''); } catch (x) {} }, // the finding link inside Insights opens Analytics → back to this site
       org: org, hasSite: !!site, noSite: !site, orgId: orgId,
       backLabel: from[0], backHref: from[1],
@@ -389,11 +422,12 @@ class Component extends DCLogic {
       canEdit: admin, canCreate: admin || role === 'Site Manager', canInvite: admin || role === 'Site Manager', readOnly: role === 'Viewer',
       headOrgBadge: org.badge || '',
       headEyebrow: site ? org.name + ' · ' + (siteEd.prov || site.prov) : '',
-      headSub: site ? site.type + ' · สิทธิ์ของคุณ: ' + role + (role === 'Viewer' ? ' · ดูได้อย่างเดียว' : '') + (site.created ? ' · ไซต์ใหม่' : '') : '',
+      headSub: site ? site.type + ' · สิทธิ์ของคุณ: ' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' }[role] || role) + (site.created ? ' · ไซต์ใหม่' : '') : '',
       headActs: !site ? [] : [
-        canCyc ? { label: site.cycle ? 'เปลี่ยนรอบล้าง' : 'ตั้งรอบล้าง', icon: 'calendar', variant: 'secondary', onPress: function () { self.setState({ cycOpen: true, cycDraft: '' }); } } : null,
-        admin ? { label: 'แก้ไขไซต์', icon: 'edit', variant: 'secondary', href: 'SiteForm.dc.html', saveKeys: 'sc.editSite=' + site.name } : null,
-        (admin || role === 'Site Manager') ? { label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=SiteDetail|sc.siteName=' + site.name } : null].filter(Boolean),
+        (admin || role === 'Site Manager') ? { label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=SiteDetail|sc.siteName=' + site.name } : null,
+        (admin || role === 'Site Manager') ? { label: 'แก้ไขไซต์', icon: 'edit', variant: 'secondary', href: 'SiteForm.dc.html', saveKeys: 'sc.editSite=' + site.name } : null].filter(Boolean),
+      showCycBtn: canCyc && !self.state.cycOpen, cycBtnLabel: site && site.cycle ? 'เปลี่ยนรอบล้าง' : 'ตั้งรอบล้าง',
+      openCyc: function () { self.setState({ cycOpen: true, cycDraft: '' }); },
       cycOpen: canCyc && !!self.state.cycOpen,
       cycTitle: site && site.cycle ? 'เปลี่ยนรอบล้างของ ' + shownName : 'ตั้งรอบล้างให้ ' + shownName,
       cycOpts: [30, 45, 60, 90].map(function (n) { return { id: String(n), label: 'ทุก ' + n + ' วัน' }; }),

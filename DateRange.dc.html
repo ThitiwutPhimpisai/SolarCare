@@ -13,11 +13,29 @@
 <style>
 body{margin:0}
 .dr-presets{scrollbar-width:thin}
-@media (max-width: 767px){.dr-presets{flex-wrap:nowrap !important;overflow-x:auto;padding-bottom:4px}.dr-field{flex:1 1 140px !important}}
+.dr-toggle{display:none}
+.dr-presets::-webkit-scrollbar{display:none}
+@media (max-width: 767px){.dr-presets{flex-wrap:nowrap !important;overflow-x:auto;scrollbar-width:none}.dr-field{flex:1 1 140px !important}}
+/* phone: one summary button ("12 เดือน · ทุกไซต์") opens the full controls, so data shows on the first screen */
+@media (max-width: 599px){.dr-toggle{display:flex !important}.dr-head{display:none !important}.dr-box[data-open="false"] .dr-body{display:none !important}.dr-box{padding:4px !important}.dr-box[data-open="true"]{padding:4px 12px 14px !important}}
 </style>
 </helmet>
-<section role="group" aria-label="{{groupLabel}}" style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0">
-  <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #374151"><dc-import name="Icon" icon="calendar" size="16" tone="muted" hint-size="16px,16px"></dc-import>ช่วงเวลา</div>
+<section class="dr-box" data-open="{{openAttr}}" role="group" aria-label="{{groupLabel}}" style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; min-width: 0">
+  <button type="button" class="dr-toggle" onClick="{{toggleOpen}}" aria-expanded="{{openAttr}}" aria-controls="dr-body" style="font-family: inherit; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: #111827; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer">
+    <dc-import name="Icon" icon="filter" size="18" tone="brand" hint-size="18px,18px"></dc-import>
+    <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{toggleText}}</span>
+    <span style="font-size: 13px; font-weight: 600; color: #0F6B5C">{{toggleHint}}</span>
+  </button>
+  <div id="dr-body" class="dr-body" style="display: flex; flex-direction: column; gap: 12px; min-width: 0">
+  <sc-if value="{{hasSites}}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
+      <label for="dr-site" style="font-size: 13px; font-weight: 600; color: #374151; display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="site" size="16" tone="muted" hint-size="16px,16px"></dc-import>ไซต์</label>
+      <select id="dr-site" value="{{siteValue}}" onChange="{{pickSite}}" style="flex: 0 1 320px; min-width: 0; min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 14px; color: #111827">
+        <sc-for list="{{siteOpts}}" as="o" hint-placeholder-count="3"><option value="{{o.id}}">{{o.label}}</option></sc-for>
+      </select>
+    </div>
+  </sc-if>
+  <div class="dr-head" style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #374151"><dc-import name="Icon" icon="calendar" size="16" tone="muted" hint-size="16px,16px"></dc-import>ช่วงเวลา</div>
   <div class="dr-presets" role="group" aria-label="ช่วงเวลาสำเร็จรูป" style="display: flex; flex-wrap: wrap; gap: 6px">
     <sc-for list="{{presets}}" as="p" hint-placeholder-count="8">
       <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="{{p.style}}">{{p.label}}</button>
@@ -53,9 +71,10 @@ body{margin:0}
     </label>
     <span role="status" style="font-size: 13px; color: #4B5563; flex: 1 1 220px; min-width: 0">{{summary}}</span>
   </div>
+  </div>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ช่วงเวลารายงาน"},"onChange":{"editor":null},"$preview":{"width":900,"height":260}}'>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ช่วงเวลารายงาน"},"onChange":{"editor":null},"siteOpts":{"editor":null},"siteValue":{"editor":"text","default":"all"},"onSite":{"editor":null},"$preview":{"width":900,"height":260}}'>
 // ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
 var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
 var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
@@ -142,7 +161,16 @@ class Component extends DCLogic {
       return r2;
     };
     var groups = scrGroups(rr.len).map(function (g) { return { id: g[0], dis: !g[2], text: g[1] + (g[2] ? '' : ' (' + g[3] + ')') }; });
+    var p = self.props, sOpts = Array.isArray(p.siteOpts) ? p.siteOpts : [], sVal = p.siteValue ?? 'all';
+    var sHit = sOpts.filter(function (o) { return o.id === sVal; })[0];
+    var open = !!st.open;
     return {
+      // the site select lives in the same filter card; hidden when the org has a single site (DATA.md round 14)
+      hasSites: sOpts.length > 2, siteOpts: sOpts, siteValue: sVal,
+      pickSite: function (e) { if (p.onSite) p.onSite(e.target.value); },
+      openAttr: open ? 'true' : 'false', toggleOpen: function () { self.setState({ open: !self.state.open }); },
+      toggleText: rr.short + (sOpts.length > 2 && sHit ? ' · ' + sHit.label : '') + ' · ' + rr.groupLabel + (rr.compareAsked && rr.compareOk ? ' · เทียบช่วงก่อน' : ''),
+      toggleHint: open ? 'ซ่อน' : 'เปลี่ยน',
       groupLabel: self.props.label || 'ช่วงเวลารายงาน',
       presets: SCR_PRESETS.map(function (x) { var on = custom ? x[0] === 'custom' : x[0] === rr.preset; return { label: x[1], on: on, style: chip(on),
         pick: function () { if (x[0] === 'custom') { self.save({ preset: 'custom', from: rr.fromIso, to: rr.toIso }); self.setState({ custom: true, err: '', info: '', sync: Date.now() }); return; } self.save({ preset: x[0], group: '' }); self.setState({ custom: false, draftFrom: '', draftTo: '', err: '', info: '', sync: Date.now() }); } }; }),
