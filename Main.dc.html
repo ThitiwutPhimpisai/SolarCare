@@ -15,7 +15,9 @@ body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 button{font-family:inherit;cursor:pointer}
 @media (max-width: 599px){.mn-cta-t{display:none}}
-.mn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px;align-items:start}
+.mn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px;align-items:stretch}
+.mn-pm{display:none}
+@media (max-width: 599px){.mn-pd{display:none}.mn-pm{display:block;margin-top:4px}}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
@@ -110,8 +112,8 @@ button{font-family:inherit;cursor:pointer}
       <sc-for list="{{attn}}" as="s" hint-placeholder-count="3">
         <li style="border-top: 1px solid #EEF0F3">
           <a href="SiteDetail.dc.html" onPointerDown="{{s.go}}" onKeyDown="{{s.go}}" onClick="{{s.go}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 20px; text-decoration: none; color: #111827">
-            <span style="flex: 1 1 160px; min-width: 0"><span style="display: block; font-weight: 600">{{s.name}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{s.meta}}</span></span>
-            <dc-import name="StatusPill" kind="site" value="{{s.st}}" label="{{s.label}}" hint-size="120px,26px"></dc-import>
+            <span style="flex: 1 1 160px; min-width: 0"><span style="display: block; font-weight: 600">{{s.name}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{s.meta}}</span><span class="mn-pm"><dc-import name="StatusPill" kind="site" value="{{s.st}}" label="{{s.label}}" hint-size="120px,26px"></dc-import></span></span>
+            <span class="mn-pd" style="flex: none"><dc-import name="StatusPill" kind="site" value="{{s.st}}" label="{{s.label}}" hint-size="120px,26px"></dc-import></span>
           </a>
         </li>
       </sc-for>
@@ -124,15 +126,15 @@ button{font-family:inherit;cursor:pointer}
       <a href="Schedule.dc.html" onPointerDown="{{toCal}}" onKeyDown="{{toCal}}" onClick="{{toCal}}" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">ดูปฏิทิน<dc-import name="Icon" icon="arrowRight" size="16" hint-size="16px,16px"></dc-import></a>
     </div>
     <sc-if value="{{weekEmpty}}" hint-placeholder-val="{{ false }}">
-      <dc-import name="ListState" state="empty" unit="งาน" icon="calendar" empty-title="ไม่มีงานใน 7 วันข้างหน้า" empty-text="งานที่ต้องจัดการอยู่ในรายการสิ่งที่ต้องทำด้านบน" hint-size="100%,160px"></dc-import>
+      <dc-import name="ListState" state="empty" unit="งาน" icon="calendar" empty-title="ยังไม่มีใบงานใน 7 วันข้างหน้า" empty-text="{{weekEmptyText}}" hint-size="100%,160px"></dc-import>
     </sc-if>
     <ul style="list-style: none; margin: 0; padding: 0">
       <sc-for list="{{week}}" as="w" hint-placeholder-count="3">
         <li style="border-top: 1px solid #EEF0F3">
           <a href="WorkOrderDetail.dc.html" onPointerDown="{{w.go}}" onKeyDown="{{w.go}}" onClick="{{w.go}}" style="display: flex; align-items: center; gap: 12px; min-height: 64px; padding: 10px 20px; text-decoration: none; color: #111827">
-            <span style="flex: none; width: 64px; text-align: center; font-size: 12px; color: #4B5563; line-height: 1.3"><span style="display: block; font-size: 18px; font-weight: 700; color: #111827">{{w.day}}</span>{{w.mon}}</span>
-            <span style="flex: 1 1 160px; min-width: 0"><span style="display: block; font-weight: 600">{{w.title}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{w.meta}}</span></span>
-            <dc-import name="StatusPill" kind="wo" value="{{w.st}}" hint-size="110px,26px"></dc-import>
+            <span style="flex: none; width: 52px; text-align: center; font-size: 12px; color: #4B5563; line-height: 1.3"><span style="display: block; font-size: 18px; font-weight: 700; color: #111827">{{w.day}}</span>{{w.mon}}</span>
+            <span style="flex: 1 1 160px; min-width: 0"><span style="display: block; font-weight: 600">{{w.title}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{w.meta}}</span><span class="mn-pm"><dc-import name="StatusPill" kind="wo" value="{{w.st}}" hint-size="110px,26px"></dc-import></span></span>
+            <span class="mn-pd" style="flex: none"><dc-import name="StatusPill" kind="wo" value="{{w.st}}" hint-size="110px,26px"></dc-import></span>
           </a>
         </li>
       </sc-for>
@@ -149,7 +151,7 @@ button{font-family:inherit;cursor:pointer}
     </a>
     <dl style="flex: 3 1 360px; display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px 24px; margin: 0">
       <sc-for list="{{stats}}" as="k" hint-placeholder-count="3">
-        <div style="border-left: 2px solid #EEF0F3; padding-left: 12px"><dt style="font-size: 13px; color: #4B5563">{{k.label}}</dt><dd style="{{k.style}}">{{k.value}}<span style="font-size: 13px; font-weight: 500; color: #4B5563"> {{k.unit}}</span></dd></div>
+        <div style="border-left: 2px solid #EEF0F3; padding-left: 12px"><dt style="font-size: 13px; color: #4B5563">{{k.label}}</dt><dd style="{{k.style}}">{{k.value}}<span style="font-size: 13px; font-weight: 500; color: #4B5563"> {{k.unit}}</span></dd><sc-if value="{{k.hasLink}}" hint-placeholder-val="{{ false }}"><a href="{{k.href}}" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 13px; font-weight: 600; color: #0F6B5C; text-decoration: none">{{k.link}}</a></sc-if></div>
       </sc-for>
     </dl>
   </section>
@@ -234,7 +236,7 @@ class Component extends DCLogic {
       { no: 'WO-1041', org: 'a', title: 'ล้างแผงตามรอบ', site: 'ฟาร์มโคราช 2', who: '', due: '25 พ.ย. 2569', dueIn: 10, st: 'new' },
       { no: 'WO-1039', org: 'a', title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', who: 'ธนากร ว.', due: '10 พ.ย. 2569', dueIn: -5, st: 'doing' },
       { no: 'GM-0211', org: 'b', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '20 พ.ย. 2569', dueIn: 5, st: 'todo' },
-      { no: 'GM-0209', org: 'b', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', dueIn: -3, st: 'doing' },
+      { no: 'GM-0209', org: 'b', title: 'ล้างแผงลานจอดรถ', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', dueIn: -3, st: 'doing' },
       { no: 'NK-0102', org: 'c', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '22 พ.ย. 2569', dueIn: 7, st: 'doing' }
     ];
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
@@ -242,9 +244,9 @@ class Component extends DCLogic {
     var org = orgs.filter(function (o) { return o.id === (SS('sc.org') || 'a'); })[0] || orgs[0];
     var orgName = org.id === 'd' && SS('sc.createdName') ? SS('sc.createdName') : org.name;
     var admin = org.role === 'Org Owner' || org.role === 'Org Admin';
-    var canApprove = admin || org.role === 'Site Manager';
+    var canApprove = admin || org.role === 'Site Manager', viewer = org.role === 'Viewer';
     // sites created in the prototype (SiteForm / CreateOrg step 3)
-    var THUMB = { 'โซลาร์ฟาร์ม': 'farmType', farm: 'farmType', 'หลังคา': 'roofType', roof: 'roofType', Carport: 'carportType', carport: 'carportType' };
+    var THUMB = { 'โซลาร์ฟาร์ม': 'farmType', farm: 'farmType', 'หลังคา': 'roofType', roof: 'roofType', Carport: 'carportType', 'ที่จอดรถ': 'carportType', carport: 'carportType' };
     var EDITS = J('sc.siteEdits', '{}');
     var DN = function (n) { return (EDITS[n] && EDITS[n].name) || n; };
     var APPROVER = { 'ฟาร์มโคราช 1': 'สมศรี ป.', 'ฟาร์มโคราช 2': 'สมศรี ป.', 'สาขารังสิต': 'ณัฐภัทร ส.', 'สาขาบางนา': 'ณัฐภัทร ส.', 'โรงงาน A ลำพูน': 'ศิริพร ก.', 'หลังคาอาคาร A หัวหิน': 'ณัฐภัทร ส.', 'หลังคาโรงงานบางปู': 'ณัฐภัทร ส.', 'ลานจอดรถลพบุรี': 'ณัฐภัทร ส.' };
@@ -268,8 +270,8 @@ class Component extends DCLogic {
     var woStat0 = J('sc.woStat', '{}');
     sites = sites.map(function (x) {
       var c = Number(CYC[x.name]) || 0, last = x.name === 'ฟาร์มโคราช 1' && woStat0['WO-1043'] === 'done' ? '14 พ.ย. 2569' : x.last;
-      if (!x.last || (!c && last === x.last)) return x;
-      c = c || x.cyc; var l = thParse(last); if (!l) return x;
+      if (!x.last) return x;
+      c = c || x.cyc; if (!c) return x; var l = thParse(last); if (!l) return x;
       var n = new Date(l.getTime() + c * 864e5), dIn = Math.round((n - TODAY) / 864e5);
       return Object.assign({}, x, { cyc: c, next: thFmt(n) + (dIn === 1 ? ' (พรุ่งนี้)' : ''), dueIn: dIn, st: dIn < 0 ? 'late' : dIn <= 14 ? 'due' : 'ok' });
     });
@@ -308,11 +310,17 @@ class Component extends DCLogic {
       else if (w.dueIn < 0) todo.push([1, woRow(w, 'เลยกำหนด ' + (-w.dueIn) + ' วัน', 'alert', 'danger', 'ดูใบงาน', '#B42318')]);
       else if (w.st === 'new' && !w.who) todo.push([2, woRow(w, 'ยังไม่มอบหมายช่าง', 'user', 'warn', admin || org.role === 'Site Manager' ? 'มอบหมาย' : 'ดูใบงาน', '#8A3B06')]);
     });
+    // Round 15: a site with no cycle, or late with no open job, is a to-do for whoever can set its cycle / create jobs
+    shownSites.forEach(function (x) {
+      if (!canApprove) return;
+      var go = link({ 'sc.siteName': x.name, 'sc.siteFrom': 'Main', 'sc.siteTab': 'cycle' });
+      if (x.st === 'unset') todo.push([3, { no: 'site-' + x.id, kind: 'ยังไม่ตั้งรอบล้าง', icon: 'calendar', bg: 'warn', title: 'ตั้งรอบล้าง · ' + DN(x.name), meta: 'ระบบจะสร้างใบงานให้อัตโนมัติเมื่อใกล้ครบรอบ', cta: 'ตั้งรอบล้าง', aria: 'ตั้งรอบล้าง ' + DN(x.name), kindStyle: 'font-weight: 600; color: #8A3B06', href: 'SiteDetail.dc.html', go: go }]);
+      else if (x.st === 'late' && !wos.some(function (w) { return w.site === x.name; })) todo.push([1, { no: 'site-' + x.id, kind: 'เลยรอบล้าง ' + (-x.dueIn) + ' วัน', icon: 'alert', bg: 'danger', title: 'สร้างใบงานล้าง · ' + DN(x.name), meta: 'ยังไม่มีใบงานสำหรับรอบนี้', cta: 'ดูไซต์', aria: 'ดูไซต์ ' + DN(x.name) + ' เลยรอบล้าง ยังไม่มีใบงาน', kindStyle: 'font-weight: 600; color: #B42318', href: 'SiteDetail.dc.html', go: go }]);
+    });
     todo.sort(function (x, y) { return x[0] - y[0]; });
     todo = todo.map(function (x) { return x[1]; });
     var inTodo = todo.map(function (t) { return t.no; });
     // ไซต์ที่ต้องดูแล: late first (most overdue), then due soon, then not set up; bigger sites first within a tier (Round 14: ranked by impact)
-    var viewer = org.role === 'Viewer';
     var tier = function (x) { return x.st === 'late' ? 0 : x.st === 'due' ? 1 : x.st === 'unset' ? 2 : 3; };
     var attnSrc = viewer ? shownSites.slice() : shownSites.filter(function (x) { return tier(x) < 3; });
     attnSrc.sort(function (a, b) { return tier(a) - tier(b) || (tier(a) === 0 ? a.dueIn - b.dueIn : tier(a) === 1 ? a.dueIn - b.dueIn : 0) || b.kwp - a.kwp; });
@@ -335,9 +343,9 @@ class Component extends DCLogic {
     var dot = function (done, active) { return 'width: 32px; height: 32px; border-radius: 999px; display: flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box; font-weight: 700; ' + (done ? 'background: #0F6B5C; color: #FFFFFF' : (active ? 'border: 2px solid #0F6B5C; color: #0F6B5C' : 'border: 2px solid #D5D9E0; color: #4B5563')); };
     var steps = [
       { title: 'สร้างองค์กร', note: 'คุณเป็น' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' }[org.role] || org.role), done: true },
-      { title: 'เพิ่มไซต์แรก', note: 'ชื่อ จังหวัด กำลังติดตั้ง และรอบล้าง', done: hasSite, cta: 'เพิ่มไซต์', icon: 'plus', href: 'SiteForm.dc.html', keys: 'sc.editSite=|sc.from=Main|sc.siteFormFrom=Main', can: admin, why: 'ต้องเป็น Org Owner / Org Admin' },
-      { title: 'เชิญทีมและช่าง', note: invites ? 'ส่งคำเชิญแล้ว ' + invites + ' คน · เชิญเพิ่มได้ที่หน้าสมาชิก' : 'กำหนดบทบาทและไซต์ที่แต่ละคนเข้าถึงได้', done: invites > 0, cta: 'เชิญสมาชิก', icon: 'users', href: 'Members.dc.html', keys: '', can: admin, why: 'ต้องเป็น Org Owner / Org Admin', variant: 'secondary' },
-      { title: 'สร้างใบงานแรก', note: 'หรือรอให้ระบบสร้างตามรอบล้างอัตโนมัติ', done: firstWo, cta: 'สร้างใบงาน', icon: 'workorder', href: 'CreateWorkOrder.dc.html', keys: 'sc.from=Main', can: admin && hasSite, why: hasSite ? 'ต้องเป็น Org Owner / Org Admin' : 'เพิ่มไซต์ก่อน (ขั้นที่ 2)', variant: 'secondary' }
+      { title: 'เพิ่มไซต์แรก', note: 'ชื่อ จังหวัด กำลังติดตั้ง และรอบล้าง', done: hasSite, cta: 'เพิ่มไซต์', icon: 'plus', href: 'SiteForm.dc.html', keys: 'sc.editSite=|sc.from=Main|sc.siteFormFrom=Main', can: admin, why: 'ต้องเป็นเจ้าของหรือผู้ดูแลองค์กร' },
+      { title: 'เชิญทีมและช่าง', note: invites ? 'ส่งคำเชิญแล้ว ' + invites + ' คน · เชิญเพิ่มได้ที่หน้าสมาชิก' : 'กำหนดบทบาทและไซต์ที่แต่ละคนเข้าถึงได้', done: invites > 0, cta: 'เชิญสมาชิก', icon: 'users', href: 'Members.dc.html', keys: '', can: admin, why: 'ต้องเป็นเจ้าของหรือผู้ดูแลองค์กร', variant: 'secondary' },
+      { title: 'สร้างใบงานแรก', note: 'หรือรอให้ระบบสร้างตามรอบล้างอัตโนมัติ', done: firstWo, cta: 'สร้างใบงาน', icon: 'workorder', href: 'CreateWorkOrder.dc.html', keys: 'sc.from=Main', can: admin && hasSite, why: hasSite ? 'ต้องเป็นเจ้าของหรือผู้ดูแลองค์กร' : 'เพิ่มไซต์ก่อน (ขั้นที่ 2)', variant: 'secondary' }
     ];
     var nDone = steps.filter(function (x) { return x.done; }).length;
     var dismissed = SS('sc.setupDismissed').split(',').indexOf(org.id) >= 0;
@@ -349,9 +357,9 @@ class Component extends DCLogic {
     var stats = [
       { label: 'ใบงานเลยกำหนด', value: String(overdue.length), unit: 'ใบ', style: statStyle(overdue.length > 0) },
       { label: 'ไซต์เลยรอบล้าง', value: String(lateSites), unit: 'ไซต์', style: statStyle(lateSites > 0) },
-      { label: 'กำลังติดตั้งรวม', value: sum.toLocaleString('en-US'), unit: 'kWp · ' + shownSites.length + ' ไซต์', style: statStyle(false) },
-      { label: 'ทีมช่างที่เข้าถึงได้', value: String(org.techs), unit: 'คน', style: statStyle(false) }
+      { label: 'กำลังติดตั้งรวม · ' + shownSites.length + ' ไซต์', value: sum.toLocaleString('en-US'), unit: 'kWp', style: statStyle(false) }
     ];
+    if (!viewer) stats.push({ label: 'ช่างที่ดูแลไซต์', value: String(org.techs), unit: org.techs ? 'คน' : 'คน · ยังไม่มีช่าง', style: statStyle(false), hasLink: !org.techs && canApprove, link: 'เชิญช่าง', href: 'Members.dc.html' });
     // analytics findings shown as the last row of "ต้องทำวันนี้" (same ids as Insights; forecast-only f5 is not a to-do)
     var IN_NOW = { f1: 'หลังคาโรงงานบางปู', f2: 'ฟาร์มโคราช 1', f3: 'ลานจอดรถลพบุรี', f4: 'ฟาร์มโคราช 2', f6: 'สาขาบางนา', f7: 'โรงงาน A ลำพูน', f8: 'สาขารังสิต' };
     var insDis = (function () { try { return (window.sessionStorage.getItem('sc.insightDismissed') || '').split(','); } catch (e) { return []; } })();
@@ -360,7 +368,7 @@ class Component extends DCLogic {
       stats: stats, heroValue: String(shownWos.length),
       attn: attn, attnEmpty: attn.length === 0, attnTitle: viewer ? 'สถานะไซต์' : 'ไซต์ที่ต้องดูแล',
       attnNote: viewer ? 'สถานะรอบล้างของไซต์ที่คุณดูได้ (ดูอย่างเดียว)' : 'เรียงจากเลยกำหนดมากสุด แล้วใกล้ครบรอบ · ไซต์ใหญ่ก่อน',
-      week: week, weekEmpty: week.length === 0,
+      week: week, weekEmpty: week.length === 0, weekEmptyText: todo.some(function (t) { return !/^site-/.test(t.no); }) ? 'ใบงานที่เลยกำหนดหรือรออนุมัติอยู่ในสิ่งที่ต้องทำด้านบน' : 'ใบงานที่ครบกำหนดในสัปดาห์นี้จะขึ้นที่นี่',
       showTodo: hasSite && !viewer, showSiteSelect: sites.length > 1,
       pickSiteEv: function (e) { var id = e && e.target ? e.target.value : 'all'; var s0 = sites.filter(function (x) { return x.id === id; })[0]; try { window.sessionStorage.setItem('sc.site', s0 ? s0.name : 'all'); } catch (er) {} self.setState({ tick: Date.now() }); },
       toSites: link({ 'sc.from': 'Main' }), toCal: link({ 'sc.from': 'Main' }),

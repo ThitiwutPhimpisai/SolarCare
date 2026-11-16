@@ -51,7 +51,7 @@ button{cursor:pointer}
                     <span style="{{n.textStyle}}">{{n.text}}</span>
                     <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 12px; color: #4B5563; margin-top: 4px">
                       <span style="display: inline-flex; align-items: center; gap: 6px"><dc-import name="Icon" icon="{{n.ic}}" size="16" tone="{{n.icTone}}" hint-size="16px,16px"></dc-import>{{n.org}} · {{n.when}}</span>
-                      <sc-if value="{{n.unread}}" hint-placeholder-val="{{ true }}"><span style="flex: none"><dc-import name="StatusPill" kind="new" value="new" hint-size="44px,26px"></dc-import></span></sc-if>
+                      <sc-if value="{{n.unreadPill}}" hint-placeholder-val="{{ true }}"><span style="flex: none"><dc-import name="StatusPill" kind="new" value="new" hint-size="44px,26px"></dc-import></span></sc-if><sc-if value="{{n.unreadSr}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">ยังไม่อ่าน</span></sc-if>
                       <sc-if value="{{n.action}}" hint-placeholder-val="{{ false }}"><span style="flex: none"><dc-import name="StatusPill" kind="wo" value="review" label="ต้องดำเนินการ" hint-size="110px,26px"></dc-import></span></sc-if>
                     </span>
                   </span>
@@ -166,7 +166,7 @@ class Component extends DCLogic {
     var A = { n: 'natthaphat', w: 'worawut', t: 'thanakorn', s: 'somsri' };
     var SF = 'sf';
     var all = [
-      { id: 'n3', day: 'today', when: '10:34 น.', av: 'qleen', logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'ทีม Qleen เข้าดูองค์กรแบบอ่านอย่างเดียว · เหตุผล: เลขเรื่อง (ticket) #4821', href: 'AuditLog.dc.html', action: false, ic: 'support', icTone: 'info' },
+      { id: 'n3', day: 'today', when: '10:34 น.', av: 'qleen', logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'ทีม Qleen เข้าดูองค์กรแบบอ่านอย่างเดียว · เหตุผล: เลขเรื่อง #4821', href: 'AuditLog.dc.html', action: false, ic: 'support', icTone: 'info' },
       { id: 'n2', day: 'today', when: '10:05 น.', av: A.t, logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'ธนากร ว. กลับมาออนไลน์ · ส่งรูปที่ค้างไว้ 6 รูปของ WO-1042 ขึ้นระบบแล้ว', href: 'WorkOrderDetail.dc.html', wo: 'WO-1042', action: false, ic: 'upload', icTone: 'brand' },
       { id: 'n6', day: 'today', when: '08:30 น.', av: '', sys: true, logo: 'nk', org: 'นิคมฯ เหนือ', so: 'c', text: 'บทบาทของคุณใน นิคมฯ เหนือ เปลี่ยนเป็น Viewer · ลิงก์หน้าสมาชิกเดิมใช้ไม่ได้แล้ว', href: 'AccessDenied.dc.html', denied: 'หน้าสมาชิก', action: false, ic: 'shield', icTone: 'muted' },
       { id: 'n4', day: 'yesterday', when: '16:40 น.', av: '', sys: true, logo: SF, org: 'สยามโซลาร์ฟาร์ม', text: 'หลังคาโรงงานบางปู เลยกำหนดล้าง 18 วัน', href: 'SiteDetail.dc.html', siteName: 'หลังคาโรงงานบางปู', action: true, ic: 'alert', icTone: 'danger' },
@@ -203,7 +203,9 @@ class Component extends DCLogic {
     var readIds = SS('sc.read').split(',');
     var isUnread = function (n) { return readIds.indexOf(n.id) < 0 && readIds.indexOf('all') < 0; };
     var filtered = all.filter(function (n) { return s.tab === 'all' || (s.tab === 'unread' && isUnread(n)) || (s.tab === 'action' && n.action); });
-    var deco = function (n) { var u = isUnread(n); var so = n.so || (n.logo === SF ? 'a' : ''); return Object.assign({}, n, { unread: u, sys: !!n.sys, person: !n.sys,
+    // the "ใหม่" pill only helps when the list mixes read and unread items; otherwise the tint is enough (screen readers still hear ยังไม่อ่าน)
+    var mixed = filtered.some(isUnread) && filtered.some(function (n) { return !isUnread(n); });
+    var deco = function (n) { var u = isUnread(n); var so = n.so || (n.logo === SF ? 'a' : ''); return Object.assign({}, n, { unread: u, unreadPill: u && mixed, unreadSr: u && !mixed, sys: !!n.sys, person: !n.sys,
       // save the context the target page needs before Play navigates, and mark the item read
       go: function (e) {
         if (e && e.type === 'keydown' && e.key !== 'Enter') return;

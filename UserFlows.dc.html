@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<title>User flows ทุกบทบาท</title>
+<title>เส้นทางการใช้งานทุกบทบาท</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -18,8 +18,8 @@ a{color:#0F6B5C}
 <div style="width: 2600px; height: 1640px; box-sizing: border-box; padding: 48px 56px; background: #FFFFFF; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; gap: 18px">
   <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 24px">
     <div>
-      <h1 style="margin: 0; font-size: 34px">User flows ทุกบทบาท</h1>
-      <p style="margin: 6px 0 0; font-size: 16px; color: #4B5563">ตัวเลขในกล่อง = หน้าบน canvas · กดกล่องในโหมด Play เพื่อเปิดหน้านั้น</p>
+      <h1 style="margin: 0; font-size: 34px">เส้นทางการใช้งานทุกบทบาท</h1>
+      <p style="margin: 6px 0 0; font-size: 16px; color: #4B5563">ตัวเลขในกล่อง = หน้าบน canvas · กดกล่องในโหมด Play เพื่อเปิดหน้านั้น · แผนภาพกว้าง เลื่อนไปทางขวาเพื่อดูต่อ →</p>
     </div>
     <div style="display: flex; gap: 18px; font-size: 14px; color: #374151">
       <span style="display: flex; align-items: center; gap: 8px"><span style="width: 18px; height: 18px; border-radius: 4px; border: 2px solid #0F6B5C; background: #F0F7F5"></span>หน้าในระบบ</span>
@@ -87,7 +87,7 @@ class Component extends DCLogic {
       { role: 'ผู้ดูอย่างเดียว / ลูกค้า', goal: 'ดูสถานะไซต์ของตนอย่างเดียว', steps: [
         P('1.1', 'เข้าสู่ระบบ', '', 'Login.dc.html'), P('1.2', 'เลือก นิคมฯ เหนือ', 'บทบาทผู้ดูอย่างเดียว', 'SelectOrg.dc.html'), P('2.1', 'ภาพรวม', 'สถานะไซต์ · อ่านอย่างเดียว', 'Main.dc.html'), P('2.3', 'รายละเอียดไซต์', 'รูปก่อน/หลังล่าสุด', 'SiteDetail.dc.html'), P('5.1', 'แจ้งเตือนเมื่อปิดงาน', '', 'Notifications.dc.html'), B('6.4', 'เปิดลิงก์หน้าสมาชิกจากแจ้งเตือน', 'ผู้ดูอย่างเดียวเปิดไม่ได้ → หน้าไม่มีสิทธิ์ · ขอสิทธิ์', 'AccessDenied.dc.html') ] },
       { role: 'ผู้ดูแลแพลตฟอร์ม (ทีม Qleen)', goal: 'ช่วยลูกค้าโดยตรวจสอบย้อนหลังได้', steps: [
-        P('1.1', 'เข้าสู่ระบบ', 'บัญชีทีม Qleen → คอนโซลแพลตฟอร์ม', 'Login.dc.html'), P('6.1', 'องค์กรทั้งหมด', 'ค้นหา · สร้างองค์กรให้ลูกค้า', 'PlatformOrgs.dc.html'), P('6.2', 'รายละเอียดองค์กร', 'การใช้งาน · ประวัติการเข้าถึง', 'PlatformOrgDetail.dc.html'), E('ใส่เหตุผล แล้วยืนยันครั้งเดียว', 'เลขเรื่อง (ticket) · เริ่มเซสชันทันที'), P('6.3', 'โหมดช่วยเหลือ', 'อ่านอย่างเดียว 60 นาที · เมนูกดไม่ได้', 'SupportSession.dc.html'), P('6.2', 'จบเซสชัน', 'กลับรายละเอียดองค์กร แท็บประวัติการเข้าถึง · บันทึกครั้งเดียว', 'PlatformOrgDetail.dc.html') ] },
+        P('1.1', 'เข้าสู่ระบบ', 'บัญชีทีม Qleen → คอนโซลแพลตฟอร์ม', 'Login.dc.html'), P('6.1', 'องค์กรทั้งหมด', 'ค้นหา · สร้างองค์กรให้ลูกค้า', 'PlatformOrgs.dc.html'), P('6.2', 'รายละเอียดองค์กร', 'การใช้งาน · ประวัติการเข้าถึง', 'PlatformOrgDetail.dc.html'), E('ใส่เหตุผล แล้วยืนยันครั้งเดียว', 'เลขเรื่อง · เริ่มเซสชันทันที'), P('6.3', 'โหมดช่วยเหลือ', 'อ่านอย่างเดียว 60 นาที · เมนูกดไม่ได้', 'SupportSession.dc.html'), P('6.2', 'จบเซสชัน', 'กลับรายละเอียดองค์กร แท็บประวัติการเข้าถึง · บันทึกครั้งเดียว', 'PlatformOrgDetail.dc.html') ] },
       { role: 'บัญชี & ความปลอดภัย', goal: 'กู้รหัส · จัดการบัญชีตัวเอง', steps: [
         P('1.1', 'ลืมรหัสผ่าน', '', 'Login.dc.html'), P('1.6', 'รีเซ็ตรหัสผ่าน', 'ส่งลิงก์ · ตั้งรหัสใหม่', 'ResetPassword.dc.html'), B('1.2', 'กลับหน้าแรกของบัญชี', 'ผู้ดูแล → เลือกองค์กร · ช่าง → แอปช่าง · ทีม Qleen → คอนโซล', 'SelectOrg.dc.html'), P('5.2', 'บัญชีของฉัน', '2FA · อุปกรณ์ · เปลี่ยนรหัส', 'MyAccount.dc.html') ] }
     ];

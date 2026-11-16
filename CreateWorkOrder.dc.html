@@ -30,7 +30,7 @@ button{cursor:pointer}
       <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding-bottom: 24px; display: flex; flex-direction: column; align-items: center">
         <dc-import name="ListState" state="empty" unit="ไซต์" icon="site" empty-title="{{blockTitle}}" empty-text="{{blockText}}" hint-size="100%,120px"></dc-import>
         <sc-if value="{{canAddSite}}" hint-placeholder-val="{{ true }}">
-          <dc-import name="Button" icon="plus" label="เพิ่มไซต์ก่อน" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=CreateWorkOrder" hint-size="130px,44px"></dc-import>
+          <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=CreateWorkOrder" hint-size="130px,44px"></dc-import>
         </sc-if>
       </div>
     </sc-if>
@@ -57,6 +57,12 @@ button{cursor:pointer}
             <input id="wo-due" type="date" min="2026-11-15" value="{{due}}" onChange="{{setDue}}" aria-invalid="{{dueBad}}" aria-describedby="wo-due-msg" style="{{dueStyle}}">
             <span style="font-size: 12px; color: #4B5563">{{dueThText}}</span>
             <span id="wo-due-msg" style="{{dueMsgStyle}}">{{dueMsg}}</span>
+            <sc-if value="{{dup.show}}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 8px; background: #FFF4E5; color: #8A3B06; font-size: 13px">
+                <span>{{dup.text}}</span>
+                <a href="WorkOrderDetail.dc.html" onPointerDown="{{dup.go}}" onKeyDown="{{dup.go}}" onClick="{{dup.go}}" style="align-self: flex-start; min-height: 44px; display: inline-flex; align-items: center; gap: 4px; color: #8A3B06; font-weight: 600">เปิดใบงาน {{dup.no}}<dc-import name="Icon" icon="arrowRight" size="14" tone="current" hint-size="14px,14px"></dc-import></a>
+              </div>
+            </sc-if>
           </div>
         </div>
 
@@ -215,21 +221,24 @@ class Component extends DCLogic {
     var mEd = JS0('sc.memberEdits', {}), rmList = JS0('sc.removed', []);
     var gone = function (em) { if (!em) return false; var k = orgId + '|' + em, e = mEd[k] || {}; return e.status === 'suspended' || e.status === 'removed' || rmList.indexOf(k) >= 0; };
     // workload = open jobs (not closed) of each person in this org: built-in jobs + jobs created/assigned in the prototype
-    var BASE_WO = { a: [['WO-1031', 'ทีมช่าง B', 'done'], ['WO-1035', 'ทีมช่าง B', 'done'], ['WO-1039', 'ธนากร ว.', 'doing'], ['WO-1042', 'ธนากร ว.', 'doing'], ['WO-1043', 'ธนากร ว.', 'review'], ['WO-1041', '', 'new']],
-      b: [['GM-0209', 'ธนากร ว.', 'doing'], ['GM-0211', 'ธนากร ว.', 'todo']], c: [['NK-0102', 'ทีมช่าง B', 'doing']], d: [], e: [] }[orgId] || [];
+    // [no, assignee, status, site, due, type] (DATA.md)
+    var BASE_WO = { a: [['WO-1031', 'ทีมช่าง B', 'done', 'ฟาร์มโคราช 1', '2 พ.ย. 2569', 'ซ่อมบำรุง'], ['WO-1035', 'ทีมช่าง B', 'done', 'ลานจอดรถลพบุรี', '5 พ.ย. 2569', 'ล้างตามรอบ'], ['WO-1039', 'ธนากร ว.', 'doing', 'หลังคาโรงงานบางปู', '10 พ.ย. 2569', 'ล้างตามรอบ'], ['WO-1042', 'ธนากร ว.', 'doing', 'ฟาร์มโคราช 1', '16 พ.ย. 2569', 'ตรวจสภาพ'], ['WO-1043', 'ธนากร ว.', 'review', 'ฟาร์มโคราช 1', '18 พ.ย. 2569', 'ล้างตามรอบ'], ['WO-1041', '', 'new', 'ฟาร์มโคราช 2', '25 พ.ย. 2569', 'ล้างตามรอบ']],
+      b: [['GM-0209', 'ธนากร ว.', 'doing', 'สาขาบางนา', '12 พ.ย. 2569', 'ล้างตามรอบ'], ['GM-0211', 'ธนากร ว.', 'todo', 'สาขารังสิต', '20 พ.ย. 2569', 'ล้างตามรอบ']], c: [['NK-0102', 'ทีมช่าง B', 'doing', 'โรงงาน A ลำพูน', '22 พ.ย. 2569', 'ล้างตามรอบ']], d: [], e: [] }[orgId] || [];
     var wStat = JS0('sc.woStat', {}), wAsg = JS0('sc.woAssign', {});
-    var allWo = BASE_WO.map(function (w) { return { who: wAsg[w[0]] || w[1], st: wStat[w[0]] || w[2] }; })
-      .concat(JS0('sc.createdWo', []).filter(function (c) { return c && c.org === orgId; }).map(function (c) { return { who: wAsg[c.no] || c.who, st: wStat[c.no] || c.st || 'todo' }; }));
+    var allWo = BASE_WO.map(function (w) { return { no: w[0], who: wAsg[w[0]] || w[1], st: wStat[w[0]] || w[2], site: w[3], due: w[4], type: w[5] }; })
+      .concat(JS0('sc.createdWo', []).filter(function (c) { return c && c.org === orgId; }).map(function (c) { return { no: c.no, who: wAsg[c.no] || c.who, st: wStat[c.no] || c.st || 'todo', site: c.site, due: c.due, type: c.type || 'ล้างตามรอบ' }; }));
     var loadOf = function (nm) { nm = nm.replace(' (คุณ)', ''); return allWo.filter(function (w) { return w.who === nm && w.st !== 'done'; }).length; };
     var techs = ORG.techs.filter(function (p) { return (!p.sites || p.sites.indexOf(site) >= 0) && !gone(p.em); }).map(function (p) {
       if (p.off) return p; var n = loadOf(p.name); return Object.assign({}, p, { note: p.note + ' · ' + (n ? 'งานค้าง ' + n : 'ว่าง') }); });
+    // a job may be created first and assigned later (as the system does for cycle jobs)
+    if (techs.length) techs = techs.concat([{ id: 'none', av: '', ini: '—', name: 'ยังไม่มอบหมาย', note: 'สร้างไว้ก่อน แล้วมอบหมายช่างทีหลังที่หน้าใบงาน' }]);
     var tech = techs.filter(function (p) { return p.id === st.tech && !p.off; })[0];
     var dueBad = !due || due < '2026-11-15';
     var zoneBad = zonesOn.length === 0, techBad = !tech;
     var miss = [];
     if (zoneBad) miss.push('เลือกโซน'); if (dueBad) miss.push('กำหนดเสร็จต้องไม่ก่อนวันนี้'); if (techBad) miss.push('เลือกผู้รับผิดชอบ');
     var blocked = miss.length > 0;
-    var techName = tech ? tech.name.replace(' (คุณ)', '') : '';
+    var techName = tech && tech.id !== 'none' ? tech.name.replace(' (คุณ)', '') : '';
     // the new job: org prefix + next number (DATA.md round 3), with the form's type, due date and zones
     var JS = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
     var created = JS('sc.createdWo', []);
@@ -241,10 +250,17 @@ class Component extends DCLogic {
     var typeRow = types.filter(function (t) { return t[0] === typeId; })[0] || types[0];
     var TITLE = { clean: 'ล้างแผงตามรอบ', inspect: 'ตรวจสภาพแผง', repair: 'ซ่อมบำรุง' };
     var zonesOut = zonesOn.map(function (z) { return z.length === 1 ? 'โซน ' + z : z; });
-    var nextCreated = created.concat([{ no: newNo, org: orgId, title: TITLE[typeRow[0]] + ((from === 'DeviceDetail' || from === 'Analytics') && SS('sc.device') ? ' ' + SS('sc.device') : ''), site: site, who: techName, due: dueTh, st: 'todo', type: typeRow[1], zones: zonesOut }]);
+    var nextCreated = created.concat([{ no: newNo, org: orgId, title: TITLE[typeRow[0]] + ((from === 'DeviceDetail' || from === 'Analytics') && SS('sc.device') ? ' ' + SS('sc.device') : ''), site: site, who: techName || '—', due: dueTh, st: techName ? 'todo' : 'new', type: typeRow[1], zones: zonesOut }]);
+    var TH_IDX = { 'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3, 'พ.ค.': 4, 'มิ.ย.': 5, 'ก.ค.': 6, 'ส.ค.': 7, 'ก.ย.': 8, 'ต.ค.': 9, 'พ.ย.': 10, 'ธ.ค.': 11 };
+    var dayTh = function (t) { var p = String(t || '').split(' '), m = TH_IDX[p[1]]; return m == null ? NaN : Math.round(Date.UTC((parseInt(p[2], 10) || 2569) - 543, m, parseInt(p[0], 10) || 1) / 864e5); };
+    var dayIso = function (t) { var p = String(t || '').split('-'); return p.length === 3 ? Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5) : NaN; };
+    var STL = { new: 'รอมอบหมาย', todo: 'มอบหมายแล้ว', doing: 'กำลังดำเนินการ', review: 'รออนุมัติ', returned: 'ส่งกลับแก้ไข', paused: 'พักงาน' };
+    var dupWo = typeRow[0] === 'clean' ? allWo.filter(function (w) { return w.site === site && w.st !== 'done' && /ล้าง/.test(w.type) && Math.abs(dayTh(w.due) - dayIso(due)) <= 14; })[0] : null;
     var noSites = siteNames.length === 0 || viewer;
     return {
       noSites: noSites, hasSites: !noSites,
+      dup: dupWo ? { show: true, no: dupWo.no, text: 'ไซต์นี้มีใบงานล้างรอบนี้แล้ว: ' + dupWo.no + ' (' + (STL[dupWo.st] || dupWo.st) + ' · กำหนด ' + dupWo.due + ')',
+        go: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.wo', dupWo.no); window.sessionStorage.setItem('sc.woFrom', 'WorkOrders'); } catch (x) {} } } : { show: false, no: '', text: '', go: null },
       blockTitle: viewer ? 'ผู้ดูอย่างเดียวสร้างใบงานไม่ได้' : 'ยังไม่มีไซต์ในองค์กรนี้',
       blockText: viewer ? 'ขอให้ผู้จัดการไซต์ของ ' + ORG.name + ' สร้างใบงานให้' : 'เพิ่มไซต์แรกก่อน แล้วจึงสร้างใบงานให้ช่าง',
       canAddSite: !viewer && (ORG.role === 'Org Admin' || ORG.role === 'Org Owner'),
@@ -258,7 +274,7 @@ class Component extends DCLogic {
       createHref: blocked ? '' : (['Schedule', 'Main', 'SiteDetail', 'DeviceDetail', 'OrgEmpty', 'Analytics'].indexOf(from) >= 0 ? ORIGIN[from].href : 'WorkOrders.dc.html'), /* return where the user started; the flash lands there */ blocked: blocked, ready: !blocked, missing: 'ยังสร้างไม่ได้: ' + miss.join(' · '),
       showMissing: blocked && st.tried, liveErr: blocked && st.tried ? 'ยังสร้างไม่ได้: ' + miss.join(' · ') : '', showZoneErr: zoneBad && st.tried, showTechErr: techBad && st.tried,
       tryCreate: function () { self.setState({ tried: true }); },
-      createStore: blocked || !newNo ? '' : 'sc.flash=สร้างใบงาน ' + newNo + ' แล้ว · แจ้ง' + techName + ' แล้ว|sc.newno=' + newNo + '|sc.newtype=' + typeRow[1] + '|sc.newdue=' + dueTh + '|sc.createdWo=' + JSON.stringify(nextCreated),
+      createStore: blocked || !newNo ? '' : 'sc.flash=สร้างใบงาน ' + newNo + ' แล้ว · ' + (techName ? 'แจ้ง' + techName + ' แล้ว' : 'ยังไม่มอบหมายช่าง') + '|sc.newno=' + newNo + '|sc.newtype=' + typeRow[1] + '|sc.newdue=' + dueTh + '|sc.createdWo=' + JSON.stringify(nextCreated),
       due: due, dueThText: dueTh ? 'วันที่ ' + dueTh + ' (พ.ศ.)' : 'เลือกวันที่', dueBad: (dueBad && (st.tried || st.dueTouched)) ? 'true' : 'false',
       dueStyle: 'min-height: 44px; padding: 0 12px; border: 1px solid ' + (dueBad && (st.tried || st.dueTouched) ? '#B42318' : '#858D9B') + '; border-radius: 8px; font-size: 14px',
       dueMsg: dueBad && (st.tried || st.dueTouched) ? 'กำหนดเสร็จต้องเป็นวันนี้ (15 พ.ย. 2569) หรือหลังจากนี้' : '',

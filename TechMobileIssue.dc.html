@@ -19,7 +19,7 @@ button{cursor:pointer}
 <div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{live}}</div>
 <div style="width: 100%; max-width: 390px; height: 100dvh; max-height: 844px; margin: 0 auto; box-sizing: border-box; background: #F5F6F8; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; overflow: hidden">
   <div style="background: #FFFFFF; border-bottom: 1px solid #E3E6EB; padding: 48px 8px 10px; display: flex; align-items: center; gap: 4px; flex: none">
-    <a href="TechMobile.dc.html" aria-label="กลับไปที่งาน" onPointerDown="{{goBack}}" onKeyDown="{{goBack}}" onClick="{{goBack}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+    <a href="TechMobile.dc.html" aria-label="กลับไปที่งาน" onPointerDown="{{goBack}}" onKeyDown="{{goBack}}" onClick="{{goBack}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #111827">
       <dc-import name="Icon" icon="arrowLeft" size="22" hint-size="22px,22px"></dc-import>
     </a>
     <div style="min-width: 0">
@@ -186,7 +186,10 @@ class Component extends DCLogic {
         var levelLabel = (levels.filter(function (l) { return l[0] === s.level; })[0] || levels[1])[1];
         try { var ss = window.sessionStorage;
           ss.setItem('sc.issueDone', no + '|' + Date.now());
-          ss.setItem('sc.issue', JSON.stringify({ no: no, kind: typeLabel, level: levelLabel, zone: zone, text: s.desc.trim(), at: 'เมื่อสักครู่', pause: !!s.stop }));
+          // every report is kept per job (sc.issues {no: [issue…]}); sc.issue stays the latest one
+          var iss = { no: no, kind: typeLabel, level: levelLabel, zone: zone, text: s.desc.trim(), at: 'เมื่อสักครู่', pause: !!s.stop };
+          var all = JSON.parse(ss.getItem('sc.issues') || 'null') || {}; all[no] = (all[no] || []).concat([iss]); ss.setItem('sc.issues', JSON.stringify(all));
+          ss.setItem('sc.issue', JSON.stringify(iss));
           if (s.stop) { var ws = JSON.parse(ss.getItem('sc.woStat') || 'null') || {}; ws[no] = 'paused'; ss.setItem('sc.woStat', JSON.stringify(ws)); }
         } catch (e) {}
         self.setState({ doneFor: no, desc: '', photos: {}, sync: Date.now() }); }

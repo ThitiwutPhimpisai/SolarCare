@@ -33,12 +33,7 @@ button{font-family:inherit;cursor:pointer}
       <div role="note" style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F3F4F6; color: #374151">{{readOnlyNote}}</div>
     </sc-if>
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
-      <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>บทบาทและสิทธิ์ ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์</h2>
-        <p style="margin: 0; font-size: 14px; color: #374151">คุณเป็น {{youRole}} ใน {{orgName}}</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ผู้จัดการไซต์" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
-        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
-      </section>
+      <dc-import name="LockedCard" title="บทบาทและสิทธิ์ ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์" role="{{youRole}}" org="{{orgName}}" note="ดูสถานะไซต์และรายงานได้" ask-name="{{ownerName}}" request-label="ขอสิทธิ์ผู้จัดการไซต์" hint-size="100%,200px"></dc-import>
     </sc-if>
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: #374151">
@@ -79,7 +74,7 @@ button{font-family:inherit;cursor:pointer}
                 <th scope="col" style="{{ro.thStyle}}">
                   <button onClick="{{ro.pick}}" aria-pressed="{{ro.on}}" style="width: 100%; min-height: 44px; border: 0; background: transparent; font-size: 13px; font-weight: 700; color: #111827; padding: 4px">
                     {{ro.label}}
-                    <div style="font-size: 12px; font-weight: 500; color: #4B5563">{{ro.en}}</div>
+                    <div style="font-size: 12px; font-weight: 500; color: #4B5563">{{ro.tier}}</div>
                   </button>
                 </th>
               </sc-for>
@@ -160,6 +155,21 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
+var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
+var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1, en: 1, name: 1 }; // Roles: the side panel keeps the system name (en) on purpose
+function scRoleTh(v) {
+  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
+  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
+  var fix = function (x, d) {
+    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
+    if (d > 6 || !x || typeof x !== 'object') return x;
+    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
+    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
+    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
+  };
+  return fix(v, 0);
+}
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { role: 2, requested: false }; }
   componentDidMount() {
@@ -176,7 +186,7 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scOrgFix(this._rv()); }
+  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
   _rv() {
     var self = this;
     var orgId = 'a'; try { orgId = window.sessionStorage.getItem('sc.org') || 'a'; } catch (e) {}
@@ -234,7 +244,7 @@ class Component extends DCLogic {
     var sel = Math.min(self.state.role || 0, roles.length - 1);
     var hi = function (i) { return i === sel ? 'background:#F0F7F5;' : ''; };
     return (function (R) { R.phActions = R.canManage ? [{ label: R.createLabel, icon: 'plus', href: 'RoleEditor.dc.html', saveKeys: 'sc.roleMode=new' }] : []; return R; })({
-      orgName: ORG[0], youRole: ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Viewer': 'ผู้ดูอย่างเดียว' })[you] || you, hubHide: you === 'Viewer' ? 'members' : '', blocked: blocked, canSee: !blocked,
+      orgName: ORG[0], youRole: ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Viewer': 'ผู้ดูอย่างเดียว' })[you] || you, hubHide: you === 'Viewer' ? 'members,roles' : '', blocked: blocked, canSee: !blocked,
       readOnly: !canManage && !blocked, ownerName: { a: 'วรวุฒิ ก. (เจ้าขององค์กร)', b: 'กิตติ พ. (เจ้าขององค์กร)', c: 'สุนทร ม. (เจ้าขององค์กร)', d: 'เจ้าขององค์กร', e: 'อรุณี ท. (เจ้าขององค์กร)' }[orgId] || 'ผู้ดูแลองค์กร',
       notRequested: !self.state.requested, requested: !!self.state.requested, requestAccess: function () { self.setState({ requested: true }); },
       readOnlyNote: 'ดูได้อย่างเดียว · ผู้จัดการไซต์สร้างหรือแก้บทบาทกำหนดเองไม่ได้ (ต้องเป็นเจ้าขององค์กรหรือผู้ดูแลองค์กร)',

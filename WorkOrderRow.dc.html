@@ -29,7 +29,7 @@ body{margin:0}
     <span class="wor-main" style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
       <span class="wor-top" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px"><span style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{no}}</span><sc-if value="{{isNew}}" hint-placeholder-val="{{ false }}"><dc-import name="StatusPill" kind="new" value="new" hint-size="44px,22px"></dc-import></sc-if></span>
       <span style="{{titleStyle}}">{{title}}</span>
-      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; color: #4B5563"><span>{{meta}}</span><sc-if value="{{hasAssignee}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true">·</span><span style="display: inline-flex; align-items: center; gap: 6px; color: #374151"><sc-if value="{{hasAv}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{av}}" size="20" hint-size="20px,20px"></dc-import></sc-if>{{assignee}}</span></sc-if></span>
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; color: #4B5563"><sc-if value="{{hasMeta}}" hint-placeholder-val="{{ true }}"><span>{{meta}}</span></sc-if><sc-if value="{{hasAssignee}}" hint-placeholder-val="{{ true }}"><sc-if value="{{hasMeta}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true">·</span></sc-if><span style="display: inline-flex; align-items: center; gap: 6px; color: #374151"><sc-if value="{{hasAv}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{av}}" size="20" hint-size="20px,20px"></dc-import></sc-if>{{assignee}}</span></sc-if></span>
     </span>
     <span class="wor-side" style="{{sideStyle}}">
       <span class="wor-pill"><dc-import name="StatusPill" kind="wo" value="{{status}}" hint-size="110px,26px"></dc-import></span>
@@ -43,7 +43,7 @@ body{margin:0}
     <span class="wor-main" style="flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: 2px">
       <span class="wor-top" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px"><span style="font-size: 12px; color: #4B5563; font-family: ui-monospace, monospace">{{no}}</span><sc-if value="{{isNew}}" hint-placeholder-val="{{ false }}"><dc-import name="StatusPill" kind="new" value="new" hint-size="44px,22px"></dc-import></sc-if></span>
       <span style="{{titleStyle}}">{{title}}</span>
-      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; color: #4B5563"><span>{{meta}}</span><sc-if value="{{hasAssignee}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true">·</span><span style="display: inline-flex; align-items: center; gap: 6px; color: #374151"><sc-if value="{{hasAv}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{av}}" size="20" hint-size="20px,20px"></dc-import></sc-if>{{assignee}}</span></sc-if></span>
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; color: #4B5563"><sc-if value="{{hasMeta}}" hint-placeholder-val="{{ true }}"><span>{{meta}}</span></sc-if><sc-if value="{{hasAssignee}}" hint-placeholder-val="{{ true }}"><sc-if value="{{hasMeta}}" hint-placeholder-val="{{ true }}"><span aria-hidden="true">·</span></sc-if><span style="display: inline-flex; align-items: center; gap: 6px; color: #374151"><sc-if value="{{hasAv}}" hint-placeholder-val="{{ true }}"><dc-import name="Avatar" person="{{av}}" size="20" hint-size="20px,20px"></dc-import></sc-if>{{assignee}}</span></sc-if></span>
     </span>
     <span class="wor-side" style="{{sideStyle}}">
       <span class="wor-pill"><dc-import name="StatusPill" kind="wo" value="{{status}}" hint-size="110px,26px"></dc-import></span>
@@ -52,7 +52,7 @@ body{margin:0}
   </button>
 </sc-if>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"no":{"editor":"text","default":"WO-1043"},"title":{"editor":"text","default":"ล้างแผงรอบไตรมาส โซน A–C"},"site":{"editor":"text","default":"ฟาร์มโคราช 1"},"due":{"editor":"text","default":"18 พ.ย. 2569"},"type":{"editor":"enum","options":["","clean","inspect","repair"],"default":""},"status":{"editor":"enum","options":["new","todo","doing","review","returned","paused","done"],"default":"review"},"assignee":{"editor":"text","default":"ธนากร ว."},"av":{"editor":"text","default":"thanakorn"},"overdue":{"editor":"text","default":""},"isNew":{"editor":"boolean","default":false},"href":{"editor":"text","default":""},"saveKeys":{"editor":"text","default":""},"selected":{"editor":"boolean","default":false},"compact":{"editor":"boolean","default":false},"variant":{"editor":"enum","options":["row","card"],"default":"row"},"onPress":{"editor":null},"$preview":{"width":760,"height":90}}'>
+<script type="text/x-dc" data-dc-script data-props='{"no":{"editor":"text","default":"WO-1043"},"title":{"editor":"text","default":"ล้างแผงรอบไตรมาส โซน A–C"},"site":{"editor":"text","default":"ฟาร์มโคราช 1"},"due":{"editor":"text","default":"18 พ.ย. 2569"},"doneAt":{"editor":"text","default":""},"type":{"editor":"enum","options":["","clean","inspect","repair"],"default":""},"status":{"editor":"enum","options":["new","todo","doing","review","returned","paused","done"],"default":"review"},"assignee":{"editor":"text","default":"ธนากร ว."},"av":{"editor":"text","default":"thanakorn"},"overdue":{"editor":"text","default":""},"isNew":{"editor":"boolean","default":false},"href":{"editor":"text","default":""},"saveKeys":{"editor":"text","default":""},"selected":{"editor":"boolean","default":false},"compact":{"editor":"boolean","default":false},"variant":{"editor":"enum","options":["row","card"],"default":"row"},"onPress":{"editor":null},"$preview":{"width":760,"height":90}}'>
 // One row for a work order wherever a WO list appears (WorkOrders, SiteDetail, Schedule agenda).
 // With href it is a link that writes saveKeys ("k=v|k=v") before navigating; without href it is a button that calls onPress.
 class Component extends DCLogic {
@@ -87,12 +87,13 @@ class Component extends DCLogic {
       typeIcon: tKind === 'clean' ? 'broom' : tKind === 'inspect' ? 'search' : tKind === 'repair' ? 'wrench' : 'workorder',
       typeLabel: { clean: 'งานล้างแผง', inspect: 'งานตรวจสภาพ', repair: 'งานซ่อมบำรุง' }[tKind] || 'ใบงาน',
       iconSize: compact ? 16 : 20, iconBg: v('status') === 'done' ? 'gray' : 'brand',
-      no: v('no'), isNew: isNew, title: v('title'), meta: meta,
+      no: v('no'), isNew: isNew, title: v('title'), meta: meta, hasMeta: !!meta,
       titleStyle: 'font-weight: 600; font-size: ' + (compact ? 14 : 15) + 'px; color: ' + (href || p.onPress ? '#0F6B5C' : '#111827'),
       sideStyle: 'display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px 12px; margin-left: auto',
       hasAssignee: !!who && who !== '—', assignee: who, av: v('av'), hasAv: !!v('av'),
       due: v('due', '—'), overdue: v('overdue'), hasOverdue: !!v('overdue'),
-      dueText: v('overdue') ? 'เลยกำหนด ' + v('overdue') : (v('status') === 'done' ? 'ครบกำหนด ' + v('due', '—') : 'กำหนด ' + v('due', '—')),
+      // a finished job shows when it finished (doneAt), not a due date
+      dueText: v('overdue') ? 'เลยกำหนด ' + v('overdue') : (v('status') === 'done' ? 'เสร็จ ' + v('doneAt', v('due', '—')) : 'กำหนด ' + v('due', '—')),
       dueStyle: 'display: inline-flex; align-items: center; gap: 4px; font-size: 13px; ' + (v('overdue') ? 'font-weight: 600; color: #B42318' : 'color: #4B5563'),
       status: v('status', 'new')
     };

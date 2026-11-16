@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>ไม่มีสิทธิ์ดู</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<section role="note" aria-labelledby="{{titleId}}" style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; max-width: 560px">
+  <h2 id="{{titleId}}" style="margin: 0; font-size: 16px; line-height: 1.4; display: flex; align-items: flex-start; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import><span>{{title}}</span></h2>
+  <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6">คุณเป็น <b>{{role}}</b> ใน {{org}}<sc-if value="{{hasNote}}" hint-placeholder-val="{{ true }}"> · {{note}}</sc-if></p>
+  <sc-if value="{{hasAsk}}" hint-placeholder-val="{{ true }}">
+    <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6">ขอสิทธิ์ได้จาก {{askName}}</p>
+  </sc-if>
+  <sc-if value="{{showRequest}}" hint-placeholder-val="{{ true }}">
+    <dc-import name="Button" variant="secondary" icon="mail" label="{{requestLabel}}" on-press="{{request}}" hint-size="200px,44px"></dc-import>
+  </sc-if>
+  <sc-if value="{{hasBack}}" hint-placeholder-val="{{ false }}">
+    <dc-import name="Button" variant="secondary" icon="arrowLeft" label="{{backLabel}}" href="{{backHref}}" hint-size="200px,44px"></dc-import>
+  </sc-if>
+  <div role="status" aria-live="polite" style="{{liveStyle}}"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{askName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"title":{"editor":"text","default":"สมาชิกและสิทธิ์ ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์"},"role":{"editor":"text","default":"ผู้ดูอย่างเดียว"},"org":{"editor":"text","default":"นิคมฯ เหนือ"},"note":{"editor":"text","default":"ดูสถานะไซต์และรายงานได้"},"askName":{"editor":"text","default":"สุนทร ม. (เจ้าขององค์กร)"},"requestLabel":{"editor":"text","default":"ขอสิทธิ์ผู้จัดการไซต์"},"backLabel":{"editor":"text","default":""},"backHref":{"editor":"text","default":""},"onRequest":{"editor":null},"$preview":{"width":600,"height":240}}'>
+// Round 15: the one "no permission" card. Same parts every time: what you can't see (title) · your role in which org · who to ask · one button
+// (request access, or go back when there is nothing to request). The request message is announced in a live region.
+var TH = { 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' };
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { requested: false }; this.uid = 'lc-' + Math.random().toString(36).slice(2, 9); }
+  renderVals() {
+    var self = this, p = this.props;
+    // board preview (no props at all) shows the sample from data-props; real pages always pass title/role/org
+    var D = Object.keys(p).filter(function (k) { return k !== 'children'; }).length ? {} : { title: 'สมาชิกและสิทธิ์ ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์', role: 'Viewer', org: 'นิคมฯ เหนือ', note: 'ดูสถานะไซต์และรายงานได้', askName: 'สุนทร ม. (เจ้าขององค์กร)', requestLabel: 'ขอสิทธิ์ผู้จัดการไซต์' };
+    var v = function (k, d) { var x = p[k]; return x == null ? (D[k] != null ? D[k] : d) : x; };
+    var req = this.state.requested, reqLabel = v('requestLabel', '');
+    return {
+      titleId: this.uid,
+      title: v('title', ''), role: TH[v('role', '')] || v('role', ''), org: v('org', ''),
+      note: v('note', ''), hasNote: !!v('note', ''),
+      askName: v('askName', ''), hasAsk: !!v('askName', ''),
+      requestLabel: reqLabel, showRequest: !!reqLabel && !req, requested: req,
+      backLabel: v('backLabel', ''), backHref: v('backHref', ''), hasBack: !!v('backLabel', ''),
+      liveStyle: req ? '' : 'position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)',
+      request: function () { self.setState({ requested: true }); if (p.onRequest) p.onRequest(); }
+    };
+  }
+}
+</script>
+</body>
+</html>

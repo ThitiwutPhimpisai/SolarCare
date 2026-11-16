@@ -44,7 +44,7 @@ button{cursor:pointer}
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px">
               <span style="font-size: 13px; font-weight: 600">อีเมล</span>
-              <div style="min-height: 44px; padding: 0 12px; border-radius: 8px; background: #F3F4F6; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; color: #374151">{{myEmail}}<dc-import name="StatusPill" kind="member" value="active" label="ยืนยันแล้ว" hint-size="76px,24px"></dc-import></div>
+              <div style="min-height: 44px; padding: 8px 12px; box-sizing: border-box; border-radius: 8px; background: #F3F4F6; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; font-size: 14px; color: #374151"><span style="min-width: 0; overflow-wrap: anywhere">{{myEmail}}</span><dc-import name="StatusPill" kind="member" value="active" label="ยืนยันแล้ว" hint-size="76px,24px"></dc-import></div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label for="ma-phone" style="font-size: 13px; font-weight: 600">เบอร์โทร</label>
@@ -75,10 +75,10 @@ button{cursor:pointer}
             <div><div style="font-weight: 600; font-size: 14px">รหัสผ่าน</div><div style="font-size: 13px; color: #4B5563">เปลี่ยนล่าสุด 3 เดือนก่อน</div></div>
             <dc-import name="Button" label="เปลี่ยนรหัสผ่าน" href="ResetPassword.dc.html" save-keys="sc.from=account" variant="secondary" hint-size="140px,44px"></dc-import>
           </div>
-          <label style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #EEF0F3; padding-top: 16px; cursor: pointer">
-            <span><span style="display: block; font-weight: 600; font-size: 14px">ยืนยันตัวตน 2 ขั้นตอน (2FA)</span><span style="{{twoFaNoteStyle}}">{{twoFaNote}}</span></span>
-            <input type="checkbox" role="switch" checked="{{twoFa}}" onChange="{{toggle2fa}}" style="width: 22px; height: 22px; accent-color: #0F6B5C; flex: none">
-          </label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid #EEF0F3; padding-top: 16px">
+            <div style="flex: 1 1 240px; min-width: 0"><div style="font-weight: 600; font-size: 14px">ยืนยันตัวตน 2 ขั้นตอน (2FA)</div><div role="status" aria-live="polite" style="{{twoFaNoteStyle}}">{{twoFaNote}}</div></div>
+            <dc-import name="Button" label="{{twoFaBtn}}" variant="{{twoFaVariant}}" on-press="{{toggle2fa}}" hint-size="140px,44px"></dc-import>
+          </div>
           <div style="border-top: 1px solid #EEF0F3; padding-top: 16px; display: flex; flex-direction: column; gap: 4px">
             <div style="font-weight: 600; font-size: 14px; margin-bottom: 6px">อุปกรณ์ที่เข้าสู่ระบบ</div>
             <sc-for list="{{devices}}" as="d" hint-placeholder-count="2">
@@ -86,10 +86,7 @@ button{cursor:pointer}
                 <div style="width: 36px; height: 36px; border-radius: 8px; background: #F3F4F6; color: #374151; display: flex; align-items: center; justify-content: center; flex: none">
                   <dc-import name="Icon" icon="{{d.icon}}" size="18" hint-size="18px,18px"></dc-import>
                 </div>
-                <div style="flex: 1 1 200px; min-width: 0"><div style="font-size: 14px; font-weight: 600">{{d.name}}</div><div style="font-size: 12px; color: #4B5563">{{d.meta}}</div></div>
-                <sc-if value="{{d.current}}" hint-placeholder-val="{{ true }}">
-                  <dc-import name="StatusPill" kind="member" value="active" label="อุปกรณ์นี้" hint-size="76px,24px"></dc-import>
-                </sc-if>
+                <div style="flex: 1 1 200px; min-width: 0"><div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14px; font-weight: 600">{{d.name}}<sc-if value="{{d.current}}" hint-placeholder-val="{{ true }}"><dc-import name="StatusPill" kind="member" value="active" label="อุปกรณ์นี้" hint-size="76px,24px"></dc-import></sc-if></div><div style="font-size: 12px; color: #4B5563">{{d.meta}}</div></div>
                 <sc-if value="{{d.other}}" hint-placeholder-val="{{ false }}">
                   <dc-import name="Button" label="ออกจากระบบอุปกรณ์นี้" variant="secondary" on-press="{{d.signOut}}" hint-size="180px,44px"></dc-import>
                 </sc-if>
@@ -97,18 +94,18 @@ button{cursor:pointer}
             </sc-for>
           </div>
         </section>
-      </div>
-
-      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 20px">
         <section aria-labelledby="ma-orgs" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 8px 0">
           <h2 id="ma-orgs" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 12px 20px 4px"><dc-import name="Icon" icon="building" size="18" tone="brand" hint-size="18px,18px"></dc-import>องค์กรของฉัน</h2>
           <div style="padding: 4px 8px"><dc-import name="OrgList" items="{{orgs}}" size="lg" label="องค์กรของฉัน" hint-size="100%,232px"></dc-import></div>
-          <p style="margin: 0; padding: 0 20px 6px; font-size: 12px; color: #4B5563">กดชื่อองค์กรเพื่อเปิดทำงาน · ปุ่ม “ออก” ใช้เมื่อไม่ต้องการเป็นสมาชิกแล้ว</p>
+          <p style="margin: 0; padding: 0 20px 6px; font-size: 12px; color: #4B5563">กดชื่อองค์กรเพื่อเปิดทำงาน · “ออกจากองค์กร” ใช้เมื่อไม่ต้องการเป็นสมาชิกแล้ว</p>
           <div role="status" aria-live="polite"><sc-if value="{{leftNote}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; padding: 6px 20px 10px; font-size: 13px; color: #0A4F44">{{leftNote}}</p></sc-if></div>
           <div role="status" aria-live="polite"><sc-if value="{{transferHint}}" hint-placeholder-val="{{ false }}">
             <div style="margin: 4px 20px 10px; font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FFF4E5; color: #8A3B06">{{transferHint}} · <a href="Members.dc.html" onPointerDown="{{goTransfer}}" onKeyDown="{{goTransfer}}" onClick="{{goTransfer}}" style="font-weight: 600; color: #8A3B06; display: inline-flex; align-items: center; min-height: 44px">ไปหน้าสมาชิกเพื่อโอน</a></div>
           </sc-if></div>
         </section>
+      </div>
+
+      <div style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 20px">
         <section aria-labelledby="ma-danger" style="background: #FFFFFF; border: 1px solid #F3C4BF; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
           <h2 id="ma-danger" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; color: #B42318"><dc-import name="Icon" icon="trash" size="18" hint-size="18px,18px"></dc-import>ลบบัญชี</h2>
           <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6">ลบข้อมูลส่วนตัวและออกจากทุกองค์กร ใบงานและ ประวัติการใช้งาน ที่คุณเคยทำจะยังอยู่ในองค์กรนั้น ถ้าคุณเป็น เจ้าขององค์กร ต้องโอนความเป็นเจ้าของก่อน</p>
@@ -194,7 +191,7 @@ class Component extends DCLogic {
     // one org-list rule (DATA round 12): role follows sc.owner, site count adds sites created in the prototype
     (function () { var own = {}, cs = []; try { own = JSON.parse(SS('sc.owner') || '{}') || {}; cs = JSON.parse(SS('sc.createdSites') || '[]') || []; } catch (e) {}
       var BASE = { a: 4, b: 2, c: 1, e: 1 };
-      all = all.map(function (o) { if (o.id === 'd') return o; var p = o.role.split(' · '); var role = p[0]; if (own[o.id] && role === 'Org Owner') role = 'Org Admin'; var n = (BASE[o.id] || 0) + cs.filter(function (c) { return c && c.org === o.id && c.name; }).length; return Object.assign({}, o, { role: role + ' · ' + n + ' ไซต์' }); }); })();
+      all = all.map(function (o) { if (o.id === 'd') return o; var p = o.role.split(' · '); var role = p[0]; if (own[o.id] && role === 'Org Owner') role = 'Org Admin'; var n = (BASE[o.id] || 0) + cs.filter(function (c) { return c && c.org === o.id && c.name; }).length; return Object.assign({}, o, { role: role + ' · ' + n + ' ไซต์', owner: role === 'Org Owner' }); }); all = all.map(function (o) { return o.id === 'd' ? Object.assign({}, o, { owner: !transferredD }) : o; }); })();
     // orgs you left are shared with SelectOrg and Sidebar through sc.left (JSON list of ids)
     var leftIds = []; try { leftIds = JSON.parse(SS('sc.left') || '[]'); } catch (e) { leftIds = []; }
     var isLeft = function (id) { return leftIds.indexOf(id) >= 0; };
@@ -220,10 +217,11 @@ class Component extends DCLogic {
       setName: function (e) { self.setState({ name: e.target.value, saved: false }); },
       save: function () { var v = String(myName || '').trim() || defName; try { window.sessionStorage.setItem('sc.myName', v); } catch (e) {} self.setState({ saved: true, name: v }); },
       toggle2fa: function () { self.setState({ twoFa: !s.twoFa }); },
-      twoFaNote: s.twoFa ? 'เปิดอยู่ · ใช้แอปยืนยันตัวตนทุกครั้งที่เข้าสู่ระบบจากอุปกรณ์ใหม่' : 'ปิดอยู่ · แนะนำให้เปิดสำหรับบัญชีที่มีสิทธิ์ Org Admin',
+      twoFaBtn: s.twoFa ? 'ปิดใช้ 2FA' : 'เปิดใช้ 2FA', twoFaVariant: s.twoFa ? 'secondary' : 'primary',
+      twoFaNote: s.twoFa ? 'เปิดอยู่ · ใช้แอปยืนยันตัวตนทุกครั้งที่เข้าสู่ระบบจากอุปกรณ์ใหม่' : 'ปิดอยู่ · แนะนำให้เปิดสำหรับบัญชีผู้ดูแลองค์กร',
       twoFaNoteStyle: 'display:block;font-size:13px;color:' + (s.twoFa ? '#0A4F44' : '#8A3B06'),
       devices: devices.map(function (d) { return Object.assign({}, d, { other: !d.current, signOut: function () { var o = Object.assign({}, s.signedOut); o[d.id] = true; self.setState({ signedOut: o }); } }); }),
-      orgs: orgs.map(function (o) { return { badge: o.badge, name: o.name, note: o.role, href: 'Main.dc.html', saveKeys: 'sc.org=' + o.id + '|sc.site=all', current: o.id === (SS('sc.org') || 'a'), actionLabel: 'ออก', actionVariant: 'ghost', onAction: function () { self.setState({ leaving: o.id, transferFor: '' }); } }; }),
+      orgs: orgs.map(function (o) { return { badge: o.badge, name: o.name, note: o.role, href: 'Main.dc.html', saveKeys: 'sc.org=' + o.id + '|sc.site=all', current: o.id === (SS('sc.org') || 'a'), actionLabel: 'ออกจากองค์กร', actionVariant: 'secondary', onAction: function () { self.setState({ leaving: o.id, transferFor: '' }); } }; }),
       transferHint: s.transferFor ? 'ต้องโอนความเป็นเจ้าของของ ' + ((all.filter(function (o) { return o.id === s.transferFor; })[0] || {}).name || '') + ' ให้สมาชิกที่ตอบรับคำเชิญแล้วก่อนออก' : '',
       goTransfer: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.org', s.transferFor || 'd'); ss.setItem('sc.site', 'all'); } catch (x) {} },
       leftNote: leftNames.length ? 'ออกจาก ' + leftNames.join(', ') + ' แล้ว · ขอเข้าร่วมใหม่ได้จากคำเชิญของผู้ดูแล' : '',

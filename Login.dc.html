@@ -46,7 +46,7 @@ button{cursor:pointer}
       </div>
       <div style="display: flex; flex-direction: column; gap: 10px">
         <dc-import name="Button" variant="secondary" full="{{true}}" label="ดำเนินการต่อด้วย Google" href="{{dest}}" save-keys="{{authKeys}}" hint-size="100%,44px"></dc-import>
-        <dc-import name="Button" variant="secondary" full="{{true}}" label="ดำเนินการต่อด้วย Microsoft (SSO องค์กร)" href="{{dest}}" save-keys="{{authKeys}}" hint-size="100%,44px"></dc-import>
+        <dc-import name="Button" variant="secondary" full="{{true}}" label="ดำเนินการต่อด้วย Microsoft (บัญชีองค์กร)" href="{{dest}}" save-keys="{{authKeys}}" hint-size="100%,44px"></dc-import>
       </div>
       <div style="display: flex; align-items: center; gap: 12px; color: #4B5563; font-size: 13px">
         <div style="flex: 1; height: 1px; background: #E3E6EB"></div>หรือใช้อีเมล<div style="flex: 1; height: 1px; background: #E3E6EB"></div>
@@ -57,7 +57,7 @@ button{cursor:pointer}
         <div style="display: flex; flex-direction: column; gap: 6px">
           <label for="lg-email" style="font-size: 13px; font-weight: 600">อีเมล</label>
           <input id="lg-email" type="email" name="email" autocomplete="email" inputmode="email" placeholder="{{emailHint}}" value="{{email}}" onChange="{{setEmail}}" aria-invalid="{{emailBad}}" aria-describedby="lg-email-err" style="{{emailStyle}}">
-          <sc-if value="{{emailBad}}" hint-placeholder-val="{{ false }}"><span id="lg-email-err" style="font-size: 12px; color: #B42318">กรอกอีเมล</span></sc-if>
+          <sc-if value="{{emailBad}}" hint-placeholder-val="{{ false }}"><span id="lg-email-err" style="font-size: 12px; color: #B42318">{{emailErr}}</span></sc-if>
         </div>
         <div style="display: flex; flex-direction: column; gap: 6px">
           <div style="display: flex; justify-content: space-between; align-items: center">
@@ -139,7 +139,8 @@ class Component extends DCLogic {
     var dest = inviteMode && cur.id === 'admin' ? 'AcceptInvite.dc.html' : cur.dest;
     var auth = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.authed', cur.id); ['sc.techView', 'sc.newAccount', 'sc.myName', 'sc.myEmail'].forEach(function (k) { ss.removeItem(k); }); } catch (x) {} }; // a new sign-in never keeps the manager's technician-preview lock
     var st = self.state, mode = self.props.state ?? 'ready';
-    var emailBad = st.tried && !st.email.trim(), pwBad = st.tried && !st.pw;
+    var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(st.email || '').trim());
+    var emailBad = st.tried && !emailOk, pwBad = st.tried && !st.pw;
     var field = function (bad) { return 'min-height: 44px; padding: 0 12px; border: 1px solid ' + (bad ? '#B42318' : '#858D9B') + '; border-radius: 8px; font-size: 14px'; };
     var fromLogin = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.from', 'login'); } catch (e) {} };
     return (self._v = {
@@ -154,16 +155,16 @@ class Component extends DCLogic {
       email: st.email, pw: st.pw,
       setEmail: function (e) { self.setState({ email: e.target.value }); },
       setPw: function (e) { self.setState({ pw: e.target.value }); },
-      emailBad: emailBad, pwBad: pwBad,
+      emailBad: emailBad, pwBad: pwBad, emailErr: !String(st.email || '').trim() ? 'กรอกอีเมล' : 'รูปแบบอีเมลไม่ถูกต้อง เช่น name@company.co.th',
       emailStyle: field(emailBad), pwStyle: field(pwBad),
       hasError: mode !== 'ready', errorBoxStyle: mode !== 'ready' ? 'font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #FDECEA; color: #B42318; border: 1px solid #F3C4BF' : 'display: none', errorText: mode === 'ready' ? '' : mode === 'locked' ? 'บัญชีถูกล็อกชั่วคราวหลังใส่รหัสผิด 5 ครั้ง ลองใหม่ใน 15 นาที หรือรีเซ็ตรหัสผ่าน' : 'อีเมลหรือรหัสผ่านไม่ถูกต้อง',
       // valid form: the sign-in control is the real link the user clicks; Enter clicks that same link.
       // invalid fields or the editor's invalid/locked states: a plain button that only shows the error.
-      canGo: mode === 'ready' && !!st.email.trim() && !!st.pw,
-      cantGo: !(mode === 'ready' && !!st.email.trim() && !!st.pw),
+      canGo: mode === 'ready' && emailOk && !!st.pw,
+      cantGo: !(mode === 'ready' && emailOk && !!st.pw),
       submit: function (e) {
         if (e && e.preventDefault) e.preventDefault();
-        if (mode !== 'ready' || !st.email.trim() || !st.pw) { self.setState({ tried: true }); return; }
+        if (mode !== 'ready' || !emailOk || !st.pw) { self.setState({ tried: true }); return; }
         var a = document.getElementById('lg-go'); if (a) (function (el) { ['pointerdown', 'mousedown', 'pointerup', 'mouseup', 'click'].forEach(function (t) { var E = t.indexOf('pointer') === 0 && window.PointerEvent ? window.PointerEvent : window.MouseEvent; el.dispatchEvent(new E(t, { bubbles: true, cancelable: true, view: window, button: 0 })); }); })(a);
       },
       personas: P.map(function (p) { var on = p.id === cur.id; return { name: p.name, note: p.note, on: on ? 'true' : 'false',

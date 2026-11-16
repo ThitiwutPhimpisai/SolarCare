@@ -25,7 +25,7 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
     <div style="padding: 0 28px 28px; display: flex; flex-direction: column; gap: 18px">
       <div style="position: relative; z-index: 1; align-self: flex-start; display: flex; margin-top: -40px; border-radius: 20px; border: 4px solid #FFFFFF; background: #FFFFFF"><dc-import name="OrgBadge" org="rr" size="72" with-name="{{false}}" hint-size="72px,72px"></dc-import></div>
       <div>
-        <div style="font-size: 14px; color: #4B5563; display: flex; align-items: center; gap: 8px"><dc-import name="Avatar" person="arunee" size="24" hint-size="24px,24px"></dc-import>คุณอรุณี ท. (Org Owner) เชิญคุณเข้าร่วม</div>
+        <div style="font-size: 14px; color: #4B5563; display: flex; align-items: center; gap: 8px"><dc-import name="Avatar" person="arunee" size="24" hint-size="24px,24px"></dc-import>คุณอรุณี ท. (เจ้าขององค์กร) เชิญคุณเข้าร่วม</div>
         <h1 style="margin: 6px 0 0; font-size: 24px">ริมทะเล รีสอร์ท</h1>
       </div>
       <div style="border: 1px solid #E3E6EB; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px">
@@ -43,21 +43,21 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
       <sc-if value="{{canAnswer}}" hint-placeholder-val="{{ true }}">
         <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
           <dc-import name="Button" variant="secondary" full="{{true}}" label="ปฏิเสธ" href="SelectOrg.dc.html" save-keys="sc.from=|sc.inviteDone=declined|sc.flash=ปฏิเสธคำเชิญจาก ริมทะเล รีสอร์ท แล้ว" hint-size="100%,44px"></dc-import>
-          <dc-import name="Button" variant="primary" full="{{true}}" label="ยอมรับและเข้าร่วม" href="Main.dc.html" save-keys="sc.org=e|sc.site=all|sc.joined=e|sc.inviteDone=accepted|sc.from=|sc.flash=เข้าร่วม ริมทะเล รีสอร์ท แล้ว ในบทบาท Site Manager" hint-size="100%,44px"></dc-import>
+          <dc-import name="Button" variant="primary" full="{{true}}" label="ยอมรับและเข้าร่วม" href="Main.dc.html" save-keys="sc.org=e|sc.site=all|sc.joined=e|sc.inviteDone=accepted|sc.from=|sc.flash=เข้าร่วม ริมทะเล รีสอร์ท แล้ว ในบทบาทผู้จัดการไซต์" hint-size="100%,44px"></dc-import>
         </div>
       </sc-if>
       <sc-if value="{{needAuthExisting}}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; flex-direction: column; gap: 10px">
           <p style="margin: 0; font-size: 14px; color: #374151">เข้าสู่ระบบด้วยอีเมลที่ได้รับคำเชิญก่อน แล้วระบบจะพากลับมาที่หน้านี้เพื่อตอบรับ</p>
           <dc-import name="Button" variant="primary" full="{{true}}" label="เข้าสู่ระบบเพื่อตอบรับ" href="Login.dc.html" save-keys="sc.from=invite" hint-size="100%,44px"></dc-import>
-          <button type="button" onClick="{{showNewInvite}}" style="align-self: flex-start; font-family: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left">ได้รับคำเชิญที่อีเมลอื่นและยังไม่มีบัญชี? เปิดคำเชิญที่ส่งถึง newstaff@rimtalay.example</button>
+          <div role="note" style="display: flex; flex-direction: column; gap: 4px; border: 1px dashed #B54708; background: #FFF4E5; border-radius: 10px; padding: 10px 12px"><span style="font-size: 12px; font-weight: 700; color: #8A3B06">โหมดต้นแบบ · ดูอีกเส้นทาง</span><button type="button" onClick="{{showNewInvite}}" style="font-family: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #8A3B06; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; text-decoration: underline">ดูคำเชิญของพนักงานใหม่ที่ยังไม่มีบัญชี</button></div>
         </div>
       </sc-if>
       <sc-if value="{{needAuthNew}}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; flex-direction: column; gap: 10px">
           <p style="margin: 0; font-size: 14px; color: #374151">อีเมลนี้ยังไม่มีบัญชี SolarCare · สร้างบัญชีด้วยอีเมลที่ได้รับคำเชิญ แล้วระบบจะพาเข้าองค์กรให้ทันที</p>
           <dc-import name="Button" variant="primary" full="{{true}}" label="สร้างบัญชีเพื่อตอบรับ" href="SignUpInvite.dc.html" save-keys="sc.inviteTo=newstaff" hint-size="100%,44px"></dc-import>
-          <button type="button" onClick="{{showOwnInvite}}" style="align-self: flex-start; font-family: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #0F6B5C; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left">กลับไปคำเชิญที่ส่งถึง natthaphat@siamsolar.example</button>
+          <div role="note" style="display: flex; flex-direction: column; gap: 4px; border: 1px dashed #B54708; background: #FFF4E5; border-radius: 10px; padding: 10px 12px"><span style="font-size: 12px; font-weight: 700; color: #8A3B06">โหมดต้นแบบ · ดูอีกเส้นทาง</span><button type="button" onClick="{{showOwnInvite}}" style="font-family: inherit; min-height: 44px; padding: 0; border: 0; background: transparent; color: #8A3B06; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; text-decoration: underline">ดูคำเชิญของผู้ที่มีบัญชีแล้ว</button></div>
         </div>
       </sc-if>
     </div>
@@ -117,11 +117,11 @@ class Component extends DCLogic {
       inviteTo: isNew ? 'newstaff@rimtalay.example (พนักงานใหม่ · หัวหน้าอาคาร A)' : 'natthaphat@siamsolar.example',
       showNewInvite: setInv('newstaff'), showOwnInvite: setInv(''),
       answered: !!done,
-      answeredText: done === 'accepted' ? 'คุณตอบรับคำเชิญนี้แล้ว · เป็น Site Manager ที่ริมทะเล รีสอร์ท' : 'คุณปฏิเสธคำเชิญนี้แล้ว · ขอให้คุณอรุณีส่งคำเชิญใหม่ได้',
+      answeredText: done === 'accepted' ? 'คุณตอบรับคำเชิญนี้แล้ว · เป็นผู้จัดการไซต์ที่ริมทะเล รีสอร์ท' : 'คุณปฏิเสธคำเชิญนี้แล้ว · ขอให้คุณอรุณีส่งคำเชิญใหม่ได้',
       answeredGo: done === 'accepted' ? 'ไปที่ภาพรวม' : 'เลือกองค์กร',
       answeredHref: done === 'accepted' ? 'Main.dc.html' : 'SelectOrg.dc.html',
       permsOpen: !!self.state.perms,
-      permsBody: 'ทำได้ในไซต์หลังคาอาคาร A หัวหิน:\n• ดูไซต์ ใบงาน และรายงานของไซต์นี้\n• สร้างและมอบหมายใบงาน อัปเดตผลและแนบรูป\n• อนุมัติปิดงาน\n• เชิญช่างเข้าไซต์นี้ และดูรายชื่อสมาชิก\n\nทำไม่ได้: แก้ข้อมูลไซต์ สร้างหรือลบไซต์ ตั้งค่าองค์กร กำหนด Role ดู Audit log',
+      permsBody: 'ทำได้ในไซต์หลังคาอาคาร A หัวหิน:\n• ดูไซต์ ใบงาน และรายงานของไซต์นี้\n• สร้างและมอบหมายใบงาน อัปเดตผลและแนบรูป\n• อนุมัติปิดงาน\n• เชิญช่างเข้าไซต์นี้ และดูรายชื่อสมาชิก\n\nทำไม่ได้: แก้ข้อมูลไซต์ สร้างหรือลบไซต์ ตั้งค่าองค์กร กำหนดบทบาท ดูประวัติการใช้งาน',
       openPerms: function () { self.setState({ perms: true }); },
       closePerms: function () { self.setState({ perms: false }); }
     };

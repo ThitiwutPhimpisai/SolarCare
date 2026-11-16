@@ -74,18 +74,21 @@ button{cursor:pointer}
           <sc-if value="{{noPhotos}}" hint-placeholder-val="{{ false }}">
             <div style="min-height: 96px; border-radius: 8px; border: 1px dashed #9CA3AF; background: #FAFBFC; display: flex; align-items: center; justify-content: center; padding: 12px; text-align: center; font-size: 13px; color: #4B5563">{{photoNote}}</div>
           </sc-if>
+          <sc-if value="{{photoDraft}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; color: #4B5563">{{photoDraft}}</div></sc-if>
           <sc-for list="{{zones}}" as="z" hint-placeholder-count="3">
             <div style="display: flex; flex-direction: column; gap: 8px">
               <div style="font-size: 14px; font-weight: 600">{{z.name}} <span style="font-weight: 400; color: #4B5563">· {{z.count}} รูป</span></div>
               <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-                <figure style="margin: 0; position: relative">
+                <sc-if value="{{z.hasBefore}}" hint-placeholder-val="{{ true }}"><figure style="margin: 0; position: relative">
                   <dc-import name="SiteThumb" site="before" w="100%" h="180px" radius="8" label="{{true}}" hint-size="100%,180px"></dc-import>
-                  <figcaption style="position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px; font-weight: 600">ก่อน · {{z.tBefore}}</figcaption>
-                </figure>
-                <figure style="margin: 0; position: relative">
+                  <figcaption style="position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px; font-weight: 600">{{z.capBefore}}</figcaption>
+                </figure></sc-if>
+                <sc-if value="{{z.noBefore}}" hint-placeholder-val="{{ false }}"><div style="min-height: 180px; border-radius: 8px; border: 1px dashed #9CA3AF; background: #FAFBFC; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4B5563">ยังไม่มีรูป{{z.wBefore}}</div></sc-if>
+                <sc-if value="{{z.hasAfter}}" hint-placeholder-val="{{ true }}"><figure style="margin: 0; position: relative">
                   <dc-import name="SiteThumb" site="after" w="100%" h="180px" radius="8" label="{{true}}" hint-size="100%,180px"></dc-import>
-                  <figcaption style="position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px; font-weight: 600">หลัง · {{z.tAfter}}</figcaption>
-                </figure>
+                  <figcaption style="position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 999px; background: rgba(17,24,39,0.8); color: #FFFFFF; font-size: 12px; font-weight: 600">{{z.capAfter}}</figcaption>
+                </figure></sc-if>
+                <sc-if value="{{z.noAfter}}" hint-placeholder-val="{{ false }}"><div style="min-height: 180px; border-radius: 8px; border: 1px dashed #9CA3AF; background: #FAFBFC; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4B5563">ยังไม่มีรูป{{z.wAfter}}</div></sc-if>
               </div>
             </div>
           </sc-for>
@@ -184,12 +187,37 @@ button{cursor:pointer}
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+// ---- work-order progress (Round 15) — identical copy in WorkOrders, WorkOrderDetail, TechMobile ----
+// one source for checklist + photos: sc.techProgress[no] = { checks: {i: true}, photos: {'before' | 'before:โซน A': 'S' | n}, fixedAt }
+// a job the technician never touched in the app is seeded from its status; a seeded photo slot ('S') stands for 4 photos
+var WP_SEED = 4;
+var WP_PHOTO_ITEM = { clean: { 0: 'before', 2: 'after' }, inspect: {}, repair: { 3: 'after' } }; // checklist items ticked by photos, never by hand
+function wpType(kind) { return /ตรวจ|inspect/.test(kind || '') ? 'inspect' : (/ซ่อม|เปลี่ยน|repair/.test(kind || '') ? 'repair' : 'clean'); }
+function wpKey(side, z, zones) { return zones.length > 1 ? side + ':' + z : side; }
+function wpSeed(st, zones) {
+  var full = st === 'review' || st === 'done' || st === 'returned' || st === 'queued', half = st === 'doing' || st === 'paused', ph = {};
+  zones.forEach(function (z) { if (full || half) ph[wpKey('before', z, zones)] = 'S'; if (full) ph[wpKey('after', z, zones)] = 'S'; });
+  return { checks: full ? { 0: true, 1: true, 2: true, 3: true } : (half ? { 0: true, 1: true } : {}), photos: ph };
+}
+function wpProgress(no, st, kind, zones, all) {
+  var type = wpType(kind), tp = (all || {})[no] || null, src = tp && (tp.photos || tp.checks) ? tp : wpSeed(st, zones);
+  var ph = src.photos || {}, ck = src.checks || {}, pi = WP_PHOTO_ITEM[type];
+  var sideOk = function (sd) { return zones.every(function (z) { return !!ph[wpKey(sd, z, zones)]; }); };
+  var items = [0, 1, 2, 3].map(function (i) { return pi[i] ? sideOk(pi[i]) : !!ck[i]; });
+  var n = 0, slots = 0, missing = [];
+  zones.forEach(function (z) { ['before', 'after'].forEach(function (sd) { var v = ph[wpKey(sd, z, zones)]; if (v) { slots++; n += v === 'S' ? WP_SEED : 1; } else missing.push({ zone: z, side: sd }); }); });
+  return { type: type, items: items, done: items.filter(Boolean).length, photos: ph, checks: ck, nPhotos: n, slots: slots, total: zones.length * 2, missing: missing, photoItem: pi, fixedAt: (tp && tp.fixedAt) || 0 };
+}
+// zones of each job (CreateWorkOrder stores 'โซน A' …); before/after photos are required for every zone
+var WP_ZONES = { 'WO-1043': ['โซน A', 'โซน B', 'โซน C'], 'WO-1042': ['โซน C'], 'WO-1041': ['โซน A', 'โซน B', 'โซน C', 'โซน D'], 'WO-1039': ['หลังคา'], 'WO-1035': ['ลานจอด'], 'WO-1031': ['โซน D'], 'GM-0211': ['หลังคา'], 'GM-0209': ['ลานจอด'], 'GM-0204': ['หลังคา'], 'NK-0102': ['หลังคา'], 'NK-0097': ['หลังคา'] };
+function wpZones(no, created) { var z = WP_ZONES[no] || (created && created.zones && created.zones.length ? created.zones : ['ทั้งไซต์']); return z.map(function (x) { return x.length === 1 ? 'โซน ' + x : x; }); }
+// ---- end work-order progress ----
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { stat: {}, dlg: false, reason: {}, draft: '', extra: {}, assignTo: '', assignMsg: {} }; }
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.wo', 'sc.createdWo', 'sc.woStat', 'sc.woAssign', 'sc.issue', 'sc.woFrom', 'sc.siteName', 'sc.createdSites', 'sc.device', 'sc.siteEdits', 'sc.memberEdits', 'sc.removed'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.wo', 'sc.createdWo', 'sc.woStat', 'sc.woAssign', 'sc.issue', 'sc.woFrom', 'sc.siteName', 'sc.createdSites', 'sc.device', 'sc.siteEdits', 'sc.memberEdits', 'sc.removed', 'sc.techProgress', 'sc.woReturn', 'sc.issues'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -221,7 +249,7 @@ class Component extends DCLogic {
     var WO = {
       a: [
         { no: 'WO-1043', title: 'ล้างแผงรอบไตรมาส โซน A–C', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '18 พ.ย. 2569', st: 'review', panels: '12,000', kind: 'ล้างตามรอบ', zones: ['โซน A', 'โซน B', 'โซน C'],
-          started: '13 พ.ย. 07:05 น.', sent: '14 พ.ย. 16:20 น. (เมื่อวาน)', took: '2 วัน (13–14 พ.ย.)', water: '2,400 ลิตร',
+          started: '13 พ.ย. 07:05 น.', sent: '14 พ.ย. 16:20 น. (เมื่อ\u2060วาน)', took: '2 วัน (13–14 พ.ย.)', water: '2,400 ลิตร',
           hist: [['ธนากร ว.', 'ส่งงานพร้อมรูป 24 รูป', '14 พ.ย. 2569 · 16:20 น.'], ['ธนากร ว.', 'เช็กอินที่ไซต์และเริ่มงาน', '13 พ.ย. 2569 · 07:05 น.'], ['สมศรี ป.', 'มอบหมายให้ธนากร ว.', '3 พ.ย. 2569'], ['ระบบ', 'สร้างอัตโนมัติจากรอบ 90 วัน', '2 พ.ย. 2569']],
           com: [['somsri', 'สมศรี ป.', '3 พ.ย. 09:12 น.', 'โซน C มีจุดร้อน 2 แผงจากรอบก่อน ฝากถ่ายรูปใกล้ ๆ ด้วยนะคะ'], ['thanakorn', 'ธนากร ว.', '14 พ.ย. 16:18 น.', 'ถ่ายแล้วครับ แนบไว้ในโซน C แผง C-14, C-15 ยังมีรอยไหม้ เปิดงานตรวจแยกเป็น WO-1042 แล้ว']] },
         { no: 'WO-1042', title: 'ตรวจจุดร้อน (hotspot) หลังพายุ', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '16 พ.ย. 2569', st: 'doing', panels: '600', kind: 'ตรวจสภาพ', zones: ['โซน C'],
@@ -240,7 +268,7 @@ class Component extends DCLogic {
       b: [
         { no: 'GM-0211', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '20 พ.ย. 2569', st: 'todo', panels: '760', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
           hist: [['ณัฐภัทร ส.', 'มอบหมายให้ธนากร ว.', '12 พ.ย. 2569']] },
-        { no: 'GM-0209', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', st: 'doing', panels: '690', kind: 'ล้างตามรอบ', zones: ['ลานจอด'],
+        { no: 'GM-0209', title: 'ล้างแผงลานจอดรถ', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', st: 'doing', panels: '690', kind: 'ล้างตามรอบ', zones: ['ลานจอด'],
           started: '11 พ.ย. 08:20 น.', hist: [['ธนากร ว.', 'เช็กอินที่ไซต์และเริ่มงาน', '11 พ.ย. 2569'], ['ณัฐภัทร ส.', 'มอบหมายงาน', '5 พ.ย. 2569']] },
         { no: 'GM-0204', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '28 ต.ค. 2569', st: 'done', panels: '760', kind: 'ล้างตามรอบ', zones: ['หลังคา'],
           started: '28 ต.ค. 07:45 น.', sent: '28 ต.ค. 10:30 น.', took: '2 ชม. 45 นาที', water: '420 ลิตร',
@@ -260,10 +288,12 @@ class Component extends DCLogic {
     // jobs created in the prototype stay listed (sc.createdWo), the same way WorkOrders shows them
     JS('sc.createdWo', []).forEach(function (c) {
       if (!c || c.org !== orgId || ORG_SITES.indexOf(c.site) < 0) return;
-      WO.unshift({ no: c.no, title: c.title, site: c.site, who: c.who, due: c.due, st: c.st || 'todo', panels: '—', kind: c.type || 'ล้างตามรอบ', zones: c.zones && c.zones.length ? c.zones : ['ตามที่เลือก'],
-        hist: [['ณัฐภัทร ส.', 'สร้างใบงานและแจ้ง' + c.who, 'เมื่อสักครู่']] });
+      WO.unshift({ no: c.no, title: c.title, site: c.site, who: c.who || '—', due: c.due, st: c.st || (c.who && c.who !== '—' ? 'todo' : 'new'), panels: '—', kind: c.type || 'ล้างตามรอบ', zones: wpZones(c.no, c),
+        hist: [['ณัฐภัทร ส.', c.who && c.who !== '—' ? 'สร้างใบงานและแจ้ง' + c.who : 'สร้างใบงาน (ยังไม่มอบหมาย)', 'เมื่อสักครู่']] });
     });
-    var woStat = JS('sc.woStat', {}), woAssign = JS('sc.woAssign', {}), issue = JS('sc.issue', null);
+    var woStat = JS('sc.woStat', {}), woAssign = JS('sc.woAssign', {}), issue = JS('sc.issue', null), woReturn = JS('sc.woReturn', {});
+    // field issues per job (sc.issues {no: [issue…]}); sc.issue = the latest one (older prototype state)
+    var issues = JS('sc.issues', {}); if (issue && issue.no && !issues[issue.no]) { issues = Object.assign({}, issues); issues[issue.no] = [issue]; }
     // back link goes to the page this job was opened from (sc.woFrom)
     var FROM = { Main: ['ภาพรวม', 'Main.dc.html'], Schedule: ['ปฏิทินรอบล้าง', 'Schedule.dc.html'], SiteDetail: [((JS('sc.siteEdits', {})[SS('sc.siteName')] || {}).name) || SS('sc.siteName') || 'ไซต์', 'SiteDetail.dc.html'], Reports: ['รายงาน', 'Reports.dc.html'], Notifications: ['การแจ้งเตือน', 'Notifications.dc.html'], Analytics: ['วิเคราะห์', 'Analytics.dc.html'], WorkOrders: ['รายการใบงาน', 'WorkOrders.dc.html'], DeviceDetail: [SS('sc.device') || 'อุปกรณ์', 'DeviceDetail.dc.html'] };
     var fromK = FROM[SS('sc.woFrom')] ? SS('sc.woFrom') : 'WorkOrders';
@@ -289,6 +319,7 @@ class Component extends DCLogic {
     var av = { 'ธนากร ว.': 'thanakorn', 'สมศรี ป.': 'somsri', 'ณัฐภัทร ส.': 'natthaphat' }[w0.who] || '';
     var facts = [{ k: 'โซน / พื้นที่', v: w0.zones.join(', ') }, { k: 'จำนวนแผง', v: w0.panels === '—' ? '—' : w0.panels + ' แผง' }, { k: 'เริ่มงาน', v: started ? w0.started : 'รอช่างเริ่มงาน' }];
     if (submitted && w0.sent) facts = facts.concat([{ k: 'ส่งงาน', v: w0.sent }, { k: 'ใช้เวลา', v: w0.took }, { k: 'น้ำที่ใช้', v: w0.water }]);
+    else if (submitted) facts = facts.concat([{ k: 'ส่งงาน', v: 'เมื่อสักครู่ (ผ่านแอปช่าง)' }]);
     // one checklist per job type (DATA.md round 5)
     var TYPE = /ตรวจ/.test(w0.kind) ? 'inspect' : (/ซ่อม/.test(w0.kind) ? 'repair' : 'clean');
     var CL = {
@@ -296,21 +327,31 @@ class Component extends DCLogic {
       inspect: [['ถ่ายภาพความร้อน (thermal)', 'ครบทุกแผงในโซนที่กำหนด'], ['ระบุแผงที่พบปัญหา', no === 'WO-1042' ? 'C-14, C-15' : 'ไม่พบ'], ['วัดค่าแรงดัน / กระแสสตริง', 'บันทึกในใบงาน'], ['สรุปผลและข้อเสนอแนะ', 'ส่งพร้อมใบงาน']],
       repair: [['ตัดไฟ / ล็อกเอาต์ก่อนเริ่ม', 'ยืนยันด้วยรูปป้ายล็อก'], ['เปลี่ยนชิ้นส่วน', no === 'WO-1031' ? 'เปลี่ยนสายสตริง 12 ใหม่ 24 แผง' : 'ตามที่กำหนด'], ['ทดสอบหลังซ่อม', 'ค่าแรงดันปกติ'], ['ถ่ายรูปหลังซ่อม', 'แนบในใบงาน']]
     }[TYPE];
-    var nDone = submitted ? 4 : (started ? 2 : 0);
-    var checks = CL.map(function (c, i) { var d = i < nDone; return { label: c[0], note: d ? c[1] : 'ยังไม่ได้ทำ', done: d, sr: d ? ' (ทำแล้ว)' : ' (ยังไม่ได้ทำ)',
+    // checklist + photos: the shared progress model (same numbers as WorkOrders and the technician app)
+    var wp = wpProgress(no, status, w0.kind, w0.zones, JS('sc.techProgress', {}));
+    var nDone = wp.done;
+    var checks = CL.map(function (c, i) { var d = wp.items[i]; return { label: c[0], note: d ? c[1] : 'ยังไม่ได้ทำ', done: d, sr: d ? ' (ทำแล้ว)' : ' (ยังไม่ได้ทำ)',
       dot: 'width: 24px; height: 24px; border-radius: 999px; display: flex; align-items: center; justify-content: center; flex: none; box-sizing: border-box; ' + (d ? 'background: #0F6B5C; color: #FFFFFF' : 'background: #FFFFFF; border: 2px solid #9CA3AF') }; });
-    var TP = JS('sc.techProgress', {})[w0.no], tpCount = TP && TP.photos ? Object.keys(TP.photos).filter(function (k) { return TP.photos[k] && /^(before|after)(:|$)/.test(k); }).length : 0; // per-zone keys before:โซน A … count too // prototype-submitted jobs: real photo count from TechMobile
-    var zones = submitted ? (TP ? [w0.zones.join(', ')] : w0.zones).map(function (z, i) { return { name: z, count: TP ? tpCount : 8, tBefore: ['07:40 น.', '10:10 น.', '12:40 น.'][i % 3], tAfter: ['09:55 น.', '12:05 น.', '14:05 น.'][i % 3] }; }) : [];
+    var PW = { clean: ['ก่อนล้าง', 'หลังล้าง'], inspect: ['ก่อนตรวจ', 'หลังตรวจ'], repair: ['ก่อนซ่อม', 'หลังซ่อม'] }[TYPE];
+    // seeded photos keep the times in DATA.md; photos taken in the prototype app were taken "เมื่อสักครู่"
+    var TB = ['07:40 น.', '10:10 น.', '12:40 น.'], TA = ['09:55 น.', '12:05 น.', '14:05 น.'];
+    var zones = wp.nPhotos ? w0.zones.map(function (z, i) {
+      var b = wp.photos[wpKey('before', z, w0.zones)], a = wp.photos[wpKey('after', z, w0.zones)];
+      var cnt = (b ? (b === 'S' ? WP_SEED : 1) : 0) + (a ? (a === 'S' ? WP_SEED : 1) : 0);
+      return { name: z, count: cnt, hasBefore: !!b, noBefore: !b, hasAfter: !!a, noAfter: !a, wBefore: PW[0], wAfter: PW[1],
+        capBefore: PW[0] + ' · ' + (b === 'S' ? TB[i % 3] : 'เมื่อสักครู่'), capAfter: PW[1] + ' · ' + (a === 'S' ? TA[i % 3] : 'เมื่อสักครู่') }; }) : [];
     var history = w0.hist.map(function (h) { return { who: h[0], what: h[1], when: h[2] }; });
     if (status === 'done' && w0.st !== 'done') history.unshift({ who: 'ณัฐภัทร ส.', what: 'อนุมัติปิดงาน', when: 'เมื่อสักครู่' });
-    if (status === 'returned' && w0.st !== 'returned') history.unshift({ who: 'ณัฐภัทร ส.', what: 'ส่งกลับแก้ไข' + (s.reason[no] ? ': ' + s.reason[no] : ''), when: 'เมื่อสักครู่' });
+    var ret = woReturn[no] || (s.reason[no] ? { reason: s.reason[no], by: 'ณัฐภัทร ส.' } : null); // the return reason is shared (sc.woReturn) so the technician sees it too
+    if (ret && w0.st !== 'returned') history.unshift({ who: ret.by || 'ณัฐภัทร ส.', what: 'ส่งกลับแก้ไข' + (ret.reason ? ': ' + ret.reason : ''), when: 'เมื่อสักครู่' });
     if (status === 'doing' && w0.st !== 'doing') history.unshift({ who: w0.who, what: woStat[no] === 'doing' && !s.stat[no] ? 'เริ่มงาน' : 'ทำงานต่อ (ผู้จัดการแก้ปัญหาแล้ว)', when: 'เมื่อสักครู่' });
-    if (status === 'review' && w0.st !== 'review') history.unshift({ who: w0.who, what: 'ส่งงานให้อนุมัติ', when: 'เมื่อสักครู่' });
-    var myIssue = issue && issue.no === no ? issue : null;
-    if (myIssue) history.unshift({ who: w0.who, what: 'แจ้งปัญหา: ' + (myIssue.kind || 'ปัญหาหน้างาน') + (myIssue.pause ? ' · พักงานจนกว่าจะแก้' : ''), when: myIssue.at || 'เมื่อสักครู่' });
+    if (status === 'review' && w0.st !== 'review') history.unshift({ who: w0.who, what: ret ? 'แก้ไขแล้วและส่งงานให้อนุมัติอีกครั้ง' : 'ส่งงานให้อนุมัติ', when: 'เมื่อสักครู่' });
+    var myIssues = issues[no] || [];
+    myIssues.forEach(function (iss) { history.unshift({ who: w0.who, what: 'แจ้งปัญหา: ' + (iss.kind || 'ปัญหาหน้างาน') + (iss.pause ? ' · พักงานจนกว่าจะแก้' : ''), when: iss.at || 'เมื่อสักครู่' }); });
     var comments = (w0.com || []).map(function (c) { return { av: c[0], who: c[1], when: c[2], text: c[3] }; });
-    if (myIssue) comments.push({ av: w0.who === 'ธนากร ว.' ? 'thanakorn' : '', who: w0.who, when: myIssue.at || 'เมื่อสักครู่',
-      text: 'แจ้งปัญหา: ' + (myIssue.kind || '') + ' · ความรุนแรง' + (myIssue.level || '') + (myIssue.zone ? ' · ' + myIssue.zone : '') + (myIssue.text ? ' — ' + myIssue.text : '') + (myIssue.pause ? ' · ขอพักงานจนกว่าจะแก้' : '') });
+    myIssues.forEach(function (iss) { comments.push({ av: w0.who === 'ธนากร ว.' ? 'thanakorn' : '', who: w0.who, when: iss.at || 'เมื่อสักครู่',
+      text: 'แจ้งปัญหา: ' + (iss.kind || '') + ' · ความรุนแรง' + (iss.level || '') + (iss.zone ? ' · ' + iss.zone : '') + (iss.text ? ' — ' + iss.text : '') + (iss.pause ? ' · ขอพักงานจนกว่าจะแก้' : '') }); });
+    if (ret && ret.reason) comments.push({ av: 'natthaphat', who: ret.by || 'ณัฐภัทร ส.', when: 'เมื่อสักครู่', text: 'ส่งกลับแก้ไข: ' + ret.reason });
     comments = comments.concat(s.extra[no] || []);
     var whoLabel = w0.who === '—' ? 'ยังไม่มอบหมาย' : w0.who;
     var whoNote = { 'ธนากร ว.': 'ช่าง · ผู้รับเหมา CleanPro', 'ทีมช่าง B': 'ทีมช่างผู้รับเหมา CleanPro', 'สมศรี ป.': 'ผู้จัดการไซต์ · ทำงานนี้เอง', 'ณัฐภัทร ส.': ROLE_TH[ROLE] + ' · ทำงานนี้เอง (คุณ)', '—': 'ยังไม่มีผู้รับผิดชอบ' }[w0.who] || '';
@@ -333,6 +374,7 @@ class Component extends DCLogic {
       // write the outcome right away so WorkOrders, Schedule, SiteDetail and TechMobile show it too
       var ws = Object.assign({}, JS('sc.woStat', {})); ws[no] = v;
       try { window.sessionStorage.setItem('sc.woStat', JSON.stringify(ws)); } catch (e) {}
+      if (v === 'returned') { var wr = Object.assign({}, JS('sc.woReturn', {})); wr[no] = { reason: String(r || '').trim(), by: 'ณัฐภัทร ส.', ts: Date.now() }; try { window.sessionStorage.setItem('sc.woReturn', JSON.stringify(wr)); } catch (e) {} }
       var st = Object.assign({}, s.stat); st[no] = v; var rr = Object.assign({}, s.reason); if (r != null) rr[no] = r; self.setState({ stat: st, reason: rr, dlg: false });
     };
     var wsNow = Object.assign({}, woStat); if (s.stat[no]) wsNow[no] = s.stat[no];
@@ -383,7 +425,8 @@ class Component extends DCLogic {
       facts: facts,
       checks: checks, checkDone: nDone, checkTotal: 4,
       zones: zones, noPhotos: !zones.length,
-      photoNote: started ? 'ช่างกำลังทำงาน · รูปก่อน/หลังจะขึ้นเมื่อส่งงาน' : 'ยังไม่มีรูป · ช่างจะถ่ายก่อน/หลังระหว่างทำงาน',
+      photoNote: started ? 'ช่างเริ่มงานแล้ว แต่ยังไม่ได้ถ่ายรูป' : 'ยังไม่มีรูป · ช่างจะถ่ายก่อน/หลังระหว่างทำงาน',
+      photoDraft: zones.length && !submitted ? 'รูปที่ช่างถ่ายแล้ว ' + wp.nPhotos + ' รูป · ยังไม่ได้ส่งงาน' : '',
       comments: comments, noComments: !comments.length, draft: s.draft, noDraft: !s.draft.trim(),
       canComment: ROLE !== 'Viewer',
       setDraft: function (e) { self.setState({ draft: e.target.value }); },

@@ -18,6 +18,11 @@ body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 button,select,input{font-family:inherit}
 button{cursor:pointer}
+/* the whole member row opens MemberDetail: the name link stretches over the row (one link, one tab stop) */
+.rt tbody tr{position:relative}
+.mb-open::after{content:'';position:absolute;inset:0}
+.rt tbody tr:hover{background:#F9FAFB}
+.mb-open:focus-visible{outline:none}.rt tbody tr:has(.mb-open:focus-visible){outline:2px solid #0F6B5C;outline-offset:-2px}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
@@ -26,15 +31,10 @@ button{cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" title="สมาชิกและสิทธิ์" icon="users" hub="people" hub-current="members" subtitle="ใครเข้าถึงไซต์ไหน ด้วยบทบาทอะไร" actions="{{headerActions}}" hint-size="100%,140px"></dc-import>
+    <dc-import name="PageHeader" title="สมาชิกและสิทธิ์" icon="users" hub="people" hub-current="members" hub-hide="{{hubHide}}" subtitle="ใครเข้าถึงไซต์ไหน ด้วยบทบาทอะไร" actions="{{headerActions}}" hint-size="100%,140px"></dc-import>
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
-      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; max-width: 560px">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>ผู้ดูอย่างเดียวดูรายชื่อสมาชิกไม่ได้</h2>
-        <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.6">ใน {{orgName}} คุณดูสถานะไซต์และรายงานได้อย่างเดียว ถ้าต้องการดูหรือเชิญสมาชิก ขอสิทธิ์ผู้จัดการไซต์จาก {{ownerName}}</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" icon="mail" label="ขอสิทธิ์ผู้จัดการไซต์" on-press="{{requestAccess}}" hint-size="200px,44px"></dc-import></sc-if>
-        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F0F7F5; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อได้รับสิทธิ์</div></sc-if></div>
-      </section>
+      <dc-import name="LockedCard" title="รายชื่อสมาชิก ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์" role="Viewer" org="{{orgName}}" note="ดูสถานะไซต์และรายงานได้" ask-name="{{ownerName}}" request-label="ขอสิทธิ์ผู้จัดการไซต์" hint-size="100%,200px"></dc-import>
     </sc-if>
 
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
@@ -49,7 +49,7 @@ button{cursor:pointer}
       </div>
       <dc-import name="FilterChips" label="สถานะสมาชิก" value="{{fSt}}" options="{{stOpts}}" on-change="{{setSt}}" hint-size="100%,44px"></dc-import>
     </div>
-    <div role="status" aria-live="polite"><sc-if value="{{rowMsg}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F0F7F5; color: #0A4F44">{{rowMsg}}</div></sc-if></div>
+    <div role="status" aria-live="polite" style="{{rowMsgStyle}}"><sc-if value="{{rowMsg}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #F0F7F5; color: #0A4F44">{{rowMsg}}</div></sc-if></div>
     <dc-import name="ResultBar" count="{{shownN}}" total="{{totalN}}" unit="คน" active="{{filtered}}" on-clear="{{clearAll}}" hint-size="100%,44px"></dc-import>
 
     <section aria-label="รายชื่อสมาชิก" style="min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow-x: auto">
@@ -74,18 +74,18 @@ button{cursor:pointer}
                   <dc-import name="Avatar" person="{{m.person}}" size="{{40}}" hint-size="40px,40px"></dc-import>
                   <div style="min-width: 0">
                     <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px">
-                      <a href="MemberDetail.dc.html" onPointerDown="{{m.open}}" onKeyDown="{{m.open}}" onClick="{{m.open}}" style="font-weight: 600; color: #111827">{{m.name}}</a>
+                      <a href="MemberDetail.dc.html" class="mb-open" onPointerDown="{{m.open}}" onKeyDown="{{m.open}}" onClick="{{m.open}}" style="font-weight: 600; color: #111827; overflow-wrap: anywhere">{{m.name}}</a>
                       <sc-if value="{{m.isSelf}}" hint-placeholder-val="{{ false }}"><span style="font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #E7F2EF; color: #0A4F44">คุณ</span></sc-if>
+                      <sc-for list="{{m.tags}}" as="tg" hint-placeholder-count="1"><span style="font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #F3F4F6; color: #374151">{{tg}}</span></sc-for>
                     </div>
-                    <div style="font-size: 13px; color: #4B5563">{{m.email}}<sc-if value="{{m.meta}}" hint-placeholder-val="{{ false }}"> · {{m.meta}}</sc-if></div>
+                    <div style="font-size: 13px; color: #4B5563; overflow-wrap: anywhere">{{m.sub}}</div>
                   </div>
                 </div>
               </td>
               <td data-label="บทบาท" style="padding: 12px">
-                <sc-if value="{{m.hasOrgRole}}" hint-placeholder-val="{{ true }}"><dc-import name="StatusPill" kind="role" value="{{m.orgRole}}" hint-size="110px,24px"></dc-import></sc-if>
-                <sc-if value="{{m.noOrgRole}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #374151">{{m.siteRoleText}}</span></sc-if>
+                <span style="font-size: 14px; color: #111827">{{m.roleText}}</span>
               </td>
-              <td data-label="เข้าถึงไซต์" style="padding: 12px; font-size: 13px; color: #374151"><span title="{{m.accessFull}}">{{m.access}}</span></td>
+              <td data-label="เข้าถึงไซต์" style="padding: 12px; font-size: 13px; color: #374151">{{m.access}}</td>
               <td data-label="สถานะ" style="padding: 12px 20px">
                 <div style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: flex-end">
                   <sc-for list="{{m.st}}" as="x" hint-placeholder-count="1">
@@ -255,7 +255,7 @@ class Component extends DCLogic {
           { ini: 'กต', name: 'กิตติ พ.', email: 'kitti@greenmart.example', orgRole: 'Org Owner', sites: [{ site: 'ทุกไซต์', role: 'สืบทอดจากองค์กร' }], st: ['active'] },
           { ini: 'ณภ', name: 'ณัฐภัทร ส.', email: 'natthaphat@siamsolar.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'สาขารังสิต', role: 'Site Manager' }, { site: 'สาขาบางนา', role: 'Site Manager' }], st: ['active'], note: 'คุณ', self: true },
           { ini: 'ธน', name: 'ธนากร ว.', email: 'thanakorn@cleanpro.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'สาขารังสิต', role: 'Technician' }, { site: 'สาขาบางนา', role: 'Technician' }], st: ['active', 'contractor'], note: 'CleanPro' },
-          { ini: 'พิ', name: 'พิมพ์ชนก ร.', email: 'pimchanok@customer.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'สาขาบางนา', role: 'Viewer' }], st: ['customer'] }
+          { ini: 'พิ', name: 'พิมพ์ชนก ร.', email: 'pimchanok@customer.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'สาขาบางนา', role: 'Viewer' }], st: ['active', 'customer'] }
         ],
         sites: [{ id: 'b1', name: 'สาขารังสิต', prov: 'ปทุมธานี' }, { id: 'b2', name: 'สาขาบางนา', prov: 'กรุงเทพฯ' }] },
       c: { name: 'นิคมฯ เหนือ', viewer: true, owner: 'สุนทร ม. (Org Owner)',
@@ -281,7 +281,7 @@ class Component extends DCLogic {
       { ini: 'วร', name: 'วรวุฒิ ก.', email: 'worawut@siamsolar.example', orgRole: 'Org Owner', sites: [{ site: 'ทุกไซต์', role: 'สืบทอดจากองค์กร' }], st: ['active'] },
       { ini: 'สม', name: 'สมศรี ป.', email: 'somsri@siamsolar.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'ฟาร์มโคราช 1', role: 'Site Manager' }, { site: 'ฟาร์มโคราช 2', role: 'Site Manager' }], st: ['active'] },
       { ini: 'ธน', name: 'ธนากร ว.', email: 'thanakorn@cleanpro.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'ฟาร์มโคราช 1', role: 'Technician' }, { site: 'ฟาร์มโคราช 2', role: 'Technician' }, { site: 'หลังคาโรงงานบางปู', role: 'Technician' }], st: ['active', 'contractor'] },
-      { ini: 'พิ', name: 'พิมพ์ชนก ร.', email: 'pimchanok@customer.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'ฟาร์มโคราช 1', role: 'Viewer' }], st: ['customer'] },
+      { ini: 'พิ', name: 'พิมพ์ชนก ร.', email: 'pimchanok@customer.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'ฟาร์มโคราช 1', role: 'Viewer' }], st: ['active', 'customer'] },
       { ini: '—', name: 'รอยืนยัน', email: 'ops@lopburi-parking.example', orgRole: 'สิทธิ์รายไซต์', sites: [{ site: 'ลานจอดรถลพบุรี', role: 'Site Manager' }], st: ['invited'], note: 'หมดอายุใน 6 วัน' }
     ];
     // invites created in the prototype (CreateOrg step 4 / this page), minus cancelled ones; ownership transfer (sc.owner)
@@ -339,7 +339,7 @@ class Component extends DCLogic {
     members = byQR.filter(function (m) { return fSt === 'all' || m.st.indexOf(fSt) >= 0; });
     var roles = [];
     all.forEach(function (m) { roleOf(m).forEach(function (r) { if (r !== 'สืบทอดจากองค์กร' && roles.indexOf(r) < 0) roles.push(r); }); });
-    var stDefs = [['all', 'ทั้งหมด'], ['active', 'ใช้งาน'], ['invited', 'รอยืนยัน'], ['suspended', 'ระงับ'], ['contractor', 'ผู้รับเหมา'], ['customer', 'ลูกค้า']];
+    var stDefs = [['all', 'ทั้งหมด'], ['active', 'ใช้งาน'], ['invited', 'รอยืนยัน'], ['suspended', 'ระงับ']]; // status only: member type (ผู้รับเหมา/ลูกค้า) is a tag next to the name
     var filtered = !!q || fSt !== 'all' || fRole !== 'all';
     var stt = self.state.retried ? 'ready' : (self.props.state ?? 'ready');
     var customRoles = J('sc.customRoles', []).filter(function (r) { return r && r.org === org && r.name; }).map(function (r) { return r.name; });
@@ -350,14 +350,15 @@ class Component extends DCLogic {
       ownerName: ownerM ? ownerM.name + ' (เจ้าขององค์กร)' : 'ผู้ดูแลองค์กร',
       notRequested: !self.state.requested, requested: !!self.state.requested,
       requestAccess: function () { self.setState({ requested: true }); },
-      rowMsg: self.state.rowMsg,
+      rowMsg: self.state.rowMsg, rowMsgStyle: self.state.rowMsg ? '' : 'position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)',
+      hubHide: O.viewer ? 'members,roles' : '',
       listState: stt, showState: stt !== 'ready', showTable: stt === 'ready',
       retry: function () { self.setState({ retried: true }); },
       isAdmin: isAdmin && sites.length > 0, noSites: !sites.length, inviteRoles: inviteRoles,
       q: self.state.q, noMatch: members.length === 0,
       emptyText: q ? 'ไม่พบสมาชิกที่ตรงกับ “' + self.state.q + '”' : 'ไม่มีสมาชิกในตัวกรองนี้',
       fSt: fSt, setSt: function (id) { self.setState({ fSt: id }); },
-      stOpts: stDefs.map(function (d) { return { id: d[0], label: d[1], count: byQR.filter(function (m) { return d[0] === 'all' || m.st.indexOf(d[0]) >= 0; }).length }; }),
+      stOpts: stDefs.filter(function (d) { return d[0] === 'all' || d[0] === 'active' || byQR.some(function (m) { return m.st.indexOf(d[0]) >= 0; }); }).map(function (d) { return { id: d[0], label: d[1], count: byQR.filter(function (m) { return d[0] === 'all' || m.st.indexOf(d[0]) >= 0; }).length }; }),
       fRole: fRole, setFRole: function (e) { self.setState({ fRole: e.target.value }); },
       roleOpts: [{ v: 'all', t: 'ทุกบทบาท' }].concat(roles.map(function (r) { return { v: r, t: th(r) }; })),
       shownN: members.length, totalN: all.length, memberCount: scMemberCount(org, ({ a: 6, b: 4, c: 3, d: 1, e: 2 })[org] || 1), filtered: filtered,
@@ -371,11 +372,17 @@ class Component extends DCLogic {
         // one short line for site access; the full list stays in the title tooltip
         var real = m.sites.filter(function (x) { return x.role !== 'สืบทอดจากองค์กร'; });
         var rset = real.map(function (x) { return x.role; }).filter(function (r, i, a) { return a.indexOf(r) === i; });
-        var access = !real.length ? (m.sites[0] && m.sites[0].site === '—' ? 'ยังไม่มีสิทธิ์ไซต์ใด' : 'ทุกไซต์') : (real.length <= 2 ? real.map(function (x) { return x.site; }).join(', ') : real.length + ' ไซต์');
+        var access = !real.length ? (m.sites[0] && m.sites[0].site === '—' ? 'ยังไม่มีสิทธิ์ไซต์ใด' : 'ทุกไซต์') : (real.length <= 2 ? real.map(function (x) { return x.site; }).join(', ') : real[0].site + ' +' + (real.length - 1)); // no hover tooltip: touch can't open it
         var selfNote = m.self || m.note === 'คุณ';
         var meta = [m.note && m.note !== 'คุณ' ? m.note : '', invited && canInviteManage ? 'เปิดเพื่อส่งใหม่หรือยกเลิก' : ''].filter(Boolean).join(' · ');
         return Object.assign({}, m, extra, { person: person, note: (m.note || '') + (invited && canInviteManage ? (m.note ? ' · ' : '') + 'เปิดเพื่อส่งใหม่หรือยกเลิก' : ''), open: open,
-          isSelf: !!selfNote, meta: meta, siteRoleText: rset.length === 1 ? th(rset[0]) : (rset.length ? 'หลายบทบาทตามไซต์' : 'ตามไซต์'),
+          isSelf: !!selfNote, meta: meta,
+          tags: (m.st || []).filter(function (x) { return x === 'contractor' || x === 'customer'; }).map(function (x) { return x === 'contractor' ? 'ผู้รับเหมา' : 'ลูกค้า'; }),
+          st: (m.st || []).filter(function (x) { return x === 'active' || x === 'invited' || x === 'suspended'; }).slice(0, 1),
+          name: invited ? m.email : m.name, // a pending invite has no name yet: show the address once, not "รอยืนยัน" twice
+          sub: [invited ? 'คำเชิญ' : m.email].concat(meta ? [meta] : []).join(' · '),
+          roleText: m.orgRole !== 'สิทธิ์รายไซต์' ? th(m.orgRole) : (rset.length === 1 ? th(rset[0]) : (rset.length ? 'หลายบทบาทตามไซต์' : 'ตามไซต์')),
+          siteRoleText: rset.length === 1 ? th(rset[0]) : (rset.length ? 'หลายบทบาทตามไซต์' : 'ตามไซต์'),
           access: access, accessFull: real.length ? real.map(function (x) { return x.site + ' · ' + th(x.role); }).join('\n') : access }); }),
       orgWide: orgWide, siteWide: !orgWide, orgVariant: orgWide ? 'primary' : 'secondary', siteVariant: orgWide ? 'secondary' : 'primary',
       setOrg: function () { self.setState({ scope: 'org' }); },

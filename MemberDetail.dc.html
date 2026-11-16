@@ -29,11 +29,7 @@ button{cursor:pointer}
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
       <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" icon="lock" icon-bg="gray" title="ดูข้อมูลสมาชิกไม่ได้" hint-size="100%,96px"></dc-import>
-      <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-        <p style="margin: 0; font-size: 14px; color: #374151">บทบาท ผู้ดูอย่างเดียว ใน {{orgName}} ดูรายชื่อและสิทธิ์ของสมาชิกไม่ได้</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" icon="mail" label="ขอสิทธิ์ ผู้จัดการไซต์" variant="secondary" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
-        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
-      </section>
+      <dc-import name="LockedCard" title="ข้อมูลสมาชิก ดูได้เฉพาะเจ้าขององค์กร ผู้ดูแลองค์กร และผู้จัดการไซต์" role="Viewer" org="{{orgName}}" note="ดูสถานะไซต์และรายงานได้" ask-name="{{ownerName}}" request-label="ขอสิทธิ์ผู้จัดการไซต์" hint-size="100%,200px"></dc-import>
     </sc-if>
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
     <dc-import name="PageHeader" back-label="{{backLabel}}" back-href="{{backHref}}" eyebrow="{{orgName}}" status-kind="member" status-value="{{statusValue}}" person="{{m.person}}" icon="user" title="{{m.name}}" subtitle="{{headSub}}" hint-size="100%,140px"></dc-import>
@@ -331,7 +327,7 @@ class Component extends DCLogic {
       blocked: O.you === 'Viewer', canSee: O.you !== 'Viewer', orgName: O.name,
       ownerName: O.ownerName || (ownerP ? ownerP.name + ' (Org Owner)' : 'ผู้ดูแลองค์กร'),
       notRequested: !s.requested, requested: !!s.requested, requestAccess: function () { self.setState({ requested: true }); },
-      canAudit: youAdmin, ownerOptText: youOwner ? 'Org Owner · ใช้ปุ่ม “โอนความเป็นเจ้าของ” ด้านล่าง' : 'Org Owner · โอนได้โดย Owner คนปัจจุบันเท่านั้น',
+      canAudit: youAdmin, ownerOptText: youOwner ? 'Org Owner · ใช้ปุ่ม “โอนความเป็นเจ้าของ” ด้านล่าง' : 'Org Owner · โอนได้โดยเจ้าขององค์กรคนปัจจุบันเท่านั้น',
       canTransfer: canTransfer && !s.transferred, transferLabel: 'โอนให้ ' + M.name, transferred: !!s.transferred && s.transferred === key,
       tDlg: !!s.tDlg, tTitle: 'โอนความเป็นเจ้าของให้ ' + M.name + '?',
       tBody: '• ' + M.name + ' จะเป็น Org Owner ของ' + O.name + '\n• คุณจะเป็น Org Admin และออกจากองค์กรได้หลังโอน\n• ย้อนกลับได้เฉพาะเมื่อ Owner คนใหม่โอนคืน',
@@ -349,7 +345,7 @@ class Component extends DCLogic {
       closeCancel: function () { self.setState({ cDlg: false }); },
       confirmCancelInvite: function () { var c = J('sc.inviteCancel', []); if (c.indexOf(M.email) < 0) c.push(M.email); setJ('sc.inviteCancel', c); self.setState({ cDlg: false, inviteFor: key + '|cancel', inviteMsg: 'ยกเลิกคำเชิญของ ' + M.email + ' แล้ว' }); },
       m: { person: M.person, name: M.name, email: M.email, since: SFX(M.since) }, headSub: M.email + ' · ' + SFX(M.since),
-      readOnly: !siteEdit, smNote: smEdit && !canEdit, readOnlyNote: M.self ? 'นี่คือบัญชีของคุณ · แก้สิทธิ์ของตัวเองไม่ได้' : M.org === 'owner' ? 'Org Owner · โอนความเป็นเจ้าของได้โดย Owner เท่านั้น' : 'ดูได้อย่างเดียว · บทบาท ' + O.you + ' แก้สิทธิ์สมาชิกไม่ได้',
+      readOnly: !siteEdit, smNote: smEdit && !canEdit, readOnlyNote: M.self ? 'นี่คือบัญชีของคุณ · แก้สิทธิ์ของตัวเองไม่ได้' : M.org === 'owner' ? 'Org Owner · โอนความเป็นเจ้าของได้โดยเจ้าขององค์กรเท่านั้น' : 'ดูได้อย่างเดียว · บทบาท ' + O.you + ' แก้สิทธิ์สมาชิกไม่ได้',
       orgRole: orgRole, isAdmin: isOrgWide, orgLocked: !canEdit, siteLocked: !siteEdit || isOrgWide,
       orgHint: isOrgWide ? 'เข้าถึงและจัดการได้ทุกไซต์ รวมไซต์ใหม่ในอนาคต' : (O.sites.length ? 'เห็นเฉพาะไซต์ที่มอบสิทธิ์ด้านล่าง' : 'องค์กรนี้ยังไม่มีไซต์'),
       setOrgRole: function (e) { setEdit({ orgRoleEdit: e.target.value }); },

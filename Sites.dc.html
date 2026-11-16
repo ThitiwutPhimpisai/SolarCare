@@ -138,18 +138,18 @@ class Component extends DCLogic {
     var self = this;
     var A = { n: 'natthaphat', w: 'worawut', s: 'somsri', t: 'thanakorn', p: 'pimchanok' };
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
-    var ORGS = { a: { role: 'Org Admin', admin: true }, b: { role: 'Site Manager', admin: false }, c: { role: 'Viewer', admin: false }, d: { role: 'Org Owner', admin: true }, e: { role: 'Site Manager', admin: false } };
+    var ORGS = { a: { role: 'ผู้ดูแลองค์กร', admin: true }, b: { role: 'ผู้จัดการไซต์', admin: false }, c: { role: 'ผู้ดูอย่างเดียว', admin: false }, d: { role: 'เจ้าขององค์กร', admin: true }, e: { role: 'ผู้จัดการไซต์', admin: false } };
     var orgId = ORGS[SS('sc.org')] ? SS('sc.org') : 'a', org = ORGS[orgId];
     var DATA = {};
     DATA.a = [
       { id: 'k1', name: 'ฟาร์มโคราช 1', prov: 'นครราชสีมา', type: 'โซลาร์ฟาร์ม', kwp: '8,400 kWp', last: '18 ส.ค. 2569', open: 2, st: 'due', thumb: 'k1', people: [A.s, A.t, A.w], peopleNote: '5 คนมีสิทธิ์' },
       { id: 'k2', name: 'ฟาร์มโคราช 2', prov: 'นครราชสีมา', type: 'โซลาร์ฟาร์ม', kwp: '6,200 kWp', last: '12 ต.ค. 2569', open: 1, st: 'due', thumb: 'k2', people: [A.s, A.t], peopleNote: '4 คนมีสิทธิ์' },
       { id: 'bp', name: 'หลังคาโรงงานบางปู', prov: 'สมุทรปราการ', type: 'หลังคา', kwp: '1,150 kWp', last: '28 ส.ค. 2569', open: 1, st: 'late', thumb: 'bp', people: [A.t, A.p], peopleNote: '4 คนมีสิทธิ์' },
-      { id: 'lb', name: 'ลานจอดรถลพบุรี', prov: 'ลพบุรี', type: 'Carport', kwp: '960 kWp', last: '5 พ.ย. 2569', open: 0, st: 'ok', thumb: 'lb', people: [A.n, A.w], peopleNote: '2 คนมีสิทธิ์ + 1 รอตอบรับ' }
+      { id: 'lb', name: 'ลานจอดรถลพบุรี', prov: 'ลพบุรี', type: 'ที่จอดรถ', kwp: '960 kWp', last: '5 พ.ย. 2569', open: 0, st: 'ok', thumb: 'lb', people: [A.n, A.w], peopleNote: '2 คนมีสิทธิ์ + 1 รอตอบรับ' }
     ];
     DATA.b = [
       { id: 'rs', name: 'สาขารังสิต', prov: 'ปทุมธานี', type: 'หลังคา', kwp: '420 kWp', last: '28 ต.ค. 2569', open: 1, st: 'ok', thumb: 'rs', people: [A.n, A.t], peopleNote: '3 คนมีสิทธิ์' },
-      { id: 'bn', name: 'สาขาบางนา', prov: 'กรุงเทพฯ', type: 'Carport', kwp: '380 kWp', last: '13 ก.ย. 2569', open: 1, st: 'late', thumb: 'bn', people: [A.n, A.t, A.p], peopleNote: '3 คนมีสิทธิ์' }
+      { id: 'bn', name: 'สาขาบางนา', prov: 'กรุงเทพฯ', type: 'ที่จอดรถ', kwp: '380 kWp', last: '13 ก.ย. 2569', open: 1, st: 'late', thumb: 'bn', people: [A.n, A.t, A.p], peopleNote: '3 คนมีสิทธิ์' }
     ];
     DATA.c = [
       { id: 'lp', name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', type: 'หลังคา', kwp: '2,300 kWp', last: '30 ต.ค. 2569', open: 1, st: 'ok', thumb: 'lp', people: [A.n], peopleNote: 'คุณดูได้อย่างเดียว' }
@@ -173,7 +173,7 @@ class Component extends DCLogic {
     var JSN = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
     var cycSet = JSN('sc.siteCycle', {});
     if (woStat['WO-1043'] === 'done') { LAST.k1 = '14 พ.ย. 2569'; DATA.a = DATA.a.map(function (x) { return x.id === 'k1' ? Object.assign({}, x, { st: 'ok' }) : x; }); } // A–C approved → next due 12 ก.พ. 2570
-    var TT = { farm: ['โซลาร์ฟาร์ม', 'farmType'], roof: ['หลังคา', 'roofType'], carport: ['Carport', 'carportType'] };
+    var TT = { farm: ['โซลาร์ฟาร์ม', 'farmType'], roof: ['หลังคา', 'roofType'], carport: ['ที่จอดรถ', 'carportType'] };
     var fresh = SS('sc.newsite') && (Date.now() - Number(SS('sc.flashAt') || 0) < 10000) ? SS('sc.newsite') : '';
     var createdSites = JSN('sc.createdSites', []).filter(function (c) { return c && c.org === orgId && c.name; });
     var known = {}; DATA[orgId].forEach(function (x) { known[x.name] = 1; });
@@ -187,7 +187,8 @@ class Component extends DCLogic {
     var thParse = function (t) { var m = /^(\d+) (\S+) (\d{4})/.exec(t || ''); var mi = m ? TH_M.indexOf(m[2]) : -1; return mi < 0 ? null : new Date(Number(m[3]) - 543, mi, Number(m[1])); };
     var TODAY = new Date(2026, 10, 15);
     var cycSt = function (last, days) { var l = thParse(last); if (!l) return 'due'; var diff = Math.round((l.getTime() + days * 864e5 - TODAY) / 864e5); return diff < 0 ? 'late' : diff <= 14 ? 'due' : 'ok'; };
-    DATA[orgId] = DATA[orgId].map(function (x) { var d = Number(cycSet[x.name]) || 0; return d ? Object.assign({}, x, { st: cycSt(LAST[x.id] || x.last, d) }) : x; });
+    var CYC0 = { k1: 90, k2: 45, bp: 60, lb: 60, rs: 30, bn: 60, lp: 30, e1: 0 };
+    DATA[orgId] = DATA[orgId].map(function (x) { var d = Number(cycSet[x.name]) || (x.created ? 0 : CYC0[x.id] || 0); return d ? Object.assign({}, x, { st: cycSt(LAST[x.id] || x.last, d) }) : x; });
     var siteEd = JSN('sc.siteEdits', {});
     // next due = last cleaned + cycle (sc.siteCycle overrides the default cycle, same as SiteDetail)
     var CYC = { k1: 90, k2: 45, bp: 60, lb: 60, rs: 30, bn: 60, lp: 30, e1: 0 };
@@ -197,7 +198,7 @@ class Component extends DCLogic {
       if (!c) return { t: 'ยังไม่ตั้งรอบล้าง', late: false };
       var l = thParse(LAST[x.id] || x.last); if (!l) return { t: 'ยังไม่เคยล้าง · ล้างครั้งแรกได้เลย', late: false };
       var n = new Date(l.getTime() + c * 864e5), diff = Math.round((n - TODAY) / 864e5);
-      return { t: thFmt(n) + (diff < 0 ? ' (เลย ' + (-diff) + ' วัน)' : diff === 0 ? ' (วันนี้)' : diff === 1 ? ' (พรุ่งนี้)' : ''), late: diff < 0, cyc: c };
+      return { t: thFmt(n) + (diff < 0 ? ' (เลย ' + (-diff) + ' วัน)' : diff === 0 ? ' (วันนี้)' : diff === 1 ? ' (พรุ่งนี้)' : ''), late: diff < 0, cyc: c, diff: diff };
     };
     // removed / suspended members never show as site people (DATA Round 13)
     var EM = { natthaphat: 'natthaphat@siamsolar.example', worawut: 'worawut@siamsolar.example', somsri: 'somsri@siamsolar.example', thanakorn: 'thanakorn@cleanpro.example', pimchanok: 'pimchanok@customer.example', arunee: 'arunee@rimtalay.example' };
@@ -210,8 +211,10 @@ class Component extends DCLogic {
       if (x.created) { ppl = INH[orgId].filter(alive).map(function (av) { return av === A.n ? meAv : av; }); note = ppl.length + ' คนมีสิทธิ์ · ยังไม่ได้มอบสิทธิ์รายไซต์'; }
       var ed = siteEd[x.name] || {};
       var nx = nextOf(x);
-      return Object.assign({}, x, { next: nx.t, nextStyle: 'font-size: 13px; font-weight: 600; color: #111827', key: x.name, name: ed.name || x.name, prov: ed.prov || x.prov, kwp: ed.kwp ? String(ed.kwp).replace(/\s*kWp$/, '') + (String(x.kwp).indexOf('kWp') >= 0 ? ' kWp' : '') : x.kwp, people: ppl.slice(0, 4), peopleNote: note, last: LAST[x.id] || x.last, link: true, isNew: x.name === fresh, open: Math.max(0, x.open + (delta[x.name] || 0)) });
+      return Object.assign({}, x, { dIn: nx.diff == null ? 9999 : nx.diff, kwN: parseInt(String(x.kwp).replace(/,/g, ''), 10) || 0, next: nx.t, nextStyle: 'font-size: 13px; font-weight: 600; color: #111827', key: x.name, name: ed.name || x.name, prov: ed.prov || x.prov, kwp: ed.kwp ? String(ed.kwp).replace(/\s*kWp$/, '') + (String(x.kwp).indexOf('kWp') >= 0 ? ' kWp' : '') : x.kwp, people: ppl.slice(0, 4), peopleNote: note, last: LAST[x.id] || x.last, link: true, isNew: x.name === fresh, open: Math.max(0, x.open + (delta[x.name] || 0)) });
     });
+    var TIER = { late: 0, due: 1, unset: 2, ok: 3 };
+    all.sort(function (a, b) { return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || (TIER[a.st] - TIER[b.st]) || (a.dIn - b.dIn) || (b.kwN - a.kwN); });
     all.forEach(function (x) { x.go = function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { window.sessionStorage.setItem('sc.siteName', x.key); window.sessionStorage.setItem('sc.siteFrom', 'Sites'); } catch (er) {} }; });
     all.forEach(function (x) { x.cardStyle = 'display: flex; flex-direction: column; background: #FFFFFF; border-radius: 12px; overflow: hidden; text-decoration: none; color: #111827; border: ' + (x.isNew ? '2px solid #0F6B5C; box-shadow: 0 0 0 4px #E7F2EF' : '1px solid #E3E6EB'); });
     var f = self.state.f, q = self.state.q.trim().toLowerCase();
@@ -232,7 +235,7 @@ class Component extends DCLogic {
       mapStatuses: shown.map(function (s) { return s.id + ':' + s.st; }).join(','),
       mapExtra: shown.filter(function (s) { return s.created; }).map(function (s) { return [s.id, s.name, s.prov, s.lat || '', s.lon || '', s.st].join('|'); }).join(';'),
       siteIds: shown.map(function (s) { return s.id; }).join(',') || 'none', // never '' (SiteMap would show every pin)
-      subtitle: org.admin ? 'แสดงทุกไซต์ในองค์กร · บทบาทของคุณ: ' + org.role : 'แสดงเฉพาะไซต์ที่คุณได้รับสิทธิ์ · บทบาทของคุณ: ' + org.role,
+      subtitle: (org.admin ? 'ทุกไซต์ในองค์กร' : 'เฉพาะไซต์ที่คุณได้รับสิทธิ์') + ' · เรียงจากเลยกำหนดมากสุด แล้วใกล้ครบรอบ',
       canAdd: org.admin, listBusy: busy, listState: busy ? listState : 'loading', orgEmpty: orgEmpty,
       retry: function () { self._retriedFor = propState; self.setState({ retried: true }); },
       q: self.state.q, setQ: function (e) { self.setState({ q: e.target.value }); },

@@ -68,9 +68,9 @@ var SM_SITES = {
   k2: { name: 'ฟาร์มโคราช 2', prov: 'นครราชสีมา', lon: 102.25, lat: 15.05, st: 'due' },
   bp: { name: 'หลังคาโรงงานบางปู', prov: 'สมุทรปราการ', lon: 100.65, lat: 13.52, st: 'late' },
   lb: { name: 'ลานจอดรถลพบุรี', prov: 'ลพบุรี', lon: 100.65, lat: 14.80, st: 'ok' },
-  rs: { name: 'สาขารังสิต', prov: 'ปทุมธานี', lon: 100.62, lat: 14.00, st: 'ok' },
+  rs: { name: 'สาขารังสิต', prov: 'ปทุมธานี', lon: 100.62, lat: 14.00, st: 'due' },
   bn: { name: 'สาขาบางนา', prov: 'กรุงเทพฯ', lon: 100.68, lat: 13.66, st: 'late' },
-  lp: { name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', lon: 99.02, lat: 18.58, st: 'ok' },
+  lp: { name: 'โรงงาน A ลำพูน', prov: 'ลำพูน', lon: 99.02, lat: 18.58, st: 'due' },
   e1: { name: 'หลังคาอาคาร A หัวหิน', prov: 'ประจวบคีรีขันธ์', st: 'unset', nocoord: true } // no pin yet
 };
 // each status has its own shape + icon so the pin never relies on colour alone
@@ -231,7 +231,7 @@ class Component extends DCLogic {
     geo.roads.forEach(function (r) { L.polyline(flip(r.l), { renderer: cv, color: r.m ? '#9CA3AF' : '#D5D9E0', weight: r.m ? 1.6 : 1, interactive: false }).addTo(r.m ? major : minor); });
     major.addTo(map);
     // labels live in their own pane under the site pins (marker pane is 600)
-    map.createPane('smLabels'); map.getPane('smLabels').style.zIndex = 450; map.getPane('smLabels').style.pointerEvents = 'none';
+    map.createPane('smLabels'); map.getPane('smLabels').style.zIndex = 450; map.getPane('smLabels').style.pointerEvents = 'none'; map.getPane('smLabels').setAttribute('aria-hidden', 'true'); // place names are decoration for screen readers
     var provNames = {}; geo.prov.forEach(function (pv) { provNames[pv.n] = 1; });
     provNames['กรุงเทพฯ'] = 1; provNames['อยุธยา'] = 1;
     var provLbl = L.layerGroup(), cityLbl = L.layerGroup(), bigCity = L.layerGroup();
@@ -242,7 +242,7 @@ class Component extends DCLogic {
     });
     var sync = function () {
       var z = map.getZoom();
-      [[minor, z >= 8], [provLbl, z >= 6 && z <= 11], [bigCity, z >= 6], [cityLbl, z >= 8]].forEach(function (x) { if (x[1]) { if (!map.hasLayer(x[0])) x[0].addTo(map); } else if (map.hasLayer(x[0])) map.removeLayer(x[0]); });
+      [[minor, z >= 8], [provLbl, z >= 7 && z <= 11], [bigCity, z >= 6], [cityLbl, z >= 8]].forEach(function (x) { if (x[1]) { if (!map.hasLayer(x[0])) x[0].addTo(map); } else if (map.hasLayer(x[0])) map.removeLayer(x[0]); });
     };
     map.on('zoomend', sync); sync();
     map.attributionControl.addAttribution('ข้อมูลแผนที่ <a href="https://www.naturalearthdata.com/">Natural Earth</a>');
@@ -352,7 +352,7 @@ class Component extends DCLogic {
       closeCard: function () { self._open = ''; self.setState({ open: '' }); self.draw(); },
       showLegend: mode !== 'pick', legend: legend,
       showPickText: mode === 'pick',
-      pickText: this.state.outside ? 'จุดที่แตะอยู่นอกประเทศไทย ลองแตะในเขตประเทศไทย' : pin ? 'ปักหมุดที่ ' + pin.lat.toFixed(4) + ', ' + pin.lon.toFixed(4) : 'แตะบนแผนที่เพื่อปักหมุดตำแหน่งไซต์ (ซูมเข้าได้ด้วยปุ่ม + −)',
+      pickText: this.state.outside ? 'จุดที่แตะอยู่นอกประเทศไทย ลองแตะในเขตประเทศไทย' : pin ? 'ปักหมุดที่ ' + pin.lat.toFixed(4) + ', ' + pin.lon.toFixed(4) : 'แตะบนแผนที่เพื่อปักหมุดตำแหน่งไซต์ หรือพิมพ์พิกัดด้านล่าง (ซูมได้ด้วยปุ่ม + −)',
       pickTextStyle: (mode === 'pick' ? '' : 'display: none; ') + 'font-size: 13px; ' + (this.state.outside ? 'color: #B42318' : 'color: #374151')
     };
   }

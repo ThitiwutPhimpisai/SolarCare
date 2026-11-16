@@ -50,7 +50,7 @@ class Component extends DCLogic {
     var shown = opts.filter(function (o) { return o.id === 'all' || o.id === value || o.count == null || o.count > 0; });
     return {
       label: p.label ?? 'ตัวกรอง',
-      rowStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: flex; gap: 8px; " + (this.state.mobile ? 'flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none' : 'flex-wrap: wrap'),
+      rowStyle: "font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; display: flex; gap: 8px; " + (this.state.mobile ? 'flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; padding-right: 24px; scrollbar-width: none; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent)' /* phone: one scrolling row; the fading edge says there is more */ : 'flex-wrap: wrap'),
       items: shown.map(function (o) {
         var on = o.id === value;
         return {

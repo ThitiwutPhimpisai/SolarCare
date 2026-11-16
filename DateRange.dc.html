@@ -15,7 +15,8 @@ body{margin:0}
 .dr-presets{scrollbar-width:thin}
 .dr-toggle{display:none}
 .dr-presets::-webkit-scrollbar{display:none}
-@media (max-width: 767px){.dr-presets{flex-wrap:nowrap !important;overflow-x:auto;scrollbar-width:none}.dr-field{flex:1 1 140px !important}}
+@media (max-width: 767px){.dr-field{flex:1 1 140px !important}}
+.dr-nw{white-space:nowrap}
 /* phone: one summary button ("12 เดือน · ทุกไซต์") opens the full controls, so data shows on the first screen */
 @media (max-width: 599px){.dr-toggle{display:flex !important}.dr-head{display:none !important}.dr-box[data-open="false"] .dr-body{display:none !important}.dr-box{padding:4px !important}.dr-box[data-open="true"]{padding:4px 12px 14px !important}}
 </style>
@@ -42,6 +43,7 @@ body{margin:0}
     </sc-for>
   </div>
   <sc-if value="{{showCustom}}" hint-placeholder-val="{{ false }}">
+    <p style="margin: 0; font-size: 12px; color: #4B5563">ช่องวันที่ใช้ปี ค.ศ. ตามเครื่อง (วว/ดด/ปปปป) · ใต้ช่องแสดงเป็น พ.ศ.</p>
     <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start">
       <label class="dr-field" for="dr-from" style="flex: 0 1 200px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #374151">ตั้งแต่วันที่
         <input id="dr-from" type="date" min="{{minIso}}" max="{{maxIso}}" value="{{fromIso}}" onChange="{{setFrom}}" aria-invalid="{{fromInvalid}}" aria-describedby="dr-msg" style="{{inputStyle}}">
@@ -60,21 +62,25 @@ body{margin:0}
     </sc-if>
   </sc-if>
   <div style="display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center">
+    <sc-if value="{{showGroup}}" hint-placeholder-val="{{ true }}">
     <label for="dr-group" style="font-size: 13px; color: #374151">แสดงผล</label>
     <select id="dr-group" value="{{group}}" onChange="{{setGroup}}" style="min-height: 44px; padding: 0 12px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-family: inherit; font-size: 14px; color: #111827">
       <sc-for list="{{groups}}" as="g" hint-placeholder-count="5">
         <option value="{{g.id}}" disabled="{{g.dis}}">{{g.text}}</option>
       </sc-for>
     </select>
+    </sc-if>
+    <sc-if value="{{showCompare}}" hint-placeholder-val="{{ true }}">
     <label style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 13px; color: #374151; cursor: pointer">
       <input type="checkbox" checked="{{compare}}" onChange="{{toggleCompare}}" style="width: 20px; height: 20px; accent-color: #0F6B5C; margin: 0">เทียบช่วงก่อนหน้า
     </label>
-    <span role="status" style="font-size: 13px; color: #4B5563; flex: 1 1 220px; min-width: 0">{{summary}}</span>
+    </sc-if>
+    <span role="status" style="font-size: 13px; color: #4B5563; flex: 1 1 220px; min-width: 0"><sc-for list="{{sumParts}}" as="s" hint-placeholder-count="3"><span class="dr-nw">{{s.t}}</span>{{s.sep}}</sc-for></span>
   </div>
   </div>
 </section>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ช่วงเวลารายงาน"},"onChange":{"editor":null},"siteOpts":{"editor":null},"siteValue":{"editor":"text","default":"all"},"onSite":{"editor":null},"$preview":{"width":900,"height":260}}'>
+<script type="text/x-dc" data-dc-script data-props='{"label":{"editor":"text","default":"ช่วงเวลารายงาน"},"onChange":{"editor":null},"siteOpts":{"editor":null},"siteValue":{"editor":"text","default":"all"},"onSite":{"editor":null},"storeKey":{"editor":"text","default":"sc.range"},"presets":{"editor":"text","default":""},"hideGroup":{"editor":"boolean","default":false},"hideCompare":{"editor":"boolean","default":false},"defaultPreset":{"editor":"text","default":""},"$preview":{"width":900,"height":260}}'>
 // ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
 var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
 var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
@@ -121,29 +127,34 @@ function scrBuckets(a, b, g) {
 function scrRead() { try { return window.sessionStorage.getItem('sc.range') || ''; } catch (e) { return ''; } }
 // ---- end sc.range resolver ----
 
-// One range picker for Reports and EnergyValue: presets, custom from/to, group-by, compare. Saves sc.range {preset, from, to, group, compare}.
+// One range picker for Reports, EnergyValue, Analytics and AuditLog: presets, custom from/to, group-by, compare. Saves {preset, from, to, group, compare}
+// to sc.range, or to props.storeKey (AuditLog keeps its own range); props.presets ("d7,d30,m3,custom") limits the chips; hideGroup / hideCompare drop those controls.
+function drRead(k) { try { return window.sessionStorage.getItem(k || 'sc.range') || ''; } catch (e) { return ''; } }
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { draftFrom: '', draftTo: '', err: '', info: '' }; }
   componentDidMount() {
     var self = this;
-    self._snap = scrRead();
-    self._sync = function () { var n = scrRead(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
+    var key = function () { return self.props.storeKey || 'sc.range'; };
+    self._snap = drRead(key());
+    self._sync = function () { var n = drRead(key()); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
     self._iv = setInterval(self._sync, 400);
     self.setState({ draftFrom: '', draftTo: '', err: '', info: '', sync: Date.now() });
   }
   componentWillUnmount() { if (this._sync) window.removeEventListener('storage', this._sync); if (this._iv) clearInterval(this._iv); }
   save(next) {
-    var raw = {}; try { raw = JSON.parse(scrRead() || '{}') || {}; } catch (e) { raw = {}; }
+    var raw = {}; try { raw = JSON.parse(drRead(this.props.storeKey) || '{}') || {}; } catch (e) { raw = {}; }
+    if (!raw.preset && this.props.defaultPreset) raw.preset = this.props.defaultPreset;
     var obj = Object.assign({}, raw, next), rr = scrResolve(obj);
     var store = { preset: rr.preset, from: rr.fromIso, to: rr.toIso, group: rr.group, compare: !!obj.compare };
-    try { window.sessionStorage.setItem('sc.range', JSON.stringify(store)); } catch (e) {}
+    try { window.sessionStorage.setItem(this.props.storeKey || 'sc.range', JSON.stringify(store)); } catch (e) {}
     this._snap = JSON.stringify(store);
     if (this.props.onChange) this.props.onChange(store);
     return rr;
   }
   renderVals() {
-    var self = this, rr = scrResolve(scrRead()), st = self.state;
+    var self = this, rr = scrResolve(drRead(self.props.storeKey) || (self.props.defaultPreset ? JSON.stringify({ preset: self.props.defaultPreset }) : '')), st = self.state;
+    var allow = String(self.props.presets || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean);
     var chip = function (on) { return "font-family: inherit; min-height: 44px; padding: 0 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; flex: none; cursor: pointer; border: 1px solid " + (on ? '#0F6B5C; background: #0F6B5C; color: #FFFFFF' : '#D5D9E0; background: #FFFFFF; color: #374151'); };
     var custom = rr.preset === 'custom' || !!st.custom;
     var fromIso = st.draftFrom || rr.fromIso, toIso = st.draftTo || rr.toIso;
@@ -169,10 +180,11 @@ class Component extends DCLogic {
       hasSites: sOpts.length > 2, siteOpts: sOpts, siteValue: sVal,
       pickSite: function (e) { if (p.onSite) p.onSite(e.target.value); },
       openAttr: open ? 'true' : 'false', toggleOpen: function () { self.setState({ open: !self.state.open }); },
-      toggleText: rr.short + (sOpts.length > 2 && sHit ? ' · ' + sHit.label : '') + ' · ' + rr.groupLabel + (rr.compareAsked && rr.compareOk ? ' · เทียบช่วงก่อน' : ''),
+      toggleText: rr.short + (sOpts.length > 2 && sHit ? ' · ' + sHit.label : '') + (self.props.hideGroup ? '' : ' · ' + rr.groupLabel) + (rr.compareAsked && rr.compareOk && !self.props.hideCompare ? ' · เทียบช่วงก่อน' : ''),
       toggleHint: open ? 'ซ่อน' : 'เปลี่ยน',
       groupLabel: self.props.label || 'ช่วงเวลารายงาน',
-      presets: SCR_PRESETS.map(function (x) { var on = custom ? x[0] === 'custom' : x[0] === rr.preset; return { label: x[1], on: on, style: chip(on),
+      showGroup: !self.props.hideGroup, showCompare: !self.props.hideCompare,
+      presets: SCR_PRESETS.filter(function (x) { return !allow.length || allow.indexOf(x[0]) >= 0 || x[0] === rr.preset; }).map(function (x) { var on = custom ? x[0] === 'custom' : x[0] === rr.preset; return { label: x[1], on: on, style: chip(on),
         pick: function () { if (x[0] === 'custom') { self.save({ preset: 'custom', from: rr.fromIso, to: rr.toIso }); self.setState({ custom: true, err: '', info: '', sync: Date.now() }); return; } self.save({ preset: x[0], group: '' }); self.setState({ custom: false, draftFrom: '', draftTo: '', err: '', info: '', sync: Date.now() }); } }; }),
       showCustom: custom, minIso: scrIso(SCR_START), maxIso: scrIso(SCR_TODAY), fromIso: fromIso, toIso: toIso,
       fromTh: isNaN(scrDay(fromIso)) ? '' : scrTh(scrDay(fromIso)), toTh: isNaN(scrDay(toIso)) ? '' : scrTh(scrDay(toIso)),
@@ -184,7 +196,9 @@ class Component extends DCLogic {
       group: rr.group, groups: groups,
       setGroup: function (e) { self.save({ group: e.target.value }); self.setState({ sync: Date.now() }); },
       compare: rr.compareAsked, toggleCompare: function (e) { self.save({ compare: !!e.target.checked }); self.setState({ sync: Date.now() }); },
-      summary: scrTh(rr.from) + ' – ' + scrTh(rr.to) + ' · ' + rr.len + ' วัน · ' + rr.groupLabel + (rr.compareAsked ? (rr.compareOk ? ' · เทียบ ' + rr.prevLabel : ' · เทียบไม่ได้ (ก่อนหน้าไม่มีข้อมูล)') : '')
+      // each part keeps its words together; the grouping is not repeated (the select beside it already says it)
+      sumParts: [scrTh(rr.from) + ' – ' + scrTh(rr.to), rr.len + ' วัน'].concat(rr.compareAsked && !self.props.hideCompare ? [rr.compareOk ? 'เทียบ ' + rr.prevLabel : 'เทียบไม่ได้ (ก่อนหน้าไม่มีข้อมูล)'] : []).map(function (t, i, a) { return { t: t, sep: i < a.length - 1 ? ' · ' : '' }; }),
+      summary: [scrTh(rr.from) + ' – ' + scrTh(rr.to), rr.len + ' วัน'].concat(rr.compareAsked && !self.props.hideCompare ? [rr.compareOk ? 'เทียบ ' + rr.prevLabel : 'เทียบไม่ได้ (ก่อนหน้าไม่มีข้อมูล)'] : []).join(' · ')
     };
   }
 }

@@ -14,6 +14,7 @@
 body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 button{font-family:inherit;cursor:pointer}
+@media (max-width: 599px){.an-tab{padding:0 9px !important;font-size:13px !important}}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
@@ -25,6 +26,14 @@ button{font-family:inherit;cursor:pointer}
     <dc-import name="PageHeader" icon="trend" back-label="{{backLabel}}" back-href="{{backHref}}" back-keys="sc.findingFrom=" eyebrow="{{orgName}}" title="วิเคราะห์" subtitle="ปัญหาที่อินเวอร์เตอร์ (inverter) ไม่แจ้งเตือน เรียงตามไฟที่เสียเป็นบาทต่อวัน พร้อมพยากรณ์ 14 วัน" hint-size="100%,96px"></dc-import>
 
     <div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">{{live}}</div>
+    <sc-if value="{{noSites}}" hint-placeholder-val="{{ false }}">
+      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; display: flex; flex-direction: column; align-items: center; padding-bottom: 24px">
+        <dc-import name="ListState" state="empty" unit="ผลวิเคราะห์" icon="trend" empty-title="ยังไม่มีไซต์ให้วิเคราะห์" empty-text="เพิ่มไซต์และเชื่อม SmartLogger แล้วระบบจะเริ่มวิเคราะห์หลังมีข้อมูล 14 วัน" hint-size="100%,140px"></dc-import>
+        <sc-if value="{{canAddSite}}" hint-placeholder-val="{{ true }}">
+          <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=Analytics" hint-size="150px,44px"></dc-import>
+        </sc-if>
+      </section>
+    </sc-if>
     <sc-if value="{{allowed}}" hint-placeholder-val="{{ true }}">
       <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px">
         <div style="flex: 1 1 320px; min-width: 0"><dc-import name="Insights" view="kpis" site="{{siteF}}" hint-size="100%,48px"></dc-import></div>
@@ -43,7 +52,7 @@ button{font-family:inherit;cursor:pointer}
 
       <div role="tablist" aria-label="มุมมองการวิเคราะห์" style="display: flex; gap: 4px; border-bottom: 1px solid #E3E6EB; overflow-x: auto; overflow-y: hidden; scrollbar-width: none">
         <sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
-          <button type="button" role="tab" id="{{t.tid}}" aria-selected="{{t.on}}" aria-controls="{{t.pid}}" tabindex="{{t.ti}}" onClick="{{t.pick}}" onKeyDown="{{tabKey}}" style="{{t.style}}">{{t.label}}</button>
+          <button type="button" role="tab" class="an-tab" id="{{t.tid}}" aria-selected="{{t.on}}" aria-controls="{{t.pid}}" tabindex="{{t.ti}}" onClick="{{t.pick}}" onKeyDown="{{tabKey}}" style="{{t.style}}">{{t.label}}</button>
         </sc-for>
       </div>
 
@@ -137,7 +146,8 @@ class Component extends DCLogic {
     var from = SS('sc.findingFrom'); // set by Main / SiteDetail; stays until the back link or the sidebar is used
     return {
       orgName: orgName + ' · ' + (sel === 'all' ? 'ทุกไซต์' : DN((sites.filter(function (r) { return r[1] === sel; })[0] || [''])[0])),
-      allowed: true, viewer: O[1] === 'Viewer',
+      // DATA.md round 15: an org with no sites gets one empty state with "เพิ่มไซต์แรก", not empty tabs and a ฿0 summary
+      allowed: sites.length > 0, noSites: sites.length === 0, canAddSite: O[1] !== 'Viewer', viewer: O[1] === 'Viewer',
       siteF: sel,
       siteOpts: [{ id: 'all', label: 'ทุกไซต์ (' + sites.length + ')' }].concat(sites.map(function (r) { return { id: r[1], label: DN(r[0]) }; })),
       multiSite: sites.length > 1,

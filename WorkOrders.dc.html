@@ -11,11 +11,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
+/* phone: back to the list from the side panel (base rule first, so the phone override wins) */
+.wo-back{display:none}
+.wo-rm{display:none}
 @media (max-width: 767px){
 .wo-hide-m{display:none !important}
 .wo-back{display:block}
+.wo-rd{display:none}.wo-rm{display:block}
 }
-.wo-back{display:none}
 @media (min-width: 768px) and (max-width: 1199px){.wo-split{flex-wrap:nowrap !important}.wo-split > section{flex:1 1 auto !important}.wo-split > aside{flex:0 0 clamp(300px, 40%, 380px) !important;position:sticky;top:16px;box-sizing:border-box}}
 .wo-fbtn,.wo-fclear{display:none}
 /* the side panel sits next to the list from 768px: it shows only what the row does not (Round 14) */
@@ -79,8 +82,11 @@ button{cursor:pointer}
     <sc-if value="{{orgEmpty}}" hint-placeholder-val="{{ false }}">
       <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding-bottom: 24px; display: flex; flex-direction: column; align-items: center">
         <dc-import name="ListState" state="empty" unit="ใบงาน" icon="workorder" empty-title="{{emptyOrgTitle}}" empty-text="{{emptyOrgText}}" hint-size="100%,120px"></dc-import>
-        <sc-if value="{{viewer.canCreate}}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{emptyCreate}}" hint-placeholder-val="{{ true }}">
           <dc-import name="Button" icon="plus" label="สร้างใบงานแรก" href="CreateWorkOrder.dc.html" save-keys="sc.from=WorkOrders" hint-size="160px,44px"></dc-import>
+        </sc-if>
+        <sc-if value="{{emptyAddSite}}" hint-placeholder-val="{{ false }}">
+          <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=WorkOrders" hint-size="160px,44px"></dc-import>
         </sc-if>
       </div>
     </sc-if>
@@ -90,7 +96,7 @@ button{cursor:pointer}
       <section class="{{listClass}}" style="flex: 999 1 640px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; overflow: hidden">
         <ul aria-label="รายการใบงาน" style="list-style: none; margin: 0; padding: 0">
           <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
-            <li><dc-import name="WorkOrderRow" no="{{r.no}}" title="{{r.title}}" site="{{r.site}}" assignee="{{r.who}}" av="{{r.av}}" due="{{r.due}}" status="{{r.st}}" overdue="{{r.overdue}}" is-new="{{r.isNew}}" selected="{{r.on}}" on-press="{{r.pick}}" hint-size="100%,64px"></dc-import></li>
+            <li><div class="{{r.dClass}}"><dc-import name="WorkOrderRow" no="{{r.no}}" title="{{r.title}}" site="{{r.site}}" assignee="{{r.who}}" av="{{r.av}}" due="{{r.due}}" done-at="{{r.doneAt}}" status="{{r.st}}" overdue="{{r.overdue}}" is-new="{{r.isNew}}" selected="{{r.on}}" on-press="{{r.pick}}" hint-size="100%,64px"></dc-import></div><sc-if value="{{r.linkable}}" hint-placeholder-val="{{ false }}"><div class="wo-rm"><dc-import name="WorkOrderRow" no="{{r.no}}" title="{{r.title}}" site="{{r.site}}" assignee="{{r.who}}" av="{{r.av}}" due="{{r.due}}" done-at="{{r.doneAt}}" status="{{r.st}}" overdue="{{r.overdue}}" is-new="{{r.isNew}}" href="WorkOrderDetail.dc.html" save-keys="{{r.woKeys}}" hint-size="100%,64px"></dc-import></div></sc-if></li>
           </sc-for>
         </ul>
         <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
@@ -249,12 +255,38 @@ function whEvents(org) {
   return out.sort(function (x, y) { return y.d - x.d; });
 }
 
+// ---- work-order progress (Round 15) — identical copy in WorkOrders, WorkOrderDetail, TechMobile ----
+// one source for checklist + photos: sc.techProgress[no] = { checks: {i: true}, photos: {'before' | 'before:โซน A': 'S' | n}, fixedAt }
+// a job the technician never touched in the app is seeded from its status; a seeded photo slot ('S') stands for 4 photos
+var WP_SEED = 4;
+var WP_PHOTO_ITEM = { clean: { 0: 'before', 2: 'after' }, inspect: {}, repair: { 3: 'after' } }; // checklist items ticked by photos, never by hand
+function wpType(kind) { return /ตรวจ|inspect/.test(kind || '') ? 'inspect' : (/ซ่อม|เปลี่ยน|repair/.test(kind || '') ? 'repair' : 'clean'); }
+function wpKey(side, z, zones) { return zones.length > 1 ? side + ':' + z : side; }
+function wpSeed(st, zones) {
+  var full = st === 'review' || st === 'done' || st === 'returned' || st === 'queued', half = st === 'doing' || st === 'paused', ph = {};
+  zones.forEach(function (z) { if (full || half) ph[wpKey('before', z, zones)] = 'S'; if (full) ph[wpKey('after', z, zones)] = 'S'; });
+  return { checks: full ? { 0: true, 1: true, 2: true, 3: true } : (half ? { 0: true, 1: true } : {}), photos: ph };
+}
+function wpProgress(no, st, kind, zones, all) {
+  var type = wpType(kind), tp = (all || {})[no] || null, src = tp && (tp.photos || tp.checks) ? tp : wpSeed(st, zones);
+  var ph = src.photos || {}, ck = src.checks || {}, pi = WP_PHOTO_ITEM[type];
+  var sideOk = function (sd) { return zones.every(function (z) { return !!ph[wpKey(sd, z, zones)]; }); };
+  var items = [0, 1, 2, 3].map(function (i) { return pi[i] ? sideOk(pi[i]) : !!ck[i]; });
+  var n = 0, slots = 0, missing = [];
+  zones.forEach(function (z) { ['before', 'after'].forEach(function (sd) { var v = ph[wpKey(sd, z, zones)]; if (v) { slots++; n += v === 'S' ? WP_SEED : 1; } else missing.push({ zone: z, side: sd }); }); });
+  return { type: type, items: items, done: items.filter(Boolean).length, photos: ph, checks: ck, nPhotos: n, slots: slots, total: zones.length * 2, missing: missing, photoItem: pi, fixedAt: (tp && tp.fixedAt) || 0 };
+}
+// zones of each job (CreateWorkOrder stores 'โซน A' …); before/after photos are required for every zone
+var WP_ZONES = { 'WO-1043': ['โซน A', 'โซน B', 'โซน C'], 'WO-1042': ['โซน C'], 'WO-1041': ['โซน A', 'โซน B', 'โซน C', 'โซน D'], 'WO-1039': ['หลังคา'], 'WO-1035': ['ลานจอด'], 'WO-1031': ['โซน D'], 'GM-0211': ['หลังคา'], 'GM-0209': ['ลานจอด'], 'GM-0204': ['หลังคา'], 'NK-0102': ['หลังคา'], 'NK-0097': ['หลังคา'] };
+function wpZones(no, created) { var z = WP_ZONES[no] || (created && created.zones && created.zones.length ? created.zones : ['ทั้งไซต์']); return z.map(function (x) { return x.length === 1 ? 'โซน ' + x : x; }); }
+// ---- end work-order progress ----
+
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { tab: 'all', sel: '', viewer: 0, pickedAt: 0, q: '', tech: 'all', picked: false, retriedFor: '', assignTo: '' }; }
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.siteOnce', 'sc.woPeriod', 'sc.siteEdits', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.newno', 'sc.createdWo', 'sc.woStat', 'sc.site', 'sc.woTab', 'sc.woRange', 'sc.woAssign', 'sc.issue', 'sc.createdSites'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.siteOnce', 'sc.woPeriod', 'sc.siteEdits', 'sc.from', 'sc.flash', 'sc.flashAt', 'sc.newno', 'sc.createdWo', 'sc.woStat', 'sc.site', 'sc.woTab', 'sc.woRange', 'sc.woAssign', 'sc.issue', 'sc.issues', 'sc.createdSites', 'sc.techProgress', 'sc.woReturn'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -285,12 +317,12 @@ class Component extends DCLogic {
     var DATA = {};
     DATA.b = [
       { no: 'GM-0211', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '20 พ.ย. 2569', st: 'todo', panels: '760', kind: 'ล้างตามรอบ', log: [{ who: 'ณัฐภัทร ส.', what: 'มอบหมายให้ธนากร ว.', when: '12 พ.ย. 2569' }] },
-      { no: 'GM-0209', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', st: 'doing', panels: '690', kind: 'ล้างตามรอบ', log: [{ who: 'ธนากร ว.', what: 'เริ่มงาน', when: '11 พ.ย. 2569' }] },
-      { no: 'GM-0204', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '28 ต.ค. 2569', st: 'done', panels: '760', kind: 'ล้างตามรอบ', log: [{ who: 'ณัฐภัทร ส.', what: 'อนุมัติปิดงาน', when: '28 ต.ค. 2569' }] }
+      { no: 'GM-0209', title: 'ล้างแผงลานจอดรถ', site: 'สาขาบางนา', who: 'ธนากร ว.', due: '12 พ.ย. 2569', st: 'doing', panels: '690', kind: 'ล้างตามรอบ', log: [{ who: 'ธนากร ว.', what: 'เริ่มงาน', when: '11 พ.ย. 2569' }] },
+      { no: 'GM-0204', doneAt: '28 ต.ค. 2569', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', who: 'ธนากร ว.', due: '28 ต.ค. 2569', st: 'done', panels: '760', kind: 'ล้างตามรอบ', log: [{ who: 'ณัฐภัทร ส.', what: 'อนุมัติปิดงาน', when: '28 ต.ค. 2569' }] }
     ];
     DATA.c = [
       { no: 'NK-0102', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '22 พ.ย. 2569', st: 'doing', panels: '4,180', kind: 'ล้างตามรอบ', log: [{ who: 'ทีมช่าง B', what: 'เริ่มงาน', when: '14 พ.ย. 2569' }] },
-      { no: 'NK-0097', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '30 ต.ค. 2569', st: 'done', panels: '4,180', kind: 'ล้างตามรอบ', log: [{ who: 'ศิริพร ก.', what: 'อนุมัติปิดงาน', when: '30 ต.ค. 2569' }] }
+      { no: 'NK-0097', doneAt: '30 ต.ค. 2569', title: 'ล้างแผงหลังคาโรงงาน A', site: 'โรงงาน A ลำพูน', who: 'ทีมช่าง B', due: '30 ต.ค. 2569', st: 'done', panels: '4,180', kind: 'ล้างตามรอบ', log: [{ who: 'ศิริพร ก.', what: 'อนุมัติปิดงาน', when: '30 ต.ค. 2569' }] }
     ];
     DATA.d = []; DATA.e = [];
     var SITES_BY = { a: ['ฟาร์มโคราช 1', 'ฟาร์มโคราช 2', 'หลังคาโรงงานบางปู', 'ลานจอดรถลพบุรี'], b: ['สาขารังสิต', 'สาขาบางนา'], c: ['โรงงาน A ลำพูน'], d: [], e: ['หลังคาอาคาร A หัวหิน'] };
@@ -301,29 +333,32 @@ class Component extends DCLogic {
       { no: 'WO-1042', title: 'ตรวจจุดร้อน (hotspot) หลังพายุ', site: 'ฟาร์มโคราช 1', who: 'ธนากร ว.', due: '16 พ.ย. 2569', st: 'doing', panels: '600', kind: 'ตรวจสภาพ', log: [{ who: 'ธนากร ว.', what: 'เช็กอินและเริ่มงาน', when: 'เมื่อวาน 14 พ.ย. 15:50' }, { who: 'ณัฐภัทร ส.', what: 'สร้างและมอบหมายให้ธนากร ว. (พบ hotspot 2 แผงจาก WO-1043)', when: '14 พ.ย. 15:30' }] },
       { no: 'WO-1041', title: 'ล้างแผงตามรอบ', site: 'ฟาร์มโคราช 2', who: '—', due: '25 พ.ย. 2569', st: 'new', panels: '11,400', kind: 'ล้างตามรอบ', log: [{ who: 'ระบบ', what: 'สร้างอัตโนมัติจากรอบ 45 วัน', when: '12 พ.ย. 2569' }] },
       { no: 'WO-1039', title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', who: 'ธนากร ว.', due: '10 พ.ย. 2569', st: 'doing', panels: '420', kind: 'ล้างตามรอบ', log: [{ who: 'วรวุฒิ ก.', what: 'มอบหมายงาน', when: '1 พ.ย. 2569' }] },
-      { no: 'WO-1035', title: 'ล้างแผงลานจอดรถ', site: 'ลานจอดรถลพบุรี', who: 'ทีมช่าง B', due: '5 พ.ย. 2569', st: 'done', panels: '360', kind: 'ล้างตามรอบ', log: [{ who: 'ณัฐภัทร ส.', what: 'อนุมัติปิดงาน', when: '5 พ.ย. 2569' }] },
-      { no: 'WO-1031', title: 'เปลี่ยนสายไฟสตริง 12', site: 'ฟาร์มโคราช 1', who: 'ทีมช่าง B', due: '2 พ.ย. 2569', st: 'done', panels: '24', kind: 'ซ่อมบำรุง', log: [{ who: 'สมศรี ป.', what: 'อนุมัติปิดงาน', when: '2 พ.ย. 2569' }] }
+      { no: 'WO-1035', doneAt: '5 พ.ย. 2569', title: 'ล้างแผงลานจอดรถ', site: 'ลานจอดรถลพบุรี', who: 'ทีมช่าง B', due: '5 พ.ย. 2569', st: 'done', panels: '360', kind: 'ล้างตามรอบ', log: [{ who: 'ณัฐภัทร ส.', what: 'อนุมัติปิดงาน', when: '5 พ.ย. 2569' }] },
+      { no: 'WO-1031', doneAt: '2 พ.ย. 2569', title: 'เปลี่ยนสายไฟสตริง 12', site: 'ฟาร์มโคราช 1', who: 'ทีมช่าง B', due: '2 พ.ย. 2569', st: 'done', panels: '24', kind: 'ซ่อมบำรุง', log: [{ who: 'สมศรี ป.', what: 'อนุมัติปิดงาน', when: '2 พ.ย. 2569' }] }
     ];
     var JS = function (k, d) { try { return JSON.parse(SS(k) || 'null') || d; } catch (e) { return d; } };
     var woStat = JS('sc.woStat', {}); // approve / send back made in WorkOrderDetail (DATA.md round 3)
-    var woAssign = JS('sc.woAssign', {}), issue = JS('sc.issue', null);
+    var woAssign = JS('sc.woAssign', {}), issue = JS('sc.issue', null), woReturn = JS('sc.woReturn', {});
+    // field issues are kept per job (sc.issues {no: [issue…]}); sc.issue = the latest one (older prototype state)
+    var issues = JS('sc.issues', {}); if (issue && issue.no && !issues[issue.no]) { issues = Object.assign({}, issues); issues[issue.no] = [issue]; }
     var created = JS('sc.createdWo', []).filter(function (w) { return w && w.org === orgId && SITES_BY[orgId].indexOf(w.site) >= 0; });
     var flashAt = Number(SS('sc.flashAt') || 0);
     var fresh = Date.now() - flashAt < 10000;
     var newNo = fresh ? SS('sc.newno') : '';
     var all = created.slice().reverse().map(function (w) {
-      return { no: w.no, title: w.title, site: w.site, who: w.who, due: w.due, st: w.st || 'todo', panels: '—', kind: w.type || 'ล้างตามรอบ', isNew: w.no === newNo,
-        log: [{ who: 'ณัฐภัทร ส.', what: 'สร้างใบงานและแจ้ง' + w.who, when: 'เมื่อสักครู่' }] };
+      return { no: w.no, title: w.title, site: w.site, who: w.who || '—', due: w.due, st: w.st || 'todo', panels: '—', kind: w.type || 'ล้างตามรอบ', isNew: w.no === newNo,
+        log: [{ who: 'ณัฐภัทร ส.', what: w.who && w.who !== '—' ? 'สร้างใบงานและแจ้ง' + w.who : 'สร้างใบงาน (ยังไม่มอบหมาย)', when: 'เมื่อสักครู่' }] };
     }).concat(DATA[orgId]).map(function (w) {
       // assignment made in the prototype (sc.woAssign) fills the technician of a new job
       var asg = woAssign[w.no];
       if (asg && w.who === '—') w = Object.assign({}, w, { who: asg, st: w.st === 'new' ? 'todo' : w.st, log: [{ who: 'ณัฐภัทร ส.', what: 'มอบหมายให้' + asg, when: 'เมื่อสักครู่' }].concat(w.log) });
       var st = woStat[w.no];
       if (st && st !== w.st) {
-        var what = { done: ['ณัฐภัทร ส.', 'อนุมัติปิดงาน'], returned: ['ณัฐภัทร ส.', 'ส่งกลับให้ช่างแก้ไข'], doing: [w.who, 'เริ่มงาน / ทำงานต่อ'], review: [w.who, 'ส่งงานให้อนุมัติ'], paused: [w.who, 'พักงานเพราะแจ้งปัญหา'] }[st];
-        w = Object.assign({}, w, { st: st, log: what ? [{ who: what[0], what: what[1], when: 'เมื่อสักครู่' }].concat(w.log) : w.log });
+        var ret = woReturn[w.no];
+        var what = { done: ['ณัฐภัทร ส.', 'อนุมัติปิดงาน'], returned: [(ret && ret.by) || 'ณัฐภัทร ส.', 'ส่งกลับให้ช่างแก้ไข' + (ret && ret.reason ? ': ' + ret.reason : '')], doing: [w.who, 'เริ่มงาน / ทำงานต่อ'], review: [w.who, 'ส่งงานให้อนุมัติ'], paused: [w.who, 'พักงานเพราะแจ้งปัญหา'] }[st];
+        w = Object.assign({}, w, { st: st, doneAt: st === 'done' ? 'วันนี้' : w.doneAt, log: what ? [{ who: what[0], what: what[1], when: 'เมื่อสักครู่' }].concat(w.log) : w.log });
       }
-      if (issue && issue.no === w.no) w = Object.assign({}, w, { log: [{ who: w.who, what: 'แจ้งปัญหา: ' + (issue.kind || 'ปัญหาหน้างาน') + (issue.pause ? ' · พักงาน' : ''), when: 'เมื่อสักครู่' }].concat(w.log) });
+      (issues[w.no] || []).forEach(function (iss) { w = Object.assign({}, w, { log: [{ who: w.who, what: 'แจ้งปัญหา: ' + (iss.kind || 'ปัญหาหน้างาน') + (iss.pause ? ' · พักงาน' : ''), when: iss.at || 'เมื่อสักครู่' }].concat(w.log) }); });
       return w;
     });
     var nw = newNo && all.some(function (w) { return w.no === newNo; }) ? newNo : '';
@@ -350,7 +385,7 @@ class Component extends DCLogic {
         if (e.d < wrFrom || e.d > wrTo) return;
         if (realDone.some(function (w) { return w.site === e.site && dayOfH(w.due) === e.d; })) return;
         var x = new Date(e.d * 864e5), due = x.getUTCDate() + ' ' + SCR_MN[x.getUTCMonth()] + ' ' + (x.getUTCFullYear() + 543);
-        hist.push({ no: PRE[0] + String(nextNo--).padStart(4, '0'), title: e.kind === 'repair' ? 'งานซ่อมบำรุง' : 'ล้างแผงตามรอบ', site: e.site, who: e.who, due: due, st: 'done', panels: '', kind: e.kind === 'repair' ? 'ซ่อมบำรุง' : 'ล้างตามรอบ', hist: true,
+        hist.push({ no: PRE[0] + String(nextNo--).padStart(4, '0'), title: e.kind === 'repair' ? 'งานซ่อมบำรุง' : 'ล้างแผงตามรอบ', site: e.site, who: e.who, due: due, doneAt: due, st: 'done', panels: '', kind: e.kind === 'repair' ? 'ซ่อมบำรุง' : 'ล้างตามรอบ', hist: true,
           log: [{ who: 'ระบบ', what: 'ปิดงานแล้ว (ประวัติ)', when: due }] });
       });
       all = all.concat(hist);
@@ -376,9 +411,14 @@ class Component extends DCLogic {
       return (site === 'all' || w.site === site) && (tech === 'all' || techOf(w) === tech) &&
         (!q || (w.no + ' ' + w.title + ' ' + w.site).toLowerCase().indexOf(q) >= 0);
     });
-    var stDefs = [['all', 'ทั้งหมด']].concat(v.canApprove ? [['review', 'รอฉันอนุมัติ']] : []).concat([['open', 'เปิดอยู่'], ['new', 'รอมอบหมาย'], ['todo', 'มอบหมายแล้ว'], ['doing', 'กำลังดำเนินการ']]).concat(v.canApprove ? [] : [['review', 'รออนุมัติ']]).concat([ ['returned', 'ส่งกลับแก้ไข'], ['paused', 'พักงาน'], ['done', 'เสร็จสิ้น'], ['overdue', 'เลยกำหนด']]);
+    var APV = { 'ฟาร์มโคราช 1': 'สมศรี ป.', 'ฟาร์มโคราช 2': 'สมศรี ป.', 'โรงงาน A ลำพูน': 'ศิริพร ก.' };
+    var APV_EM = { 'สมศรี ป.': 'somsri@siamsolar.example', 'ศิริพร ก.': 'siriporn@nikom-north.example' };
+    var mEdA = JS('sc.memberEdits', {}), rmA = JS('sc.removed', []);
+    var apvOf = function (w) { var nm = APV[w.site] || 'ณัฐภัทร ส.', em = APV_EM[nm]; if (em) { var k = orgId + '|' + em, e = mEdA[k] || {}; if (e.status === 'suspended' || e.status === 'removed' || rmA.indexOf(k) >= 0) nm = 'ณัฐภัทร ส.'; } return nm; }; // a removed approver falls back to the admin (round 13)
+    var mine = function (w) { return w.st === 'review' && apvOf(w) === 'ณัฐภัทร ส.'; };
+    var stDefs = [['all', 'ทั้งหมด']].concat(v.canApprove ? [['mine', 'รอฉันอนุมัติ']] : []).concat([['review', 'รออนุมัติ'], ['open', 'เปิดอยู่'], ['new', 'รอมอบหมาย'], ['todo', 'มอบหมายแล้ว'], ['doing', 'กำลังดำเนินการ'], ['returned', 'ส่งกลับแก้ไข'], ['paused', 'พักงาน'], ['done', 'เสร็จสิ้น'], ['overdue', 'เลยกำหนด']]);
     var WSD = JS0('sc.woStat', {}); var inPeriod = function (w) { if (!period || w.st !== 'done') return true; var d = WSD[w.no] === 'done' ? SCR_TODAY : dayOf(w.due); return isNaN(d) || (d >= wrFrom && d <= wrTo); }; // closed inside the Reports range (prototype approvals close today)
-    var match = function (w, id) { return inPeriod(w) && (id === 'all' || (id === 'open' ? w.st !== 'done' : (id === 'overdue' ? isOverdue(w) : w.st === id))); };
+    var match = function (w, id) { return inPeriod(w) && (id === 'all' || (id === 'open' ? w.st !== 'done' : (id === 'overdue' ? isOverdue(w) : (id === 'mine' ? mine(w) : w.st === id)))); };
     var tab = fromReports && stDefs.some(function (d) { return d[0] === handTab; }) ? handTab : (stDefs.some(function (d) { return d[0] === self.state.tab; }) ? self.state.tab : 'all');
     var rows = base.filter(function (w) { return match(w, tab); });
     var cur = scoped.filter(function (w) { return w.no === selNo; })[0] || rows[0] || scoped[0];
@@ -401,9 +441,12 @@ class Component extends DCLogic {
     // checklist progress (what a row can't show): เช็กอิน → รูปก่อนล้าง → ล้าง/ซ่อม → รูปหลังล้าง; [steps done, step in progress]
     // same checklist as WorkOrderDetail (one per job type)
     var STEP_N = /ตรวจ/.test(c.kind) ? ['ถ่ายภาพความร้อน (thermal)', 'ระบุแผงที่พบปัญหา', 'วัดค่าแรงดัน / กระแสสตริง', 'สรุปผลและข้อเสนอแนะ'] : /ซ่อม/.test(c.kind) ? ['ตัดไฟ / ล็อกเอาต์ก่อนเริ่ม', 'เปลี่ยนชิ้นส่วน', 'ทดสอบหลังซ่อม', 'ถ่ายรูปหลังซ่อม'] : ['ถ่ายรูปก่อนล้าง', 'ล้างด้วยน้ำ DI', 'ถ่ายรูปหลังล้าง', 'ตรวจรอยร้าว / ขั้วต่อ'];
-    var prog = { new: [0, false], todo: [0, false], doing: [2, true], paused: [2, false], returned: [3, true], review: [4, false], done: [4, false] }[c.st] || [0, false];
-    var PH = { 'WO-1043': 'ส่งรูปก่อน/หลังแล้ว 24 รูป', 'WO-1042': 'ถ่ายแล้ว 6 รูป · รอสัญญาณเพื่อส่ง' };
-    var photoText = PH[c.no] || (c.st === 'review' || c.st === 'done' ? 'ส่งรูปก่อน/หลังครบแล้ว' : c.st === 'doing' || c.st === 'returned' ? 'กำลังถ่ายรูป · ยังไม่ส่ง' : 'ยังไม่มีรูป · ช่างถ่ายในแอปเมื่อเริ่มงาน');
+    // checklist + photos come from the shared progress model (same numbers as WorkOrderDetail and the technician app)
+    var createdC = JS('sc.createdWo', []).filter(function (x) { return x && x.no === c.no; })[0];
+    var wp = wpProgress(c.no, c.st, c.kind, wpZones(c.no, createdC), JS('sc.techProgress', {}));
+    var working = c.st === 'doing' || c.st === 'paused' || c.st === 'returned', sent = c.st === 'review' || c.st === 'done';
+    var nowStep = working ? wp.items.indexOf(false) : -1;
+    var photoText = !c.no ? '' : sent ? 'ส่งรูปก่อน/หลังแล้ว ' + wp.nPhotos + ' รูป' : wp.nPhotos ? 'ถ่ายแล้ว ' + wp.nPhotos + ' รูป · ยังขาด ' + wp.missing.length + ' ชุด (ก่อน/หลังของแต่ละโซน)' : (c.st === 'new' || c.st === 'todo' ? 'ยังไม่มีรูป · ช่างถ่ายในแอปเมื่อเริ่มงาน' : 'ยังไม่มีรูป');
     var fCount = (site !== 'all' ? 1 : 0) + (tech !== 'all' ? 1 : 0), fOpen = !!self.state.fOpen;
     return {
       fOpen: fOpen ? 'true' : 'false', fLabel: fCount ? 'ตัวกรอง (' + fCount + ')' : 'ตัวกรอง', fBtnBorder: fCount ? '#0F6B5C' : '#D5D9E0',
@@ -411,18 +454,19 @@ class Component extends DCLogic {
       clearFx: function () { setSiteVal('all'); self.setState({ tech: 'all' }); },
       listBusy: busy, listState: busy ? listState : 'loading', orgEmpty: orgEmpty, hasData: !orgEmpty, showMain: !busy && !orgEmpty,
       retry: function () { self.setState({ retriedFor: propState }); },
-      emptyOrgTitle: 'ยังไม่มีใบงานในองค์กรนี้',
-      emptyOrgText: SITES.length ? 'สร้างใบงานแรก หรือตั้งรอบล้างที่หน้าไซต์เพื่อให้ระบบสร้างให้อัตโนมัติ' : 'เพิ่มไซต์ก่อน แล้วจึงสร้างใบงานให้ช่าง',
+      emptyOrgTitle: SITES.length ? 'ยังไม่มีใบงานในองค์กรนี้' : 'ยังไม่มีไซต์ในองค์กรนี้',
+      emptyCreate: v.canCreate && SITES.length > 0, emptyAddSite: !SITES.length && (orgId === 'a' || orgId === 'd'), // only an owner / admin adds sites
+      emptyOrgText: SITES.length ? 'สร้างใบงานแรก หรือตั้งรอบล้างที่หน้าไซต์เพื่อให้ระบบสร้างให้อัตโนมัติ' : 'เพิ่มไซต์ก่อน แล้วใบงานของไซต์จะแสดงที่นี่',
       viewer: v,
       headSub: 'ใบงานล้าง ตรวจ และซ่อมบำรุง · ' + (ROLE_TH[v.name.split(' · ')[0]] || v.name) + ' · ' + v.scope,
       multiSite: SITES.length > 1,
-      progText: 'ทำแล้ว ' + prog[0] + ' จาก 4',
-      steps: STEP_N.map(function (lb, i) { var ok = i < prog[0], now = i === prog[0] && prog[1]; return { label: lb, icon: ok ? 'checkCircle' : now ? 'sync' : 'circle', tone: ok ? 'brand' : now ? 'warn' : 'muted', color: ok || now ? '#111827' : '#4B5563', sr: ok ? '(ทำครบแล้ว)' : now ? '(กำลังทำ)' : '(ยังไม่ถึง)' }; }),
+      progText: 'ทำแล้ว ' + wp.done + ' จาก 4',
+      steps: STEP_N.map(function (lb, i) { var ok = wp.items[i], now = i === nowStep; return { label: lb, icon: ok ? 'checkCircle' : now ? 'sync' : 'circle', tone: ok ? 'brand' : now ? 'warn' : 'muted', color: ok || now ? '#111827' : '#4B5563', sr: ok ? '(ทำครบแล้ว)' : now ? '(กำลังทำ)' : '(ยังไม่ถึง)' }; }),
       photoText: photoText,
       hasCtx: !!onceSite || !!period,
       ctxChips: [].concat(onceSite ? [{ label: 'ไซต์: ' + DN(onceSite), aria: 'ล้างตัวกรองไซต์ ' + DN(onceSite), clear: function () { self.setState({ onceSite: '' }); } }] : []).concat(period ? [{ label: 'ประวัติงานปิด · ' + (wr.label || ''), aria: 'ล้างช่วงเวลา ' + (wr.label || ''), clear: function () { self.setState({ wrange: null }); } }] : []),
       canOpen: !c.hist,
-      headActs: v.canCreate ? [{ label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=WorkOrders' }] : [],
+      headActs: v.canCreate && SITES.length ? [{ label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=WorkOrders' }] : [],
       last: (c.log && c.log[0]) || { who: 'ระบบ', what: 'ยังไม่มีความเคลื่อนไหว', when: '' },
       viewers: viewers.map(function (x, i) { var on = i === self.state.viewer; return { name: x.name, on: on,
         style: 'min-height:44px;padding:0 14px;border:0;font-size:13px;font-weight:600;background:' + (on ? '#0F6B5C;color:#FFFFFF' : '#FFFFFF;color:#374151'),
@@ -438,7 +482,7 @@ class Component extends DCLogic {
       clearAll: function () { setSiteVal('all'); self.setState({ tab: 'all', q: '', tech: 'all', wrange: null, onceSite: '' }); },
       filterClass: picked ? 'wo-hide-m' : '', listClass: picked ? 'wo-hide-m' : '', asideClass: picked ? 'wo-aside' : 'wo-aside wo-hide-m',
       unpick: function () { self.setState({ picked: false }); },
-      rows: rows.map(function (w) { var d = deco(w); d.isNew = !!w.isNew;
+      rows: rows.map(function (w) { var d = deco(w); d.isNew = !!w.isNew; d.doneAt = w.doneAt || ''; d.linkable = !w.hist; d.dClass = w.hist ? '' : 'wo-rd'; d.woKeys = 'sc.wo=' + w.no + '|sc.woFrom=WorkOrders';
         d.on = w.no === c.no; d.pick = function () { self.setState({ sel: w.no, pickedAt: Date.now(), picked: true }); }; return d; }),
       empty: rows.length === 0,
       lastWhen: (c.log && c.log[0] && c.log[0].when) ? '· ' + c.log[0].when : '',
@@ -447,7 +491,7 @@ class Component extends DCLogic {
       showApprove: c.st === 'review' && v.canApprove,
       openLabel: c.st === 'review' && v.canApprove ? 'ตรวจงานและอนุมัติ' : 'เปิดใบงานเต็ม',
       openIcon: c.st === 'review' && v.canApprove ? 'checkCircle' : 'arrowRight',
-      openVariant: c.st === 'review' && v.canApprove ? 'primary' : 'secondary',
+      openVariant: 'secondary',
       canAssign: canAssign, assignTo: assignPick, assignBad: !assignPick,
       assignOpts: [{ v: '', t: 'เลือกช่าง' }].concat(techOk.map(function (n) { return { v: n, t: n }; })),
       setAssign: function (e) { self.setState({ assignTo: e.target.value }); },

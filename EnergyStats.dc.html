@@ -15,6 +15,9 @@
 .rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}
 }
 body{margin:0}
+.es-scroll{scrollbar-width:none}
+.es-scroll::-webkit-scrollbar{display:none}
+@media (max-width: 767px){.es-scroll{-webkit-mask-image:linear-gradient(to right,#000 88%,transparent);mask-image:linear-gradient(to right,#000 88%,transparent)}}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; display: flex; flex-direction: column; gap: 16px; min-width: 0">
@@ -44,7 +47,7 @@ body{margin:0}
             <sc-for list="{{rp.legend}}" as="l" hint-placeholder-count="2"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="{{l.sw}}"></span>{{l.label}}</span></sc-for>
           </div>
         </div>
-        <div style="overflow-x: auto; margin-top: 16px">
+        <div class="es-scroll" style="overflow-x: auto; margin-top: 16px">
           <div style="{{rp.rowStyle}}">
             <sc-for list="{{rp.bars}}" as="b" hint-placeholder-count="12">
               <button type="button" onClick="{{b.pick}}" aria-pressed="{{b.on}}" aria-label="{{b.aria}}" style="{{b.col}}">
@@ -121,10 +124,10 @@ body{margin:0}
             </sc-for>
           </ul>
         </div>
-        <div style="overflow-x: auto">
+        <div class="es-scroll" style="overflow-x: auto">
           <div role="list" aria-label="{{flowTitle}}" style="{{chartRowStyle}}">
             <sc-for list="{{bars}}" as="b" hint-placeholder-count="12">
-              <div role="listitem" aria-label="{{b.aria}}" title="{{b.aria}}" style="flex: 1 0 36px; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 36px">
+              <div role="listitem" aria-label="{{b.aria}}" title="{{b.aria}}" style="{{b.colStyle}}">
                 <span aria-hidden="true" style="font-size: 12px; color: #374151; font-variant-numeric: tabular-nums">{{b.total}}</span>
                 <div aria-hidden="true" style="height: 160px; display: flex; align-items: flex-end; gap: 3px">
                   <div style="width: 18px; display: flex; flex-direction: column; justify-content: flex-end">
@@ -133,7 +136,7 @@ body{margin:0}
                   </div>
                   <span style="{{b.impStyle}}"></span>
                 </div>
-                <span aria-hidden="true" style="font-size: 12px; color: #4B5563; white-space: nowrap">{{b.m}}</span>
+                <span aria-hidden="true" style="font-size: 12px; color: #4B5563; white-space: nowrap">{{b.mShort}}</span>
               </div>
             </sc-for>
           </div>
@@ -146,7 +149,7 @@ body{margin:0}
               <thead><tr style="color: #4B5563; font-size: 12px; text-align: right"><th scope="col" style="text-align: left; padding: 8px">เดือน</th><th scope="col" style="padding: 8px">ผลิต (kWh)</th><th scope="col" style="padding: 8px">ใช้เอง</th><th scope="col" style="padding: 8px">ขายคืน</th><th scope="col" style="padding: 8px">ซื้อจากการไฟฟ้า</th><th scope="col" style="padding: 8px">PR</th></tr></thead>
               <tbody>
                 <sc-for list="{{bars}}" as="b" hint-placeholder-count="12">
-                  <tr style="border-top: 1px solid #EEF0F3; text-align: right; font-variant-numeric: tabular-nums"><th scope="row" style="text-align: left; padding: 8px; font-weight: 500">{{b.m}}</th><td style="padding: 8px">{{b.eTxt}}</td><td style="padding: 8px">{{b.selfTxt}}</td><td style="padding: 8px">{{b.expTxt}}</td><td style="padding: 8px">{{b.impTxt}}</td><td style="padding: 8px">{{b.prTxt}}</td></tr>
+                  <tr style="border-top: 1px solid #EEF0F3; text-align: right; font-variant-numeric: tabular-nums"><th scope="row" style="text-align: left; padding: 8px; font-weight: 500">{{b.mFull}}</th><td style="padding: 8px">{{b.eTxt}}</td><td style="padding: 8px">{{b.selfTxt}}</td><td style="padding: 8px">{{b.expTxt}}</td><td style="padding: 8px">{{b.impTxt}}</td><td style="padding: 8px">{{b.prTxt}}</td></tr>
                 </sc-for>
               </tbody>
             </table>
@@ -201,6 +204,9 @@ body{margin:0}
           <li style="{{r.style}}"><b style="font-weight: 700">{{r.site}}</b> · {{r.text}}</li>
         </sc-for>
       </ul></sc-if>
+      <sc-if value="{{hasDustNote}}" hint-placeholder-val="{{ false }}">
+        <p style="margin: 0; display: flex; align-items: flex-start; gap: 6px; font-size: 13px; color: #374151; line-height: 1.6"><dc-import name="Icon" icon="info" size="16" tone="muted" hint-size="16px,16px"></dc-import><span>{{dustNote}}</span></p>
+      </sc-if>
     </section>
   </sc-if>
 
@@ -256,6 +262,16 @@ var ES_RATE_INFO = [
   ['tree', 'CO2 ที่ต้นไม้ 1 ต้นดูดซับต่อปี', 'kgCO2/ต้น/ปี', 1, 'ใช้แสดงเป็นจำนวนต้นไม้เทียบเท่าเท่านั้น']
 ];
 var ES_CLEAN_RATE = { farm: 10, roof: 20, carport: 20 }; // บาท/แผง ต่อครั้ง
+// last FusionSolar sync (every 5 min; today 10:40) — the same time Analytics › แหล่งข้อมูล shows (DATA.md round 15)
+var ES_SYNC = '15 พ.ย. 2569 10:35';
+// dust loss TODAY (฿/day) = kWp × 4.2 kWh/kWp/day (Nov yield) × soiling now × tariff — identical to Insights inLossKwh × IN_SITES tariff,
+// so EnergyValue "วันนี้" equals the total in Analytics › พยากรณ์ › ฝุ่นสะสมและวันที่ควรล้าง
+var ES_TARIFF_NOW = { k1: 2.20, k2: 2.20 };
+function esDustToday(ids) { var b = 0; ids.forEach(function (sid) { var s = ES_DATA[sid], c = ES_SOIL_NOW[sid]; if (!s || c == null) return; b += s.kwp * 4.2 * c / 100 * (ES_TARIFF_NOW[sid] || 4.18); }); return b; }
+// PR and "ถ้าแผงสะอาด" shown with one more decimal when they round to the same number (so a dust loss never sits next to two equal PRs)
+function esPr2(a, b) { var d = esNum(a * 100, 1) === esNum(b * 100, 1) ? 2 : 1; return [esNum(a * 100, d), esNum(b * 100, d) + '%']; }
+// chart label: a part-month bucket drops its year ("1–15 พ.ย. 69" → "1–15 พ.ย.") so neighbours do not collide
+function esShortLab(l) { return String(l).replace(/^(\d+–\d+ \S+) \d\d$/, '$1'); }
 
 function esNum(n, dp) { return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: dp || 0, maximumFractionDigits: dp || 0 }); }
 function esEnergy(kwh) { return Math.abs(kwh) >= 10000 ? { v: esNum(kwh / 1000, kwh >= 1000000 ? 0 : 1), u: 'MWh' } : { v: esNum(kwh), u: 'kWh' }; }
@@ -378,7 +394,7 @@ function esSlots(a, b) {
 function esMonth(sid, sl, f) { var src = ES_DATA[sid].months[sl.i], k = sl.scale * f; return { i: sl.i, m: src.m, d: src.d, h: src.h * f * (sl.hs || 1), pr: src.pr, loss: src.loss, e: src.e * k, self: src.self * k, exp: src.exp * k, load: src.load * k, imp: src.imp * k, cleaned: false }; }
 function esEnergyBuckets(ids, rng) {
   return scrBuckets(rng.from, rng.to, rng.group).map(function (bk) {
-    var o = { m: bk.label, s: bk.s, e: 0, self: 0, exp: 0, imp: 0, kwpH: 0 };
+    var o = { m: bk.label, s: bk.s, part: bk.e >= SCR_TODAY, e: 0, self: 0, exp: 0, imp: 0, kwpH: 0 };
     esSlots(bk.s, bk.e).forEach(function (x) { ids.forEach(function (sid) { var mm = esMonth(sid, x.sl, x.f); o.e += mm.e; o.self += mm.self; o.exp += mm.exp; o.imp += mm.imp; o.kwpH += ES_DATA[sid].kwp * mm.h; }); });
     return o;
   });
@@ -455,7 +471,7 @@ function esDeviceEvents() {
       out.push({ sid: sid, org: ES_DATA[sid].org, d: d, kind: off ? 'offline' : 'alarm', dev: esInvName(sid, (n * 5 + si) % ES_INV[sid]), txt: off ? 'สื่อสารขาด' : ES_ALARM_TXT[n % 4], hours: off ? 1 + (n % 6) : 2 + (n % 4), open: false });
     }
   });
-  out.push({ sid: 'k1', org: 'a', d: SCR_TODAY - 1, kind: 'alarm', dev: 'INV-C03', txt: 'กระแสสตริง 4 ต่ำ (จุดร้อน 2 แผง · WO-1042)', hours: 19.5, open: true, since: '14 พ.ย. 2569 15:10' });
+  out.push({ sid: 'k1', org: 'a', d: SCR_TODAY - 1, kind: 'alarm', dev: 'INV-C03', txt: 'MPPT 4 ต่ำ (จุดร้อน 2 แผง · WO-1042)', hours: 19.5, open: true, since: '14 พ.ย. 2569 15:10' });
   out.push({ sid: 'bn', org: 'b', d: SCR_TODAY - 1, kind: 'offline', dev: 'INV-04', txt: 'สื่อสารขาด', hours: 12.5, open: true, since: '14 พ.ย. 2569 22:10' });
   ES_DEV_CACHE = out; return out;
 }
@@ -490,7 +506,8 @@ function esReport(type, org, ids, rng, R) {
     var ok = ev.filter(function (e) { return !e.late; }).length, late = ev.length - ok;
     if (type === 'clean') {
       var panels = 0, appr = 0; ev.forEach(function (e) { panels += e.panels; appr += e.appr; });
-      out.kpis = [{ id: 'done', label: 'ใบงานที่ปิดแล้ว', icon: 'workorder', num: ev.length, value: esNum(ev.length), unit: 'ใบ', link: true },
+      var nRep = ev.filter(function (e) { return e.kind !== 'clean'; }).length; // a closed repair job is still a closed work order (same count as WorkOrders) — say how many were cleanings
+      out.kpis = [{ id: 'done', label: 'ใบงานที่ปิดแล้ว', icon: 'workorder', num: ev.length, value: esNum(ev.length), unit: 'ใบ', link: true, note: nRep ? 'ล้าง ' + (ev.length - nRep) + ' · ซ่อม/ตรวจ ' + nRep : '' },
         { id: 'ontime', label: 'เสร็จตรงเวลา', icon: 'checkCircle', num: pct(ok, ev.length), value: ev.length ? pct(ok, ev.length) + '%' : '—', unit: '' },
         { id: 'panels', label: 'แผงที่ล้างแล้ว', icon: 'broom', num: panels, value: esNum(panels), unit: 'แผง' },
         { id: 'appr', label: 'เวลาอนุมัติเฉลี่ย', icon: 'clock', num: ev.length ? appr / ev.length : null, value: ev.length ? esNum(appr / ev.length, 1) : '—', unit: ev.length ? 'วัน' : '', lowerBetter: true }];
@@ -545,8 +562,8 @@ function esReport(type, org, ids, rng, R) {
     var t = esCalc(org, ids, 12, R, rng), E = esEnergy(t.e), V = esBaht(t.value), LB = esBaht(t.lossVal);
     if (type === 'energy') {
       out.kpis = [{ id: 'e', label: 'ผลิตไฟ', icon: 'sun', num: t.e, value: E.v, unit: E.u },
-        { id: 'v', label: 'ผลตอบแทนรวม', icon: 'coin', num: t.value, value: V.v, unit: V.u, note: 'ประหยัดค่าไฟ + ขายไฟ' },
-        { id: 'pr', label: 'PR (ประสิทธิภาพระบบ)', icon: 'gauge', num: t.pr * 100, value: esNum(t.pr * 100, 1), unit: '%', note: 'ถ้าแผงสะอาด ' + esPct(t.prClean) },
+        { id: 'v', label: 'ผลตอบแทนรวม', icon: 'coin', num: t.value, value: V.v, unit: V.u, note: 'เฉลี่ย ' + esNum(t.e ? t.value / t.e : 0, 2) + ' บาท/kWh' },
+        { id: 'pr', label: 'PR (ประสิทธิภาพระบบ)', icon: 'gauge', num: t.pr * 100, value: esPr2(t.pr, t.prClean)[0], unit: '%', note: 'ถ้าแผงสะอาด ' + esPr2(t.pr, t.prClean)[1] },
         { id: 'loss', label: 'เสียไปกับฝุ่น', icon: 'alert', num: t.lossVal, value: LB.v, unit: LB.u, note: esEnergy(t.lossKwh).v + ' ' + esEnergy(t.lossKwh).u, lowerBetter: true }];
       out.series = [{ label: 'ไฟที่ผลิต (MWh)', color: '#0F6B5C' }];
       out.bars = t.monthly.map(function (m) { return { label: m.m, vals: [m.e / 1000], fmt: 1 }; });
@@ -634,15 +651,17 @@ class Component extends DCLogic {
     var colW = rr.group === 'day' ? 26 : 44, mx = 0;
     cur.bars.forEach(function (b) { var tt = 0; b.vals.forEach(function (v) { tt += v; }); mx = Math.max(mx, tt); }); mx = mx || 1;
     var fmtV = function (v, b) { return b.fmt ? esNum(v, v >= 100 ? 0 : 1) : esNum(v); };
+    var bksR = scrBuckets(rr.from, rr.to, rr.group);
     var bars = cur.bars.map(function (b, i) {
       var tt = 0; b.vals.forEach(function (v) { tt += v; }); var on = i === sel;
       var parts = cur.series.map(function (sr, j) { return sr.label + ' ' + fmtV(b.vals[j] || 0, b); }).join(' · ');
-      return { label: b.label, total: fmtV(tt, b), on: on, aria: b.label + ' · ' + (cur.series.length > 1 ? 'รวม ' + fmtV(tt, b) + ' ' + cur.unit + ' · ' : '') + parts,
+      var bk = bksR[i], part = !!bk && bk.e >= SCR_TODAY && (cur.unit === 'MWh' || cur.unit === 'tCO2');
+      return { label: esShortLab(b.label), total: fmtV(tt, b), on: on, aria: b.label + (part ? ' (ถึงวันนี้ 10:40)' : '') + ' · ' + (cur.series.length > 1 ? 'รวม ' + fmtV(tt, b) + ' ' + cur.unit + ' · ' : '') + parts,
         pick: function () { self.setState({ sel: i, selKey: key }); },
         segs: b.vals.map(function (v, j) { return { st: 'display: block; width: 100%; max-width: 44px; flex: none; height: ' + Math.round(v / mx * 170) + 'px; background: ' + cur.series[j].color + (j === b.vals.length - 1 ? '; border-radius: 4px 4px 0 0' : '') }; }).reverse(),
         col: 'flex: 1 0 ' + colW + 'px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; height: 230px; border: 0; padding: 0 2px; border-radius: 8px; font-family: inherit; cursor: pointer; background: ' + (on ? '#F0F7F5' : 'transparent'),
         labStyle: 'margin-top: 6px; font-size: 12px; white-space: nowrap; ' + (on ? 'color: #0A4F44; font-weight: 700' : 'color: #4B5563'),
-        detail: b.label + ' · ' + (cur.series.length > 1 ? 'รวม ' + fmtV(tt, b) + ' ' + cur.unit + ' · ' : '') + parts + (cur.series.length > 1 ? '' : ' ' + cur.unit) };
+        detail: b.label + (part ? ' (ถึงวันนี้ 10:40 ยังไม่ครบช่วง)' : '') + ' · ' + (cur.series.length > 1 ? 'รวม ' + fmtV(tt, b) + ' ' + cur.unit + ' · ' : '') + parts + (cur.series.length > 1 ? '' : ' ' + cur.unit) };
     });
     var SN = {}; Object.keys(ES_SITES).forEach(function (k) { SN[k] = ES_SITES[k].name; });
     var cell = function (c, j, cols, isFoot) {
@@ -684,7 +703,7 @@ class Component extends DCLogic {
       emptyText: all.length ? 'เลือกไซต์อื่น หรือเชื่อมต่ออินเวอร์เตอร์ ของไซต์นี้ก่อน' : 'เพิ่มไซต์และเชื่อมต่ออินเวอร์เตอร์ เพื่อเริ่มคำนวณพลังงาน ผลตอบแทน และคาร์บอน',
       showReport: false, rp: { kpis: [], hero: {}, heroStats: [], showChart: false, bars: [], legend: [], cols: [], rows: [], foot: [] }, hero: {}, heroStats: [],
       showLine: false, lineText: '', showSummary: false, showSite: false, showFull: false, showCleaning: false, showAssumptions: view === 'assumptions',
-      dataNote: 'ข้อมูลจาก FusionSolar · ซิงก์ล่าสุด 15 พ.ย. 2569 10:15' + (R.custom ? ' · ใช้อัตราที่องค์กรปรับเอง' : ''),
+      dataNote: 'ข้อมูลจาก FusionSolar · ซิงก์ล่าสุด ' + ES_SYNC + (R.custom ? ' · ใช้อัตราที่องค์กรปรับเอง' : ''), hasDustNote: false, dustNote: '',
       summaryCards: [], siteFacts: [], groups: [], headline: [], legend: [], bars: [], envCards: [], cleanCards: [], recs: [], rateRows: [], formulas: [],
       chartRowStyle: '', flowNote: '', carbonNote: '', flowTitle: 'การไหลของพลังงานรายเดือน (MWh)'
     };
@@ -708,7 +727,7 @@ class Component extends DCLogic {
       // Main: one inline line, month-to-date (1–15 พ.ย. 2569, today counted to 10:40) from the same engine
       var mr = scrResolve({ preset: 'custom', from: '2026-11-01', to: scrIso(SCR_TODAY), group: 'day' });
       var mt = esCalc(org, ids, per, R, mr), ME = esEnergy(mt.e), MV = esBaht(mt.value);
-      return Object.assign(base, { showLine: true, lineText: '1–' + new Date(SCR_TODAY * 864e5).getUTCDate() + ' พ.ย. 69 · ' + ME.v + ' ' + ME.u + ' · ≈ ' + (MV.u === 'บาท' ? '฿' + MV.v : MV.v + ' ' + MV.u) });
+      return Object.assign(base, { showLine: true, lineText: '1–' + new Date(SCR_TODAY * 864e5).getUTCDate() + ' พ.ย. 69 · ' + ME.v + ' ' + ME.u + ' · ≈ ' + MV.v + ' ' + MV.u }); // one money format: "172,554 บาท" / "2.23 ล้านบาท"
     }
     if (view === 'report') return Object.assign(base, { showReport: true, rp: this.reportVals(org, ids, rng || scrResolve({}), R) });
     var t = esCalc(org, ids, per, R, rng);
@@ -717,9 +736,9 @@ class Component extends DCLogic {
       base.showSummary = true;
       base.summaryCards = [
         { label: 'ผลิตไฟ · ' + periodLabel, value: E.v, unit: E.u, note: 'PR ' + esPct(t.pr) },
-        { label: 'ผลตอบแทนรวม', value: V.v, unit: V.u, note: 'ประหยัดค่าไฟ + ขายไฟ' },
+        { label: 'ผลตอบแทนรวม', value: V.v, unit: V.u, note: 'เฉลี่ย ' + esNum(t.e ? t.value / t.e : 0, 2) + ' บาท/kWh' },
         { label: 'CO2 ที่ลดได้', value: esNum(t.co2, t.co2 < 100 ? 1 : 0), unit: 'tCO2', note: 'มูลค่าเครดิต ~' + esBaht(t.credit).v + ' ' + esBaht(t.credit).u },
-        { label: 'PR (ประสิทธิภาพระบบ)', value: esNum(t.pr * 100, 1), unit: '%', note: 'ถ้าแผงสะอาด ' + esPct(t.prClean) }
+        { label: 'PR (ประสิทธิภาพระบบ)', value: esPr2(t.pr, t.prClean)[0], unit: '%', note: 'ถ้าแผงสะอาด ' + esPr2(t.pr, t.prClean)[1] }
       ];
     }
     if (view === 'site') {
@@ -727,7 +746,7 @@ class Component extends DCLogic {
       var st = t.sites[0], LV = esBaht(t.lossVal);
       base.siteFacts = [
         { label: 'ไฟที่ผลิต', value: E.v, unit: E.u, note: 'ผลผลิตจำเพาะ ' + esNum(t.sy) + ' kWh/kWp' },
-        { label: 'PR จริง', value: esNum(t.pr * 100, 1), unit: '%', note: 'ถ้าแผงสะอาด ' + esPct(t.prClean) },
+        { label: 'PR จริง', value: esPr2(t.pr, t.prClean)[0], unit: '%', note: 'ถ้าแผงสะอาด ' + esPr2(t.pr, t.prClean)[1] },
         { label: t.hasExport ? 'รายได้ขายไฟ (PPA)' : 'ผลตอบแทน', value: V.v, unit: V.u, note: t.hasExport ? 'อัตรา ' + esNum(R.fit, 4) + ' บาท/kWh' : 'ใช้เอง ' + esPct(t.selfRate) },
         { label: 'CO2 ที่ลดได้', value: esNum(t.co2, 1), unit: 'tCO2', note: 'เครดิต ~' + esBaht(t.credit).v + ' ' + esBaht(t.credit).u },
         { label: 'เสียไปกับฝุ่น', value: LV.v, unit: LV.u, note: esEnergy(t.lossKwh).v + ' ' + esEnergy(t.lossKwh).u },
@@ -742,7 +761,7 @@ class Component extends DCLogic {
       energyCards.push({ label: t.hasSelf && !t.hasExport ? 'ขายคืนการไฟฟ้า' : 'ส่งเข้าระบบ (ขายไฟ)', value: EX.v, unit: EX.u, note: t.hasExport ? 'รวมโซลาร์ฟาร์มที่ขายตามสัญญา PPA' : 'ไฟส่วนเกินที่ไม่ได้ใช้' });
       if (t.hasSelf) energyCards.push({ label: 'ซื้อจากการไฟฟ้า', value: IM.v, unit: IM.u, note: 'พึ่งพาตัวเอง ' + esPct(t.selfSuff) });
       var perfCards = [
-        { label: 'PR (ประสิทธิภาพระบบ)', value: esNum(t.pr * 100, 1), unit: '%', note: 'ถ้าแผงสะอาด ' + esPct(t.prClean) },
+        { label: 'PR (ประสิทธิภาพระบบ)', value: esPr2(t.pr, t.prClean)[0], unit: '%', note: 'ถ้าแผงสะอาด ' + esPr2(t.pr, t.prClean)[1] },
         { label: 'ผลผลิตจำเพาะ', value: esNum(t.sy), unit: 'kWh/kWp', note: 'กำลังติดตั้ง ' + esNum(t.kwp) + ' kWp' },
         { label: 'ชั่วโมงเทียบเท่า', value: esNum(t.eqh, 2), unit: 'ชม./วัน', note: 'เฉลี่ย ' + esNum(t.days) + ' วัน' }
       ];
@@ -752,7 +771,7 @@ class Component extends DCLogic {
       valCards.push({ label: 'ผลตอบแทนรวม', value: V.v, unit: V.u, note: 'เฉลี่ย ' + esNum(t.e ? t.value / t.e : 0, 2) + ' บาท/kWh' });
       // one headline row (energy · value · PR · dust loss); "ตัวเลขทั้งหมด" lists only what the headline does not show; CO2 lives in the environment block
       var LH = esBaht(t.lossVal);
-      var head = [energyCards[0], valCards[valCards.length - 1], perfCards[0], { label: 'เสียไปกับฝุ่น', value: LH.v, unit: LH.u, note: esEnergy(t.lossKwh).v + ' ' + esEnergy(t.lossKwh).u + ' ที่ผลิตไม่ได้' }];
+      var head = [energyCards[0], valCards[valCards.length - 1], perfCards[0], { label: 'เสียไปกับฝุ่น', value: LH.v, unit: LH.u, note: esEnergy(t.lossKwh).v + ' ' + esEnergy(t.lossKwh).u + ' · เฉลี่ย ≈ ' + esNum(t.days ? t.lossVal / t.days : 0) + '\u00a0บาท/\u2060วัน' }];
       if (rng && rng.compare) {
         var tp = esCalc(org, ids, per, R, { from: rng.prevFrom, to: rng.prevTo, group: rng.group, len: rng.len });
         var cur4 = [t.e, t.value, t.pr, t.lossVal], prev4 = [tp.e, tp.value, tp.pr, tp.lossVal], lower = [false, false, false, true];
@@ -772,16 +791,22 @@ class Component extends DCLogic {
         .concat([{ label: t.hasExport && !t.hasSelf ? 'ขายไฟ (PPA)' : 'ขายคืน / ส่งเข้าระบบ', sw: 'display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: #4FA08F' }])
         .concat(t.hasSelf ? [{ label: 'ซื้อจากการไฟฟ้า (แท่งบาง)', sw: 'display: inline-block; width: 6px; height: 12px; border-radius: 2px; background: #9CA3AF' }] : []);
       base.flowTitle = 'การไหลของพลังงาน' + (rng ? rng.groupLabel : 'รายเดือน') + ' (MWh)';
-      base.chartRowStyle = 'display: flex; gap: 6px; align-items: flex-end; min-width: ' + (t.monthly.length * 42) + 'px';
+      base.chartRowStyle = 'display: flex; gap: 6px; align-items: flex-end; padding: 0 10px; min-width: ' + (t.monthly.length * 50 + 20) + 'px'; // side padding: edge labels are not clipped
+      var anyPart = false;
       base.bars = t.monthly.map(function (m) {
-        var pr = m.kwpH ? m.e / m.kwpH : 0;
-        return { m: m.m, total: esNum(m.e / 1000, m.e >= 100000 ? 0 : 1),
-          aria: m.m + ' · ผลิต ' + esNum(m.e) + ' kWh' + (t.hasSelf ? ' · ใช้เอง ' + esNum(m.self) + ' kWh' : '') + ' · ขาย ' + esNum(m.exp) + ' kWh' + (t.hasSelf ? ' · ซื้อจากการไฟฟ้า ' + esNum(m.imp) + ' kWh' : '') + ' · PR ' + esPct(pr),
-          selfStyle: seg(m.self, '#0F6B5C') + '; border-radius: 0', expStyle: seg(m.exp, '#4FA08F') + '; border-radius: 4px 4px 0 0',
+        var pr = m.kwpH ? m.e / m.kwpH : 0, part = rng ? !!m.part : m.m === 'พ.ย. 69', op = part ? '; opacity: 0.5' : ''; if (part) anyPart = true;
+        var en = function (v) { var x = esEnergy(v); return x.v + ' ' + x.u; }; // chart text in the chart's unit (MWh), not raw kWh
+        return { m: m.m, mShort: esShortLab(m.m), mFull: m.m + (part ? ' (ถึง 10:40)' : ''), total: esNum(m.e / 1000, m.e >= 100000 ? 0 : 1),
+          colStyle: 'flex: 1 0 44px; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 44px',
+          aria: m.m + (part ? ' (ถึงวันนี้ 10:40 ยังไม่ครบช่วง)' : '') + ' · ผลิต ' + en(m.e) + (t.hasSelf ? ' · ใช้เอง ' + en(m.self) : '') + ' · ขาย ' + en(m.exp) + (t.hasSelf ? ' · ซื้อจากการไฟฟ้า ' + en(m.imp) : '') + ' · PR ' + esPct(pr),
+          selfStyle: seg(m.self, '#0F6B5C') + '; border-radius: 0' + op, expStyle: seg(m.exp, '#4FA08F') + '; border-radius: 4px 4px 0 0' + op,
           impStyle: t.hasSelf ? 'display: block; width: 6px; border-radius: 2px 2px 0 0; background: #9CA3AF; height: ' + hgt(m.imp) + 'px' : 'display: none',
           eTxt: esNum(m.e), selfTxt: esNum(m.self), expTxt: esNum(m.exp), impTxt: esNum(m.imp), prTxt: esPct(pr) };
       });
-      base.flowNote = t.hasExport && !t.hasSelf ? 'โซลาร์ฟาร์มขายไฟทั้งหมดเข้าระบบตามสัญญา PPA จึงไม่มีการใช้เองหรือซื้อไฟ' : 'ตัวเลขบนแท่ง = ไฟที่ผลิตในแต่ละช่วง (MWh) · แท่งบางสีส้ม = ไฟที่ไซต์ซื้อจากการไฟฟ้า';
+      base.flowNote = (t.hasExport && !t.hasSelf ? 'โซลาร์ฟาร์มขายไฟทั้งหมดเข้าระบบตามสัญญา PPA จึงไม่มีการใช้เองหรือซื้อไฟ' : 'ตัวเลขบนแท่ง = ไฟที่ผลิตในแต่ละช่วง (MWh) · แท่งบางสีเทา = ไฟที่ไซต์ซื้อจากการไฟฟ้า') + (anyPart ? ' · แท่งสีจาง = รวมถึงวันนี้ 10:40 เท่านั้น ยังไม่ครบช่วง' : '');
+      var dToday = esDustToday(ids);
+      base.hasDustNote = dToday > 0;
+      base.dustNote = 'วันนี้ฝุ่นทำให้เสีย ≈ ' + esNum(dToday) + ' บาท/วัน (จากฝุ่นตอนนี้ของแต่ละไซต์ · ตัวเลขเดียวกับหน้าวิเคราะห์ › พยากรณ์) · เฉลี่ยในช่วงที่เลือก ≈ ' + esNum(t.days ? t.lossVal / t.days : 0) + ' บาท/วัน ต่างกันเพราะฝุ่นขึ้นลงตามรอบล้างและฝน';
       var C = esBaht(t.credit);
       base.envCards = [
         { label: 'CO2 ที่ลดได้', value: esNum(t.co2, t.co2 < 100 ? 1 : 0), unit: 'tCO2', note: '× ' + esNum(R.ef, 4) + ' tCO2/MWh' },

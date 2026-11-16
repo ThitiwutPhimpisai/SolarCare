@@ -16,6 +16,8 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
 button,input,textarea{font-family:inherit}
 button{cursor:pointer}
 input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
+/* rate labels: room for two lines so every input in a row lines up when one label wraps */
+@media (min-width: 600px){.op-rl{min-height:40px}}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
@@ -64,7 +66,8 @@ input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
           <sc-for list="{{fields}}" as="f" hint-placeholder-count="6">
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label for="{{f.id}}" style="font-size: 13px; font-weight: 600">{{f.label}}</label>
-              <input id="{{f.id}}" value="{{f.val}}" onChange="{{f.change}}" disabled="{{locked}}" aria-invalid="{{f.invalid}}" aria-describedby="{{f.errId}}" style="{{f.style}}">
+              <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}"><input id="{{f.id}}" value="{{f.val}}" onChange="{{f.change}}" aria-invalid="{{f.invalid}}" aria-describedby="{{f.errId}}" style="{{f.style}}"></sc-if>
+              <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}"><div style="min-height: 44px; display: flex; align-items: center; font-size: 14px; color: #111827; border-bottom: 1px solid #EEF0F3; overflow-wrap: anywhere"><span id="{{f.id}}">{{f.val}}</span></div></sc-if>
               <span id="{{f.errId}}" role="alert" style="font-size: 13px; color: #B42318"><sc-if value="{{f.hasErr}}" hint-placeholder-val="{{ false }}">{{f.err}}</sc-if></span>
             </div>
           </sc-for>
@@ -105,8 +108,9 @@ input:disabled,textarea:disabled{background:#F3F4F6;color:#4B5563}
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
         <sc-for list="{{rateFields}}" as="r" hint-placeholder-count="7">
           <div style="display: flex; flex-direction: column; gap: 6px">
-            <label for="{{r.id}}" style="font-size: 13px; font-weight: 600">{{r.label}} <span style="font-weight: 400; color: #4B5563">({{r.unit}})</span></label>
-            <input id="{{r.id}}" inputmode="decimal" value="{{r.val}}" onChange="{{r.change}}" disabled="{{locked}}" aria-describedby="{{r.hid}}" style="{{r.style}}">
+            <label for="{{r.id}}" class="op-rl" style="font-size: 13px; font-weight: 600">{{r.label}} <span style="font-weight: 400; color: #4B5563">({{r.unit}})</span></label>
+            <sc-if value="{{canEdit}}" hint-placeholder-val="{{ true }}"><input id="{{r.id}}" inputmode="decimal" value="{{r.val}}" onChange="{{r.change}}" aria-describedby="{{r.hid}}" style="{{r.style}}"></sc-if>
+            <sc-if value="{{locked}}" hint-placeholder-val="{{ false }}"><div style="min-height: 44px; display: flex; align-items: center; font-size: 14px; color: #111827; border-bottom: 1px solid #EEF0F3; overflow-wrap: anywhere"><span id="{{r.id}}" aria-describedby="{{r.hid}}">{{r.val}} {{r.unit}}</span></div></sc-if>
             <span id="{{r.hid}}" style="{{r.helpStyle}}">{{r.help}}</span>
           </div>
         </sc-for>

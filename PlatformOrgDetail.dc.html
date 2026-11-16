@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
+@media (max-width: 599px){.pf-long{display:none}.pf-badge{display:none !important}}
 @media (max-width: 767px){.pf-name{display:none !important}.pf-note{display:none !important}.po-x{display:none !important}.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}}
 body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
@@ -22,8 +23,8 @@ button{cursor:pointer}
   <div style="background: #FFFFFF; color: #111827; border-bottom: 1px solid #E3E6EB; padding: 10px clamp(16px, 3vw, 32px); display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between">
     <div style="display: flex; align-items: center; gap: 10px">
       <dc-import name="Icon" icon="support" size="18" bg="brand" hint-size="32px,32px"></dc-import>
-      <span style="font-weight: 700">SolarCare · คอนโซลทีม Qleen</span>
-      <span style="white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; background: #F3F4F6; color: #374151; font-size: 12px; font-weight: 600"><dc-import name="Icon" icon="shield" size="14" tone="current" hint-size="14px,14px"></dc-import>ผู้ดูแลแพลตฟอร์ม</span>
+      <span style="font-weight: 700"><span class="pf-long">SolarCare · </span>คอนโซลทีม Qleen</span>
+      <span class="pf-badge" style="white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; background: #F3F4F6; color: #374151; font-size: 12px; font-weight: 600"><dc-import name="Icon" icon="shield" size="14" tone="current" hint-size="14px,14px"></dc-import>ผู้ดูแลแพลตฟอร์ม</span>
     </div>
     <div style="display: flex; align-items: center; gap: 12px">
       <span class="pf-note" style="font-size: 13px; color: #4B5563">ทุกการเข้าถึงข้อมูลองค์กรถูกบันทึก</span>
@@ -111,7 +112,7 @@ button{cursor:pointer}
   </div>
 
   <dc-import name="ConfirmDialog" open="{{dialog}}" title="{{suspendTitle}}" body="{{suspendBody}}" reason-label="เหตุผล (บังคับ)" reason-placeholder="เช่น ละเมิดข้อตกลงการใช้งาน" confirm-label="ระงับองค์กร" tone="danger" on-confirm="{{suspend}}" on-close="{{close}}" hint-size="100%,0px"></dc-import>
-  <dc-import name="ConfirmDialog" open="{{supportOpen}}" title="{{supportTitle}}" body="คุณจะเห็นข้อมูลขององค์กรนี้แบบอ่านอย่างเดียว 60 นาที ทุกการเข้าถึงถูกบันทึกใน Audit log ของแพลตฟอร์มและขององค์กร และ Org Owner จะได้รับอีเมลแจ้ง" reason-label="เหตุผล / เลขเรื่อง (ticket) (บังคับ)" reason-placeholder="เช่น เลขเรื่อง #4821 · รายงานไม่ตรง" confirm-label="เริ่มเซสชันอ่านอย่างเดียว" tone="dark" on-confirm="{{grant}}" on-close="{{closeSupport}}" hint-size="100%,0px"></dc-import>
+  <dc-import name="ConfirmDialog" open="{{supportOpen}}" title="{{supportTitle}}" body="คุณจะเห็นข้อมูลขององค์กรนี้แบบอ่านอย่างเดียว 60 นาที ทุกการเข้าถึงถูกบันทึกในประวัติการใช้งานของแพลตฟอร์มและขององค์กร และเจ้าขององค์กรจะได้รับอีเมลแจ้ง" reason-label="เหตุผลหรือเลขเรื่อง (บังคับ)" reason-placeholder="เช่น เลขเรื่อง #4821 · รายงานไม่ตรง" confirm-label="เริ่มเซสชันอ่านอย่างเดียว" tone="dark" on-confirm="{{grant}}" on-close="{{closeSupport}}" hint-size="100%,0px"></dc-import>
   <a id="pd-go" href="SupportSession.dc.html" tabIndex="-1" aria-hidden="true" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">เริ่มเซสชัน</a>
 </div>
 </x-dc>
@@ -197,8 +198,8 @@ class Component extends DCLogic {
       a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', slug: 'siamsolar', badge: 'sf', type: 'เจ้าของไซต์', st: 'active', sites: 4, kwp: '16,710', members: scMemberCount('a', 6), memberNote: 'รวมผู้รับเหมา 1 คน', open: 4, photos: '2,184',
         people: [P('worawut', 'วรวุฒิ ก.', 'worawut@siamsolar.example', 'Org Owner'), P('natthaphat', 'ณัฐภัทร ส.', 'natthaphat@siamsolar.example', 'Org Admin')],
         sessions: [
-          { id: 't4821', when: '15 พ.ย. 2569 10:34 น.', who: 'ทีม Qleen', why: 'เลขเรื่อง (ticket) #4821 · รายงานไม่ตรง', dur: 'กำลังเปิดอยู่' },
-          { when: '2 ต.ค. 2569 14:40 น.', who: 'ทีม Qleen', why: 'เลขเรื่อง (ticket) #4710 · ย้ายข้อมูลไซต์', dur: '42 นาที' },
+          { id: 't4821', when: '15 พ.ย. 2569 10:34 น.', who: 'ทีม Qleen', why: 'เลขเรื่อง #4821 · รายงานไม่ตรง', dur: 'กำลังเปิดอยู่' },
+          { when: '2 ต.ค. 2569 14:40 น.', who: 'ทีม Qleen', why: 'เลขเรื่อง #4710 · ย้ายข้อมูลไซต์', dur: '42 นาที' },
           { when: '11 ก.ย. 2569 10:05 น.', who: 'Qleen Onboarding', why: 'ช่วยตั้งค่าเริ่มต้น', dur: '60 นาที' }] },
       b: { name: 'กรีนมาร์ท รีเทล', slug: 'greenmart', badge: 'gm', type: 'เจ้าของไซต์', st: 'active', sites: 2, kwp: '800', members: scMemberCount('b', 4), memberNote: 'รวมผู้รับเหมา 1 คน', open: 2, photos: '312',
         people: [P('kitti', 'กิตติ พ.', 'kitti@greenmart.example', 'Org Owner'), P('natthaphat', 'ณัฐภัทร ส.', 'natthaphat@siamsolar.example', 'Site Manager'), P('thanakorn', 'ธนากร ว.', 'thanakorn@cleanpro.example', 'Technician'), P('pimchanok', 'พิมพ์ชนก ร.', 'pimchanok@customer.example', 'Viewer')],
@@ -207,7 +208,7 @@ class Component extends DCLogic {
         people: [P('sunthorn', 'สุนทร ม.', 'sunthorn@nikom-north.example', 'Org Owner'), P('siriporn', 'ศิริพร ก.', 'siriporn@nikom-north.example', 'Site Manager'), P('natthaphat', 'ณัฐภัทร ส.', 'natthaphat@siamsolar.example', 'Viewer')], sessions: ONB('1 ก.ค. 2569 09:00 น.') },
       d: { name: 'ไร่ทองโซลาร์', slug: 'raithong', badge: 'rt', type: 'เจ้าของไซต์', st: 'trial', sites: 0, kwp: '0', members: 2, memberNote: 'รอยืนยันคำเชิญ 1 คน', open: 0, photos: '0',
         people: [P('natthaphat', 'ณัฐภัทร ส.', 'natthaphat@siamsolar.example', 'Org Owner'), P('invited', 'รอยืนยัน', 'admin@raithong.example', 'Org Admin')], sessions: [] },
-      e: { name: 'ริมทะเล รีสอร์ท', slug: 'rimtalay', badge: 'rr', type: 'เจ้าของไซต์', st: 'trial', sites: 1, kwp: '210', members: scMemberCount('e', 2), memberNote: 'Owner 1 · Site Manager 1', open: 0, photos: '0',
+      e: { name: 'ริมทะเล รีสอร์ท', slug: 'rimtalay', badge: 'rr', type: 'เจ้าของไซต์', st: 'trial', sites: 1, kwp: '210', members: scMemberCount('e', 2), memberNote: 'เจ้าขององค์กร 1 · ผู้จัดการไซต์ 1', open: 0, photos: '0',
         people: [P('arunee', 'อรุณี ท.', 'arunee@rimtalay.example', 'Org Owner'), P('natthaphat', 'ณัฐภัทร ส.', 'natthaphat@siamsolar.example', 'Site Manager')], sessions: [] },
       cp: { name: 'CleanPro Services', slug: 'cleanpro', badge: 'cp', type: 'ผู้ให้บริการล้าง', st: 'active', sites: 0, kwp: '0', members: 12, memberNote: 'ช่างผู้รับเหมา', open: 0, photos: '—',
         people: [P('thanakorn', 'ธนากร ว.', 'thanakorn@cleanpro.example', 'Technician')], sessions: ONB('5 มิ.ย. 2569 10:00 น.') },
@@ -237,7 +238,7 @@ class Component extends DCLogic {
       ORGS.d.members = scMemberCount('d', 1); ORGS.d.memberNote = dPend ? 'รอยืนยันคำเชิญ ' + dPend + ' คน' : (ORGS.d.members > 1 ? 'ตอบรับครบแล้ว' : 'ยังไม่ได้เชิญใคร');
       ORGS.d.people = dPeople.map(function (p) { return P(p.person, p.name, p.email, p.role); });
     } else { delete ORGS.d; }
-    if (pnew) ORGS['new'] = { name: pnew, slug: 'new-org', badge: '', type: 'เจ้าของไซต์', st: 'trial', sites: 0, kwp: '0', members: 1, memberNote: 'รอ Owner ยืนยันคำเชิญ', open: 0, photos: '0', people: [P('invited', 'รอยืนยัน', 'owner@' + 'customer.example', 'Org Owner')], sessions: [] };
+    if (pnew) ORGS['new'] = { name: pnew, slug: 'new-org', badge: '', type: 'เจ้าของไซต์', st: 'trial', sites: 0, kwp: '0', members: 1, memberNote: 'รอเจ้าขององค์กรยืนยันคำเชิญ', open: 0, photos: '0', people: [P('invited', 'รอยืนยัน', 'owner@' + 'customer.example', 'Org Owner')], sessions: [] };
     // an unknown id never falls back to another customer's data
     ['a', 'b', 'c', 'e'].forEach(function (k) { var L = scPlatLive(k, ORGS[k].sites, ORGS[k].kwp); ORGS[k].sites = L.sites; ORGS[k].kwp = L.kwp; ORGS[k].open = L.open; });
     if (ORGS.d) ORGS.d.open = scPlatLive('d', 0, 0).open;
@@ -289,7 +290,7 @@ class Component extends DCLogic {
       membersNote: o.members > o.people.length ? 'สมาชิกอื่นอีก ' + (o.members - o.people.length) + ' คน · ดูรายละเอียดได้ในเซสชันช่วยเหลือ' : 'แสดงสมาชิกครบทุกคน',
       sessions: sessions, noSessions: sessions.length === 0,
       suspendTitle: 'ระงับ ' + o.name + '?',
-      suspendBody: 'สมาชิกทั้ง ' + o.members + ' คนจะเข้าใช้งานไม่ได้ ใบงานอัตโนมัติจะหยุดสร้าง ข้อมูลทั้งหมดยังเก็บไว้และเปิดใช้งานคืนได้ Org Owner จะได้รับอีเมลแจ้ง',
+      suspendBody: 'สมาชิกทั้ง ' + o.members + ' คนจะเข้าใช้งานไม่ได้ ใบงานอัตโนมัติจะหยุดสร้าง ข้อมูลทั้งหมดยังเก็บไว้และเปิดใช้งานคืนได้ เจ้าขององค์กรจะได้รับอีเมลแจ้ง',
       supportOpen: s.support, supportTitle: 'เข้าดู ' + o.name,
       openSupport: function () { self.setState({ support: true, grantedFor: '' }); },
       closeSupport: function () { self.setState({ support: false }); },

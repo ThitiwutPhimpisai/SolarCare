@@ -24,7 +24,7 @@ button{cursor:pointer}
     <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; gap: 14px; align-items: center">
       <dc-import name="OrgBadge" org="rr" size="56" with-name="{{false}}" hint-size="56px,56px"></dc-import>
       <div style="flex: 1; min-width: 0">
-        <div style="font-size: 13px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="Avatar" person="arunee" size="20" hint-size="20px,20px"></dc-import>คุณอรุณี ท. (Org Owner) เชิญคุณเข้าร่วม</div>
+        <div style="font-size: 13px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="Avatar" person="arunee" size="20" hint-size="20px,20px"></dc-import>คุณอรุณี ท. (เจ้าขององค์กร) เชิญคุณเข้าร่วม</div>
         <div style="font-size: 17px; font-weight: 700; margin-top: 2px">ริมทะเล รีสอร์ท</div>
         <div style="font-size: 13px; color: #374151">ผู้จัดการไซต์ · 1 ไซต์ (หลังคาอาคาร A หัวหิน)</div>
       </div>
@@ -120,9 +120,9 @@ class Component extends DCLogic {
     var nameOk = !!s.name.trim(), emailOk = true;
     var ready = allOk && s.agree && nameOk && emailOk;
     var saveJoin = function () { try { joinKeys.split('|').forEach(function (kv) { var i = kv.indexOf('='); window.sessionStorage.setItem(kv.slice(0, i), kv.slice(i + 1)); }); window.sessionStorage.setItem('sc.flashAt', String(Date.now())); window.sessionStorage.setItem('sc.flashTo', 'Main.dc.html'); } catch (x) {} };
-    var joinKeys = 'sc.authed=new|sc.newAccount=1|sc.myName=' + s.name.trim().replace(/[|=]/g, ' ') + '|sc.myEmail=' + INVITED + '|sc.org=e|sc.site=all|sc.joined=e|sc.inviteDone=accepted|sc.from=|sc.flash=สร้างบัญชีและเข้าร่วม ริมทะเล รีสอร์ท แล้ว ในบทบาท Site Manager';
+    var joinKeys = 'sc.authed=new|sc.newAccount=1|sc.myName=' + s.name.trim().replace(/[|=]/g, ' ') + '|sc.myEmail=' + INVITED + '|sc.org=e|sc.site=all|sc.joined=e|sc.inviteDone=accepted|sc.from=|sc.flash=สร้างบัญชีและเข้าร่วม ริมทะเล รีสอร์ท แล้ว ในบทบาทผู้จัดการไซต์';
     var DOCS = {
-      terms: ['ข้อกำหนดการใช้งาน (สรุป)', 'ใช้ SolarCare เพื่อจัดการงานดูแลแผงของไซต์ที่คุณได้รับสิทธิ์เท่านั้น\nข้อมูลไซต์ รูป และใบงานเป็นขององค์กรเจ้าของไซต์\nห้ามแชร์บัญชี · ทุกการเปลี่ยนสิทธิ์ถูกบันทึกใน Audit log\n'],
+      terms: ['ข้อกำหนดการใช้งาน (สรุป)', 'ใช้ SolarCare เพื่อจัดการงานดูแลแผงของไซต์ที่คุณได้รับสิทธิ์เท่านั้น\nข้อมูลไซต์ รูป และใบงานเป็นขององค์กรเจ้าของไซต์\nห้ามแชร์บัญชี · ทุกการเปลี่ยนสิทธิ์ถูกบันทึกในประวัติการใช้งานขององค์กร\n'],
       privacy: ['นโยบายความเป็นส่วนตัว (สรุป)', 'เราเก็บชื่อ อีเมล และตำแหน่ง GPS ตอนเช็กอินงานเท่านั้น\nองค์กรที่คุณเป็นสมาชิกเห็นข้อมูลนี้ได้ตามสิทธิ์\nขอลบบัญชีได้ทุกเมื่อจากหน้าบัญชีของฉัน\n']
     };
     var doc = DOCS[this.state.doc];

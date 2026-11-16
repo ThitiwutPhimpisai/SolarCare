@@ -85,6 +85,19 @@ button{font-family:inherit;cursor:pointer}
               </button>
               </sc-for>
             </sc-for>
+            <sc-if value="{{hasSent}}" hint-placeholder-val="{{ false }}">
+              <details style="margin-top: 6px; border: 1px solid #E3E6EB; border-radius: 14px; background: #FFFFFF">
+                <summary style="min-height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 14px; font-size: 14px; font-weight: 700; color: #374151; cursor: pointer">ส่งแล้ว · รออนุมัติ <span style="font-weight: 400; color: #4B5563">· {{sentCount}} งาน</span></summary>
+                <div style="display: flex; flex-direction: column; border-top: 1px solid #EEF0F3">
+                  <sc-for list="{{sentItems}}" as="j" hint-placeholder-count="1">
+                    <button onClick="{{j.open}}" style="display: flex; align-items: center; gap: 10px; width: 100%; min-height: 56px; padding: 8px 14px; border: 0; border-bottom: 1px solid #EEF0F3; background: #FFFFFF; text-align: left">
+                      <span style="flex: 1; min-width: 0"><span style="display: block; font-size: 14px; font-weight: 600; color: #111827">{{j.title}}</span><span style="display: block; font-size: 12px; color: #4B5563">{{j.no}} · {{j.site}}</span></span>
+                      <dc-import name="StatusPill" kind="wo" value="{{j.st}}" hint-size="100px,24px"></dc-import>
+                    </button>
+                  </sc-for>
+                </div>
+              </details>
+            </sc-if>
           </div>
         </div>
       </sc-if>
@@ -145,15 +158,20 @@ button{font-family:inherit;cursor:pointer}
             <dc-import name="Icon" icon="arrowLeft" size="22" hint-size="22px,22px"></dc-import>
           </button>
         </sc-if>
-        <sc-if value="{{preview}}" hint-placeholder-val="{{ false }}">
-          <a href="WorkOrderDetail.dc.html" onPointerDown="{{exitPreview}}" onKeyDown="{{exitPreview}}" onClick="{{exitPreview}}" aria-label="กลับไปที่ใบงาน" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #111827"><dc-import name="Icon" icon="arrowLeft" size="22" hint-size="22px,22px"></dc-import></a>
-        </sc-if>
         <div style="min-width: 0">
-          <div style="font-size: 12px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="OrgBadge" org="{{job.logo}}" size="16" with-name="{{false}}" hint-size="16px,16px"></dc-import>{{job.no}} · {{job.org}}</div>
+          <div style="font-size: 12px; color: #4B5563; display: flex; align-items: center; gap: 6px"><dc-import name="OrgBadge" org="{{job.logo}}" size="16" with-name="{{false}}" hint-size="16px,16px"></dc-import>{{job.no}} · {{job.site}}</div>
           <h1 style="font-size: 16px; font-weight: 700; margin: 0">{{job.title}}</h1>
         </div>
       </div>
       <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+        <sc-if value="{{ret.show}}" hint-placeholder-val="{{ false }}">
+          <div role="alert" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: #FDECEA; border: 1px solid #F5C2BC; color: #B42318">
+            <div style="display: flex; gap: 8px; align-items: flex-start; font-size: 14px"><dc-import name="Icon" icon="alert" size="18" tone="current" hint-size="18px,18px"></dc-import><span style="flex: 1"><b>ส่งกลับแก้ไข:</b> {{ret.reason}}<span style="display: block; font-size: 12px; color: #7A271A; margin-top: 2px">{{ret.by}}</span></span></div>
+            <sc-if value="{{ret.canAck}}" hint-placeholder-val="{{ false }}">
+              <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; font-weight: 600; color: #7A271A; cursor: pointer"><input type="checkbox" checked="{{ret.fixed}}" onChange="{{ret.toggle}}" style="width: 22px; height: 22px; accent-color: #B42318">แก้ไขตามที่ผู้จัดการแจ้งแล้ว</label>
+            </sc-if>
+          </div>
+        </sc-if>
         <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 14px; padding: 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; font-size: 13px">
           <div><div style="color: #4B5563; display: flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="site" size="16" tone="muted" hint-size="16px,16px"></dc-import>ไซต์</div><div style="font-weight: 600">{{job.site}}</div></div>
           <div><div style="color: #4B5563; display: flex; align-items: center; gap: 4px"><dc-import name="Icon" icon="clock" size="16" tone="muted" hint-size="16px,16px"></dc-import>กำหนด</div><div style="font-weight: 600">{{job.due}}</div></div>
@@ -170,8 +188,8 @@ button{font-family:inherit;cursor:pointer}
           <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; padding: 8px 0 4px; margin: 0"><dc-import name="Icon" icon="checkCircle" size="16" tone="muted" hint-size="16px,16px"></dc-import>เช็กลิสต์ ({{doneCount}}/{{totalCount}})</h2>
           <sc-for list="{{checks}}" as="c" hint-placeholder-count="4">
             <label style="display: flex; align-items: center; gap: 12px; min-height: 48px; border-top: 1px solid #EEF0F3; font-size: 14px">
-              <input type="checkbox" checked="{{c.on}}" onChange="{{c.toggle}}" disabled="{{locked}}" style="width: 22px; height: 22px; accent-color: #0F6B5C">
-              <span>{{c.label}}</span>
+              <input type="checkbox" checked="{{c.on}}" onChange="{{c.toggle}}" disabled="{{c.off}}" aria-describedby="{{c.noteId}}" style="width: 22px; height: 22px; accent-color: #0F6B5C">
+              <span style="display: flex; flex-direction: column"><span>{{c.label}}</span><sc-if value="{{c.auto}}" hint-placeholder-val="{{ false }}"><span id="{{c.noteId}}" style="font-size: 12px; color: #4B5563">ติ๊กเองเมื่อถ่ายรูปครบทุกโซน</span></sc-if></span>
             </label>
           </sc-for>
         </div>
@@ -236,6 +254,31 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
+// ---- work-order progress (Round 15) — identical copy in WorkOrders, WorkOrderDetail, TechMobile ----
+// one source for checklist + photos: sc.techProgress[no] = { checks: {i: true}, photos: {'before' | 'before:โซน A': 'S' | n}, fixedAt }
+// a job the technician never touched in the app is seeded from its status; a seeded photo slot ('S') stands for 4 photos
+var WP_SEED = 4;
+var WP_PHOTO_ITEM = { clean: { 0: 'before', 2: 'after' }, inspect: {}, repair: { 3: 'after' } }; // checklist items ticked by photos, never by hand
+function wpType(kind) { return /ตรวจ|inspect/.test(kind || '') ? 'inspect' : (/ซ่อม|เปลี่ยน|repair/.test(kind || '') ? 'repair' : 'clean'); }
+function wpKey(side, z, zones) { return zones.length > 1 ? side + ':' + z : side; }
+function wpSeed(st, zones) {
+  var full = st === 'review' || st === 'done' || st === 'returned' || st === 'queued', half = st === 'doing' || st === 'paused', ph = {};
+  zones.forEach(function (z) { if (full || half) ph[wpKey('before', z, zones)] = 'S'; if (full) ph[wpKey('after', z, zones)] = 'S'; });
+  return { checks: full ? { 0: true, 1: true, 2: true, 3: true } : (half ? { 0: true, 1: true } : {}), photos: ph };
+}
+function wpProgress(no, st, kind, zones, all) {
+  var type = wpType(kind), tp = (all || {})[no] || null, src = tp && (tp.photos || tp.checks) ? tp : wpSeed(st, zones);
+  var ph = src.photos || {}, ck = src.checks || {}, pi = WP_PHOTO_ITEM[type];
+  var sideOk = function (sd) { return zones.every(function (z) { return !!ph[wpKey(sd, z, zones)]; }); };
+  var items = [0, 1, 2, 3].map(function (i) { return pi[i] ? sideOk(pi[i]) : !!ck[i]; });
+  var n = 0, slots = 0, missing = [];
+  zones.forEach(function (z) { ['before', 'after'].forEach(function (sd) { var v = ph[wpKey(sd, z, zones)]; if (v) { slots++; n += v === 'S' ? WP_SEED : 1; } else missing.push({ zone: z, side: sd }); }); });
+  return { type: type, items: items, done: items.filter(Boolean).length, photos: ph, checks: ck, nPhotos: n, slots: slots, total: zones.length * 2, missing: missing, photoItem: pi, fixedAt: (tp && tp.fixedAt) || 0 };
+}
+// zones of each job (CreateWorkOrder stores 'โซน A' …); before/after photos are required for every zone
+var WP_ZONES = { 'WO-1043': ['โซน A', 'โซน B', 'โซน C'], 'WO-1042': ['โซน C'], 'WO-1041': ['โซน A', 'โซน B', 'โซน C', 'โซน D'], 'WO-1039': ['หลังคา'], 'WO-1035': ['ลานจอด'], 'WO-1031': ['โซน D'], 'GM-0211': ['หลังคา'], 'GM-0209': ['ลานจอด'], 'GM-0204': ['หลังคา'], 'NK-0102': ['หลังคา'], 'NK-0097': ['หลังคา'] };
+function wpZones(no, created) { var z = WP_ZONES[no] || (created && created.zones && created.zones.length ? created.zones : ['ทั้งไซต์']); return z.map(function (x) { return x.length === 1 ? 'โซน ' + x : x; }); }
+// ---- end work-order progress ----
 class Component extends DCLogic {
   constructor(p) {
     super(p);
@@ -245,7 +288,7 @@ class Component extends DCLogic {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
     var get = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
-    var snap = function () { return ['sc.wo', 'sc.woStat', 'sc.from', 'sc.createdWo', 'sc.woAssign', 'sc.techView', 'sc.techProgress', 'sc.siteEdits'].map(get).join('|'); };
+    var snap = function () { return ['sc.wo', 'sc.woStat', 'sc.from', 'sc.createdWo', 'sc.woAssign', 'sc.techView', 'sc.techProgress', 'sc.siteEdits', 'sc.woReturn'].map(get).join('|'); };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -273,8 +316,8 @@ class Component extends DCLogic {
     var SF = 'sf', GM = 'gm', farm = 'k1', roof = 'bp';
     // ธนากร ว.'s jobs only (canonical data: ../DATA.md; today = 15 พ.ย. 2569)
     var base = [
-      { id: 'WO-1039', no: 'WO-1039', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: roof, title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', due: 'เลยกำหนด 5 วัน (10 พ.ย.)', day: 'today', time: '08:00', panels: '420 แผง', st: 'doing', type: 'clean', q: 'บางปู+สมุทรปราการ' },
-      { id: 'GM-0209', no: 'GM-0209', orgId: 'GM', org: 'กรีนมาร์ท รีเทล', logo: GM, img: 'bn', title: 'ล้างแผงลานจอดรถ (Carport)', site: 'สาขาบางนา', due: 'เลยกำหนด 3 วัน (12 พ.ย.)', day: 'today', time: '13:00', panels: '690 แผง', st: 'doing', type: 'clean', q: 'สาขาบางนา+กรุงเทพ' },
+      { id: 'WO-1039', no: 'WO-1039', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: roof, title: 'ล้างแผงหลังคา', site: 'หลังคาโรงงานบางปู', due: 'เลยกำหนด 5 วัน (10 พ.ย.)', dueOk: 'กำหนด 10 พ.ย. 2569', day: 'today', time: '08:00', panels: '420 แผง', st: 'doing', type: 'clean', q: 'บางปู+สมุทรปราการ' },
+      { id: 'GM-0209', no: 'GM-0209', orgId: 'GM', org: 'กรีนมาร์ท รีเทล', logo: GM, img: 'bn', title: 'ล้างแผงลานจอดรถ', site: 'สาขาบางนา', due: 'เลยกำหนด 3 วัน (12 พ.ย.)', dueOk: 'กำหนด 12 พ.ย. 2569', day: 'today', time: '13:00', panels: '690 แผง', st: 'doing', type: 'clean', q: 'สาขาบางนา+กรุงเทพ' },
       { id: 'WO-1042', no: 'WO-1042', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: farm, title: 'ตรวจจุดร้อน (hotspot) หลังพายุ', site: 'ฟาร์มโคราช 1', due: 'พรุ่งนี้ (16 พ.ย.)', day: 'tomorrow', time: '08:00', panels: '600 แผง', st: 'doing', type: 'inspect', q: 'ฟาร์มโคราช+1' },
       { id: 'GM-0211', no: 'GM-0211', orgId: 'GM', org: 'กรีนมาร์ท รีเทล', logo: GM, img: 'rs', title: 'ล้างแผงหลังคา', site: 'สาขารังสิต', due: '20 พ.ย. 2569', day: 'later', time: '08:00', panels: '760 แผง', st: 'todo', type: 'clean', q: 'สาขารังสิต+ปทุมธานี' },
       { id: 'WO-1043', no: 'WO-1043', orgId: 'SF', org: 'สยามโซลาร์ฟาร์ม', logo: SF, img: farm, title: 'ล้างแผงรอบไตรมาส โซน A–C', site: 'ฟาร์มโคราช 1', due: '18 พ.ย. 2569', day: 'later', time: '—', panels: '12,000 แผง', st: 'review', type: 'clean', q: 'ฟาร์มโคราช+1' }
@@ -301,7 +344,8 @@ class Component extends DCLogic {
       if (st === 'queued' && !offline) st = 'review';
       var ph = s.photos[j.id] || {};
       var unsynced = offline && (st === 'queued' || Object.keys(ph).some(function (k) { return ph[k]; }));
-      return Object.assign({}, j, { st: st, unsynced: !!unsynced, siteKey: j.site, site: DN(j.site),
+      var sentNow = st === 'review' || st === 'queued' || st === 'done';
+      return Object.assign({}, j, { st: st, due: sentNow && j.dueOk ? j.dueOk : j.due, unsynced: !!unsynced, siteKey: j.site, site: DN(j.site),
         maps: 'https://www.google.com/maps/search/?api=1&query=' + j.q,
         open: function () { try { window.sessionStorage.setItem('sc.wo', j.id); } catch (e) {} self._lastWo = j.id; self.setState({ screen: 'job', jobId: j.id }); } });
     });
@@ -317,10 +361,9 @@ class Component extends DCLogic {
     }
     var job = jobs.filter(function (j) { return j.id === s.jobId; })[0] || jobs[0];
     // zones of each job (same as TechMobileIssue); before/after photos are required for every zone
-    var ZONES = { 'WO-1039': ['หลังคา'], 'GM-0209': ['ลานจอด'], 'WO-1042': ['โซน C'], 'GM-0211': ['หลังคา'], 'WO-1043': ['โซน A', 'โซน B', 'โซน C'], 'WO-1041': ['โซน A', 'โซน B', 'โซน C', 'โซน D'] };
     var createdZ = (function () { try { return JSON.parse(SS('sc.createdWo') || 'null') || []; } catch (e) { return []; } })().filter(function (c) { return c && c.no === (job && job.id); })[0];
-    var jobZones = (job && (ZONES[job.id] || (createdZ && createdZ.zones && createdZ.zones.length ? createdZ.zones.map(function (z) { return z.length === 1 ? 'โซน ' + z : z; }) : null))) || ['ทั้งไซต์'];
-    var pk = function (side, z) { return jobZones.length > 1 ? side + ':' + z : side; }; // one zone keeps the old keys before/after
+    var jobZones = job ? wpZones(job.id, createdZ) : ['ทั้งไซต์'];
+    var pk = function (side, z) { return wpKey(side, z, jobZones); }; // one zone keeps the old keys before/after
     // one checklist per job type (DATA.md round 5)
     var labels = {
       clean: ['ถ่ายรูปก่อนล้าง', 'ล้างด้วยน้ำ DI', 'ถ่ายรูปหลังล้าง', 'ตรวจรอยร้าว / ขั้วต่อ'],
@@ -335,14 +378,20 @@ class Component extends DCLogic {
       var e = J('sc.memberEdits', {})[k] || {}; if (/\|.+/.test(k) && (e.status === 'suspended' || e.status === 'removed' || J('sc.removed', []).indexOf(k) >= 0)) approver = oid === 'b' ? 'กิตติ พ. (เจ้าขององค์กร)' : 'ณัฐภัทร ส. (ผู้ดูแลองค์กร)'; })();
     // checklist / photo progress is kept per job in sc.techProgress, so leaving for the issue page (or reloading) keeps it
     var PROG = (function () { try { return JSON.parse(SS('sc.techProgress') || 'null') || {}; } catch (e) { return {}; } })();
-    var jc = s.checks[job.id] || (PROG[job.id] && PROG[job.id].checks) || {}, jp = s.photos[job.id] || (PROG[job.id] && PROG[job.id].photos) || {};
-    var done = labels.filter(function (l, i) { return jc[i]; }).length;
+    if (s.checks[job.id] || s.photos[job.id]) { PROG = Object.assign({}, PROG); PROG[job.id] = Object.assign({}, PROG[job.id] || wpSeed(job.st, jobZones), s.checks[job.id] ? { checks: s.checks[job.id] } : {}, s.photos[job.id] ? { photos: s.photos[job.id] } : {}); }
+    var wp = wpProgress(job.id, job.st, job.type, jobZones, PROG);
+    var jc = wp.checks, jp = wp.photos;
+    var done = wp.done;
+    // a returned job: the manager's reason (sc.woReturn, written by WorkOrderDetail) + the technician's "fixed" tick
+    var RET = (function () { try { return JSON.parse(SS('sc.woReturn') || 'null') || {}; } catch (e) { return {}; } })()[job.id] || null;
+    var retFixed = !!RET && !!RET.ts && wp.fixedAt === RET.ts;
     var missPh = []; jobZones.forEach(function (z) { [['before', photoWord[0]], ['after', photoWord[1]]].forEach(function (p) { if (!jp[pk(p[0], z)]) missPh.push((jobZones.length > 1 ? z + ' ' : '') + 'รูป' + p[1]); }); });
     var notStarted = job.st === 'todo' || job.st === 'new';
     var locked = preview || notStarted || job.st === 'review' || job.st === 'queued' || job.st === 'done' || job.st === 'paused';
     var setJob = function (key, val) {
       var o = Object.assign({}, s[key]); o[job.id] = val; var u = {}; u[key] = o; self.setState(u);
-      if (key === 'checks' || key === 'photos') { try { var pr = JSON.parse(window.sessionStorage.getItem('sc.techProgress') || 'null') || {}; pr[job.id] = Object.assign({}, pr[job.id] || {}); pr[job.id][key] = val; window.sessionStorage.setItem('sc.techProgress', JSON.stringify(pr)); } catch (e) {} }
+      // the first change keeps what the job already had (seeded from its status), so nothing done before disappears
+      if (key === 'checks' || key === 'photos' || key === 'fixedAt') { try { var pr = JSON.parse(window.sessionStorage.getItem('sc.techProgress') || 'null') || {}; var cur = pr[job.id] && (pr[job.id].photos || pr[job.id].checks) ? pr[job.id] : Object.assign({}, pr[job.id] || {}, wpSeed(job.st, jobZones)); pr[job.id] = Object.assign({}, cur); pr[job.id][key] = val; window.sessionStorage.setItem('sc.techProgress', JSON.stringify(pr)); } catch (e) {} }
     };
     var setStatus = function (val) {
       if (val !== 'queued') { try { var ws = JSON.parse(window.sessionStorage.getItem('sc.woStat') || 'null') || {}; ws[job.id] = val; window.sessionStorage.setItem('sc.woStat', JSON.stringify(ws)); } catch (e) {} }
@@ -350,8 +399,8 @@ class Component extends DCLogic {
     };
     var primary;
     if (job.st === 'todo') primary = { label: 'เริ่มงาน', disabled: false, hint: 'ระบบจะบันทึกเวลาและพิกัด GPS', act: function () { setStatus('doing'); } };
-    else if (job.st === 'doing' || job.st === 'returned') { var ok = done === labels.length && missPh.length === 0;
-      primary = { label: offline ? 'ส่งงานให้ตรวจ (ส่งเมื่อมีสัญญาณ)' : 'ส่งงานให้ตรวจและอนุมัติ', disabled: !ok, hint: ok ? 'ส่งให้ ' + approver + ' ตรวจและอนุมัติ' : 'ยังขาด: ' + [].concat(done < labels.length ? ['เช็กลิสต์ ' + (labels.length - done) + ' ข้อ'] : []).concat(missPh.slice(0, 3)).join(' · ') + (missPh.length > 3 ? ' และอีก ' + (missPh.length - 3) + ' รูป' : ''), act: function () { setStatus(offline ? 'queued' : 'review'); self.setState({ screen: 'list', toast: offline ? 'เก็บงาน ' + job.no + ' ไว้แล้ว · จะส่งให้ ' + approver + ' เมื่อมีสัญญาณ' : 'ส่งงาน ' + job.no + ' ให้ ' + approver + ' อนุมัติแล้ว' }); } }; }
+    else if (job.st === 'doing' || job.st === 'returned') { var needFix = job.st === 'returned' && !!RET && !retFixed; var ok = done === labels.length && missPh.length === 0 && !needFix;
+      primary = { label: offline ? 'ส่งงานให้ตรวจ (ส่งเมื่อมีสัญญาณ)' : (job.st === 'returned' ? 'ส่งงานที่แก้แล้วให้ตรวจอีกครั้ง' : 'ส่งงานให้ตรวจและอนุมัติ'), disabled: !ok, hint: ok ? 'ส่งให้ ' + approver + ' ตรวจและอนุมัติ' : 'ยังขาด: ' + [].concat(needFix ? ['ยืนยันว่าแก้ไขตามที่แจ้งแล้ว'] : []).concat(done < labels.length ? ['เช็กลิสต์ ' + (labels.length - done) + ' ข้อ'] : []).concat(missPh.slice(0, 3)).join(' · ') + (missPh.length > 3 ? ' และอีก ' + (missPh.length - 3) + ' รูป' : ''), act: function () { setStatus(offline ? 'queued' : 'review'); self.setState({ screen: 'list', toast: offline ? 'เก็บงาน ' + job.no + ' ไว้แล้ว · จะส่งให้ ' + approver + ' เมื่อมีสัญญาณ' : 'ส่งงาน ' + job.no + ' ให้ ' + approver + ' อนุมัติแล้ว' }); } }; }
     else if (job.st === 'done') primary = { label: 'ปิดงานแล้ว', disabled: true, hint: approver + ' อนุมัติงานนี้แล้ว', act: function () {} };
     else if (job.st === 'paused') primary = { label: 'พักงานอยู่', disabled: true, hint: 'รอ ' + approver + ' แก้ปัญหาที่แจ้งไว้ แล้วจะแจ้งให้ทำงานต่อ', act: function () {} };
     else primary = { label: job.st === 'queued' ? 'รอส่ง' : 'ส่งแล้ว', disabled: true, hint: job.st === 'queued' ? 'อยู่ในคิว จะส่งอัตโนมัติ' : 'รอ ' + approver + ' อนุมัติ', act: function () {} };
@@ -363,6 +412,8 @@ class Component extends DCLogic {
     // วันนี้ first, ordered by start time; then the rest by day
     var DORD = { today: 0, tomorrow: 1, later: 2 };
     var shownSorted = shown.map(function (j) { return Object.assign({}, j, { hasTime: j.day === 'today' && /^\d/.test(j.time || '') }); }).sort(function (a, b) { return (DORD[a.day] - DORD[b.day]) || String(a.time).localeCompare(String(b.time)); });
+    var isSent = function (j) { return j.st === 'review' || j.st === 'queued' || j.st === 'done'; };
+    var todoJobs = shownSorted.filter(function (j) { return !isSent(j); }), sentJobs = shownSorted.filter(isSent);
     var tabDefs = [['jobs', 'งานวันนี้', 'workorder'], ['schedule', 'ตารางงาน', 'calendar'], ['profile', 'โปรไฟล์', 'user']];
     var dayLabel = { today: 'วันนี้', tomorrow: 'พรุ่งนี้', later: 'ถัดไป' };
     return {
@@ -384,12 +435,15 @@ class Component extends DCLogic {
       logout: function () { try { var ss = window.sessionStorage, ks = []; for (var i = 0; i < ss.length; i++) { var k = ss.key(i); if (k && k.indexOf('sc.') === 0) ks.push(k); } ks.forEach(function (k) { ss.removeItem(k); }); } catch (e) {} },
       job: job, locked: locked, doneCount: done, totalCount: labels.length,
       lockedNote: preview ? 'มุมมองตัวอย่างของผู้จัดการ — ช่างเป็นผู้ติ๊กเช็กลิสต์และถ่ายรูปจากแอปของตน' : notStarted ? 'กดเริ่มงานก่อน แล้วจึงติ๊กเช็กลิสต์และถ่ายรูป' : job.st === 'paused' ? 'พักงานไว้เพราะแจ้งปัญหา — รอ ' + approver + ' แก้ปัญหา' : job.st === 'done' ? 'ปิดงานแล้ว — เช็กลิสต์และรูปถูกบันทึกไว้ในใบงาน' : job.st === 'queued' ? 'ส่งงานแล้วแต่ยังออฟไลน์ — งานอยู่ในคิว จะส่งให้ ' + approver + ' อัตโนมัติเมื่อมีสัญญาณ' : 'ส่งงานแล้ว — รอ ' + approver + ' อนุมัติ แก้ไขไม่ได้จนกว่าจะถูกส่งกลับ',
-      checks: labels.map(function (l, i) { return { label: l, on: !!jc[i], toggle: function () { var c = Object.assign({}, jc); c[i] = !c[i]; setJob('checks', c); } }; }),
+      checks: labels.map(function (l, i) { var auto = !!wp.photoItem[i]; return { label: l, on: !!wp.items[i], auto: auto, off: locked || auto, noteId: auto ? 'tm-auto-' + i : undefined,
+        toggle: function () { if (auto) return; var c = Object.assign({}, jc); c[i] = !c[i]; setJob('checks', c); } }; }),
+      ret: { show: job.st === 'returned', reason: RET && RET.reason ? RET.reason : 'ผู้จัดการส่งงานกลับให้แก้ไข · ดูรายละเอียดในใบงาน', by: (RET && RET.by ? RET.by : approver) + ' · ส่งกลับเมื่อสักครู่',
+        canAck: job.st === 'returned' && !!RET && !preview, fixed: retFixed, toggle: function () { setJob('fixedAt', retFixed ? 0 : RET.ts); } },
       photoRule: jobZones.length > 1 ? 'ต้องมีรูปก่อนและหลังของทุกโซน (' + jobZones.length + ' โซน)' : 'ต้องมีรูปก่อนและหลังทำงาน',
       photoZones: jobZones.map(function (zn) { var ph2 = [['before', photoWord[0], 'before'], ['after', photoWord[1], 'after']].map(function (p) { var key = pk(p[0], zn), has = !!jp[key]; return {
         has: has, none: !has, src: p[2],
         label: (has ? 'ถ่ายรูป' + p[1] + 'ใหม่' : 'ถ่ายรูป' + p[1]) + (jobZones.length > 1 ? ' ' + zn : ''),
-        caption: p[1] + (jp[key] > 1 ? ' (ถ่ายใหม่)' : '') + (offline ? ' · รอส่ง' : ' · ส่งแล้ว'),
+        caption: p[1] + (jp[key] === 'S' ? ' · ' + WP_SEED + ' รูป' : (jp[key] > 1 ? ' (ถ่ายใหม่)' : '')) + (offline ? ' · รอส่ง' : ' · ส่งแล้ว'),
         style: 'position:relative;overflow:hidden;padding:0;min-height:110px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;border:' + (has ? '1px solid #0F6B5C;background:#E7F2EF;color:#0A4F44' : '1px dashed #4B5563;background:#FAFBFC;color:#374151'),
         // retake replaces the photo; it never removes it (the old one stays until the new one is taken)
         toggle: function () { var o = Object.assign({}, jp); o[key] = (Number(o[key]) || 0) + 1; setJob('photos', o); self.setState({ live: has ? 'บันทึกรูป' + p[1] + 'ใหม่แทนรูปเดิมแล้ว' : 'บันทึกรูป' + p[1] + 'แล้ว' }); } }; });
@@ -405,7 +459,8 @@ class Component extends DCLogic {
       showAll: function () { self.setState({ org: 'all' }); },
       retry: function () { self.setState({ loadState: 'ready' }); },
       jobsShown: listState === 'ready' ? shownSorted : [],
-      groups: listState === 'ready' ? [['today', 'วันนี้'], ['next', 'ถัดไป']].map(function (g) { var it = shownSorted.filter(function (j) { return (j.day === 'today') === (g[0] === 'today'); }); return { label: g[1], items: it, count: it.length, has: it.length > 0 }; }).filter(function (g) { return g.has; }) : [],
+      hasSent: listState === 'ready' && sentJobs.length > 0, sentItems: sentJobs, sentCount: sentJobs.length,
+      groups: listState === 'ready' ? [['today', 'วันนี้'], ['next', 'ถัดไป']].map(function (g) { var it = todoJobs.filter(function (j) { return (j.day === 'today') === (g[0] === 'today'); }); return { label: g[1], items: it, count: it.length, has: it.length > 0 }; }).filter(function (g) { return g.has; }) : [],
       syncText: offline ? 'ออฟไลน์ · ' + (pending || queuedJobs ? 'รอส่ง ' + (pending + queuedJobs) + ' รายการ' : 'ทำงานต่อได้') : (pending || queuedJobs ? 'กำลังส่ง…' : 'ซิงก์แล้ว 10:40'),
       syncIcon: offline ? 'wifiOff' : 'sync',
       syncStyle: 'display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; font-weight: 600; ' + (offline ? 'background: #FFF4E5; color: #8A3B06' : 'background: rgba(255,255,255,0.18); color: #FFFFFF'),

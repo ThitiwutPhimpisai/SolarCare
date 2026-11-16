@@ -38,11 +38,11 @@ button{cursor:pointer}
         <div style="display: flex; flex-direction: column; gap: 16px">
           <div>
             <h2 style="margin: 0; font-size: 18px">บัญชีของคุณ</h2>
-            <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563">ใช้บัญชีนี้เข้าสู่ระบบทุกองค์กร · คุณจะเป็นเจ้าของ (Org Owner) ขององค์กรที่สร้าง</p>
+            <p style="margin: 4px 0 0; font-size: 13px; color: #4B5563">ใช้บัญชีนี้เข้าสู่ระบบทุกองค์กร · คุณจะเป็นเจ้าขององค์กรที่สร้าง</p>
           </div>
           <div style="display: flex; flex-direction: column; gap: 10px">
             <dc-import name="Button" variant="secondary" full="{{true}}" label="สมัครด้วย Google" on-press="{{ssoGoogle}}" hint-size="100%,44px"></dc-import>
-            <dc-import name="Button" variant="secondary" full="{{true}}" label="สมัครด้วย Microsoft (SSO องค์กร)" on-press="{{ssoMs}}" hint-size="100%,44px"></dc-import>
+            <dc-import name="Button" variant="secondary" full="{{true}}" label="สมัครด้วย Microsoft (บัญชีองค์กร)" on-press="{{ssoMs}}" hint-size="100%,44px"></dc-import>
           </div>
           <div style="display: flex; align-items: center; gap: 12px; color: #4B5563; font-size: 13px">
             <div style="flex: 1; height: 1px; background: #E3E6EB"></div>หรือใช้อีเมล<div style="flex: 1; height: 1px; background: #E3E6EB"></div>
@@ -101,7 +101,6 @@ button{cursor:pointer}
       </sc-if>
 
       <div style="display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
-        <sc-if value="{{isFirst}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" label="ย้อนกลับ" href="{{backHref}}" hint-size="100px,44px"></dc-import></sc-if>
         <sc-if value="{{notFirst}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" variant="secondary" label="ย้อนกลับ" on-press="{{prev}}" hint-size="100px,44px"></dc-import></sc-if>
         <span role="status" aria-live="polite" style="flex: 1; align-self: center; font-size: 12px; color: #4B5563; text-align: right">{{blockedHint}}</span>
         <sc-if value="{{notLast}}" hint-placeholder-val="{{ true }}">

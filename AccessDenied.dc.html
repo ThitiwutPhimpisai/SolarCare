@@ -15,7 +15,13 @@ body{margin:0;background:#F5F6F8}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
 </style>
 </helmet>
-<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; box-sizing: border-box; padding: clamp(24px, 6vw, 48px) 16px">
+<div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827; background: #F5F6F8; min-height: 100vh; display: flex; flex-wrap: wrap">
+<sc-if value="{{hasShell}}" hint-placeholder-val="{{ true }}">
+<div style="flex: 1 1 260px; background: #FFFFFF">
+  <dc-import name="Sidebar" active="" hint-size="260px,900px"></dc-import>
+</div>
+</sc-if>
+<main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(24px, 6vw, 48px) 16px 48px">
   <div style="max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
     <sc-if value="{{is403}}" hint-placeholder-val="{{ true }}">
     <section aria-labelledby="ad-403" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(20px, 5vw, 32px); display: flex; flex-direction: column; gap: 14px">
@@ -35,7 +41,6 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
         <dc-import name="Button" variant="ghost" label="สลับองค์กร" href="SelectOrg.dc.html" hint-size="110px,44px"></dc-import>
       </div>
       <p role="status" aria-live="polite" style="margin: 0; font-size: 13px; color: #0A4F44">{{reqMsg}}</p>
-      <p style="margin: 0; font-size: 12px; color: #4B5563">รหัสอ้างอิงสำหรับทีมช่วยเหลือ: 403</p>
     </section>
     </sc-if>
 
@@ -52,7 +57,6 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
         <dc-import name="Button" variant="primary" label="สลับองค์กร" href="SelectOrg.dc.html" hint-size="110px,44px"></dc-import>
         <dc-import name="Button" variant="secondary" label="กลับหน้าแรก" href="Main.dc.html" hint-size="120px,44px"></dc-import>
       </div>
-      <p style="margin: 0; font-size: 12px; color: #4B5563">รหัสอ้างอิงสำหรับทีมช่วยเหลือ: 404</p>
     </section>
     </sc-if>
 
@@ -67,10 +71,10 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
       <div style="display: flex; gap: 8px; flex-wrap: wrap">
         <dc-import name="Button" variant="primary" label="เข้าสู่ระบบอีกครั้ง" href="Login.dc.html" hint-size="160px,44px"></dc-import>
       </div>
-      <p style="margin: 0; font-size: 12px; color: #4B5563">รหัสอ้างอิงสำหรับทีมช่วยเหลือ: 401</p>
     </section>
     </sc-if>
   </div>
+</main>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"kind":{"editor":"enum","options":["403","404","401"],"default":"403"},"$preview":{"width":1440,"height":800}}'>
@@ -95,21 +99,6 @@ function scOrgFix(v) {
   };
   return fix(v, 0);
 }
-// Round 14: role names are shown in Thai; values/keys keep the English ids (same idea as scOrgFix)
-var SC_ROLE_TH = [['Custom Role', 'บทบาทกำหนดเอง'], ['Audit log', 'ประวัติการใช้งาน'], ['Org Owner', 'เจ้าขององค์กร'], ['Org Admin', 'ผู้ดูแลองค์กร'], ['Site Manager', 'ผู้จัดการไซต์'], ['Technician', 'ช่าง'], ['Viewer', 'ผู้ดูอย่างเดียว']];
-var SC_ROLE_KEEP = { v: 1, value: 1, val: 1, key: 1, id: 1, orgRole: 1, role: 1, you: 1, statusValue: 1, q: 1, email: 1, typed: 1, draft: 1, inputVal: 1, nameVal: 1 };
-function scRoleTh(v) {
-  var re = /Custom Role|Audit log|Org Owner|Org Admin|Site Manager|Technician|Viewer/g, m = {};
-  SC_ROLE_TH.forEach(function (p) { m[p[0]] = p[1]; });
-  var fix = function (x, d) {
-    if (typeof x === 'string') return x.replace(re, function (h) { return m[h]; });
-    if (d > 6 || !x || typeof x !== 'object') return x;
-    if (Array.isArray(x)) return x.map(function (y) { return fix(y, d + 1); });
-    if (Object.getPrototypeOf(x) !== Object.prototype) return x;
-    var o = {}; Object.keys(x).forEach(function (k) { o[k] = SC_ROLE_KEEP[k] ? x[k] : fix(x[k], d + 1); }); return o;
-  };
-  return fix(v, 0);
-}
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { requested: '' }; }
   componentDidMount() {
@@ -126,44 +115,48 @@ class Component extends DCLogic {
     if (this._sync) window.removeEventListener('storage', this._sync);
     if (this._iv) clearInterval(this._iv);
   }
-  renderVals() { return scRoleTh(scOrgFix(this._rv())); }
+  renderVals() { return scOrgFix(this._rv()); }
   _rv() {
     var self = this;
     var SS = function (k) { try { return window.sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+    var TH = { owner: 'เจ้าขององค์กร', admin: 'ผู้ดูแลองค์กร', sm: 'ผู้จัดการไซต์', viewer: 'ผู้ดูอย่างเดียว' };
     var ORGS = {
-      a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', badge: 'sf', role: 'Org Admin' },
-      b: { name: 'กรีนมาร์ท รีเทล', badge: 'gm', role: 'Site Manager' },
-      c: { name: 'นิคมฯ เหนือ', badge: 'nk', role: 'Viewer' },
-      d: { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', badge: 'rt', role: (function () { try { return (JSON.parse(SS('sc.owner') || '{}') || {}).d ? 'Org Admin' : 'Org Owner'; } catch (e) { return 'Org Owner'; } })() },
-      e: { name: 'ริมทะเล รีสอร์ท', badge: 'rr', role: 'Site Manager' }
+      a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', badge: 'sf', role: 'admin', owner: 'วรวุฒิ ก.' },
+      b: { name: 'กรีนมาร์ท รีเทล', badge: 'gm', role: 'sm', owner: 'กิตติ พ.' },
+      c: { name: 'นิคมฯ เหนือ', badge: 'nk', role: 'viewer', owner: 'สุนทร ม.' },
+      d: { name: SS('sc.createdName') || 'ไร่ทองโซลาร์', badge: 'rt', role: (function () { try { return (JSON.parse(SS('sc.owner') || '{}') || {}).d ? 'admin' : 'owner'; } catch (e) { return 'owner'; } })(), owner: '' },
+      e: { name: 'ริมทะเล รีสอร์ท', badge: 'rr', role: 'sm', owner: 'อรุณี ท.' }
     };
     var id = SS('sc.org') || 'c';
     var o = ORGS[id] || ORGS.c;
-    var denied = SS('sc.denied') || 'หน้าสมาชิก';
+    // page names shown in Thai, whatever older pages stored in sc.denied
+    var PAGE_TH = { 'Audit log': 'ประวัติการใช้งาน', 'Role & สิทธิ์': 'บทบาทและสิทธิ์', 'แก้ไข Role': 'หน้าแก้ไขบทบาท' };
+    var denied = SS('sc.denied') || 'หน้าสมาชิก'; denied = PAGE_TH[denied] || denied;
     // a leftover sc.denied must never claim a page this role can open (DATA.md permissions)
-    var opens = { 'Org Owner': ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'Audit log', 'Role & สิทธิ์', 'แก้ไข Role'], 'Org Admin': ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'Audit log', 'Role & สิทธิ์', 'แก้ไข Role'],
-      'Site Manager': ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'Role & สิทธิ์'], 'Viewer': [] }[o.role] || [];
-    if (opens.indexOf(denied) >= 0) denied = { 'Site Manager': 'Audit log', 'Org Admin': 'หน้าลบองค์กร', 'Org Owner': 'หน้าลบองค์กร' }[o.role] || 'หน้าสมาชิก';
+    var ADMIN_OPENS = ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'ประวัติการใช้งาน', 'บทบาทและสิทธิ์', 'หน้าแก้ไขบทบาท'];
+    var opens = { owner: ADMIN_OPENS, admin: ADMIN_OPENS, sm: ['หน้าสมาชิก', 'รายละเอียดสมาชิก', 'บทบาทและสิทธิ์'], viewer: [] }[o.role] || [];
+    if (opens.indexOf(denied) >= 0) denied = { sm: 'ประวัติการใช้งาน', admin: 'หน้าลบองค์กร', owner: 'หน้าลบองค์กร' }[o.role] || 'หน้าสมาชิก';
     var can = {
-      'Viewer': 'Viewer ดูภาพรวม ไซต์ ใบงาน และรายงานได้แบบอ่านอย่างเดียว ส่วนการจัดการสมาชิก สิทธิ์ และ Audit log ทำได้เฉพาะ Org Owner / Org Admin',
-      'Site Manager': 'Site Manager ดูแลไซต์ ใบงาน และเชิญช่างในไซต์ของตนได้ ส่วนการตั้งค่าสิทธิ์และ Audit log ทำได้เฉพาะ Org Owner / Org Admin',
-      'Org Admin': 'หน้านี้ต้องใช้สิทธิ์ที่บทบาทของคุณยังไม่มี ขอให้ Org Owner เปิดสิทธิ์ให้',
-      'Org Owner': 'หน้านี้ต้องใช้สิทธิ์ที่บัญชีนี้ยังไม่มี'
+      viewer: 'ผู้ดูอย่างเดียวดูภาพรวม ไซต์ ใบงาน และรายงานได้ แต่แก้ไขไม่ได้ ส่วนสมาชิก สิทธิ์ และประวัติการใช้งาน จัดการได้เฉพาะเจ้าขององค์กรและผู้ดูแลองค์กร',
+      sm: 'ผู้จัดการไซต์ดูแลไซต์ ใบงาน และเชิญช่างในไซต์ของตนได้ ส่วนการตั้งค่าสิทธิ์และประวัติการใช้งาน จัดการได้เฉพาะเจ้าขององค์กรและผู้ดูแลองค์กร',
+      admin: 'หน้านี้ต้องใช้สิทธิ์ที่บทบาทของคุณยังไม่มี ขอให้เจ้าขององค์กรเปิดสิทธิ์ให้',
+      owner: 'หน้านี้ต้องใช้สิทธิ์ที่บัญชีนี้ยังไม่มี'
     }[o.role];
     var key = id + '|' + denied;
     // one state per visit: 403 (default), 404 or 401 via the kind prop or sc.errorKind
     var kind = String(self.props.kind || SS('sc.errorKind') || '403'); if (['403', '404', '401'].indexOf(kind) < 0) kind = '403';
-    var FROM = { 'Notifications.dc.html': 'การแจ้งเตือน', 'Members.dc.html': 'หน้าสมาชิก', 'MemberDetail.dc.html': 'หน้าสมาชิก', 'Roles.dc.html': 'Role & สิทธิ์', 'RoleEditor.dc.html': 'Role & สิทธิ์', 'AuditLog.dc.html': 'Audit log', 'Main.dc.html': 'ภาพรวม' };
+    var FROM = { 'Notifications.dc.html': 'การแจ้งเตือน', 'Members.dc.html': 'หน้าสมาชิก', 'MemberDetail.dc.html': 'หน้าสมาชิก', 'Roles.dc.html': 'บทบาทและสิทธิ์', 'RoleEditor.dc.html': 'บทบาทและสิทธิ์', 'AuditLog.dc.html': 'ประวัติการใช้งาน', 'Main.dc.html': 'ภาพรวม' };
     var fromF = SS('sc.deniedFrom');
-    var back = FROM[fromF] ? ['กลับไปที่' + (/^[A-Za-z]/.test(FROM[fromF]) ? ' ' : '') + FROM[fromF], fromF === 'RoleEditor.dc.html' ? 'Roles.dc.html' : fromF] : ['กลับไปภาพรวม' + o.name, 'Main.dc.html'];
+    var back = FROM[fromF] ? ['กลับไปที่' + FROM[fromF], fromF === 'RoleEditor.dc.html' ? 'Roles.dc.html' : fromF] : ['กลับไปภาพรวม' + o.name, 'Main.dc.html'];
     var requested = this.state.requested === key;
     return {
-      grantBy: ({ a: 'วรวุฒิ ก. (Org Owner) หรือ Org Admin ของ', b: 'กิตติ พ. (Org Owner) ของ', c: 'สุนทร ม. (Org Owner) ของ', e: 'อรุณี ท. (Org Owner) ของ' }[id] || 'Org Owner ของ') + o.name,
-      orgName: o.name, badge: o.badge, role: o.role, denied: /^[A-Za-z]/.test(denied) ? ' ' + denied + ' ' : denied, canDo: can,
+      grantBy: (o.owner ? o.owner + ' (เจ้าขององค์กร)' + ' ของ' : 'เจ้าขององค์กร ของ') + o.name,
+      orgName: o.name, badge: o.badge, role: TH[o.role], denied: denied, canDo: can,
+      hasShell: kind !== '401',
       backLabel: back[0], backHref: back[1],
       is403: kind === '403', is404: kind === '404', is401: kind === '401',
-      requested: requested, reqMsg: requested ? 'ส่งคำขอถึงผู้ดูแลของ' + o.name + 'แล้ว จะได้รับแจ้งเตือนเมื่อมีการตอบรับ' : '',
-      reqLabel: requested ? 'ส่งคำขอแล้ว' : 'ขอสิทธิ์จากผู้ดูแล',
+      requested: requested, reqMsg: requested ? 'ส่งคำขอถึง' + (o.owner ? o.owner + ' (เจ้าขององค์กร)' : 'เจ้าขององค์กร') + 'แล้ว จะได้รับแจ้งเตือนเมื่อมีการตอบรับ' : '',
+      reqLabel: requested ? 'ส่งคำขอแล้ว' : (o.role === 'owner' ? 'ติดต่อทีม Qleen' : 'ขอสิทธิ์จากเจ้าขององค์กร'),
       request: function () { self.setState({ requested: key }); }
     };
   }

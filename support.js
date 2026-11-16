@@ -44,6 +44,7 @@
     for (var j = 1; j < parts.length; j++) { if (val == null) return undefined; val = val[parts[j]]; }
     return val;
   }
+  // attributes: a value that is exactly one hole passes the raw value (functions, arrays, booleans)
   function evalAttr(text, scopes) {
     if (text == null) return undefined;
     var m = HOLE_ONLY.exec(text);
@@ -139,7 +140,16 @@
   function buildNode(node, scopes) {
     if (node.nodeType === 3) {
       var t = node.nodeValue;
-      return t.indexOf('{{') < 0 ? t : evalAttr(t, scopes);
+      if (t.indexOf('{{') < 0) return t;
+      // a text node that is one hole keeps the spaces around it ("ธนากร ว. {{x}} · เมื่อวาน"), like normal HTML text
+      var one = HOLE_ONLY.exec(t);
+      if (one) {
+        var tv = lookup(one[1], scopes);
+        if (tv == null || tv === false) return null;
+        if (typeof tv !== 'string' && typeof tv !== 'number') return tv;
+        return t.match(/^\s*/)[0] + tv + t.match(/\s*$/)[0];
+      }
+      return evalAttr(t, scopes);
     }
     if (node.nodeType !== 1) return null;
     var tag = node.localName;

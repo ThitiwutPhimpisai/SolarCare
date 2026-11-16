@@ -203,9 +203,9 @@ class Component extends DCLogic {
       siteOpts: [{ id: 'all', label: 'ทุกไซต์ (' + O.sites.length + ')' }].concat(O.sites.map(function (n) { return { id: n, label: shown(n) }; })),
       setSiteF: function (id) { try { window.sessionStorage.setItem('sc.site', id); } catch (e) {} self.setState({ once: '', sync: Date.now() }); }
     };
-    R0.headSub = R0.hasSites ? 'พลังงาน มูลค่า และคาร์บอนตามช่วงเวลา · ข้อมูลจาก FusionSolar ซิงก์ 15 พ.ย. 2569 10:15' : 'พลังงาน มูลค่า และคาร์บอนจะแสดงเมื่อไซต์เริ่มส่งข้อมูล';
+    R0.headSub = R0.hasSites ? 'พลังงาน มูลค่า และคาร์บอนตามช่วงเวลา · ข้อมูลจาก FusionSolar ซิงก์ 15 พ.ย. 2569 10:35' : 'พลังงาน มูลค่า และคาร์บอนจะแสดงเมื่อไซต์เริ่มส่งข้อมูล';
     // the reports hub shares one primary action: export (Viewer cannot export — DATA.md round 13)
-    R0.headActs = R0.hasSites && O.role !== 'Viewer' ? [{ label: 'ส่งออกเป็นรายงาน', icon: 'download', variant: 'primary', href: 'Reports.dc.html', saveKeys: 'sc.reportType=energy|sc.rpExport=1' }] : [];
+    R0.headActs = R0.hasSites && O.role !== 'Viewer' ? [{ label: 'ส่งออกรายงานนี้', icon: 'download', variant: 'primary', href: 'Reports.dc.html', saveKeys: 'sc.reportType=energy|sc.rpExport=1' }] : [];
     return R0;
   }
 }

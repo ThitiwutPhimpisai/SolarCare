@@ -13,7 +13,8 @@
 <style>
 body{margin:0}
 a{color:#0F6B5C}a:hover{color:#0A4F44}
-@media (max-width: 767px){.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}.dv-grp td{padding:8px 12px !important}}
+@media (max-width: 767px){.rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}.dv-grp td{padding:8px 12px !important}.rt td.dv-hide-m{display:none !important}.rt .dv-m-only{display:inline !important}.rt tr.dv-row{display:flex !important;align-items:center;gap:8px}.rt tr.dv-row td.rt-main{flex:1 1 auto;min-width:0;padding-bottom:4px !important}.rt tr.dv-row td.dv-st{flex:none}.rt tr.dv-row td.dv-st::before{display:none}}
+.dv-m-only{display:none}
 </style>
 </helmet>
 <div style="font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; color: #111827">
@@ -36,26 +37,29 @@ a{color:#0F6B5C}a:hover{color:#0A4F44}
           <button type="button" onClick="{{clearZone}}" aria-label="{{zoneAria}}" style="font-family: inherit; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid #0F6B5C; border-radius: 999px; background: #E7F2EF; color: #0A4F44; font-size: 13px; font-weight: 600; cursor: pointer">{{zoneLabel}}<dc-import name="Icon" icon="x" size="14" hint-size="14px,14px"></dc-import></button>
         </div>
       </sc-if>
-      <div style="padding: 0 20px">
-        <dc-import name="FilterChips" label="กรองอุปกรณ์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
+      <div style="padding: 0 20px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center">
+        <div style="flex: 1 1 280px; min-width: 0"><dc-import name="FilterChips" label="สถานะอุปกรณ์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import></div>
+        <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #374151">ประเภท
+          <select onChange="{{setT}}" style="font-family: inherit; min-height: 44px; padding: 0 10px; border: 1px solid #D5D9E0; border-radius: 8px; background: #FFFFFF; font-size: 14px; color: #111827">
+            <sc-for list="{{typeOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.id}}" selected="{{o.on}}">{{o.label}}</option></sc-for>
+          </select></label>
       </div>
       <div style="padding: 0 20px; font-size: 12px; color: #4B5563">ดึงข้อมูลจาก {{loggerName}} ทุก 5 นาที · กดที่อุปกรณ์เพื่อดูสเปกและค่าล่าสุด</div>
       <table class="rt" aria-label="{{tableLabel}}" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 520px">
-        <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">อุปกรณ์</th><th scope="col" style="padding: 10px 12px; font-weight: 600">สถานะ</th><th scope="col" style="padding: 10px 12px; font-weight: 600">ประเภท</th><th scope="col" style="padding: 10px 12px; font-weight: 600">รุ่น</th></tr></thead>
+        <thead><tr style="text-align: left; color: #4B5563; font-size: 12px"><th scope="col" style="padding: 10px 20px; font-weight: 600">อุปกรณ์</th><th scope="col" style="padding: 10px 12px; font-weight: 600">สถานะ</th><th scope="col" style="padding: 10px 12px; font-weight: 600">รุ่น</th></tr></thead>
         <tbody>
           <sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
-            <tr class="dv-grp" style="{{g.rowStyle}}"><td class="rt-main" colspan="4" style="{{g.cellStyle}}">{{g.title}}</td></tr>
+            <tr class="dv-grp" style="{{g.rowStyle}}"><td class="rt-main" colspan="3" style="{{g.cellStyle}}">{{g.title}}</td></tr>
             <sc-for list="{{g.rows}}" as="d" hint-placeholder-count="3">
-              <tr style="border-top: 1px solid #EEF0F3">
+              <tr class="dv-row" style="border-top: 1px solid #EEF0F3">
                 <td class="rt-main" style="padding: 8px 20px">
                   <a href="DeviceDetail.dc.html" onPointerDown="{{d.go}}" onKeyDown="{{d.go}}" onClick="{{d.go}}" style="display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #111827">
                     <img src="{{d.img}}" alt="" width="40" height="40" style="width: 40px; height: 40px; object-fit: contain; flex: none; border-radius: 6px; background: #FFFFFF; border: 1px solid #EEF0F3">
-                    <span style="display: flex; flex-direction: column; min-width: 0"><span style="font-weight: 600; color: #0F6B5C; overflow-wrap: anywhere">{{d.name}}</span><span style="font-size: 12px; color: #4B5563">{{d.sub}}</span></span>
+                    <span style="display: flex; flex-direction: column; min-width: 0"><span style="font-weight: 600; color: #0F6B5C; overflow-wrap: anywhere">{{d.name}}</span><span style="font-size: 12px; color: #4B5563">{{d.sub}}<span class="dv-m-only"> · {{d.model}}</span></span></span>
                   </a>
                 </td>
-                <td data-label="สถานะ" style="padding: 8px 12px"><dc-import name="StatusPill" kind="device" value="{{d.stKey}}" label="{{d.stText}}" hint-size="110px,24px"></dc-import></td>
-                <td data-label="ประเภท" style="padding: 8px 12px">{{d.typeTh}}</td>
-                <td data-label="รุ่น" style="padding: 8px 20px 8px 12px">{{d.model}}</td>
+                <td class="dv-st" data-label="สถานะ" style="padding: 8px 12px"><dc-import name="StatusPill" kind="device" value="{{d.stKey}}" label="{{d.stText}}" hint-size="110px,24px"></dc-import></td>
+                <td class="dv-hide-m" data-label="รุ่น" style="padding: 8px 20px 8px 12px">{{d.model}}</td>
               </tr>
             </sc-for>
           </sc-for>
@@ -210,7 +214,7 @@ function dvRead(F, d) {
     var a = p * 1000 / v / C.mppt / 0.985;
     return { at: 'อัปเดต 15 พ.ย. 2569 10:40 · ผ่าน ' + d.link, rows: [
       ['กำลังไฟฟ้าขณะนี้', dvNum(p, 1), 'kW', 'พิกัด ' + C.rated + ' kW'], ['พลังงานวันนี้', dvNum(e, 0), 'kWh'], ['พลังงานสะสม', dvNum(invKwp * 1.35 * months / 12, 1), 'MWh', 'ตั้งแต่ ' + S.inst],
-      ['ประสิทธิภาพ', dvNum(dvJit(d.name + 'f', C.eff[0], C.eff[1]), 2), '%'], ['อุณหภูมิภายใน', dvNum(dvJit(d.name + 't', 41, 49), 1), '°C'],
+      ['ประสิทธิภาพแปลงไฟ', dvNum(dvJit(d.name + 'f', C.eff[0], C.eff[1]), 2), '%'], ['อุณหภูมิภายใน', dvNum(dvJit(d.name + 't', 41, 49), 1), '°C'],
       ['อินพุต MPPT', C.mppt + ' × ' + dvNum(v) + ' V', '', d.st === 'alarm' ? 'MPPT 4: กระแสต่ำกว่าค่าเฉลี่ย 18%' : 'เฉลี่ย ' + dvNum(a, 1) + ' A ต่อ MPPT']] };
   }
   var sumP = 0, sumE = 0, online = 0;
@@ -230,7 +234,7 @@ function dvRead(F, d) {
     ['กำลังผลิตรวมขณะนี้', dvNum(sumP, 0), 'kW'], ['พลังงานรวมวันนี้', dvNum(sumE / (S.kwp >= 2000 ? 1000 : 1), S.kwp >= 2000 ? 2 : 0), S.kwp >= 2000 ? 'MWh' : 'kWh']] };
 }
 class Component extends DCLogic {
-  constructor(p) { super(p); this.state = { f: 'all' }; }
+  constructor(p) { super(p); this.state = { f: 'all', t: 'all' }; }
   renderVals() {
     var self = this, p = this.props, mode = p.mode ?? 'list', site = p.site ?? 'ฟาร์มโคราช 1';
     var F = dvFleet(site);
@@ -244,25 +248,26 @@ class Component extends DCLogic {
     var devs = F.devices;
     var count = function (fn) { return devs.filter(fn).length; };
     if (mode !== 'detail') {
-      var FILT = ['all', 'check', 'ok', 'inv', 'meter', 'logger'];
+      var FILT = ['all', 'check', 'ok'], TF = ['all', 'inv', 'meter', 'logger'];
+      var tf = TF.indexOf(self.state.t) >= 0 ? self.state.t : 'all';
       var f = FILT.indexOf(self.state.f) >= 0 ? self.state.f : 'all';
-      if (f === 'check' && !nAl) f = 'all';
       var zq = String(p.zone ?? '').replace(/^โซน\s*/, '').trim();
       var zoneOk = zq && F.S.zones && F.S.zones.some(function (z) { return z[0] === zq; });
       // chip counts follow the zone filter (only that zone's inverters are listed)
-      var inZone = function (d) { return !zoneOk || (d.type === 'inv' && d.zone === 'โซน ' + zq); };
+      var inZone = function (d) { return (!zoneOk || (d.type === 'inv' && d.zone === 'โซน ' + zq)) && (tf === 'all' || d.type === tf); };
       count = function (fn) { return devs.filter(function (d) { return inZone(d) && fn(d); }).length; };
       var nAl = count(function (d) { return d.st !== 'ok'; });
+      if (f === 'check' && !nAl) f = 'all';
       var row = function (d) {
         var s = stv[d.st];
-        return { name: d.name, sub: d.type === 'inv' ? (d.zone ? d.zone + ' · ' : '') + d.addr : d.zone, img: d.img, typeTh: DV_TYPE[d.type], model: d.model,
+        return { name: d.name, sub: d.type === 'inv' ? (d.zone ? d.zone + ' · ' : '') + d.addr : DV_TYPE[d.type] + (d.zone ? ' · ' + d.zone : ''), img: d.img, typeTh: DV_TYPE[d.type], model: d.model,
           stIcon: s[0], stTone: s[1], stText: s[2], stKey: d.st === 'ok' ? 'online' : d.st === 'alarm' ? 'warn' : 'offline',
           go: key(function (ss) { ss.setItem('sc.device', d.name); ss.setItem('sc.siteName', site); ss.setItem('sc.deviceFrom', 'SiteDetail'); }) };
       };
       var keep = function (d) {
-        if (zoneOk && !(d.type === 'inv' && d.zone === 'โซน ' + zq)) return false;
-        if (f === 'all') return true; if (f === 'check') return d.st !== 'ok'; if (f === 'ok') return d.st === 'ok';
-        return d.type === f;
+        if (!inZone(d)) return false;
+        if (f === 'check') return d.st !== 'ok'; if (f === 'ok') return d.st === 'ok';
+        return true;
       };
       var G = function (title, rows, warn) { return { title: title, rows: rows.map(row),
         rowStyle: 'border-top: 1px solid ' + (warn ? '#F3D7B0' : '#EEF0F3') + '; background: ' + (warn ? '#FFF4E5' : '#FAFBFC'),
@@ -280,10 +285,12 @@ class Component extends DCLogic {
       else { var r2 = devs.filter(function (d) { return d.type === 'inv' && okOnly(d); }); if (r2.length) groups.push(G('อินเวอร์เตอร์ · ' + r2.length + ' เครื่อง', r2)); }
       var opts = [{ id: 'all', label: 'ทั้งหมด', count: count(function () { return true; }) }];
       if (nAl) opts.push({ id: 'check', label: 'ต้องตรวจ', count: nAl });
-      opts.push({ id: 'ok', label: 'ออนไลน์', count: count(function (d) { return d.st === 'ok'; }) }, { id: 'inv', label: 'อินเวอร์เตอร์', count: count(function (d) { return d.type === 'inv'; }) }, { id: 'meter', label: 'มิเตอร์', count: count(function (d) { return d.type === 'meter'; }) }, { id: 'logger', label: 'ล็อกเกอร์', count: count(function (d) { return d.type === 'logger'; }) });
+      opts.push({ id: 'ok', label: 'ออนไลน์', count: count(function (d) { return d.st === 'ok'; }) });
+      var nT = function (t) { return devs.filter(function (d) { return (!zoneOk || (d.type === 'inv' && d.zone === 'โซน ' + zq)) && (t === 'all' || d.type === t); }).length; };
+      var typeOpts = [['all', 'ทุกประเภท'], ['inv', 'อินเวอร์เตอร์'], ['meter', 'มิเตอร์ไฟฟ้า'], ['logger', 'ดาต้าล็อกเกอร์']].filter(function (o) { return o[0] === 'all' || nT(o[0]); }).map(function (o) { return { id: o[0], label: o[1] + ' (' + nT(o[0]) + ')', on: o[0] === tf }; });
       return Object.assign(base, {
         f: f, setF: function (id) { self.setState({ f: id }); },
-        chipOpts: opts,
+        chipOpts: opts, typeOpts: typeOpts, setT: function (e) { self.setState({ t: e && e.target ? e.target.value : 'all' }); },
         nOk: count(function (d) { return d.st === 'ok'; }), nAlarm: count(function (d) { return d.st === 'alarm'; }), nOff: count(function (d) { return d.st === 'off'; }),
         hasZone: !!zoneOk, zoneLabel: zoneOk ? 'อินเวอร์เตอร์โซน ' + zq : '', zoneAria: 'ลบตัวกรอง อินเวอร์เตอร์โซน ' + zq, clearZone: function () { if (self.props.onClearZone) self.props.onClearZone(); },
         loggerName: F.logger, tableLabel: 'อุปกรณ์ในไซต์ ' + siteDN, groups: groups, noRows: groups.length === 0,
@@ -296,8 +303,8 @@ class Component extends DCLogic {
     var repWo = null; try { var wst = JSON.parse(window.sessionStorage.getItem('sc.woStat') || '{}') || {}; repWo = (JSON.parse(window.sessionStorage.getItem('sc.createdWo') || '[]') || []).filter(function (w) { return w && w.site === site && (w.device === d.name || String(w.title || '').indexOf(d.name) >= 0) && (wst[w.no] || w.st) !== 'done'; }).pop() || null; } catch (x) { repWo = null; }
     var mono = 'margin: 2px 0 0; font-family: ui-monospace, monospace; font-size: 14px; overflow-wrap: anywhere', plain = 'margin: 2px 0 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere';
     var info = [['ชื่ออุปกรณ์', d.name], ['ประเภท', DV_TYPE[d.type]], ['รุ่น', d.model], ['หมายเลขเครื่อง (SN)', d.sn, 1], ['เวอร์ชันซอฟต์แวร์', d.sw, 1], [d.type === 'logger' ? 'ที่อยู่ IP' : 'การเชื่อมต่อ RS485', d.addr, 1],
-      ['เชื่อมกับ', d.link], ['ตำแหน่ง', (d.zone || 'ทั้งไซต์') + ' · ' + siteDN], ['ติดตั้ง', F.S.inst], ['สถานะ', s[2]]].map(function (x) { return { k: x[0], v: x[1], style: x[2] ? mono : plain }; });
-    var note = d.st === 'alarm' ? ['แจ้งเตือน: กระแสสตริง 4 ต่ำ', 'MPPT 4 ของ ' + d.name + ' ต่ำกว่าค่าเฉลี่ย 18% ตั้งแต่ 14 พ.ย. 15:10 · ตรงกับจุดร้อน (hotspot) 2 แผงในโซน C ที่กำลังตรวจตามใบงาน WO-1042', 'alert', 'warn', '#FFF4E5', '#F3D7B0', '#8A3B06']
+      ['เชื่อมกับ', d.link], ['ตำแหน่ง', (d.zone || 'ทั้งไซต์') + ' · ' + siteDN], ['ติดตั้ง', F.S.inst]].map(function (x) { return { k: x[0], v: x[1], style: x[2] ? mono : plain }; });
+    var note = d.st === 'alarm' ? ['แจ้งเตือน: MPPT 4 กระแสต่ำ', 'MPPT 4 ของ ' + d.name + ' ต่ำกว่าค่าเฉลี่ย 18% ตั้งแต่ 14 พ.ย. 15:10 · ตรงกับจุดร้อน (hotspot) 2 แผงในโซน C ที่กำลังตรวจตามใบงาน WO-1042', 'alert', 'warn', '#FFF4E5', '#F3D7B0', '#8A3B06']
       : d.st === 'off' ? ['ขาดการเชื่อมต่อ', d.name + ' ไม่ส่งข้อมูลถึง ' + d.link + ' ตั้งแต่ 14 พ.ย. 2569 22:10 · ตรวจสาย RS485 (COM2) และไฟเลี้ยงที่ตู้ ถ้ายังไม่กลับมา ให้สร้างใบงานซ่อม', 'wifiOff', 'danger', '#FDECEA', '#F3C4BF', '#B42318'] : null;
     return Object.assign(base, {
       dv: { img: d.img, model: d.model, src: C.src, name: d.name, sn: d.sn },

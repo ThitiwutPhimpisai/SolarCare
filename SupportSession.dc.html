@@ -35,6 +35,24 @@ button{font-family:inherit}
       <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
       <dc-import name="PageHeader" icon="overview" eyebrow="{{eyebrow}}" title="ภาพรวม" subtitle="โหมดช่วยเหลือ · ดูได้อย่างเดียว แก้ไขไม่ได้" hint-size="100%,96px"></dc-import>
 
+      <section aria-labelledby="ss-attn" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
+        <div style="padding: 12px 20px; border-bottom: 1px solid #E3E6EB">
+          <h2 id="ss-attn" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="site" size="18" tone="muted" hint-size="18px,18px"></dc-import>ไซต์ที่ต้องดูแล</h2>
+        </div>
+        <p style="margin: 0; padding: 8px 20px 0; font-size: 13px; color: #4B5563">ลำดับเดียวกับหน้าภาพรวมของลูกค้า: เลยกำหนดมากสุด แล้วใกล้ครบรอบ</p>
+        <sc-if value="{{attnEmpty}}" hint-placeholder-val="{{ false }}">
+          <dc-import name="ListState" state="empty" unit="ไซต์" icon="checkCircle" empty-title="ทุกไซต์อยู่ในรอบล้าง" empty-text="ไม่มีไซต์เลยกำหนดหรือใกล้ครบรอบใน 14 วัน" hint-size="100%,160px"></dc-import>
+        </sc-if>
+        <ul style="list-style: none; margin: 0; padding: 4px 0 0">
+          <sc-for list="{{attn}}" as="r" hint-placeholder-count="3">
+            <li style="border-top: 1px solid #EEF0F3; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-height: 64px; padding: 10px 20px; box-sizing: border-box">
+              <span style="flex: 1 1 200px; min-width: 0"><span style="display: block; font-weight: 600">{{r.name}}</span><span style="display: block; font-size: 13px; color: #4B5563">{{r.prov}} · ล้างล่าสุด {{r.last}}</span></span>
+              <dc-import name="StatusPill" kind="site" value="{{r.s}}" hint-size="110px,26px"></dc-import>
+            </li>
+          </sc-for>
+        </ul>
+      </section>
+
       <section aria-label="สถานะโดยรวม" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(16px, 2.5vw, 20px); display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: center">
         <div style="flex: 1 1 200px">
           <span style="display: block; font-size: 14px; color: #4B5563">ใบงานเปิดอยู่</span>
@@ -49,8 +67,8 @@ button{font-family:inherit}
 
       <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px">
         <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #E3E6EB">
-          <h2 style="margin: 0; font-size: 16px">ไซต์</h2>
-          <span title="แก้ไขไม่ได้ในโหมดช่วยเหลือ"><dc-import name="Button" variant="primary" label="เพิ่มไซต์" icon="plus" disabled="{{true}}" hint-size="120px,44px"></dc-import></span>
+          <h2 style="margin: 0; font-size: 16px">ไซต์ทั้งหมด</h2>
+          <span style="font-size: 13px; color: #4B5563">{{siteCount}} ไซต์ · ดูอย่างเดียว</span>
         </div>
         <div style="overflow-x: auto">
           <table class="rt" aria-label="ไซต์ขององค์กร (อ่านอย่างเดียว)" style="width: 100%; border-collapse: collapse; font-size: 14px; min-width: 640px">
@@ -133,9 +151,9 @@ class Component extends DCLogic {
       a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', short: 'สยามโซลาร์ฟาร์ม', kwp: '16,710', open: 4, late: 1, members: scMemberCount('a', 6),
         rows: [R('ฟาร์มโคราช 1', 'นครราชสีมา', '8,400', '18 ส.ค. 2569', 'due', 'k1'), R('ฟาร์มโคราช 2', 'นครราชสีมา', '6,200', '12 ต.ค. 2569', 'due', 'k2'), R('หลังคาโรงงานบางปู', 'สมุทรปราการ', '1,150', '28 ส.ค. 2569', 'late', 'bp'), R('ลานจอดรถลพบุรี', 'ลพบุรี', '960', '5 พ.ย. 2569', 'ok', 'lb')] },
       b: { name: 'กรีนมาร์ท รีเทล', short: 'กรีนมาร์ท รีเทล', kwp: '800', open: 2, late: 1, members: scMemberCount('b', 4),
-        rows: [R('สาขารังสิต', 'ปทุมธานี', '420', '28 ต.ค. 2569', 'ok', 'rs'), R('สาขาบางนา', 'กรุงเทพฯ', '380', '13 ก.ย. 2569', 'late', 'bn')] },
+        rows: [R('สาขารังสิต', 'ปทุมธานี', '420', '28 ต.ค. 2569', 'due', 'rs'), R('สาขาบางนา', 'กรุงเทพฯ', '380', '13 ก.ย. 2569', 'late', 'bn')] },
       c: { name: 'นิคมฯ เหนือ', short: 'นิคมฯ เหนือ', kwp: '2,300', open: 1, late: 0, members: scMemberCount('c', 3),
-        rows: [R('โรงงาน A ลำพูน', 'ลำพูน', '2,300', '30 ต.ค. 2569', 'ok', 'lp')] },
+        rows: [R('โรงงาน A ลำพูน', 'ลำพูน', '2,300', '30 ต.ค. 2569', 'due', 'lp')] },
       d: (function () {
         var rl = function (k) { try { var v = JSON.parse(SS(k) || '[]'); return Array.isArray(v) ? v.filter(function (x) { return x && x.org === 'd'; }) : []; } catch (e) { return []; } };
         var ds = rl('sc.createdSites'), di = rl('sc.createdInvites'), nm = SS('sc.createdName') || 'ไร่ทองโซลาร์';
@@ -161,7 +179,7 @@ class Component extends DCLogic {
         try { log = JSON.parse(ss.getItem('sc.supportLog') || '[]') || []; } catch (x) { log = []; }
         var d = new Date(), hm = (function (ms) { var t0 = Number(ss.getItem('sc.protoT0')) || 0; if (!t0) { t0 = ms; ss.setItem('sc.protoT0', String(t0)); } var m = 640 + Math.floor((ms - t0) / 60000); m = Math.min(m, 1439); return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); })(d.getTime()); // prototype clock, same as the start time
         var t0 = Number(ss.getItem('sc.supportStartMs')) || 0, mins = t0 ? Math.max(1, Math.round((d.getTime() - t0) / 60000)) : 0;
-        log.push({ org: SS('sc.porg') || 'a', reason: SS('sc.supportReason') || 'ไม่ได้ระบุเหตุผล', start: SS('sc.supportStart') || 'วันนี้', end: 'วันนี้ ' + hm, mins: mins });
+        log.push({ org: SS('sc.porg') || 'a', reason: SS('sc.supportReason') || 'เลขเรื่อง #4821 · รายงานไม่ตรง', start: SS('sc.supportStart') || 'วันนี้', end: 'วันนี้ ' + hm, mins: mins });
         ss.setItem('sc.supportLog', JSON.stringify(log));
         ss.removeItem('sc.supportReason'); ss.removeItem('sc.supportStart'); ss.removeItem('sc.supportStartMs');
       } catch (x) {}
@@ -172,14 +190,16 @@ class Component extends DCLogic {
       leftMin: (function () { try { var ss = window.sessionStorage, now = Date.now(), t0 = Number(ss.getItem('sc.protoT0')) || now, protoNow = 640 + Math.floor((now - t0) / 60000), st = Number(ss.getItem('sc.supportStartMs')) || 0; var elapsed = st ? Math.floor((now - st) / 60000) : protoNow - 634; return Math.max(0, 60 - elapsed); } catch (x) { return 54; } })(),
       endKeys: 'sc.from=|sc.pdTab=access|sc.flash=จบเซสชันช่วยเหลือแล้ว · บันทึกในประวัติการเข้าถึงขององค์กรแล้ว',
       eyebrow: o.name + ' / ทุกไซต์',
-      o: o, noRows: o.rows.length === 0, reason: SS('sc.supportReason') || 'ไม่ได้ระบุเหตุผล',
+      o: o, noRows: o.rows.length === 0, reason: SS('sc.supportReason') || 'เลขเรื่อง #4821 · รายงานไม่ตรง',
       heroValue: o.open,
       kpis: [
         { label: 'กำลังติดตั้งรวม', icon: 'panel', value: o.kwp, unit: 'kWp' },
         { label: 'เลยกำหนดล้าง', icon: 'clock', value: o.late, unit: 'ไซต์' },
         { label: 'สมาชิก', icon: 'users', value: o.members, unit: 'คน' }
       ],
-      rows: o.rows
+      rows: o.rows, siteCount: o.rows.length,
+      attn: o.rows.filter(function (r) { return r.s === 'late' || r.s === 'due'; }).sort(function (x, y) { return (x.s === 'late' ? 0 : 1) - (y.s === 'late' ? 0 : 1); }),
+      attnEmpty: !o.rows.some(function (r) { return r.s === 'late' || r.s === 'due'; }),
     };
   }
 }

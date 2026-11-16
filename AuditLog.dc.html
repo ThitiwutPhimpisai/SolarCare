@@ -11,7 +11,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
-@media (max-width: 767px){
+@media (min-width: 1024px){.rt{min-width:0 !important}.rt .al-nw{white-space:nowrap}}
+@media (max-width: 1023px){
 .rt{min-width:0 !important}.rt thead{display:none !important}.rt tr{display:block !important;padding:10px 4px !important}.rt td{display:flex !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px;padding:4px 12px !important;border:0 !important;text-align:right}.rt td[data-label]::before{content:attr(data-label);font-size:12px;color:#4B5563;text-align:left}.rt td.rt-main{display:block !important;text-align:left;padding-bottom:6px !important}
 }
 body{margin:0;background:#F5F6F8}
@@ -25,15 +26,10 @@ button{font-family:inherit;cursor:pointer}
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
-    <dc-import name="PageHeader" title="ตั้งค่าองค์กร" icon="building" hub="settings" hub-current="audit" subtitle="ทุกการเปลี่ยนแปลงในองค์กร · เก็บ 1 ปี · แก้ไขไม่ได้" actions="{{phActions}}" hint-size="100%,140px"></dc-import>
+    <dc-import name="PageHeader" title="ตั้งค่าองค์กร" icon="building" hub="settings" hub-current="audit" hub-hide="{{hubHide}}" subtitle="ทุกการเปลี่ยนแปลงในองค์กร · เก็บ 1 ปี · แก้ไขไม่ได้" actions="{{phActions}}" hint-size="100%,140px"></dc-import>
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
-      <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; max-width: 560px">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>ประวัติการใช้งาน ดูได้เฉพาะ เจ้าขององค์กร และ ผู้ดูแลองค์กร</h2>
-        <p style="margin: 0; font-size: 14px; color: #4B5563; line-height: 1.6">คุณเป็น {{myRole}} ใน {{orgName}} ถ้าต้องการตรวจประวัติการเปลี่ยนแปลง ขอให้ผู้ดูแลองค์กรส่งออกให้ หรือขอสิทธิ์เพิ่ม</p>
-        <sc-if value="{{notRequested}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" icon="mail" label="ขอสิทธิ์ดู ประวัติการใช้งาน" on-press="{{requestAccess}}" hint-size="180px,44px"></dc-import></sc-if>
-        <div role="status" aria-live="polite"><sc-if value="{{requested}}" hint-placeholder-val="{{ false }}"><div style="font-size: 13px; padding: 10px 12px; border-radius: 8px; background: #E7F2EF; color: #0A4F44">ส่งคำขอถึง {{ownerName}} แล้ว · จะได้รับการแจ้งเตือนเมื่อมีการอนุมัติ</div></sc-if></div>
-      </section>
+      <dc-import name="LockedCard" title="ประวัติการใช้งาน ดูได้เฉพาะเจ้าขององค์กรและผู้ดูแลองค์กร" role="{{myRole}}" org="{{orgName}}" note="ขอให้ผู้ดูแลองค์กรส่งออกประวัติให้ได้" ask-name="{{ownerName}}" request-label="ขอสิทธิ์ดูประวัติการใช้งาน" hint-size="100%,200px"></dc-import>
     </sc-if>
     <sc-if value="{{canSee}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-direction: column; gap: 12px">
@@ -44,11 +40,8 @@ button{font-family:inherit;cursor:pointer}
         <select id="al-who" value="{{who}}" onChange="{{setWho}}" style="min-height: 44px; flex: 0 1 200px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
           <sc-for list="{{whoOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}">{{o.t}}</option></sc-for>
         </select>
-        <label for="al-range" style="position: absolute; left: -9999px">ช่วงเวลา</label>
-        <select id="al-range" value="{{range}}" onChange="{{setRange}}" style="min-height: 44px; flex: 0 1 180px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #111827">
-          <option value="1">วันนี้</option><option value="7">7 วันล่าสุด</option><option value="30">30 วันล่าสุด</option><option value="90">90 วันล่าสุด</option><option value="all">ทั้งหมด (1 ปี)</option>
-        </select>
       </div>
+      <dc-import name="DateRange" label="ช่วงเวลาของประวัติ" store-key="sc.auditRange" presets="d7,d30,m3,custom" default-preset="m3" hide-group="true" hide-compare="true" on-change="{{onRange}}" hint-size="100%,120px"></dc-import>
       <dc-import name="FilterChips" label="ประเภทเหตุการณ์" value="{{f}}" options="{{chipOpts}}" on-change="{{setF}}" hint-size="100%,44px"></dc-import>
     </div>
     <dc-import name="ResultBar" count="{{shownN}}" total="{{totalN}}" unit="เหตุการณ์" active="{{filtered}}" on-clear="{{showAll}}" hint-size="100%,44px"></dc-import>
@@ -64,10 +57,10 @@ button{font-family:inherit;cursor:pointer}
           <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
             <tr style="{{r.tr}}">
               <td data-label="เวลา" style="padding: 12px 20px; font-size: 13px; color: #374151; white-space: nowrap">{{r.when}}</td>
-              <td class="rt-main" style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><dc-import name="Avatar" person="{{r.av}}" size="{{28}}" hint-size="28px,28px"></dc-import><span style="font-weight: 600">{{r.who}}</span></div></td>
+              <td class="rt-main" style="padding: 12px"><div style="display: flex; align-items: center; gap: 8px"><dc-import name="Avatar" person="{{r.av}}" size="{{28}}" hint-size="28px,28px"></dc-import><span class="al-nw" style="font-weight: 600">{{r.who}}</span></div></td>
               <td data-label="การกระทำ" style="padding: 12px"><span title="{{r.codeTitle}}" style="{{r.tag}}">{{r.action}}</span></td>
               <td data-label="รายละเอียด" style="padding: 12px; color: #374151">{{r.detail}}</td>
-              <td data-label="ไซต์" style="padding: 12px 20px; color: #374151">{{r.site}}</td>
+              <td data-label="ไซต์" class="al-nw" style="padding: 12px 20px; color: #374151">{{r.site}}</td>
             </tr>
           </sc-for>
           <sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
@@ -125,12 +118,57 @@ function scRoleTh(v) {
   };
   return fix(v, 0);
 }
+// ---- sc.range resolver (DATA.md round 10) — identical copy in DateRange, EnergyStats, Reports, EnergyValue, WorkOrders ----
+var SCR_START = Math.round(Date.UTC(2025, 0, 1) / 864e5), SCR_TODAY = Math.round(Date.UTC(2026, 10, 15) / 864e5);
+var SCR_MN = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+var SCR_PRESETS = [['d7', '7 วัน'], ['d30', '30 วัน'], ['m3', '3 เดือน'], ['m6', '6 เดือน'], ['m12', '12 เดือน'], ['ytd', 'ปีนี้'], ['ly', 'ปีที่แล้ว'], ['custom', 'กำหนดเอง']];
+function scrDay(iso) { var p = String(iso || '').split('-'); if (p.length < 3) return NaN; var d = Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 864e5); return isNaN(d) ? NaN : d; }
+function scrIso(d) { var x = new Date(d * 864e5); return x.getUTCFullYear() + '-' + ('0' + (x.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + x.getUTCDate()).slice(-2); }
+function scrTh(d, short) { var x = new Date(d * 864e5), y = x.getUTCFullYear() + 543; return x.getUTCDate() + ' ' + SCR_MN[x.getUTCMonth()] + ' ' + (short ? String(y).slice(-2) : y); }
+function scrPresetRange(p) {
+  var T = SCR_TODAY, ms = function (n) { return Math.round(Date.UTC(2026, 10 - n + 1, 1) / 864e5); };
+  if (p === 'd7') return [T - 6, T]; if (p === 'd30') return [T - 29, T]; if (p === 'm3') return [ms(3), T]; if (p === 'm6') return [ms(6), T];
+  if (p === 'ytd') return [Math.round(Date.UTC(2026, 0, 1) / 864e5), T]; if (p === 'ly') return [Math.round(Date.UTC(2025, 0, 1) / 864e5), Math.round(Date.UTC(2025, 11, 31) / 864e5)];
+  return [ms(12), T];
+}
+function scrGroups(len) { return [['day', 'รายวัน', len <= 62, 'ช่วงยาวเกิน 62 วัน'], ['week', 'รายสัปดาห์', len >= 7 && len <= 366, len < 7 ? 'ช่วงสั้นกว่า 7 วัน' : 'ช่วงยาวเกิน 1 ปี'], ['month', 'รายเดือน', len >= 28, 'ช่วงสั้นกว่า 1 เดือน'], ['quarter', 'รายไตรมาส', len >= 89, 'ช่วงสั้นกว่า 3 เดือน'], ['year', 'รายปี', len >= 300, 'ช่วงสั้นกว่า 1 ปี']]; }
+function scrDefaultGroup(len) { return len <= 31 ? 'day' : len <= 62 ? 'week' : 'month'; }
+function scrResolve(raw) {
+  var r = {}; try { r = typeof raw === 'string' ? (JSON.parse(raw || '{}') || {}) : (raw || {}); } catch (e) { r = {}; }
+  var preset = SCR_PRESETS.some(function (x) { return x[0] === r.preset; }) ? r.preset : 'm12', a, b, clamped = false;
+  if (preset === 'custom') { a = scrDay(r.from); b = scrDay(r.to); if (isNaN(a) || isNaN(b) || a > b) { preset = 'm12'; } }
+  if (preset !== 'custom') { var pr = scrPresetRange(preset); a = pr[0]; b = pr[1]; }
+  if (a < SCR_START) { a = SCR_START; clamped = true; } if (b > SCR_TODAY) { b = SCR_TODAY; clamped = true; } if (a > b) a = b;
+  if (b - a > 1095) { a = b - 1095; clamped = true; }
+  var len = b - a + 1, g = r.group, okG = scrGroups(len).filter(function (x) { return x[0] === g && x[2]; })[0]; if (!okG) g = scrDefaultGroup(len);
+  var pname = SCR_PRESETS.filter(function (x) { return x[0] === preset; })[0][1];
+  var pa = a - len, pb = a - 1, cmpOk = pa >= SCR_START;
+  return { preset: preset, from: a, to: b, fromIso: scrIso(a), toIso: scrIso(b), len: len, group: g, groupLabel: scrGroups(len).filter(function (x) { return x[0] === g; })[0][1],
+    compare: !!r.compare && cmpOk, compareAsked: !!r.compare, compareOk: cmpOk, prevFrom: pa, prevTo: pb, clamped: clamped,
+    label: (preset === 'custom' ? '' : pname + ' · ') + scrTh(a) + ' – ' + scrTh(b), short: preset === 'custom' ? scrTh(a, 1) + ' – ' + scrTh(b, 1) : pname,
+    prevLabel: scrTh(pa) + ' – ' + scrTh(pb) };
+}
+function scrBuckets(a, b, g) {
+  var out = [], d = a, guard = 0;
+  while (d <= b && guard++ < 2000) {
+    var x = new Date(d * 864e5), y = x.getUTCFullYear(), m = x.getUTCMonth(), e, lab;
+    if (g === 'day') { e = d; lab = x.getUTCDate() + ' ' + SCR_MN[m]; }
+    else if (g === 'week') { var wd = (x.getUTCDay() + 6) % 7; e = Math.min(b, d - wd + 6); var xe = new Date(e * 864e5); lab = x.getUTCDate() + (xe.getUTCMonth() !== m ? ' ' + SCR_MN[m] : '') + '–' + xe.getUTCDate() + ' ' + SCR_MN[xe.getUTCMonth()]; }
+    else if (g === 'month') { e = Math.round(Date.UTC(y, m + 1, 0) / 864e5); lab = SCR_MN[m] + ' ' + String(y + 543).slice(-2); if (x.getUTCDate() !== 1 || e > b) lab = x.getUTCDate() + '–' + new Date(Math.min(e, b) * 864e5).getUTCDate() + ' ' + lab; } // part of a month (e.g. 1–15 พ.ย. 69 month-to-date) says so
+    else if (g === 'quarter') { var q = Math.floor(m / 3); e = Math.round(Date.UTC(y, q * 3 + 3, 0) / 864e5); lab = 'ไตรมาส ' + (q + 1) + '/' + String(y + 543).slice(-2); }
+    else { e = Math.round(Date.UTC(y, 12, 0) / 864e5); lab = String(y + 543); }
+    e = Math.min(e, b); out.push({ s: d, e: e, label: lab }); d = e + 1;
+  }
+  return out;
+}
+function scrRead() { try { return window.sessionStorage.getItem('sc.range') || ''; } catch (e) { return ''; } }
+// ---- end sc.range resolver ----
 class Component extends DCLogic {
   constructor(p) { super(p); this.state = { f: 'all', who: 'all', range: '90', requested: false, q: '' }; }
   componentDidMount() {
     // Play may pre-render pages before they are shown, so re-render whenever a shared sc.* value changes
     var self = this;
-    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.supportLog', 'sc.newAccount', 'sc.myName', 'sc.site', 'sc.createdName', 'sc.createdInvites', 'sc.inviteCancel', 'sc.owner', 'sc.auditExtra', 'sc.flash', 'sc.memberEdits', 'sc.removed', 'sc.customRoles', 'sc.woStat', 'sc.woAssign', 'sc.createdWo', 'sc.createdSites', 'sc.siteEdits', 'sc.siteCycle', 'sc.autoCycle'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
+    var snap = function () { try { var s = window.sessionStorage; return ['sc.org', 'sc.orgNames', 'sc.supportLog', 'sc.newAccount', 'sc.myName', 'sc.site', 'sc.createdName', 'sc.createdInvites', 'sc.inviteCancel', 'sc.owner', 'sc.auditExtra', 'sc.flash', 'sc.memberEdits', 'sc.removed', 'sc.customRoles', 'sc.woStat', 'sc.woAssign', 'sc.createdWo', 'sc.createdSites', 'sc.siteEdits', 'sc.siteCycle', 'sc.autoCycle', 'sc.auditRange'].map(function (k) { return s.getItem(k); }).join('|'); } catch (e) { return ''; } };
     self._snap = snap();
     self._sync = function () { var n = snap(); if (n !== self._snap) { self._snap = n; self.setState({ sync: Date.now() }); } };
     window.addEventListener('storage', self._sync);
@@ -154,7 +192,7 @@ class Component extends DCLogic {
     var O = ORGS[org] || ORGS.a, canSee = O[1] === 'Org Admin' || O[1] === 'Org Owner';
     var A = { n: 'natthaphat', w: 'worawut', s: 'somsri', t: 'thanakorn', q: 'qleen' };
     var all = [
-      ['15 พ.ย. 10:34', A.q, 'ทีม Qleen', 'platform.access', 'platform', 'เข้าดูองค์กรเพื่อช่วยแก้ปัญหา — เหตุผล: เลขเรื่อง (ticket) #4821' + (function () { try { var L = (JSON.parse(window.sessionStorage.getItem('sc.supportLog') || '[]') || []).filter(function (x) { return x && x.org === 'a'; }); var last = L[L.length - 1]; return last ? ' · จบเซสชัน ' + String(last.end || '').replace('วันนี้ ', '') : ' · กำลังเปิดอยู่'; } catch (e) { return ''; } })(), '—'],
+      ['15 พ.ย. 10:34', A.q, 'ทีม Qleen', 'platform.access', 'platform', 'เข้าดูองค์กรเพื่อช่วยแก้ปัญหา — เหตุผล: เลขเรื่อง #4821' + (function () { try { var L = (JSON.parse(window.sessionStorage.getItem('sc.supportLog') || '[]') || []).filter(function (x) { return x && x.org === 'a'; }); var last = L[L.length - 1]; return last ? ' · จบเซสชัน ' + String(last.end || '').replace('วันนี้ ', '') : ' · กำลังเปิดอยู่'; } catch (e) { return ''; } })(), '—'],
       ['14 พ.ย. 16:20', A.t, 'ธนากร ว.', 'wo.submit', 'wo', 'ส่ง WO-1043 พร้อมรูป 24 รูป', 'ฟาร์มโคราช 1'],
       ['14 พ.ย. 15:50', A.t, 'ธนากร ว.', 'wo.start', 'wo', 'เริ่ม WO-1042 (GPS ตรงกับไซต์)', 'ฟาร์มโคราช 1'],
       ['14 พ.ย. 15:30', A.n, 'ณัฐภัทร ส.', 'wo.create', 'wo', 'สร้าง WO-1042 ตรวจจุดร้อน (hotspot) โซน C', 'ฟาร์มโคราช 1'],
@@ -176,7 +214,7 @@ class Component extends DCLogic {
     var strip = function (t) { return String(t || '').replace('วันนี้ ', ''); };
     var extra = [];
     J('sc.createdInvites', []).forEach(function (v) { if (v && v.org === org) extra.push([at(v.at), A.n, 'ณัฐภัทร ส.', 'member.invite', 'member', 'เชิญ ' + v.email + ' เป็น ' + v.role, v.site || '—']); });
-    J('sc.inviteCancel', []).forEach(function (em) { if (all.some(function (r) { return r[5].indexOf(em) >= 0; }) || J('sc.createdInvites', []).some(function (v) { return v && v.org === org && v.email === em; })) extra.push([at(), A.n, 'ณัฐภัทร ส.', 'member.invite', 'member', 'ยกเลิกคำเชิญ ' + em, '—']); });
+    J('sc.inviteCancel', []).forEach(function (em) { if (all.some(function (r) { return r[5].indexOf(em) >= 0; }) || J('sc.createdInvites', []).some(function (v) { return v && v.org === org && v.email === em; })) extra.push([at(), A.n, 'ณัฐภัทร ส.', 'member.uninvite', 'member', 'ยกเลิกคำเชิญ ' + em, '—']); });
     if (owners[org]) extra.push([at(), A.n, 'ณัฐภัทร ส.', 'member.role', 'member', 'โอน Org Owner ให้ ' + owners[org], '—']);
     J('sc.auditExtra', []).forEach(function (x) { if (x && x.org === org) extra.push([at(x.at), A.n, 'ณัฐภัทร ส.', x.action || 'org.update', x.action === 'org.update' ? 'org' : (x.cat || 'org'), x.text || '', x.site || '—']); });
     // member edits: acceptance (actor = invitee), suspension and role changes are separate events
@@ -222,8 +260,12 @@ class Component extends DCLogic {
     if (SS('sc.newAccount') === '1') { var meN = SS('sc.myName') || 'คุณ'; all = all.map(function (r) { return r[1] === A.n ? [r[0], 'me', meN].concat(r.slice(3)) : r; }); }
     var MON = { 'ส.ค.': 8, 'ก.ย.': 9, 'ต.ค.': 10, 'พ.ย.': 11 };
     var age = function (when) { var p = String(when).split(' '); return Math.round((new Date(2026, 10, 15) - new Date(2026, (MON[p[1]] || 11) - 1, Number(p[0]))) / 86400000); };
-    var who = self.state.who, range = self.state.range;
-    var base = all.filter(function (r) { return (who === 'all' || r[2] === who) && (range === 'all' || age(r[0]) < Number(range)); });
+    var who = self.state.who;
+    // period: the shared range picker, kept in its own key (sc.auditRange, default 3 เดือน) so it never changes the report range
+    var rr = scrResolve((function () { try { return window.sessionStorage.getItem('sc.auditRange') || '{"preset":"m3"}'; } catch (e) { return '{"preset":"m3"}'; } })());
+    var dayOf = function (when) { var p = String(when).split(' '); return Math.round(Date.UTC(2026, (MON[p[1]] || 11) - 1, Number(p[0])) / 864e5); };
+    var inRange = function (r) { var d = dayOf(r[0]); return d >= rr.from && d <= rr.to; };
+    var base = all.filter(function (r) { return (who === 'all' || r[2] === who) && inRange(r); });
     var defs = [['all', 'ทั้งหมด'], ['member', 'สมาชิก & สิทธิ์'], ['role', 'บทบาท'], ['org', 'ข้อมูลองค์กร'], ['site', 'ไซต์ & รอบล้าง'], ['wo', 'ใบงาน'], ['platform', 'เข้าถึงข้ามองค์กร']];
     var shown = base.filter(function (r) { return f === 'all' || r[4] === f; });
     var people = [];
@@ -231,7 +273,7 @@ class Component extends DCLogic {
     var stt = self.state.retried ? 'ready' : (self.props.state ?? 'ready');
     // event codes stay internal: people read a Thai label (the code is in the tooltip)
     var EV = { 'platform.access': 'ทีม Qleen เข้าดูองค์กร', 'wo.submit': 'ส่งงานรออนุมัติ', 'wo.start': 'เริ่มงาน', 'wo.create': 'สร้างใบงาน', 'wo.assign': 'มอบหมายใบงาน', 'wo.approve': 'อนุมัติปิดงาน', 'wo.return': 'ส่งกลับแก้ไข', 'wo.pause': 'พักงาน',
-      'member.invite': 'เชิญ / ยกเลิกคำเชิญ', 'member.join': 'เข้าร่วมองค์กร', 'member.role': 'เปลี่ยนบทบาท', 'member.suspend': 'ระงับการใช้งาน', 'member.remove': 'นำออกจากองค์กร', 'site.assign': 'มอบสิทธิ์รายไซต์',
+      'member.invite': 'เชิญสมาชิก', 'member.uninvite': 'ยกเลิกคำเชิญ', 'member.join': 'เข้าร่วมองค์กร', 'member.role': 'เปลี่ยนบทบาท', 'member.suspend': 'ระงับการใช้งาน', 'member.remove': 'นำออกจากองค์กร', 'site.assign': 'มอบสิทธิ์รายไซต์',
       'role.create': 'สร้างบทบาท', 'role.update': 'แก้ไขบทบาท', 'org.create': 'สร้างองค์กร', 'org.update': 'แก้ไขข้อมูลองค์กร', 'org.leave': 'ออกจากองค์กร',
       'site.create': 'เพิ่มไซต์', 'site.update': 'แก้ไขข้อมูลไซต์', 'cycle.update': 'เปลี่ยนรอบล้าง', 'cycle.auto': 'ตั้งค่าใบงานอัตโนมัติ' };
     // search across who / action label / detail / site
@@ -248,18 +290,19 @@ class Component extends DCLogic {
       notRequested: !self.state.requested, requested: !!self.state.requested, requestAccess: function () { self.setState({ requested: true }); },
       listState: stt, showState: stt !== 'ready', showTable: stt === 'ready',
       retry: function () { self.setState({ retried: true }); },
-      noRows: shown.length === 0, showAll: function () { self.setState({ f: 'all', who: 'all', range: '90', q: '' }); },
+      noRows: shown.length === 0, showAll: function () { try { window.sessionStorage.removeItem('sc.auditRange'); } catch (e) {} self.setState({ f: 'all', who: 'all', q: '', sync: Date.now() }); },
+      onRange: function () { self.setState({ sync: Date.now() }); },
       q: self.state.q || '', setQ: function (e) { self.setState({ q: e.target.value }); },
       f: f, setF: function (id) { self.setState({ f: id }); },
       chipOpts: defs.map(function (d) { return { id: d[0], label: d[1], count: base.filter(function (r) { return d[0] === 'all' || r[4] === d[0]; }).length }; }),
       who: who, setWho: function (e) { self.setState({ who: e.target.value }); },
       whoOpts: [{ v: 'all', t: 'ทุกคน' }].concat(people.map(function (p) { return { v: p, t: p }; })),
-      range: range, setRange: function (e) { self.setState({ range: e.target.value }); },
-      shownN: shown.length, totalN: range === 'all' ? all.length : all.filter(function (r) { return age(r[0]) < 90; }).length, filtered: f !== 'all' || who !== 'all' || range !== '90' || !!qq,
+      hubHide: canSee ? '' : 'audit',
+      shownN: shown.length, totalN: all.filter(inRange).length, filtered: f !== 'all' || who !== 'all' || !!qq,
       rows: shown.map(function (r) { var pf = r[4] === 'platform'; return { when: r[0], av: r[1], who: r[2], action: EV[r[3]] || r[3], code: r[3], codeTitle: 'รหัสเหตุการณ์: ' + r[3], detail: r[5].indexOf('เปลี่ยนชื่อจาก') >= 0 ? r[5] : SFX(r[5]), site: r[6] === '—' ? '—' : DN(r[6]),
         tr: 'border-top:1px solid #EEF0F3;background:' + (pf ? '#F0F7F5' : '#FFFFFF'),
         // colour = meaning (Round 14): red removed/stopped, green added/approved, brand-light cross-org access, gray changes
-        tag: 'display:inline-block;font-size:12px;font-weight:600;white-space:nowrap;padding:2px 8px;border-radius:6px;background:' + (pf ? '#F0F7F5;color:#0A4F44;box-shadow:inset 0 0 0 1px #B9DACF' : /remove|suspend|cancel|leave|reject|return/.test(r[3]) ? '#FDECEA;color:#B42318' : /approve|join|create/.test(r[3]) ? '#E7F2EF;color:#0A4F44' : '#F3F4F6;color:#374151') }; })
+        tag: 'display:inline-block;font-size:12px;font-weight:600;white-space:nowrap;padding:2px 8px;border-radius:6px;background:' + (pf ? '#F0F7F5;color:#0A4F44;box-shadow:inset 0 0 0 1px #B9DACF' : /remove|suspend|cancel|uninvite|leave|reject|return/.test(r[3]) ? '#FDECEA;color:#B42318' : /approve|join|create/.test(r[3]) ? '#E7F2EF;color:#0A4F44' : '#F3F4F6;color:#374151') }; })
     });
   }
 }

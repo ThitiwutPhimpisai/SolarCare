@@ -37,7 +37,7 @@ body{margin:0}
         </div>
       </sc-if>
       <sc-if value="{{o.hasAction}}" hint-placeholder-val="{{ false }}">
-        <dc-import name="Button" label="{{o.actionLabel}}" variant="{{o.actionVariant}}" on-press="{{o.onAction}}" hint-size="130px,44px"></dc-import>
+        <dc-import name="Button" label="{{o.actionLabel}}" variant="{{o.actionVariant}}" icon="{{o.actionIcon}}" aria-label="{{o.actionAria}}" on-press="{{o.onAction}}" hint-size="130px,44px"></dc-import>
       </sc-if>
     </li>
   </sc-for>
@@ -66,7 +66,8 @@ function scOrgFix(v) {
   return fix(v, 0);
 }
 // One org list for SelectOrg, the Sidebar switcher and MyAccount.
-// items: [{ badge, name, note, href?, current?, saveKeys? 'k=v|k=v', onPick?, actionLabel?, actionVariant?, onAction? }]
+// items: [{ badge, name, note, href?, current?, saveKeys? 'k=v|k=v', onPick?, actionLabel?, actionVariant?, actionIcon?, actionAria?, onAction? }]
+// an action (e.g. MyAccount "ออกจากองค์กร", variant danger) sits after the row and wraps under it on narrow screens
 // href → link (saveKeys written on pointerdown before navigation); onPick without href → button; neither → static row.
 var SAMPLE = [
   { badge: 'sf', name: 'สยามโซลาร์ฟาร์ม จำกัด', note: 'Org Admin · 4 ไซต์ · ใช้ล่าสุด', href: 'Main.dc.html', current: true, saveKeys: 'sc.org=a|sc.site=all' },
@@ -116,7 +117,7 @@ class Component extends DCLogic {
           liStyle: 'display: flex; align-items: center; gap: 12px; flex-wrap: wrap;' + (o.actionLabel ? ' padding-right: 12px' : ''),
           save: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; if (e && e.type === 'pointerdown') { if (e.button !== 0) return; if (e.pointerType === 'touch') { self._td = { x: e.clientX, y: e.clientY }; return; } } if (e && e.type === 'pointerup') { var td = self._td; self._td = null; if (!td || Math.abs(e.clientX - td.x) + Math.abs(e.clientY - td.y) > 10) return; } write(o.saveKeys, o.href); },
           pick: function (e) { write(o.saveKeys, ''); if (o.onPick) o.onPick(e); },
-          hasAction: !!o.actionLabel, actionLabel: o.actionLabel || '', actionVariant: o.actionVariant || 'secondary', onAction: o.onAction || null
+          hasAction: !!o.actionLabel, actionLabel: o.actionLabel || '', actionVariant: o.actionVariant || 'secondary', actionIcon: o.actionIcon || '', actionAria: o.actionAria || (o.actionLabel ? o.actionLabel + ' ' + o.name : ''), onAction: o.onAction || null
         };
       })
     };

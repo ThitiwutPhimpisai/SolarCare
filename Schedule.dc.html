@@ -30,6 +30,15 @@ button{cursor:pointer}
   <div style="max-width: 1376px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px">
     <dc-import name="PageHeader" icon="workorder" title="งานล้าง" subtitle="{{headSub}}" actions="{{headActs}}" hub="work" hub-current="calendar" hint-size="100%,140px"></dc-import>
 
+    <sc-if value="{{orgEmpty}}" hint-placeholder-val="{{ false }}">
+      <div style="background: #FFFFFF; border: 1px dashed #D5D9E0; border-radius: 12px; padding-bottom: 24px; display: flex; flex-direction: column; align-items: center">
+        <dc-import name="ListState" state="empty" unit="ไซต์" icon="calendar" empty-title="ยังไม่มีไซต์ในองค์กรนี้" empty-text="เพิ่มไซต์และตั้งรอบล้าง แล้ววันครบรอบและใบงานจะแสดงในปฏิทินนี้" hint-size="100%,120px"></dc-import>
+        <sc-if value="{{canAddSite}}" hint-placeholder-val="{{ true }}">
+          <dc-import name="Button" icon="plus" label="เพิ่มไซต์แรก" href="SiteForm.dc.html" save-keys="sc.editSite=|sc.siteFormFrom=Schedule" hint-size="160px,44px"></dc-import>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{hasSites}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
       <div class="sch-month" role="group" aria-label="เดือน" style="display: flex; gap: 8px; align-items: center">
           <button type="button" onClick="{{monNav.prev}}" aria-label="{{monNav.prevLabel}}" title="{{monNav.prevLabel}}" disabled="{{monNav.prevOff}}" style="{{monNav.prevStyle}}">
@@ -133,7 +142,7 @@ button{cursor:pointer}
             <h2 style="margin: 0; font-size: 16px">{{selG.siteName}}</h2>
             <div style="font-size: 13px; color: #374151">{{selG.note}}</div>
             <sc-if value="{{selG.hasJob}}" hint-placeholder-val="{{ true }}"><dc-import name="Button" variant="secondary" icon="arrowRight" label="{{selG.jobLabel}}" href="WorkOrderDetail.dc.html" save-keys="{{selG.jobKeys}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if>
-            <sc-if value="{{selG.canNew}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" icon="plus" label="สร้างใบงานจากรอบนี้" href="CreateWorkOrder.dc.html" save-keys="{{selG.createKeys}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if>
+            <sc-if value="{{selG.canNew}}" hint-placeholder-val="{{ false }}"><dc-import name="Button" variant="secondary" icon="plus" label="สร้างใบงานจากรอบนี้" href="CreateWorkOrder.dc.html" save-keys="{{selG.createKeys}}" full="{{true}}" hint-size="100%,44px"></dc-import></sc-if>
           </section>
         </sc-if>
         <sc-if value="{{sel}}" hint-placeholder-val="{{ true }}">
@@ -155,7 +164,7 @@ button{cursor:pointer}
 
         <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 6px 0">
           <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px; padding: 12px 16px 2px"><dc-import name="Icon" icon="broom" size="18" tone="muted" hint-size="18px,18px"></dc-import>รอบล้างของแต่ละไซต์</h2>
-          <p style="margin: 0; padding: 0 16px 8px; font-size: 13px; color: #4B5563">เปลี่ยนรอบล้างได้ที่หน้าไซต์</p>
+          <p style="margin: 0; padding: 0 16px 8px; font-size: 13px; color: #4B5563">เปลี่ยนรอบล้างและการสร้างใบงานอัตโนมัติได้ที่หน้าไซต์</p>
           <sc-for list="{{cycles}}" as="s" hint-placeholder-count="4">
             <div style="border-top: 1px solid #EEF0F3">
               <a href="SiteDetail.dc.html" onPointerDown="{{s.goSite}}" onKeyDown="{{s.goSite}}" onClick="{{s.goSite}}" aria-label="{{s.aria}}" style="display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 16px; text-decoration: none; color: #111827">
@@ -166,11 +175,8 @@ button{cursor:pointer}
                 </span>
                 <dc-import name="Icon" icon="arrowRight" size="16" tone="brand" hint-size="16px,16px"></dc-import>
               </a>
-              <sc-if value="{{s.canToggle}}" hint-placeholder-val="{{ true }}">
-                <label style="display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px 6px 66px; font-size: 13px; color: #374151; cursor: pointer">
-                  <input type="checkbox" checked="{{s.auto}}" onChange="{{s.toggle}}" style="width: 20px; height: 20px; accent-color: #0F6B5C">
-                  สร้างใบงานให้อัตโนมัติ 14 วันก่อนครบรอบ
-                </label>
+              <sc-if value="{{s.hasCycle}}" hint-placeholder-val="{{ true }}">
+                <div style="display: flex; align-items: center; gap: 6px; padding: 0 16px 10px 66px; font-size: 12px; color: #4B5563"><dc-import name="Icon" icon="{{s.autoIcon}}" size="14" tone="muted" hint-size="14px,14px"></dc-import>{{s.autoText}}</div>
               </sc-if>
             </div>
           </sc-for>
@@ -180,6 +186,7 @@ button{cursor:pointer}
         </section>
       </aside>
     </div>
+    </sc-if>
   </div>
 </main>
   <dc-import name="Flash" page="Schedule.dc.html" sample="" hint-size="100%,0px"></dc-import>
@@ -221,7 +228,7 @@ class Component extends DCLogic {
       { no: 'WO-1041', day: 25, site: 'k2', siteName: 'ฟาร์มโคราช 2', title: 'ล้างแผงตามรอบ', short: 'โคราช 2 · ล้าง', who: 'ยังไม่มอบหมาย', st: 'new' }
     ];
     EV.b = [
-      { no: 'GM-0209', day: 12, site: 'bn', siteName: 'สาขาบางนา', title: 'ล้างแผงลานจอดรถ (Carport)', short: 'บางนา · ล้าง', who: 'ธนากร ว.', st: 'doing', overdue: '3 วัน' },
+      { no: 'GM-0209', day: 12, site: 'bn', siteName: 'สาขาบางนา', title: 'ล้างแผงลานจอดรถ', short: 'บางนา · ล้าง', who: 'ธนากร ว.', st: 'doing', overdue: '3 วัน' },
       { no: 'GM-0211', day: 20, site: 'rs', siteName: 'สาขารังสิต', title: 'ล้างแผงหลังคา', short: 'รังสิต · ล้าง', who: 'ธนากร ว.', st: 'todo' }
     ];
     EV.c = [{ no: 'NK-0102', day: 22, site: 'lp', siteName: 'โรงงาน A ลำพูน', title: 'ล้างแผงหลังคาโรงงาน A', short: 'ลำพูน · ล้าง', who: 'ทีมช่าง B', st: 'doing' }];
@@ -251,7 +258,7 @@ class Component extends DCLogic {
     });
     CY[orgId] = CY[orgId].map(function (r) {
       var d = Number(cycSet[r[1]]) || 0; r = r.slice(); if (d) r[3] = d;
-      if (!r[3]) { r[6] = canEdit ? 'ยังไม่ตั้งรอบล้าง · ตั้งได้ที่หน้าไซต์' : 'ยังไม่ตั้งรอบล้าง · ขอให้ Site Manager หรือ Org Admin ตั้ง'; return r; }
+      if (!r[3]) { r[6] = canEdit ? 'ยังไม่ตั้งรอบล้าง · ตั้งได้ที่หน้าไซต์' : 'ยังไม่ตั้งรอบล้าง · ขอให้ผู้จัดการไซต์หรือผู้ดูแลองค์กรตั้ง'; return r; }
       if (d || !r[6]) {
         var l = thParse(r[4]);
         if (!l) { r[5] = 15; r[6] = 'ทุก ' + r[3] + ' วัน · ยังไม่เคยล้าง ควรล้างครั้งแรก'; return r; }
@@ -287,13 +294,14 @@ class Component extends DCLogic {
     // short site label for chips: an edited name wins (sc.siteEdits), else the built-in short form
     var SL = function (n) { var e = DN(n); return e !== n ? e : (SHORTN[n] || n); };
     var createdEv = JS('sc.createdWo', []).filter(function (c) { return c && c.org === orgId && thParse(c.due); }).map(function (c) {
-      return { no: c.no, date: thParse(c.due), site: KEY[c.site] || '', siteName: c.site, title: c.title, short: SL(c.site) + ' · ' + (c.type === 'ตรวจสภาพ' ? 'ตรวจ' : c.type === 'ซ่อมบำรุง' ? 'ซ่อม' : 'ล้าง'), who: c.who, st: c.st || 'todo' };
+      return { no: c.no, date: thParse(c.due), site: KEY[c.site] || '', siteName: c.site, title: c.title, short: SL(c.site) + ' · ' + (c.type === 'ตรวจสภาพ' ? 'ตรวจ' : c.type === 'ซ่อมบำรุง' ? 'ซ่อม' : 'ล้าง'), who: c.who && c.who !== '—' ? c.who : 'ยังไม่มอบหมาย', st: c.st || 'todo' };
     });
     var events = EV[orgId].map(function (e) { return Object.assign({ date: new Date(2026, 10, e.day) }, e); }).concat(createdEv).map(function (e) {
       var o = Object.assign({}, e); o.day = o.date.getDate();
       if (o.short && o.siteName && o.short.indexOf(' · ') > 0) o.short = SL(o.siteName) + o.short.slice(o.short.indexOf(' · '));
       if (woAssign[e.no]) { o.who = woAssign[e.no]; if (o.st === 'new') o.st = 'todo'; }
-      var st = woStat[e.no]; if (st) { o.st = st; if (st === 'done') o.overdue = ''; }
+      var st = woStat[e.no]; if (st) o.st = st;
+      if (o.st === 'done' || o.st === 'review') o.overdue = ''; // a submitted job is no longer overdue (same rule as WorkOrders)
       return o;
     });
     var stOf = {}; events.forEach(function (e) { stOf[e.no] = e.st; });
@@ -387,7 +395,8 @@ class Component extends DCLogic {
     var autoOf = function (r) { return AUTO[r[0]] != null ? !!AUTO[r[0]] : (AUTO_DEF[r[0]] != null ? AUTO_DEF[r[0]] : !!r[3]); };
     return {
       headSub: 'ดูรอบล้างและใบงานรายเดือน · เฉพาะไซต์ในขอบเขตของคุณ' + (canEdit ? '' : ' · คุณเป็นผู้ดูอย่างเดียว'),
-      headActs: canEdit ? [{ label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=Schedule|sc.siteName=|sc.cycleDue=' }] : [],
+      orgEmpty: !busy && cyc.length === 0, hasSites: busy || cyc.length > 0, canAddSite: orgId === 'a' || orgId === 'd', // only an owner / admin adds sites
+      headActs: canEdit && cyc.length ? [{ label: 'สร้างใบงาน', icon: 'plus', href: 'CreateWorkOrder.dc.html', saveKeys: 'sc.from=Schedule|sc.siteName=|sc.cycleDue=' }] : [],
       canCreate: canEdit,
       listBusy: busy, listState: busy ? listState : 'loading', showCal: !busy,
       retry: function () { self.setState({ retriedFor: propState }); },
@@ -411,9 +420,20 @@ class Component extends DCLogic {
       cycles: cyc.map(function (r) {
         var job = r[7] && ((stOf[r[7]] || madeSt[r[7]]) && (stOf[r[7]] || madeSt[r[7]]) !== 'done') && inWindow(r[7], dueOf(r)) ? r[7] : '';
         var late = /เลยกำหนด/.test(r[6]);
-        return { name: DN(r[1]), site: r[2], note: r[6], auto: autoOf(r), canToggle: canEdit && !!r[3],
-          short: r[3] ? String(r[6]).split(' · ').filter(function (x) { return /ครบรอบ|เลยกำหนด|ทุก/.test(x); }).slice(0, 2).join(' · ') || r[6] : 'ยังไม่ตั้งรอบล้าง · ตั้งได้ที่หน้าไซต์',
-          noteColor: late ? '#B42318' : '#4B5563', aria: DN(r[1]) + ' · ดูและเปลี่ยนรอบล้างที่หน้าไซต์',
+        // a cycle with an open job shows that job (and its own overdue count), not a second "เลยกำหนด" for the cycle
+        var jEv = job ? events.filter(function (e) { return e.no === job; })[0] : null, cDue = dueOf(r);
+        // due soon = within 14 days of the cycle date (same rule as Sites / Main / SiteDetail)
+        var cDiff = cDue ? Math.round((cDue - TODAY) / 864e5) : NaN, soon = cDiff >= 0 && cDiff <= 14;
+        var dueTxt = cDue ? 'ครบรอบ ' + thFmt(cDue) + (soon ? ' · ใกล้ครบรอบ (' + (cDiff ? 'อีก ' + cDiff + ' วัน' : 'วันนี้') + ')' : '') : '';
+        var short = !r[3] ? 'ยังไม่ตั้งรอบล้าง · ตั้งได้ที่หน้าไซต์'
+          : jEv ? 'ทุก ' + r[3] + ' วัน · ' + dueTxt + ' · มีใบงาน ' + job + ' (' + (jEv.overdue ? 'เลยกำหนด ' + jEv.overdue : (STL[jEv.st] || jEv.st)) + ')'
+          : soon ? 'ทุก ' + r[3] + ' วัน · ' + dueTxt
+          : String(r[6]).split(' · ').filter(function (x) { return /ครบรอบ|เลยกำหนด|ทุก/.test(x); }).slice(0, 2).join(' · ') || r[6];
+        var auto = autoOf(r);
+        return { name: DN(r[1]), site: r[2], note: r[6], auto: auto, hasCycle: !!r[3], autoIcon: auto ? 'sync' : 'x',
+          autoText: auto ? 'สร้างใบงานอัตโนมัติ 14 วันก่อนครบรอบ · เปิด' : 'สร้างใบงานอัตโนมัติ · ปิด (สร้างใบงานเอง)',
+          short: short,
+          noteColor: (jEv ? !!jEv.overdue : late) ? '#B42318' : (soon ? '#8A3B06' : '#4B5563'), aria: DN(r[1]) + ' · ดูและเปลี่ยนรอบล้างที่หน้าไซต์',
           goSite: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.siteName', r[1]); ss.setItem('sc.siteFrom', 'Schedule'); ss.setItem('sc.siteTab', 'work'); } catch (x) {} },
           hasJob: !!job, jobLabel: 'เปิดใบงาน ' + job + ' ของรอบนี้', jobKeys: 'sc.wo=' + job + '|sc.woFrom=Schedule',
           canCreate: canEdit && !!r[3] && !job, createKeys: 'sc.from=Schedule|sc.siteName=' + r[1] + '|sc.cycleDue=' + isoDue(r),

@@ -22,7 +22,7 @@ button{cursor:pointer}
   <dc-import name="Sidebar" active="sites" hint-size="260px,900px"></dc-import>
 </div>
 <main style="flex: 999 1 520px; min-width: 0; box-sizing: border-box; padding: clamp(20px, 4vw, 28px) clamp(16px, 3vw, 32px) 48px">
-  <div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
+  <div style="max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px">
     <dc-import name="PageHeader" icon="site" back-label="{{backLabel}}" back-href="{{backHref}}" title="{{pageTitle}}" subtitle="{{subtitle}}" hint-size="100%,96px"></dc-import>
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
@@ -35,25 +35,27 @@ button{cursor:pointer}
 
     <sc-if value="{{allowed}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
-      <section style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px">
+      <section style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: clamp(16px, 3vw, 24px); display: flex; flex-direction: column; gap: 20px">
+        <p style="margin: 0; font-size: 13px; color: #4B5563"><span aria-hidden="true" style="color: #B42318">*</span> ต้องกรอก</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px">
           <div style="display: flex; flex-direction: column; gap: 6px">
-            <label for="sf-name" style="font-size: 13px; font-weight: 600">ชื่อไซต์</label>
+            <label for="sf-name" style="font-size: 13px; font-weight: 600">ชื่อไซต์ <span aria-hidden="true" style="color: #B42318">*</span></label>
             <input id="sf-name" value="{{name}}" onChange="{{setName}}" aria-required="true" aria-invalid="{{nameBad}}" aria-describedby="sf-name-err" placeholder="เช่น ฟาร์มโคราช 3" style="{{nameStyle}}">
             <sc-if value="{{nameBad}}" hint-placeholder-val="{{ false }}"><div id="sf-name-err" style="font-size: 12px; color: #B42318">ใส่ชื่อไซต์อย่างน้อย 2 ตัวอักษร</div></sc-if>
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
-            <label for="sf-prov" style="font-size: 13px; font-weight: 600">จังหวัด</label>
+            <label for="sf-prov" style="font-size: 13px; font-weight: 600">จังหวัด<span style="font-weight: 400; color: #4B5563"> (ไม่บังคับ)</span></label>
             <input id="sf-prov" value="{{prov}}" onChange="{{setProv}}" placeholder="เช่น นครราชสีมา" autocomplete="address-level1" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
           </div>
           <div style="display: flex; flex-direction: column; gap: 6px">
-            <label for="sf-kwp" style="font-size: 13px; font-weight: 600">กำลังติดตั้ง (kWp)</label>
+            <label for="sf-kwp" style="font-size: 13px; font-weight: 600">กำลังติดตั้ง (kWp)<span style="font-weight: 400; color: #4B5563"> (ไม่บังคับ)</span></label>
             <input id="sf-kwp" value="{{kwp}}" onChange="{{setKwp}}" inputmode="decimal" placeholder="เช่น 1,200" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
           </div>
           <sc-if value="{{adding}}" hint-placeholder-val="{{ true }}">
           <div style="display: flex; flex-direction: column; gap: 6px">
-            <label for="sf-cyc" style="font-size: 13px; font-weight: 600">รอบล้าง (วัน)</label>
-            <input id="sf-cyc" value="{{cyc}}" onChange="{{setCyc}}" inputmode="numeric" placeholder="90" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+            <label for="sf-cyc" style="font-size: 13px; font-weight: 600">ล้างทุกกี่วัน<span style="font-weight: 400; color: #4B5563"> (ไม่บังคับ)</span></label>
+            <input id="sf-cyc" value="{{cyc}}" onChange="{{setCyc}}" inputmode="numeric" aria-describedby="sf-cyc-help" style="min-height: 44px; padding: 0 12px; border: 1px solid #858D9B; border-radius: 8px; font-size: 14px">
+            <span id="sf-cyc-help" style="font-size: 12px; color: #4B5563">ค่าแนะนำ 90 วัน · เว้นว่างถ้ายังไม่ทราบ</span>
           </div>
           </sc-if>
           <sc-if value="{{editingCyc}}" hint-placeholder-val="{{ false }}">
@@ -77,21 +79,47 @@ button{cursor:pointer}
         </fieldset>
 
         <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0">
-          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 4px">ตำแหน่งไซต์ (สำหรับนำทางช่างและตรวจ GPS ตอนเริ่มงาน)</legend>
-          <p id="sf-geo-help" style="margin: 0; font-size: 13px; color: #4B5563">แตะบนแผนที่เพื่อปักหมุด หรือพิมพ์พิกัด</p>
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 4px">ตำแหน่งไซต์ <span aria-hidden="true" style="color: #B42318">*</span> <span style="font-weight: 400; color: #4B5563">ใช้นำทางช่างและตรวจ GPS ตอนเริ่มงาน</span></legend>
           <dc-import name="SiteMap" mode="pick" height="320" pin-lat="{{lat}}" pin-lon="{{lon}}" on-pick="{{setLoc}}" hint-size="100%,350px"></dc-import>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px">
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label for="sf-lat" style="font-size: 13px; font-weight: 600">ละติจูด</label>
-              <input id="sf-lat" inputmode="decimal" aria-describedby="sf-geo-help sf-geo-err" aria-invalid="{{locBad}}" placeholder="เช่น 14.9700" value="{{lat}}" onChange="{{setLat}}" style="{{locStyle}}">
+              <input id="sf-lat" inputmode="decimal" aria-describedby="sf-geo-err" aria-invalid="{{locBad}}" placeholder="เช่น 14.9700" value="{{lat}}" onChange="{{setLat}}" style="{{locStyle}}">
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px">
               <label for="sf-lon" style="font-size: 13px; font-weight: 600">ลองจิจูด</label>
-              <input id="sf-lon" inputmode="decimal" aria-describedby="sf-geo-help sf-geo-err" aria-invalid="{{locBad}}" placeholder="เช่น 102.1000" value="{{lon}}" onChange="{{setLon}}" style="{{locStyle}}">
+              <input id="sf-lon" inputmode="decimal" aria-describedby="sf-geo-err" aria-invalid="{{locBad}}" placeholder="เช่น 102.1000" value="{{lon}}" onChange="{{setLon}}" style="{{locStyle}}">
             </div>
           </div>
           <sc-if value="{{locBad}}" hint-placeholder-val="{{ false }}"><div id="sf-geo-err" style="font-size: 12px; color: #B42318">ปักหมุดบนแผนที่ หรือใส่ละติจูด 5.5–20.6 และลองจิจูด 97.3–105.7 (ในประเทศไทย)</div></sc-if>
         </fieldset>
+
+        <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0">
+          <legend style="font-size: 13px; font-weight: 600; margin-bottom: 4px">ภาพปกไซต์<span style="font-weight: 400; color: #4B5563"> (ไม่บังคับ)</span></legend>
+          <input id="sf-cover" type="file" accept="image/*" onChange="{{pickedCover}}" aria-label="เลือกภาพปกไซต์" style="display: none">
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+            <sc-if value="{{hasThumb}}" hint-placeholder-val="{{ false }}"><dc-import name="SiteThumb" site="{{thumb}}" w="160px" h="96px" radius="8" hint-size="160px,96px"></dc-import></sc-if>
+            <button type="button" onClick="{{chooseCover}}" aria-label="{{coverAria}}" style="cursor: pointer; flex: 1 1 200px; min-height: 96px; border-radius: 10px; border: 2px dashed #9CA3AF; background: #FAFBFC; color: #4B5563; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 13px">
+              <dc-import name="Icon" icon="upload" size="22" tone="current" hint-size="22px,22px"></dc-import>{{coverCta}}</button>
+          </div>
+          <span role="status" aria-live="polite" style="font-size: 12px; color: #0F6B5C">{{coverNote}}</span>
+          <span style="font-size: 12px; color: #4B5563">{{coverHint}}</span>
+        </fieldset>
+
+        <section aria-labelledby="sf-who" style="background: #F7F8FA; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+          <h2 id="sf-who" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 14px"><dc-import name="Icon" icon="eye" size="16" tone="muted" hint-size="16px,16px"></dc-import>ใครจะเห็นไซต์นี้</h2>
+          <sc-if value="{{hasViewers}}" hint-placeholder-val="{{ true }}">
+          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px">
+            <sc-for list="{{viewers}}" as="v" hint-placeholder-count="2">
+              <li style="display: flex; align-items: center; gap: 8px">
+                <dc-import name="Avatar" person="{{v.person}}" size="28" hint-size="28px,28px"></dc-import>
+                <span style="font-size: 13px; color: #374151"><b style="color: #111827">{{v.name}}</b> · {{v.role}}</span>
+              </li>
+            </sc-for>
+          </ul>
+          </sc-if>
+          <p style="margin: 0; font-size: 13px; color: #4B5563; line-height: 1.6">เจ้าของและผู้ดูแลองค์กรของ {{orgName}} เห็นทุกไซต์อัตโนมัติ คนอื่นต้องได้รับสิทธิ์รายไซต์ก่อน — มอบสิทธิ์ได้ที่หน้ารายละเอียดสมาชิก หลังบันทึก</p>
+        </section>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #E3E6EB; padding-top: 16px">
           <dc-import name="Button" variant="secondary" label="ยกเลิก" href="{{backHref}}" save-keys="sc.editSite=" hint-size="90px,44px"></dc-import>
@@ -104,29 +132,6 @@ button{cursor:pointer}
         </div>
       </section>
 
-      <aside style="flex: 1 1 320px; display: flex; flex-direction: column; gap: 16px">
-        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
-          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="eye" size="18" tone="muted" hint-size="18px,18px"></dc-import>ใครจะเห็นไซต์นี้</h2>
-          <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
-            <sc-for list="{{viewers}}" as="v" hint-placeholder-count="2">
-              <li style="display: flex; align-items: center; gap: 10px">
-                <dc-import name="Avatar" person="{{v.person}}" size="32" hint-size="32px,32px"></dc-import>
-                <span style="font-size: 13px; color: #374151"><b style="color: #111827">{{v.name}}</b> · {{v.role}}</span>
-              </li>
-            </sc-for>
-          </ul>
-          <p style="margin: 0; font-size: 13px; color: #374151">เจ้าของและผู้ดูแลองค์กรของ {{orgName}} เห็นทุกไซต์อัตโนมัติ</p>
-          <p style="margin: 0; font-size: 13px; color: #4B5563; line-height: 1.6">คนอื่นต้องได้รับมอบสิทธิ์รายไซต์ก่อนถึงจะเห็น — ทำได้หลังบันทึก ที่หน้ารายละเอียดไซต์ หรือหน้าสมาชิก</p>
-        </section>
-        <section style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px">
-          <h2 style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px"><dc-import name="Icon" icon="camera" size="18" tone="muted" hint-size="18px,18px"></dc-import>ภาพปกไซต์</h2>
-          <input id="sf-cover" type="file" accept="image/*" onChange="{{pickedCover}}" aria-label="เลือกภาพปกไซต์" style="display: none">
-          <button type="button" onClick="{{chooseCover}}" aria-label="{{coverAria}}" style="cursor: pointer; min-height: 120px; border-radius: 10px; border: 2px dashed #9CA3AF; background: #FAFBFC; color: #4B5563; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 13px">
-            <dc-import name="Icon" icon="upload" size="22" tone="current" hint-size="22px,22px"></dc-import>ลากรูปมาวาง หรือกดเพื่อเลือก</button>
-          <span role="status" aria-live="polite" style="font-size: 12px; color: #0F6B5C">{{coverNote}}</span>
-          <span style="font-size: 12px; color: #4B5563">ข้ามได้ ระบบใช้รูปตามประเภทการติดตั้งแทน</span>
-        </section>
-      </aside>
     </div>
     </sc-if>
   </div>
@@ -158,10 +163,10 @@ function scOrgFix(v) {
 // Org-aware add/edit site form. Edit mode only when sc.editSite names a site of the active org (DATA.md);
 // every "add site" entry clears sc.editSite, and cancel/save here clear it too.
 var SF_ORGS = {
-  a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', viewers: [{ person: 'worawut', name: 'วรวุฒิ ก.', role: 'Org Owner' }, { person: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', role: 'Org Admin' }] },
+  a: { name: 'สยามโซลาร์ฟาร์ม จำกัด', role: 'Org Admin', viewers: [{ person: 'worawut', name: 'วรวุฒิ ก.', role: 'เจ้าขององค์กร' }, { person: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', role: 'ผู้ดูแลองค์กร' }] },
   b: { name: 'กรีนมาร์ท รีเทล', role: 'Site Manager', viewers: [] },
   c: { name: 'นิคมฯ เหนือ', role: 'Viewer', viewers: [] },
-  d: { name: 'ไร่ทองโซลาร์', role: 'Org Owner', viewers: [{ person: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', role: 'Org Owner' }] },
+  d: { name: 'ไร่ทองโซลาร์', role: 'Org Owner', viewers: [{ person: 'natthaphat', name: 'ณัฐภัทร ส. (คุณ)', role: 'เจ้าขององค์กร' }] },
   e: { name: 'ริมทะเล รีสอร์ท', role: 'Site Manager', viewers: [] }
 };
 var SF_SITES = {
@@ -172,6 +177,7 @@ var SF_SITES = {
   d: [],
   e: [['หลังคาอาคาร A หัวหิน', 'ประจวบคีรีขันธ์', '210', '', 'roof', '', '']]
 };
+var SF_THUMB = { 'ฟาร์มโคราช 1': 'k1', 'ฟาร์มโคราช 2': 'k2', 'หลังคาโรงงานบางปู': 'bp', 'ลานจอดรถลพบุรี': 'lb', 'สาขารังสิต': 'rs', 'สาขาบางนา': 'bn', 'โรงงาน A ลำพูน': 'lp', 'หลังคาอาคาร A หัวหิน': 'e1' };
 var SF_BLANK = { name: null, prov: null, kwp: null, cyc: null, type: null, lat: null, lon: null, tried: false, touchedName: false, touchedLoc: false };
 class Component extends DCLogic {
   constructor(p) {
@@ -218,8 +224,8 @@ class Component extends DCLogic {
     this._editKey = editKey;
     var st = self.state;
     var pick = function (k, i, d) { return st[k] != null ? st[k] : (editRow ? (i === 0 ? (editRow[8] || editRow[0]) : editRow[i]) : d); };
-    var name = pick('name', 0, ''), prov = pick('prov', 1, ''), kwp = pick('kwp', 2, ''), cyc = pick('cyc', 3, ''), type = pick('type', 4, 'farm'), lat = pick('lat', 5, ''), lon = pick('lon', 6, '');
-    var defs = [['farm', 'โซลาร์ฟาร์ม', 'farmType'], ['roof', 'หลังคา', 'roofType'], ['carport', 'Carport', 'carportType']];
+    var name = pick('name', 0, ''), prov = pick('prov', 1, ''), kwp = pick('kwp', 2, ''), cyc = pick('cyc', 3, '90'), type = pick('type', 4, 'farm'), lat = pick('lat', 5, ''), lon = pick('lon', 6, '');
+    var defs = [['farm', 'โซลาร์ฟาร์ม', 'farmType'], ['roof', 'หลังคา', 'roofType'], ['carport', 'ที่จอดรถ (Carport)', 'carportType']];
     var la = parseFloat(lat), lo = parseFloat(lon);
     var nameOk = String(name).trim().length >= 2;
     var locOk = !isNaN(la) && !isNaN(lo) && la >= 5.5 && la <= 20.6 && lo >= 97.3 && lo <= 105.7;
@@ -227,7 +233,7 @@ class Component extends DCLogic {
     var nameBad = !nameOk && (st.tried || st.touchedName), locBad = !locOk && (st.tried || st.touchedLoc);
     var editing = !!editRow, n = String(name).trim() || 'ไซต์ใหม่';
     // back goes to the page that opened the form (sc.siteFormFrom); editing always returns to the site
-    var FROM = { Sites: ['ไซต์', 'Sites.dc.html'], Main: ['ภาพรวม', 'Main.dc.html'], EnergyValue: ['พลังงานและผลตอบแทน', 'EnergyValue.dc.html'], Members: ['สมาชิกองค์กร', 'Members.dc.html'], CreateWorkOrder: ['สร้างใบงาน', 'CreateWorkOrder.dc.html'], SiteDetail: ['ไซต์ทั้งหมด', 'Sites.dc.html'] };
+    var FROM = { Sites: ['ไซต์', 'Sites.dc.html'], Main: ['ภาพรวม', 'Main.dc.html'], EnergyValue: ['พลังงานและผลตอบแทน', 'EnergyValue.dc.html'], Members: ['สมาชิกองค์กร', 'Members.dc.html'], CreateWorkOrder: ['สร้างใบงาน', 'CreateWorkOrder.dc.html'], WorkOrders: ['งานล้าง', 'WorkOrders.dc.html'], Schedule: ['ปฏิทินรอบล้าง', 'Schedule.dc.html'], SiteDetail: ['ไซต์ทั้งหมด', 'Sites.dc.html'] };
     var fromKey = FROM[SS('sc.siteFormFrom')] ? SS('sc.siteFormFrom') : 'Sites';
     var from = FROM[fromKey];
     var backHref = editing ? 'SiteDetail.dc.html' : from[1];
@@ -267,13 +273,16 @@ class Component extends DCLogic {
       coverAria: self.state.coverFile ? 'ภาพปกไซต์: ' + self.state.coverFile + ' · กดเพื่อเปลี่ยน' : 'อัปโหลดภาพปกไซต์', coverNote: self.state.coverFile ? 'เลือก ' + self.state.coverFile + ' แล้ว · อัปโหลดเมื่อบันทึก' : '', hasCoverNote: !!self.state.coverFile,
       allowed: canEdit, blocked: !canEdit,
       blockTitle: editing ? 'แก้ไขไซต์ได้เฉพาะเจ้าของ ผู้ดูแลองค์กร และผู้จัดการไซต์นี้' : 'เพิ่มไซต์ได้เฉพาะเจ้าของและผู้ดูแลองค์กร',
-      blockText: 'คุณเป็น' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' }[org.role] || org.role) + ' ใน ' + org.name + ' จึง' + (editing ? 'ดูข้อมูลไซต์ได้แต่แก้ไขไม่ได้' : 'เพิ่มไซต์ใหม่ไม่ได้') + (editing ? ' ขอให้ Org Owner, Org Admin หรือ Site Manager ของไซต์นี้ทำแทน' : ' ขอให้ Org Owner หรือ Org Admin ขององค์กรทำแทน'),
+      blockText: 'คุณเป็น' + ({ 'Org Owner': 'เจ้าขององค์กร', 'Org Admin': 'ผู้ดูแลองค์กร', 'Site Manager': 'ผู้จัดการไซต์', 'Technician': 'ช่าง', 'Viewer': 'ผู้ดูอย่างเดียว' }[org.role] || org.role) + 'ขององค์กร ' + org.name + ' จึง' + (editing ? 'ดูข้อมูลไซต์ได้แต่แก้ไขไม่ได้' : 'เพิ่มไซต์ใหม่ไม่ได้') + (editing ? ' ขอให้เจ้าของ ผู้ดูแลองค์กร หรือผู้จัดการไซต์นี้ทำแทน' : ' ขอให้เจ้าของหรือผู้ดูแลองค์กรทำแทน'),
       pageTitle: editing ? 'แก้ไขไซต์' : 'เพิ่มไซต์',
       subtitle: editing ? (editRow[8] || editRow[0]) + ' · ' + org.name : 'ไซต์ใหม่จะอยู่ในองค์กร ' + org.name,
       backHref: backHref, backLabel: editing ? (editRow[8] || editRow[0]) : from[0], backLabelLong: editing ? 'กลับไปที่ ' + (editRow[8] || editRow[0]) : 'กลับไปที่' + from[0],
       adding: !editing, editingCyc: editing,
       goCyc: function (e) { if (e && e.type === 'keydown' && e.key !== 'Enter') return; try { var ss = window.sessionStorage; ss.setItem('sc.siteName', editRow ? editRow[0] : ''); ss.setItem('sc.siteTab', 'cycle'); } catch (x) {} }, cycNow: cycCur ? 'ทุก ' + cycCur + ' วัน' : 'ยังไม่ตั้ง',
-      orgName: org.name, viewers: org.viewers,
+      orgName: org.name, viewers: org.viewers, hasViewers: org.viewers.length > 0,
+      thumb: editing ? (SF_THUMB[editRow[0]] || (type + 'Type')) : '', hasThumb: editing,
+      coverCta: editing ? 'เปลี่ยนรูป · ลากรูปมาวาง หรือกดเพื่อเลือก' : 'ลากรูปมาวาง หรือกดเพื่อเลือก',
+      coverHint: editing ? 'รูปปัจจุบันของไซต์นี้ · ไม่เปลี่ยนก็ได้' : 'ข้ามได้ ระบบใช้รูปตามประเภทการติดตั้งแทน',
       saveLabel: editing ? 'บันทึกการแก้ไข' : 'บันทึกไซต์',
       saveHref: editing ? 'SiteDetail.dc.html' : newHref,
       saveStore: editing

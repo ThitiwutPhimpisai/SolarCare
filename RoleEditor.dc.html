@@ -26,11 +26,7 @@ button{cursor:pointer}
     <dc-import name="PageHeader" back-label="บทบาทและสิทธิ์" back-href="Roles.dc.html" icon="shield" title="{{pageTitle}}" hint-size="100%,76px"></dc-import>
 
     <sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
-      <section role="note" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-        <h2 style="margin: 0; font-size: 16px; display: flex; align-items: center; gap: 8px"><dc-import name="Icon" icon="lock" size="18" tone="muted" hint-size="18px,18px"></dc-import>สร้างหรือแก้บทบาทกำหนดเองได้เฉพาะ เจ้าขององค์กร และ ผู้ดูแลองค์กร</h2>
-        <p style="margin: 0; font-size: 14px; color: #374151">คุณเป็น {{youRole}} ใน {{orgName}} · ดูสิทธิ์ของแต่ละบทบาทได้ที่หน้าบทบาทและสิทธิ์</p>
-        <dc-import name="Button" icon="arrowLeft" label="กลับไปหน้าบทบาทและสิทธิ์" variant="secondary" href="Roles.dc.html" hint-size="200px,44px"></dc-import>
-      </section>
+      <dc-import name="LockedCard" title="สร้างหรือแก้บทบาทกำหนดเองได้เฉพาะเจ้าขององค์กรและผู้ดูแลองค์กร" role="{{youRole}}" org="{{orgName}}" note="ดูสิทธิ์ของแต่ละบทบาทได้ที่หน้าบทบาทและสิทธิ์" back-label="กลับไปหน้าบทบาทและสิทธิ์" back-href="Roles.dc.html" hint-size="100%,200px"></dc-import>
     </sc-if>
     <sc-if value="{{canManage}}" hint-placeholder-val="{{ true }}">
     <div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
@@ -189,7 +185,7 @@ class Component extends DCLogic {
     ];
     var isSite = s.level === 'site';
     var count = Object.keys(s.on).filter(function (k) { return s.on[k] && !(isSite && orgOnly[k]); }).length;
-    var lv = [['site', 'ระดับไซต์', 'มอบให้รายไซต์ผ่าน SiteAssignment'], ['org', 'ระดับองค์กร', 'มีผลทุกไซต์ในองค์กร']];
+    var lv = [['site', 'ระดับไซต์', 'มอบให้ทีละไซต์ที่หน้ารายละเอียดสมาชิก'], ['org', 'ระดับองค์กร', 'มีผลทุกไซต์ในองค์กร']];
     // edit mode changes a role people already hold; new/copy starts with nobody on it
     var modeNote = roleMode === 'edit' ? 'มีผลกับสมาชิกที่มีบทบาทนี้' : 'ยังไม่มีสมาชิกได้รับบทบาทนี้';
     var nm = String(s.roleName || '').trim();
